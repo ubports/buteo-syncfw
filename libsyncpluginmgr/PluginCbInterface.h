@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #ifndef PLUGINCBINTERFACE_H
 #define PLUGINCBINTERFACE_H
 
@@ -77,7 +76,7 @@ public:
 
     /*! \brief Destroys the given storage plug-in instance.
      *
-     * \param aPluginName Storage plug-in to destroy.
+     * \param aStorage Storage plug-in to destroy.
      */
     virtual void destroyStorage(StoragePlugin *aStorage) = 0;
 

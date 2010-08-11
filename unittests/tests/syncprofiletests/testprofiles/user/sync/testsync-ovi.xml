@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<profile name="testsync-ovi" type="sync" >
+
+    <key name="enabled" value="true" />
+
+    <profile type="service" name="ovi.com" >
+    </profile>
+
+    <profile name="hcalendar" type="storage" >
+        <key name="enabled" value="false" />
+	<key name="Notebook Name" value="Something" />
+    </profile>
+
+    <profile name="hcontacts" type="storage" >
+	<key name="enabled" value="true" />
+    </profile>
+    
+</profile>

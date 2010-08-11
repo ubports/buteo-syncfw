@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "PluginManager.h"
 
 #include <QDir>

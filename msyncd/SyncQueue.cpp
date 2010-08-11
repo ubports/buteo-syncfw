@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include "SyncQueue.h"
 #include "SyncSession.h"
 #include "SyncProfile.h"

@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef SERVERPLUGINRUNNER_H
 #define SERVERPLUGINRUNNER_H
 
@@ -82,6 +81,12 @@ public:
     //! @see PluginRunner::plugin
     virtual bool cleanUp();
 
+    // Suspend a server plug-in
+    void suspend();
+
+    // Resume a suspended server plug-in
+    void resume();
+
 private slots:
 
     // Slots for catching plug-in signals.
@@ -90,7 +95,7 @@ private slots:
 
     void onTransferProgress(const QString &aProfileName,
         Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-        const QString &aMimeType);
+        const QString &aMimeType, int aCommittedItems);
 
     void onStorageAccquired(const QString &aMimeType );
     void onError(const QString &aProfileName, const QString &aMessage, int aErrorCode);
@@ -112,7 +117,9 @@ private:
 
     ServerActivator *iServerActivator;
 
+#ifdef SYNCFW_UNIT_TESTS
     friend class ServerPluginRunnerTest;
+#endif
 
 };
 

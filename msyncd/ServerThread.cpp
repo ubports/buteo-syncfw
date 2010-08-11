@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include "ServerThread.h"
 #include "ServerPlugin.h"
 #include "LogMacros.h"

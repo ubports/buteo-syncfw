@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include "StorageBooker.h"
 #include <QMutexLocker>
 #include "LogMacros.h"

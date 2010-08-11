@@ -1,6 +1,6 @@
 <!--
 /*
- * This file is part of meego-sync-fw
+ * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
@@ -36,26 +36,49 @@
       <arg name="aTransferDatabase" type="i" direction="out"/>
       <arg name="aTransferType" type="i" direction="out"/>
       <arg name="aMimeType" type="s" direction="out"/>
+      <arg name="aCommittedItems" type="i" direction="out"/>
     </signal>
     <signal name="signalProfileChanged">
       <arg name="aProfileName" type="s" direction="out"/>
       <arg name="aChangeType" type="i" direction="out"/>
+      <arg name="aProfileAsXml" type="s" direction="out"/>
+    </signal>
+    <signal name="backupInProgress">
+    </signal>
+    <signal name="backupDone">
+    </signal>
+    <signal name="restoreInProgress">
+    </signal>
+    <signal name="restoreDone">
+    </signal>
+    <signal name="resultsAvailable">
+      <arg name="aProfileName" type="s" direction="out"/>
+      <arg name="aResultsAsXml" type="s" direction="out"/>
     </signal>
     <method name="startSync">
       <arg type="b" direction="out"/>
-      <arg name="aProfileName" type="s" direction="in"/>
+      <arg name="aProfileId" type="s" direction="in"/>
     </method>
     <method name="abortSync">
-      <arg name="aProfileName" type="s" direction="in"/>
+      <arg name="aProfileId" type="s" direction="in"/>
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
     </method>
-    <method name="profileChanged">
-      <arg name="aProfileName" type="s" direction="in"/>
-      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    <method name="addProfile">
+      <arg type="b" direction="out"/>
+      <arg name="aProfileAsXml" type="s" direction="in"/>
     </method>
-    <method name="profileDeleted">
-      <arg name="aProfileName" type="s" direction="in"/>
-      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    <method name="removeProfile">
+      <arg type="b" direction="out"/>
+      <arg name="aProfileId" type="s" direction="in"/>
+    </method>
+    <method name="updateProfile">
+      <arg type="b" direction="out"/>
+      <arg name="aProfileAsXml" type="s" direction="in"/>
+    </method>
+    <method name="saveSyncResults">
+      <arg type="b" direction="out"/>
+      <arg name="aProfileId" type="s" direction="in"/>
+      <arg name="aSyncResults" type="s" direction="in"/>
     </method>
     <method name="requestStorages">
       <arg type="b" direction="out"/>
@@ -67,6 +90,30 @@
     </method>
     <method name="runningSyncs">
       <arg type="as" direction="out"/>
+    </method>
+    <method name="getBackUpRestoreState">
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="setSyncSchedule">
+      <arg type="b" direction="out"/>
+      <arg name="aProfileId" type="s" direction="in"/>
+      <arg name="aScheduleAsXml" type="s" direction="in"/>
+    </method>
+    <method name="isLastSyncScheduled">
+      <arg type="b" direction="out"/>
+      <arg name="aProfileId" type="s" direction="in"/>
+    </method>
+    <method name="lastSyncMinorCode">
+      <arg name="aMinorCode" type="i" direction="out"/>
+      <arg name="aProfileId" type="s" direction="in"/>
+    </method>
+    <method name="lastSyncMajorCode">
+      <arg name="aMajorCode" type="i" direction="out"/>
+      <arg name="aProfileId" type="s" direction="in"/>
+    </method>
+    <method name="lastSyncTime">
+      <arg name="aTimeAsString" type="s" direction="out"/>
+      <arg name="aProfileId" type="s" direction="in"/>
     </method>
   </interface>
 </node>

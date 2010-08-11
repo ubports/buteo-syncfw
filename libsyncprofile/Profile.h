@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef PROFILE_H
 #define PROFILE_H
 
@@ -56,10 +55,20 @@ public:
 
     //! String constants for different profile type names.
     static const QString TYPE_CLIENT;
+    //! Server type .
     static const QString TYPE_SERVER;
+    //! Storage type
     static const QString TYPE_STORAGE;
+    //! Service type
     static const QString TYPE_SERVICE;
+    //! Sync type
     static const QString TYPE_SYNC;
+	
+   /*! \brief Default Constructor
+    *
+    */
+   Profile();
+
 
     /*! \brief Constructs a Profile object with given name and type.
      *
@@ -96,11 +105,23 @@ public:
      */
     QString name() const;
 
+    /*! \brief Gets the display name of the profile.
+     *
+     * \return Profile display name.
+     */
+    QString displayname() const;
+
     /*! \brief Sets the name of the profile.
      *
      * \param aName Name of the profile.
      */
     virtual void setName(const QString &aName);
+    
+    /*! \brief Sets the name of the profile.
+     *
+     * \param aKeys Keys required to generate the profile name.
+     */
+    virtual void setName(const QStringList &aKeys);
 
     /*! \brief Gets the type of the profile.
      *
@@ -260,6 +281,9 @@ public:
      */
     Profile *subProfile(const QString &aName, const QString &aType = "");
 
+    /*! \brief const method for subProfile \see Profile::subProfile
+     *
+     */
     const Profile *subProfile(const QString &aName, const QString &aType = "") const;
 
     /*! \brief Gets a sub-profile by key value.
@@ -283,6 +307,11 @@ public:
      */
     QList<Profile*> allSubProfiles();
 
+    /*! \brief Gets all sub-profiles as const
+     *
+     * \return List of sub-profiles. The returned sub-profiles are const and are owned by the main
+     *  profile and the user must not delete them.
+     */
     QList<const Profile*> allSubProfiles() const;
 
     /*! \brief Merges a profile to this profile.
@@ -348,7 +377,18 @@ private:
 
     ProfilePrivate *d_ptr;
 
+    /*! \brief Generates a profile id based on keys
+     *
+     * \param aKeys List of keys to generate profile id
+     * \returns Profile name
+     *
+     */ 
+    QString generateProfileId(const QStringList &aKeys);
+
+#ifdef SYNCFW_UNIT_TESTS
     friend class ProfileTest;
+#endif
+
 };
 
 }

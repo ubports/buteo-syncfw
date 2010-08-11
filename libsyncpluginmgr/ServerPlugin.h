@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #ifndef SERVERPLUGIN_H_4399340943904399349843
 #define SERVERPLUGIN_H_4399340943904399349843
 
@@ -67,6 +66,18 @@ public:
      */
     virtual void stopListen() = 0;
 
+    /*! \brief Suspend activity
+     *
+     * Implement this if upon being asked to suspend for some reason, any ongoing
+     * activity can be suspended
+     */
+    virtual void suspend() = 0;
+
+    /*! \brief Resume suspended activity
+     *
+     */
+    virtual void resume() = 0;
+
 signals:
 
     /*! \brief Signal sent when a new sync session is received by the server
@@ -78,6 +89,7 @@ signals:
 
 protected:
 
+    //! Profile Object that the server plugin operates on
     Profile iProfile;
 };
 

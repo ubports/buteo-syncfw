@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef SYNCSCHEDULE_H
 #define SYNCSCHEDULE_H
 
@@ -77,6 +75,12 @@ public:
      * \return Root element of the created XML.
      */
     QDomElement toXml(QDomDocument &aDoc) const;
+	
+	/*! \brief Exports the sync schedule to QString.
+     *
+     * \return return the Schedule as xml formatted string
+     */
+    QString toString() const;
 
     /*! \brief Gets the enabled week days of the sync schedule.
      *
@@ -186,7 +190,9 @@ private:
 
     SyncSchedulePrivate* d_ptr;
 
+#ifdef SYNCFW_UNIT_TESTS
     friend class SyncScheduleTest;
+#endif
 
 };
 

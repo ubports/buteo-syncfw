@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "SyncProfile.h"
 #include "ProfileEngineDefs.h"
 #include "LogMacros.h"
@@ -124,6 +123,18 @@ void SyncProfile::setName(const QString &aName)
   // reflect there
   if (d_ptr->iLog)
     d_ptr->iLog->setProfileName(aName);
+}
+
+void SyncProfile::setName(const QStringList &aKeys)
+{
+  // sets the name in the super class Profile.
+
+  Profile::setName(aKeys);
+  // Here we also must set name for the log associated to this profile, 
+  // as that is only set during log construction. Changing SyncProfile name does not 
+  // reflect there
+  if (d_ptr->iLog)
+    d_ptr->iLog->setProfileName(Profile::name());
 }
 
 
@@ -456,13 +467,13 @@ SyncProfile::ConflictResolutionPolicy SyncProfile::conflictResolutionPolicy() co
         policyStr = client->key(KEY_CONFLICT_RESOLUTION_POLICY);
     } // no else
 
-    if (policyStr == VALUE_PREFER_CLIENT)
+    if (policyStr == VALUE_PREFER_REMOTE)
     {
-        policy = CR_POLICY_PREFER_CLIENT;
+        policy = CR_POLICY_PREFER_REMOTE_CHANGES;
     }
-    else if (policyStr == VALUE_PREFER_SERVER)
+    else if (policyStr == VALUE_PREFER_LOCAL)
     {
-        policy = CR_POLICY_PREFER_SERVER;
+        policy = CR_POLICY_PREFER_LOCAL_CHANGES;
     }
     else
     {
@@ -478,12 +489,12 @@ void SyncProfile::setConflictResolutionPolicy(ConflictResolutionPolicy aPolicy)
 
     switch (aPolicy)
     {
-    case CR_POLICY_PREFER_CLIENT:
-        policyStr = VALUE_PREFER_CLIENT;
+    case CR_POLICY_PREFER_REMOTE_CHANGES:
+        policyStr = VALUE_PREFER_REMOTE;
         break;
 
-    case CR_POLICY_PREFER_SERVER:
-        policyStr = VALUE_PREFER_SERVER;
+    case CR_POLICY_PREFER_LOCAL_CHANGES:
+        policyStr = VALUE_PREFER_LOCAL;
         break;
 
     case CR_POLICY_UNDEFINED:

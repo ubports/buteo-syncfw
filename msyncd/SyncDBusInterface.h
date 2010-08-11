@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef SYNCDBUSINTERFACE_H
 #define SYNCDBUSINTERFACE_H
 
@@ -65,11 +63,12 @@ signals:
      *  same sync session.
      * \param aMessage A message describing the status change in detail. This
      *  can for example be shown to the user or written to a log
-     * \param aErrorCode When aStatus is ERROR, this parameter contains a
-     *  specific error code.
+     * \param aMoreDetails
+     *  When aStatus is ERROR, this parameter contains a specific error code.
+     *  When aStatus is PROGRESS, this parameter contains more details about the progress
      */
     void syncStatus(QString aProfileName, int aStatus,
-                    QString aMessage, int aErrorCode);
+                    QString aMessage, int aMoreDetails);
 
     /*! \brief Notifies about progress in transferring items
      *
@@ -83,9 +82,11 @@ signals:
      *      2 (DELETION): Deletion was made to database
      *      3 (ERROR): Addition/Modification/Deletion was attempted, but it failed
      * \param aMimeType Mime type of the processed item
+     * \param aCommittedItems No. of Items committed for this operation
      */
+
     void transferProgress(QString aProfileName, int aTransferDatabase,
-                          int aTransferType , QString aMimeType);
+                          int aTransferType , QString aMimeType, int aCommittedItems);
 
     /*! \brief Notifies about a change in profile.
      *
@@ -96,9 +97,49 @@ signals:
      *      0 (ADDITION): Profile was added.
      *      1 (MODIFICATION): Profile was modified.
      *      2 (DELETION): Profile was deleted.
+     * \param aProfileAsXml Updated Profile Object is sent as xml
+     *
      */
-    void signalProfileChanged(QString aProfileName, int aChangeType);
+    void signalProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
+    
+   
+    /*! \brief Notifies about Backup start.
+     *
+     * This signal is sent when the backup framework is backing the sync related
+     * data
+     */
+    void backupInProgress ();
+    
+    /*! \brief Notifies about Backup done.
+     *
+     * This signal is sent when the backup framework has completed backing the sync related
+     * data.
+     */
+    void backupDone();
+    
+    /*! \brief Notifies about Restore start.
+     *
+     * This signal is sent when the backup framework is restoring the sync related
+     * data
+     */
+    void restoreInProgress();
+    
+    /*! \brief Notifies about Restore Done.
+     *
+     * This signal is sent when the backup framework has restored the sync related
+     * data
+     */
+    void restoreDone();
 
+    /*! \brief Notifies about the availability of Results for a recent sync
+     *
+     * This signal is sent when the results are available for the last sync
+     * only recent results ( SyncResults object) are sent as xml.
+     * \param aProfileName Name of the profile for which results are available
+     * \param aResultsAsXml results as an xml object
+     */
+    void resultsAvailable(QString aProfileName , QString aResultsAsXml);
+ 
 public slots:
 
     /*!
@@ -111,11 +152,11 @@ public slots:
      * adds the sync request to a sync queue. Otherwise a sync session is
      * started immediately.
      *
-     * \param aProfileName Name of the profile to use in sync.
-     * \return True if a profile with the given name was found. Otherwise
+     * \param aProfileId Id of the profile to use in sync.
+     * \return True if a profile with the given id was found. Otherwise
      *  false and no status change signals will follow from this request.
      */
-    virtual bool startSync(QString aProfileName) = 0;
+    virtual bool startSync(QString aProfileId) = 0;
 
     /*!
      * \brief Stops synchronizing the profile with the given name.
@@ -123,23 +164,34 @@ public slots:
      * If the sync request is still in queue and not yet started, the queue
      * entry is removed.
      *
-     * \param aProfileName Name of the profile to stop syncing.
+     * \param aProfileId Name of the profile to stop syncing.
      */
-    virtual Q_NOREPLY void abortSync(QString aProfileName) = 0;
+    virtual Q_NOREPLY void abortSync(QString aProfileId) = 0;
+
+    /*!
+     * \brief This function should be called when a new profile has to be created.
+     *
+     * \param aProfileAsXml Profile Object sent as xml over dbus
+     * \return status of the add operation
+     */
+    virtual bool addProfile(QString aProfileAsXml) = 0;
+
+    /*!
+     * \brief This function should be called when sync profile has to be deleted
+     *
+     * \param aProfileId Id of the profile to be deleted.
+     * \return status of the remove operation
+     */
+    virtual bool removeProfile(QString aProfileId) = 0;
 
     /*!
      * \brief This function should be called when sync profile information has
      *  been changed by someone else than the sync daemon.
      *
-     * This way the daemon knows to update its information and for example
-     * verify if automatic synchronization settings have changed and take
-     * appropriate actions. Call this function also if a profile is deleted or
-     * a new profile is added.
-     *
-     * \param aProfileName Name of the modified profile. If this is empty, sync
-     *  daemon should refresh information of all profiles.
+     * \param aProfileAsXml - Modified Profile Object as XML.
+     * \return status of the update operation
      */
-    virtual Q_NOREPLY void profileChanged(QString aProfileName) = 0;
+    virtual bool updateProfile(QString aProfileAsXml) = 0;
 
     /*!
      * \brief Requests sync daemon to reserve storages for the caller.
@@ -174,6 +226,62 @@ public slots:
      * \return Profile name list.
      */
     virtual QStringList runningSyncs() = 0;
+    
+    
+    /*!
+     * \brief This function returns true if backup/restore in progress else
+     * false.
+     */
+    virtual bool  getBackUpRestoreState() = 0;
+	
+	
+	/*!
+     * \brief sets the schedule for a profile
+     *
+     * This Function helps in setting a schedule to profile
+     * this Function is to be used by the SyncInterface Client Library to
+     * expose a user friendly API  by abstracting the dbus mechanisms
+     * involved with synchronizer
+     *
+     * \param aProfileId - Id of the profile for which schedule has to be set
+     * \param aScheduleAsXml - Over the dbus the schedule object is transmitted as xml
+     *
+     * \return bool - status of the operation
+     */
+    virtual bool setSyncSchedule(QString aProfileId , QString aScheduleAsXml) = 0;
+
+    /*!
+     * \brief Save SyncResults to log.xml file.
+     * \param aProfileId to save result in corresponding file.
+     * \param aSyncResults to save in the \code <profileId>.log.xml. \endcode
+     * \return status of the saveSyncResults
+     */
+    virtual bool saveSyncResults(QString aProfileId,QString aSyncResults) = 0;
+
+    /*! \brief Gets the Major code for the last.
+     *
+     * \return Major code.
+     */
+    virtual int lastSyncMajorCode(const QString &aProfileId) = 0;
+
+    /*! \brief Gets the Minor code for the last.
+     *
+     * \return Minor code.
+     */
+    virtual int lastSyncMinorCode(const QString &aProfileId) = 0;
+
+    /*! \brief Gets the time of last completed sync session with this profile.
+     *
+     * \return Last sync time. Null object if this could not be determined.
+     */
+    virtual QString lastSyncTime(const QString &aProfileId) = 0;
+
+    /*! \brief Checks if the results are from a scheduled sync.
+     *
+     * \return True if scheduled.
+     */
+    virtual bool isLastSyncScheduled(const QString &aProfileId)= 0;
+
 
 };
 

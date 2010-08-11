@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profile type="sync" name="ovi-calendar">
+    <key value="true" name="enabled"/>
+    <profile type="service" name="ovi.com"/>
+    <profile type="storage" name="hcalendar">
+        <key value="myNotebook" name="Notebook Name"/>
+        <key value="true" name="enabled"/>
+    </profile>
+    <profile type="storage" name="hcontacts"/>
+    <schedule interval="0" days="" time="">
+        <rush begin="" enabled="false" interval="0" end="" days=""/>
+    </schedule>
+</profile>

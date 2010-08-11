@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef PROFILEFACTORY_H
 #define PROFILEFACTORY_H
 

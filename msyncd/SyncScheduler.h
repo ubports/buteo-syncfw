@@ -20,15 +20,13 @@
  * 02110-1301 USA
  *
  */
-
 #ifndef SYNCSCHEDULER_H
 #define SYNCSCHEDULER_H
 
 #include <QObject>
 #include <QMap>
-//#include <alarmd/libalarm.h>
-#include "SyncAlarmInventory.h"
 #include <ctime>
+#include "SyncAlarmInventory.h"
 
 class QDateTime;
 
@@ -37,19 +35,14 @@ namespace Buteo {
 class SyncSession;
 class SyncSchedulerTest;
 class SyncProfile;
-//class IPHeartBeat;
+class IPHeartBeat;
 
+/*! \brief SyncScheduler Object to be used to set Schedule via the framework */
 class SyncScheduler : public QObject
 {
     Q_OBJECT
 
 public:
-
-    // D-Bus string constants.
-    static const char* DBUS_INTERFACE;
-    static const char* DBUS_SERVICE;
-    static const char* DBUS_OBJECT;
-    static const char* DBUS_NAME;
 
     //! \brief Constructor.
     SyncScheduler(QObject *aParent = 0);
@@ -89,7 +82,8 @@ public slots:
      * 
      * @param aAlarmEventID an ID that identifies the triggered alarm event
      */
-    void doAlarmActions(long aAlarmEventID);
+
+    void doAlarmActions(int aAlarmEventID);
     
     /**
      * \brief Performs needed actions when a IP heart beat is triggered
@@ -116,15 +110,6 @@ private: // functions
      */
     int setNextAlarm(const SyncProfile* aProfile);
     
-    /**
-     * \brief Sets alarm action options
-     */
-    //void setupAlarmActions();
-    
-    /**
-     * \brief Sets alarm event options
-     */
-    //void setupAlarmEvent(alarm_event_t* aEvent);
     
     /**
      * \brief Creates a DBUS adaptor for the scheduler
@@ -142,37 +127,21 @@ private: // functions
      */
     void removeAllAlarms();
     
-    /**
-     * \brief Allocates a new alarm event
-     * @return A pointer to allocated alarm event
-     */
-    //alarm_event_t* createAlarmEvent();
-    
-    /**
-     * \brief Deletes an allocated alarm event
-     * @param aEvent The event to be deleted
-     */
-    void deleteAlarmEvent(int aEventId);
-    
 private: // data
     
     /// A list of sync schedule profiles
     QMap<QString, int> iSyncScheduleProfiles; 
-    
-    /// Alarm action parameters for an alarm event
-    //alarm_action_t*         iAlarmActionParameters;
-    
-    /// An alarm event parameter object which is used to enqueue an alarm to alarmd
-    //alarm_event_t*          iAlarmEventParameters;
-    
-    // Alarm factory object
-    SyncAlarmInventory      *iAlarmInventory;
 
+    /// Alarm factory object
+    SyncAlarmInventory      *iAlarmInventory;
+    
     /// IP Heartbeat management object
-    //IPHeartBeat*            iIPHeartBeatMan;
-    
+    IPHeartBeat*            iIPHeartBeatMan;
+
+#ifdef SYNCFW_UNIT_TESTS
     friend class SyncSchedulerTest;
-    
+#endif
+
 };
 
 }

@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include "ProfileFactory.h"
 
 #include <QDomDocument>

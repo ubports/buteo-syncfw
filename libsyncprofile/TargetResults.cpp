@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include "TargetResults.h"
 #include "ProfileEngineDefs.h"
 #include <QDomDocument>

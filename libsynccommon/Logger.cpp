@@ -22,13 +22,14 @@
  */
 
 
-
 #include "Logger.h"
 #include <QMutexLocker>
 #include <iostream>
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
+
+#include <syslog.h>
 
 using namespace Buteo;
 
@@ -54,7 +55,15 @@ void Logger::createInstance(const QString &aLogFileName, bool aUseStdOut,
                             int aIndentSize)
 {
     deleteInstance();
-    sInstance = new Logger(aLogFileName, aUseStdOut, aIndentSize);
+#ifndef QT_NO_DEBUG
+	sInstance = new Logger(aLogFileName, aUseStdOut, aIndentSize);
+#else
+    if (QFile::exists(aLogFileName)){
+	    sInstance = new Logger(aLogFileName, aUseStdOut, aIndentSize);
+    } else {
+	    sInstance = new Logger(QString(), aUseStdOut, aIndentSize);
+    }
+#endif
 }
 
 void Logger::deleteInstance()
@@ -116,10 +125,15 @@ Logger::~Logger()
 bool  Logger::setLogLevel(int aLevel)
 {
 	bool retVal = false;
-    if ((aLevel >= FIRST_CUSTOM_LEVEL)  && (aLevel < NUM_LEVELS))
+    if ((aLevel > 0)  && (aLevel <= NUM_LEVELS))
     {
 		disable(iEnabledLevels);
-        enable(QBitArray(aLevel + 1, true));
+        QBitArray iLevels(NUM_LEVELS, false);
+        for(int i = aLevel; i > 0; i--)
+        {
+            iLevels.setBit(NUM_LEVELS - i);
+        }
+        enable(iLevels);
         retVal = true;
     } // no else
     return retVal;
@@ -163,21 +177,26 @@ void Logger::write(int aLevel, const char *aMsg)
         "Warning: ",
         "Critical: ",
         "Fatal: ",
-        "[FATAL] ",
-        "[CRITICAL] ",
-        "[WARNING] ",
-        "[PROTOCOL] " ,
-        "[INFO] ",
-        "[DEBUG] ",
-        "[TRACE] "
     };
+
+    int syslogLevel[NUM_LEVELS] = {
+	    LOG_DEBUG,
+	    LOG_WARNING,
+	    LOG_CRIT,
+	    LOG_CRIT,
+    } ;
 
     QMutexLocker lock(&iMutex);
 
     // Verify that the log message can and should be written.
-    if (aLevel < 0 || aLevel >= NUM_LEVELS || !iEnabledLevels.testBit(aLevel))
+    if (aLevel < QtDebugMsg || aLevel > QtFatalMsg || !iEnabledLevels.testBit(aLevel))
         return;
 
+    // We don't make use of format specifiers in our logs, but syslog (vprintf) might interpret any % as part of
+    // a format specifier and might fail (crash) when it doesn't find values corresponding to the format, prevent that.
+    QString sysLogMsg = QString::fromLocal8Bit(aMsg);
+    sysLogMsg = sysLogMsg.remove("%");
+    syslog (syslogLevel[aLevel], sysLogMsg.toLocal8Bit().data());
     if (iFileStream != 0)
     {
         *iFileStream << QString(iIndentLevel, ' ') << levelTexts[aLevel] <<
@@ -185,7 +204,7 @@ void Logger::write(int aLevel, const char *aMsg)
         iFileStream->flush();
     }
 
-    if (aLevel >= LEVEL_FATAL && aLevel <= LEVEL_WARNING)
+    if (aLevel != QtDebugMsg)
     {
         if (iStdErrStream != 0)
         {
@@ -201,10 +220,11 @@ void Logger::write(int aLevel, const char *aMsg)
         iStdOutStream->flush();
     }
 
-    if (LEVEL_FATAL == aLevel || QtFatalMsg == aLevel)
+    if (QtFatalMsg == aLevel)
     {
         // Exit on fatal message.
         abort();
     } // no else
 }
+
 

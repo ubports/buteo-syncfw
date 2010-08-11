@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #include "SyncPluginBase.h"
 #include "PluginCbInterface.h"
 

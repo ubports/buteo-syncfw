@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<service id="ovi-sync">
+  <type>Sync</type>
+  <provider>ovi</provider>
+  <name>OviSync</name>
+  <icon>icon_syncl</icon>
+
+  <template>
+    <parameters>
+      <setting name="Host">www.ovi.com</setting>
+    </parameters>
+    <setting name="enabled" type="b">true</setting>
+  </template>
+
+  <ui>
+    <layout type ="linear">
+      <layout type ="linear">
+	<widget type="string" key="Host"/>
+      </layout>
+    </layout>
+  </ui>
+</service>
+

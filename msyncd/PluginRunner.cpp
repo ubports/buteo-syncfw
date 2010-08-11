@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "PluginRunner.h"
 #include "LogMacros.h"
 

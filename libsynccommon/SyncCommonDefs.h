@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef SYNCCOMMONDEFS_H
 #define SYNCCOMMONDEFS_H
 
@@ -36,7 +35,17 @@ enum SyncStatus {
     SYNC_ERROR,
     SYNC_DONE,
     SYNC_ABORTED,
+    SYNC_CANCELLED,
+    SYNC_STOPPING,
     SYNC_NOTPOSSIBLE
+};
+
+// UI needs to display a detailed Progress for the Current ongoing sync
+enum SyncProgressDetail {
+	SYNC_PROGRESS_INITIALISING = 201,
+	SYNC_PROGRESS_SENDING_ITEMS ,
+	SYNC_PROGRESS_RECEIVING_ITEMS,
+	SYNC_PROGRESS_FINALISING
 };
 
 enum TransferDatabase {

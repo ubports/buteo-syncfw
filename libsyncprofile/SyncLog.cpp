@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include "SyncLog.h"
 #include "LogMacros.h"
 #include <QDomDocument>
@@ -138,7 +136,7 @@ QDomElement SyncLog::toXml(QDomDocument &aDoc) const
 
 const SyncResults* SyncLog::lastResults() const
 {
-  FUNCTION_CALL_TRACE;
+    FUNCTION_CALL_TRACE;
     if (d_ptr->iResults.isEmpty()) {
         return 0;
     }
@@ -154,7 +152,7 @@ QList<const SyncResults*> SyncLog::allResults() const
 
 void SyncLog::addResults(const SyncResults &aResults)
 {
-  FUNCTION_CALL_TRACE;
+    FUNCTION_CALL_TRACE;
     // To prevent the log growing too much, the maximum number of entries in 
     //the log is defined
     const int MAXLOGENTRIES = 5;

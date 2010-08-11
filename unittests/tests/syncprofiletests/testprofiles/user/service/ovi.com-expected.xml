@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profile type="service" name="ovi.com">
+    <key value="your_password" name="Password"/>
+    <key value="https://sync.ovi.com:443/services/syncml" name="Remote database"/>
+    <key value="your_username" name="Username"/>
+    <key value="online" name="destinationtype"/>
+    <key value="" name="http_proxy_host"/>
+    <key value="" name="http_proxy_port"/>
+    <profile type="client" name="syncml">
+        <key value="HTTP" name="Sync Transport"/>
+        <key value="false" name="WantB64"/>
+        <key value="false" name="use_wbxml"/>
+    </profile>
+    <profile type="storage" name="hcalendar">
+        <key value="vcalendar" name="Calendar Format"/>
+        <key value="./EventTask/Tasks" name="Target URI"/>
+    </profile>
+</profile>

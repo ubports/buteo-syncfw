@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "ClientPluginRunner.h"
 #include "ClientThread.h"
 #include "ClientPlugin.h"
@@ -96,8 +95,8 @@ bool ClientPluginRunner::init()
 
     // Connect signals from the plug-in.
 
-    connect(iPlugin, SIGNAL(transferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &)),
-        this, SLOT(onTransferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &)));
+    connect(iPlugin, SIGNAL(transferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &, int)),
+        this, SLOT(onTransferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &, int)));
 
     connect(iPlugin, SIGNAL(error(const QString &, const QString &, int)),
         this, SLOT(onError(const QString &, const QString &, int)));
@@ -107,8 +106,11 @@ bool ClientPluginRunner::init()
 
     connect(iPlugin, SIGNAL(accquiredStorage(const QString &)),
         this, SLOT(onStorageAccquired(const QString &)));
-    // Connect signals from the thread.
 
+    connect(iPlugin,SIGNAL(syncProgressDetail(const QString &,int)),
+    		this ,SLOT(onSyncProgressDetail(const QString &,int)));
+
+    // Connect signals from the thread.
     connect(iThread, SIGNAL(initError(const QString &, const QString &, int)),
         this, SLOT(onError(const QString &, const QString &, int)));
 
@@ -190,11 +192,11 @@ bool ClientPluginRunner::cleanUp()
 
 void ClientPluginRunner::onTransferProgress(const QString &aProfileName,
     Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-    const QString &aMimeType)
+    const QString &aMimeType, int aCommittedItems)
 {
     FUNCTION_CALL_TRACE;
 
-    emit transferProgress(aProfileName, aDatabase, aType, aMimeType);
+    emit transferProgress(aProfileName, aDatabase, aType, aMimeType, aCommittedItems);
 }
 
 void ClientPluginRunner::onError(const QString &aProfileName,
@@ -222,6 +224,14 @@ void ClientPluginRunner::onStorageAccquired(const QString &aMimeType )
 
     emit storageAccquired(aMimeType);
 }
+
+void ClientPluginRunner::onSyncProgressDetail(const QString &aProfileName,int aProgressDetail)
+{
+	FUNCTION_CALL_TRACE;
+
+	emit syncProgressDetail(aProfileName,aProgressDetail);
+}
+
 
 void ClientPluginRunner::onThreadExit()
 {

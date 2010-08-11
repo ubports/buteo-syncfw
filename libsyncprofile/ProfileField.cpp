@@ -21,39 +21,53 @@
  *
  */
 
-
 #include "ProfileField.h"
 #include "ProfileEngineDefs.h"
 #include <QDomDocument>
 
 namespace Buteo {
 
+//! ProfileField Visbility Const string for always
 const QString ProfileField::VISIBLE_ALWAYS = "always";
+
+//! ProfileField Visbility Const string for never
 const QString ProfileField::VISIBLE_NEVER = "never";
+
+//! ProfileField Visbility Const string for user
 const QString ProfileField::VISIBLE_USER = "user";
 
+//! ProfileField Visbility Const string for boolean
 const QString ProfileField::TYPE_BOOLEAN = "boolean";
 
 // Private implementation class for ProfileField.
 class ProfileFieldPrivate
 {
 public:
+	//! \brief Constructor
     ProfileFieldPrivate();
 
+    //! \brief Copy Constructor
     ProfileFieldPrivate(const ProfileFieldPrivate &aSource);
 
+    //! \brief Name of the ProfileField
     QString iName;
 
+    //! \brief Type of the ProfileField
     QString iType;
 
+    //! \brief DefaultValue of the ProfileField
     QString iDefaultValue;
 
+    //! \brief List of Options of the ProfileField
     QStringList iOptions;
 
+    //! \brief Label of the ProfileField
     QString iLabel;
 
+    //! \brief Visibility of the ProfileField
     QString iVisible;
 
+    //! \brief Write Access Specifier of the ProfileField
     bool iReadOnly;
 };
 

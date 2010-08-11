@@ -1,0 +1,55 @@
+TEMPLATE = lib
+TARGET = hdummy-server
+DEPENDPATH += .
+INCLUDEPATH += . \
+    ../../.. \
+    ../../../libsynccommon \
+    ../../../libsyncpluginmgr \
+    ../../../libsyncprofile
+
+CONFIG += plugin silent
+
+QT -= gui
+
+#input
+HEADERS += DummyServer.h
+
+SOURCES += DummyServer.cpp
+
+#clean
+QMAKE_CLEAN += $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2)
+QMAKE_CLEAN += $(OBJECTS_DIR)/*.gcda $(OBJECTS_DIR)/*.gcno $(OBJECTS_DIR)/*.gcov $(OBJECTS_DIR)/moc_*
+
+target.path = /usr/share/sync-fw-tests/
+INSTALLS += target
+
+# #####################################################################
+# make coverage (debug)
+# #####################################################################
+coverage.CONFIG += recursive
+QMAKE_EXTRA_TARGETS += coverage
+CONFIG(debug,debug|release){
+    QMAKE_EXTRA_TARGETS += cov_cxxflags \
+			cov_lflags
+
+    cov_cxxflags.target = coverage
+    cov_cxxflags.depends = CXXFLAGS \
+         += \
+        -fprofile-arcs \
+        -ftest-coverage
+
+    cov_lflags.target = coverage
+    cov_lflags.depends = LFLAGS \
+        += \
+        -fprofile-arcs \
+	-ftest-coverage
+
+    coverage.commands = @echo \
+        "Built with coverage support..."
+
+    build_pass|!debug_and_release : coverage.depends = all
+
+    QMAKE_CLEAN += $(OBJECTS_DIR)/*.gcda \
+        $(OBJECTS_DIR)/*.gcno \
+        $(OBJECTS_DIR)/*.gcov
+}

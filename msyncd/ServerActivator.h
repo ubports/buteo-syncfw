@@ -107,7 +107,7 @@ public slots:
     /*! \brief Called when transport state changes
      *
      * @param aType Connectivity type
-     * @oaran aState New state
+     * @param aState New state
      */
     void onConnectivityStateChanged(Sync::ConnectivityType aType, bool aState);
 
@@ -127,7 +127,10 @@ private:
 
     QMap<QString, ServerData> iServers;
 
+#ifdef SYNCFW_UNIT_TESTS
     friend class ServerActivatorTest;
+#endif
+
 };
 
 }

@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef CLIENTPLUGINRUNNER_H
 #define CLIENTPLUGINRUNNER_H
 
@@ -78,19 +77,22 @@ public:
 
     //! @see PluginRunner::plugin
     virtual bool cleanUp();
+
 private slots:
 
     // Slots for catching plug-in signals.
 
     void onTransferProgress(const QString &aProfileName,
         Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-        const QString &aMimeType);
+        const QString &aMimeType, int aCommittedItems);
 
     void onError(const QString &aProfileName, const QString &aMessage, int aErrorCode);
 
     void onSuccess(const QString &aProfileName, const QString &aMessage);
 
     void onStorageAccquired(const QString &aMimeType);
+
+    void onSyncProgressDetail(const QString &aProfileName,int aProgressDetail);
 
     // Slot for observing thread exit
     void onThreadExit();
@@ -103,7 +105,10 @@ private:
 
     ClientThread *iThread;
     
+#ifdef SYNCFW_UNIT_TESTS
     friend class ClientPluginRunnerTest;
+#endif
+
 };
 
 }

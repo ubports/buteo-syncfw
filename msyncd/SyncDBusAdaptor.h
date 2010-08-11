@@ -32,8 +32,8 @@
  * before re-generating it.
  */
 
-#ifndef SYNCDBUSADAPTOR_H_1275837207
-#define SYNCDBUSADAPTOR_H_1275837207
+#ifndef SYNCDBUSADAPTOR_H_1280214486
+#define SYNCDBUSADAPTOR_H_1280214486
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -44,9 +44,8 @@ class QString;
 class QStringList;
 class QVariant;
 
-namespace Buteo {
-/*
- * Adaptor class for interface com.nokia.msyncd
+/*!
+ * \brief Adaptor class for interface com.nokia.msyncd
  */
 class SyncDBusAdaptor: public QDBusAbstractAdaptor
 {
@@ -69,22 +68,40 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "    <signal name=\"signalProfileChanged\">\n"
 "      <arg direction=\"out\" type=\"s\" name=\"aProfileName\"/>\n"
 "      <arg direction=\"out\" type=\"i\" name=\"aChangeType\"/>\n"
+"      <arg direction=\"out\" type=\"s\" name=\"aProfileAsXml\"/>\n"
+"    </signal>\n"
+"    <signal name=\"backupInProgress\"/>\n"
+"    <signal name=\"backupDone\"/>\n"
+"    <signal name=\"restoreInProgress\"/>\n"
+"    <signal name=\"restoreDone\"/>\n"
+"    <signal name=\"resultsAvailable\">\n"
+"      <arg direction=\"out\" type=\"s\" name=\"aProfileName\"/>\n"
+"      <arg direction=\"out\" type=\"s\" name=\"aResultsAsXml\"/>\n"
 "    </signal>\n"
 "    <method name=\"startSync\">\n"
 "      <arg direction=\"out\" type=\"b\"/>\n"
-"      <arg direction=\"in\" type=\"s\" name=\"aProfileName\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
 "    </method>\n"
 "    <method name=\"abortSync\">\n"
-"      <arg direction=\"in\" type=\"s\" name=\"aProfileName\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
 "      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
 "    </method>\n"
-"    <method name=\"profileChanged\">\n"
-"      <arg direction=\"in\" type=\"s\" name=\"aProfileName\"/>\n"
-"      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
+"    <method name=\"addProfile\">\n"
+"      <arg direction=\"out\" type=\"b\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileAsXml\"/>\n"
 "    </method>\n"
-"    <method name=\"profileDeleted\">\n"
-"      <arg direction=\"in\" type=\"s\" name=\"aProfileName\"/>\n"
-"      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
+"    <method name=\"removeProfile\">\n"
+"      <arg direction=\"out\" type=\"b\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
+"    </method>\n"
+"    <method name=\"updateProfile\">\n"
+"      <arg direction=\"out\" type=\"b\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileAsXml\"/>\n"
+"    </method>\n"
+"    <method name=\"saveSyncResults\">\n"
+"      <arg direction=\"out\" type=\"b\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aSyncResults\"/>\n"
 "    </method>\n"
 "    <method name=\"requestStorages\">\n"
 "      <arg direction=\"out\" type=\"b\"/>\n"
@@ -97,26 +114,111 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "    <method name=\"runningSyncs\">\n"
 "      <arg direction=\"out\" type=\"as\"/>\n"
 "    </method>\n"
+"    <method name=\"getBackUpRestoreState\">\n"
+"      <arg direction=\"out\" type=\"b\"/>\n"
+"    </method>\n"
+"    <method name=\"setSyncSchedule\">\n"
+"      <arg direction=\"out\" type=\"b\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aScheduleAsXml\"/>\n"
+"    </method>\n"
+"    <method name=\"isLastSyncScheduled\">\n"
+"      <arg direction=\"out\" type=\"b\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
+"    </method>\n"
+"    <method name=\"lastSyncMinorCode\">\n"
+"      <arg direction=\"out\" type=\"i\" name=\"aMinorCode\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
+"    </method>\n"
+"    <method name=\"lastSyncMajorCode\">\n"
+"      <arg direction=\"out\" type=\"i\" name=\"aMajorCode\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
+"    </method>\n"
+"    <method name=\"lastSyncTime\">\n"
+"      <arg direction=\"out\" type=\"s\" name=\"aTimeAsString\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
+"    </method>\n"
 "  </interface>\n"
-        "")
+        "");
 public:
+    //! \see SyncDBusInterface::SyncDBusInterface()
     SyncDBusAdaptor(QObject *parent);
+
+    //! \see ~SyncDBusInterface::SyncDBusInterface()
     virtual ~SyncDBusAdaptor();
 
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
-    Q_NOREPLY void abortSync(const QString &aProfileName);
-    Q_NOREPLY void profileChanged(const QString &aProfileName);
-    Q_NOREPLY void profileDeleted(const QString &aProfileName);
+
+	//! \see SyncDBusInterface::abortSync()
+    Q_NOREPLY void abortSync(const QString &aProfileId);
+
+    //! \see SyncDBusInterface::addProfile()
+    bool addProfile(const QString &aProfileAsXml);
+
+    //! \see SyncDBusInterface::getBackUpRestoreState()
+    bool getBackUpRestoreState();
+
+    //! \see SyncDBusInterface::releaseStorages()
     Q_NOREPLY void releaseStorages(const QStringList &aStorageNames);
+
+    //! \see SyncDBusInterface::removeProfile()
+    bool removeProfile(const QString &aProfileId);
+
+    //! \see SyncDBusInterface::requestStorages()
     bool requestStorages(const QStringList &aStorageNames);
+
+    //! \see SyncDBusInterface::isLastSyncScheduled()
+    bool isLastSyncScheduled(const QString &aProfileId);
+
+    //! \see SyncDBusInterface::lastSyncMajorCode()
+    int lastSyncMajorCode(const QString &aProfileId);
+
+    //! \see SyncDBusInterface::lastSyncMinorCode()
+    int lastSyncMinorCode(const QString &aProfileId);
+
+    //! \see SyncDBusInterface::lastSyncTime()
+    QString lastSyncTime(const QString &aProfileId);
+
+    //! \see SyncDBusInterface::runningSyncs()
     QStringList runningSyncs();
-    bool startSync(const QString &aProfileName);
+
+    //! \see SyncDBusInterface::saveSyncResults()
+    bool saveSyncResults(const QString &aProfileId, const QString &aSyncResults);
+
+    //! \see SyncDBusInterface::setSyncSchedule()
+    bool setSyncSchedule(const QString &aProfileId, const QString &aScheduleAsXml);
+
+    //! \see SyncDBusInterface::startSync()
+    bool startSync(const QString &aProfileId);
+
+    //! \see SyncDBusInterface::updateProfile()
+    bool updateProfile(const QString &aProfileAsXml);
 Q_SIGNALS: // SIGNALS
-    void signalProfileChanged(const QString &aProfileName, int aChangeType);
+
+	//! \see SyncDBusInterface::backupDone()
+    void backupDone();
+
+    //! \see SyncDBusInterface::backupInProgress()
+    void backupInProgress();
+
+    //! \see SyncDBusInterface::restoreDone()
+    void restoreDone();
+
+    //! \see SyncDBusInterface::restoreInProgress()
+    void restoreInProgress();
+
+    //! \see SyncDBusInterface::resultsAvailable()
+    void resultsAvailable(const QString &aProfileName, const QString &aResultsAsXml);
+
+    //! \see SyncDBusInterface::signalProfileChanged()
+    void signalProfileChanged(const QString &aProfileName, int aChangeType, const QString &aProfileAsXml);
+
+    //! \see SyncDBusInterface::syncStatus()
     void syncStatus(const QString &aProfileName, int aStatus, const QString &aMessage, int aErrorCode);
-    void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType);
+
+    //! \see SyncDBusInterface::transferProgress()
+    void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType, int aCommittedItems);
 };
 
-}
 #endif

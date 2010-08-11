@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef ACCOUNTSHELPER_H
 #define ACCOUNTSHELPER_H
 
@@ -37,23 +35,51 @@ class AccountsHelperTest;
 class ProfileManager;
 class SyncProfile;
     
+/*! \brief Helper Class towards Accounts::Manager and various SSO related
+ *  operations.
+ */
 class AccountsHelper : public QObject
 {
     Q_OBJECT
 
 public:
+
+    /*! \brief Constructor
+     *
+     * \param aProfileManager - reference to Profile Manager Object
+     * \param aParent - Parent object
+     */
     AccountsHelper(ProfileManager &aProfileManager, QObject *aParent = NULL);
 
+    /*! \brief Destructor
+     *
+     */
     virtual ~AccountsHelper();
 
 public Q_SLOTS:
 
+	/*! \brief slot for Accounts::Manager accountCreated signal
+	 *
+	 * \param id Accounts Id
+	 */
     void slotAccountCreated(Accounts::AccountId id);
 
+	/*! \brief slot for Accounts::Manager accountRemoved signal
+	 *
+	 * \param id of the accounts
+	 */
     void slotAccountRemoved(Accounts::AccountId id);
 
+	/*! \brief slot for Accounts::Manager accountEnabled signal
+	 *
+	 * \param id of the accounts
+	 */
     void slotAccountEnabled(Accounts::AccountId id);
 
+	/*! \brief slot for Accounts::Manager displayNameChanged signal
+	 * *
+	 * \param newName of the accounts
+	 */
     void slotAccountNameChanged(const QString &newName);
 
 Q_SIGNALS:
@@ -66,6 +92,7 @@ Q_SIGNALS:
      *          2 -- Profile deleted
      */
     void profileChanged(QString profileName, int changeType);
+
 private:
 
     QList<SyncProfile*> getProfilesByAccountId(Accounts::AccountId);
@@ -84,7 +111,9 @@ private:
 
     QList<Accounts::Account*> iAccountList;
 
+#ifdef SYNCFW_UNIT_TESTS
     friend class AccountsHelperTest;
+#endif
 };
 
 }

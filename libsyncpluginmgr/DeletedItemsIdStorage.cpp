@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #include "DeletedItemsIdStorage.h"
 #include "LogMacros.h"
 #include <QSqlQuery>

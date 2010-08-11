@@ -1,0 +1,18 @@
+/*! \page plugin-guide Writing plugins for Synchronization Framework 
+
+\section clientpluginguide Writing Client plugins
+
+Client plugins are shared libraries loaded by the Plugin Manager. 
+Plugin Manager runs in the Synchronization Daemon. Client Plugins have to 
+implement the ClientPluginInterface 
+
+\code
+
+\endcode
+
+\section storagepluginguide Writing storage plugins
+
+\section serverplugincode Writing Server plugins
+
+
+*/

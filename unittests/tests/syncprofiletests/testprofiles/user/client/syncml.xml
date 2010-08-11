@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<profile name="syncml" type="client" > 
+
+  <field name="WantB64" type="boolean" />
+  <field name="use_wbxml" type="boolean" />
+  <field name="Sync Transport" />
+  
+</profile>

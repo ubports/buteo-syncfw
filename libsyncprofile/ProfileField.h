@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef PROFILEFIELD_H
 #define PROFILEFIELD_H
 
@@ -50,17 +49,17 @@ class ProfileField
 {
 public:
 
-    // Field should be always visible in UI.
+    //! Field should be always visible in UI.
     static const QString VISIBLE_ALWAYS;
 
-    // Field should never be visible in UI.
+    //! Field should never be visible in UI.
     static const QString VISIBLE_NEVER;
 
-    // Field should be visible in UI if a value for the field has not
+    //! Field should be visible in UI if a value for the field has not
     // been pre-defined in the sub-profiles loaded by the main profile.
     static const QString VISIBLE_USER;
 
-    // Field type for boolean fields.
+    //! Field type for boolean fields.
     static const QString TYPE_BOOLEAN;
 
     /*! \brief Constructs a ProfileField from XML.

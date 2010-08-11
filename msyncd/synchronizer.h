@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef SYNCHRONIZER_H
 #define SYNCHRONIZER_H
 
@@ -29,6 +27,7 @@
 #include "SyncQueue.h"
 #include "StorageBooker.h"
 #include "SyncScheduler.h"
+#include "SyncBackup.h"
 
 #include "SyncCommonDefs.h"
 #include "ProfileManager.h"
@@ -41,23 +40,10 @@
 #include <QCoreApplication>
 #include <QMap>
 #include <QString>
+#include <QDBusInterface>
 
 
 class ContextProperty;
-
-/*! \mainpage Harmattan Sync Framework
- *
-* The Synchronization framework subsystem provides a generic framework for
-* application developers wanting to develop Synchronization plug-ins for any
-* synchronization service. It provides a plug-in API for the client, server and the storage
-* plug-ins in the framework. It also provides services like profile management, sync
-* controller functionality for sequencing simultaneous sync requests, a sync daemon and
-* other common sync related functionality. This subsystem also provides an
-* implementation of the OMA DS SyncML specification. The SyncML engine is provided as a
-* public API for application developers. It also provides an implementation of the MTP 1.0
-* specification, but this library interface is not open.
-*
-*/
 
 namespace Buteo {
 
@@ -72,10 +58,9 @@ class AccountsHelper;
 /// This class manages other components and connects them to provide
 /// the fully functioning synchronization framework.
 class Synchronizer : public SyncDBusInterface, // Derived from QObject
-                     public PluginCbInterface
+		     public PluginCbInterface
 {
     Q_OBJECT
-
 public:
 
     /// \brief The contructor.
@@ -84,24 +69,31 @@ public:
     /// \brief Destructor
     virtual ~Synchronizer();
 
+    /// \brief registers the dbus service and creates handlers for various
+    /// tasks of the synchronizer
     bool initialize();
 
+    /// \brief stops the daemon and unregisters the dbus object
     void close();
 
 
 // From PluginCbInterface
 // ---------------------------------------------------------------------------
-
+    /// \see PluginCbInterface::requestStorage
     virtual bool requestStorage(const QString &aStorageName,
                                 const SyncPluginBase *aCaller);
 
+    /// \see PluginCbInterface::releaseStorage
     virtual void releaseStorage(const QString &aStorageName,
                                 const SyncPluginBase *aCaller);
 
+    /// \see PluginCbInterface::createStorage
     virtual StoragePlugin* createStorage(const QString &aPluginName);
 
+    /// \see PluginCbInterface::destroyStorage
     virtual void destroyStorage(StoragePlugin *aStorage);
 
+    /// \see PluginCbInterface::isConnectivityAvailable
     virtual bool isConnectivityAvailable( Sync::ConnectivityType aType );
 
 
@@ -116,12 +108,15 @@ public slots:
     //! \see SyncDBusInterface::abortSync
     virtual void abortSync(QString aProfileName);
 
-    //! \see SyncDBusInterface::profileChanged
-    virtual void profileChanged(QString aProfileName);
+    //! \see SyncDBusInterface::addProfile
+    virtual bool addProfile(QString aProfileAsXml);
 
-    //! \see SyncDBusInterface::profileDeleted
-    virtual void profileDeleted(QString aProfileName);
-    
+    //! \see SyncDBusInterface::removeProfile
+    virtual bool removeProfile(QString aProfileAsXml);
+
+    //! \see SyncDBusInterface::updateProfile
+    virtual bool updateProfile(QString aProfileAsXml);
+
     //! \see SyncDBusInterface::requestStorages
     virtual bool requestStorages(QStringList aStorageNames);
 
@@ -131,12 +126,61 @@ public slots:
     //! \see SyncDBusInterface::runningSyncs
     virtual QStringList runningSyncs();
 
+    //! \see SyncDBusInterface::setSyncSchedule
+    virtual bool setSyncSchedule(QString aProfileId , QString aScheduleAsXml);
+
+    //! \see SyncDBusInterface::saveSyncResults
+    virtual bool saveSyncResults(QString aProfileId,QString aSyncResults);
+
+    /*! \brief Gets the Major code for the last.
+     *
+     * \return Major code.
+     */
+    virtual int lastSyncMajorCode(const QString &aProfileId);
+
+    /*! \brief Gets the Minor code for the last.
+     *
+     * \return Minor code.
+     */
+    virtual int lastSyncMinorCode(const QString &aProfileId);
+
+    /*! \brief Gets the time of last completed sync session with this profile.
+     *
+     * \return Last sync time. Null object if this could not be determined.
+     */
+    virtual QString lastSyncTime(const QString &aProfileId);
+
+    /*! \brief Checks if the results are from a scheduled sync.
+     *
+     * \return True if scheduled.
+     */
+    virtual bool isLastSyncScheduled(const QString &aProfileId);
 // --------------------------------------------------------------------------
 
+    //! Called  starts a schedule sync.
     bool startScheduledSync(QString aProfileName);
+
+    //! Called  when backup starts
+    void backupStarts();
+
+    //! Called when backup is completed
+    void backupFinished();
+
+    //! Called when  starting to restore a backup.
+    void restoreStarts();
+
+    //! Called when backup is restored
+    void restoreFinished();
+
+    //! Called to get the current backup/restore state
+    virtual bool getBackUpRestoreState();
+
+    //! handles any changes in the accounts profile
+    virtual void handleAccountsProfileChange(QString,int);
 
 signals:
 
+	//! emitted by releaseStorages call
     void storageReleased();
 
 private slots:
@@ -150,13 +194,15 @@ private slots:
 
     void onTransferProgress( const QString &aProfileName,
         Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-        const QString &aMimeType );
+        const QString &aMimeType, int aCommittedItems );
 
     void onSessionFinished( const QString &aProfileName,
         Sync::SyncStatus aStatus, const QString &aMessage, int aErrorCode );
 
     void onStorageAccquired(const QString &aProfileName, const QString &aMimeType);
     
+    void onSyncProgressDetail(const QString &aProfileName,int aProgressDetail);
+
     void onServerDone();
 
     void onNewSession(const QString &aDestination);
@@ -196,22 +242,40 @@ private:
 
     /*! \brief Start all server plug-ins
      *
+     * @param resume, if true resume servers instead of starting them
      */
-    void startServers();
+    void startServers( bool resume = false );
 
     /*! \brief Stop all server plug-ins
      *
+     * @param suspend, if true suspend servers instead of stopping them
      */
-    void stopServers();
+    void stopServers( bool suspend = false );
 
+    /*! \brief Helper function when backup/restore starts.
+     *
+     */
+     void backupRestoreStarts ();
+	    
+    /*! \brief Helper function when backup/restore is done.
+     *
+     */
+     void backupRestoreFinished();
+    
     /*! \brief Adds a profile to sync scheduler
      *
      * @param aProfileName Name of the profile to schedule.
      */
     void reschedule(const QString &aProfileName);
 
+    /*! \brief Initializes sync scheduler
+     *
+     */
+    void initializeScheduler();
     bool isTransportAvailable(const SyncSession *aSession);
 
+    bool isBackupRestoreInProgress ();
+    
     QMap<QString, SyncSession*> iActiveSessions;
 
     QMap<QString, ServerPluginRunner*> iServers;
@@ -225,6 +289,8 @@ private:
     StorageBooker iStorageBooker;
 
     SyncScheduler *iSyncScheduler;
+    
+    SyncBackup *iSyncBackup;
 
     TransportTracker *iTransportTracker;
 
@@ -236,7 +302,11 @@ private:
 
     bool iClosing;
 
+#ifdef SYNCFW_UNIT_TESTS
     friend class SynchronizerTest;
+#endif
+
+    QDBusInterface *iSyncUIInterface;
 };
 
 }

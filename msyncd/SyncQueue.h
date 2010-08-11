@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef SYNCQUEUE_H
 #define SYNCQUEUE_H
 
@@ -41,7 +39,7 @@ class SyncQueue
 public:
     /*! \brief Adds a new profile to the queue. Queue is sorted automatically.
      *
-     * \param aProfile Profile to add.
+     * \param aSession Session to add to queue
      */
     void enqueue(SyncSession *aSession);
 

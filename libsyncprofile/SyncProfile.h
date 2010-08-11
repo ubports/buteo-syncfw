@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef SYNCPROFILE_H
 #define SYNCPROFILE_H
 
@@ -90,11 +89,11 @@ public:
     //! Conflict resolution policy for device-to-device syncs.
     enum ConflictResolutionPolicy
     {
-        //! Prefer client data in conflict situation.
-        CR_POLICY_PREFER_CLIENT,
+        //! Prefer local data in conflict situation.
+        CR_POLICY_PREFER_LOCAL_CHANGES,
 
-        //! Prefer server data in conflict situation.
-        CR_POLICY_PREFER_SERVER,
+        //! Prefer remote data in conflict situation.
+        CR_POLICY_PREFER_REMOTE_CHANGES,
 
         //! Conflict resolution policy is undefined.
         CR_POLICY_UNDEFINED
@@ -131,6 +130,10 @@ public:
     /*! \brief Sets the name for the profile and associated log.
      */
     virtual void setName(const QString &aName);
+    
+    /*! \brief Sets the name for the profile and associated log.
+     */
+    virtual void setName(const QStringList &aKeys);
     
     
     //! \see Profile::toXml

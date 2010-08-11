@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef STORAGEBOOKER_H
 #define STORAGEBOOKER_H
 

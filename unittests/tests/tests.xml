@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<testdefinition version="0.1">
+  <!-- Test suite, name mandatory - the same as test package name -->
+  <suite name="sync-fw-tests" domain="synchronization"> 
+    <!-- At least one set per suite, name and description mandatory -->
+    <set name="Syncml-FW " description="tests for sync fw" feature="sync framework">
+      <!-- Possibly some pre-steps to execute before running the test cases -->
+      <pre_steps>
+        <step>export LD_LIBRARY_PATH=/usr/share/sync-fw-tests:$LD_LIBRARY_PATH</step>
+        <step>timed -d</step>
+      </pre_steps>
+
+      <case name="sync-fw-all" type="Functional" description="Running Tests for Synchronization Framework" timeout="1000" subfeature="">
+        <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
+        <step expected_result="0">/usr/share/sync-fw-tests/./runstarget.sh  /usr/share/sync-fw-tests/sync-fw-tests </step>
+      </case>
+
+      <!-- Get optional - fetches additional result files -->
+      <get>
+        <file>/tmp/sync-fw-tests.out</file>
+        <file>/tmp/sync-fw-tests.cmp</file>
+      </get>
+
+    </set>
+  </suite>
+</testdefinition>

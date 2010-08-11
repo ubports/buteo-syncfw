@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include "ClientThread.h"
 #include "ClientPlugin.h"
 #include "LogMacros.h"

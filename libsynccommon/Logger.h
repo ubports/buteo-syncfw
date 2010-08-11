@@ -22,7 +22,6 @@
  */
 
 
-
 #ifndef LOGGER_H
 #define LOGGER_H
 
@@ -49,28 +48,9 @@ namespace Buteo {
 class Logger
 {
 public:
-    //! Possible logging levels.
-    enum LogLevel
-    {
-        // These are already defined in QtMsgType:
-        //QtDebugMsg,
-        //QtWarningMsg,
-        //QtCriticalMsg,
-        //QtFatalMsg,
-
-        FIRST_CUSTOM_LEVEL = 4,
-
-        LEVEL_FATAL = FIRST_CUSTOM_LEVEL,
-        LEVEL_CRITICAL,
-        LEVEL_WARNING,
-        LEVEL_PROTOCOL,
-        LEVEL_INFO,
-        LEVEL_DEBUG,
-        LEVEL_TRACE,
-
-        NUM_LEVELS
-    };
-
+    
+    static const int NUM_LEVELS = 4;
+    
     //! Default indent size.
     static const int DEFAULT_INDENT_SIZE;
 
@@ -176,3 +156,4 @@ private:
 }
 
 #endif // LOGGER_H
+

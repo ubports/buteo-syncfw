@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef CLIENTTHREAD_H
 #define CLIENTTHREAD_H
 
@@ -33,7 +31,7 @@ namespace Buteo {
 
 class ClientPlugin;
     
-/* !\brief Thread for client plugins
+/*! \brief Thread for client plugins
  *
  */
 class ClientThread : public QThread
@@ -94,7 +92,8 @@ signals:
         int aErrorCode);
 
 protected:
-
+    /*! \brief overriding method for QThread::run
+     */
     virtual void run();
 
 private:
@@ -106,8 +105,12 @@ private:
     bool iRunning;
     
     mutable QMutex iMutex;
-    
+
+#ifdef SYNCFW_UNIT_TESTS
     friend class ClientThreadTest;
+#endif
+
+
 
 };
 

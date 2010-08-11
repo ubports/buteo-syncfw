@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef TARGETRESULTS_H
 #define TARGETRESULTS_H
 
@@ -36,12 +34,19 @@ class TargetResultsPrivate;
     
 //! \brief Container for number of items added, deleted and modified.
 struct ItemCounts {
+	//! No. of Items added
     unsigned added;
+
+    //! No. of Items deleted
     unsigned deleted;
+
+    //! No. of Items modified
     unsigned modified;
 
+    //! Default Constructor
     ItemCounts() : added(0), deleted(0), modified(0) { };
 
+    //! Constructor with 3 parameters
     ItemCounts(unsigned aAdded, unsigned aDeleted, unsigned aModified)
         : added(aAdded), deleted(aDeleted), modified(aModified) {}
 };

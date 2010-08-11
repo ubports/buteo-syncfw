@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profile type="storage" name="hcalendar">
+    <key value="./Calendar" name="Local URI"/>
+    <field default="" type="" name="Target URI" label=""/>
+    <field default="" type="" name="Calendar Format" label=""/>
+    <field default="myNotebook" type="combo" name="Notebook Name" label="Notebook">
+        <option>myNotebook</option>
+        <option>otherNotebook</option>
+    </field>
+</profile>

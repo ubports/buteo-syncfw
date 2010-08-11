@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef PROFILEMANAGER_H
 #define PROFILEMANAGER_H
 
@@ -44,12 +43,17 @@ class ProfileManagerPrivate;
 class ProfileManager
 {
 public:
+
+    //! Primary profile path where profiles will be searched.
     static const QString DEFAULT_PRIMARY_PROFILE_PATH;
+
+    //! Secondary profile path where profiles will be searched.
     static const QString DEFAULT_SECONDARY_PROFILE_PATH;
 
-    //! \brief Search criteria for finding profiles.
+    //! Search criteria for finding profiles.
     struct SearchCriteria
     {
+    	//! Enum to identify if a member type exists or not
         enum Type
         {
             //! Sub-profile (and key) exists.
@@ -193,14 +197,6 @@ public:
      */
     bool save(const Profile &aProfile);
 
-    /*! \brief Deletes a profile from the persistent storage.
-     *
-     * \param aName Name of the profile to remove.
-     * \param aType Type of the profile to remove.
-     * \return Success indicator.
-     */
-    bool remove(const QString &aName, const QString &aType);
-
     /*! \brief Expands the given profile.
      *
      * Loads and merges all sub-profiles that are referenced from the main
@@ -240,13 +236,30 @@ public:
      
     /*! \brief Gets a temporary profile (saved if sync is sucessfull).
      *
-     * \param destAddress  Address of the remote device bt address/usb .
+     * \param btAddress  Address of the remote device bt address/usb .
      * \param saveNewProfile If to save the profile or not (e.g pc suite profile)
      * \return Pointer to the profile. 
      *  Changes made to the profile are not saved to profile storage, unless
      *  save function of this class is called
      */
     SyncProfile *createTempSyncProfile (const QString &btAddress, bool &saveNewProfile);
+
+    /*! \brief used to create a profile and save it to persistent storage.
+     * 	if a profile with the same name and type exists , this API
+     *  overwrites it.
+     *
+     * \param aProfileAsXml  - sync profile object passed as xml
+     * \return profileId
+     */
+    QString addProfile(QString &aProfileAsXml);
+
+    /*! \brief Deletes a profile from the persistent storage.
+     *
+     * \param aName Name of the profile to remove.
+     * \param aType Type of the profile to remove.
+     * \return Success indicator.
+     */
+    bool remove(const QString &aName, const QString &aType);
 
     /*! \brief Renames a profile, and the associated log too
      *
@@ -256,10 +269,10 @@ public:
      */
     bool rename(const QString &aName, const QString &aNewName);
   
-    /*! \brief Enables synced storages in profile
+    /*! \brief Enables sync'd storages in profile
      *
-     * \param profile Profile of the remote device
-     * \aStorageMap Map of storage names(hcalendar, hcontacts) and if sync 
+     * \param aProfile Profile of the remote device
+     * \param aStorageMap Map of storage names(hcalendar, hcontacts) and if sync
      * enabled value true/false
      *
      */ 
@@ -267,16 +280,27 @@ public:
    
     /*! \brief Sets remote target in profile
      *
-     * \param profile Profile of the remote device
-     * \aId remote device id  
+     * \param aProfile Profile of the remote device
+     * \param aId remote device id
      *
      */ 
     void saveRemoteTargetId (Profile &aProfile,const QString& aId);
     
+    /*! \brief Sets/Overwrites the schedule to a profile
+     *
+     * \param aProfileId Profile Id
+     * \param aScheduleAsXml SyncSchedule Object as an xml string
+     *
+     */
+    bool setSyncSchedule(QString aProfileId , QString aScheduleAsXml);
+
+#ifdef SYNCFW_UNIT_TESTS
     friend class ProfileManagerTest;
+#endif
 
 private:
     
+
     ProfileManager& operator=(const ProfileManager &aRhs);
     
     ProfileManagerPrivate *d_ptr;

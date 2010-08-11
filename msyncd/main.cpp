@@ -21,8 +21,6 @@
  *
  */
 
-
-
 #include <QCoreApplication>
 #include <QtDebug>
 #include <QDateTime>

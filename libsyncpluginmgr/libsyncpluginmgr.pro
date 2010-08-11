@@ -21,6 +21,10 @@ CONFIG += dll debug silent
 QT+=sql
 QT -= gui
 
+
+LIBS += -L../libsyncprofile/ \
+        -lsyncprofile 
+
 # Input
 HEADERS += ClientPlugin.h \
 	PluginCbInterface.h \

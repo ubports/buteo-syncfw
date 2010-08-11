@@ -40,7 +40,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QVariant>
 
-using namespace Buteo;
 /*
  * Implementation of adaptor class SyncDBusAdaptor
  */
@@ -57,28 +56,72 @@ SyncDBusAdaptor::~SyncDBusAdaptor()
     // destructor
 }
 
-void SyncDBusAdaptor::abortSync(const QString &aProfileName)
+void SyncDBusAdaptor::abortSync(const QString &aProfileId)
 {
     // handle method call com.nokia.msyncd.abortSync
-    QMetaObject::invokeMethod(parent(), "abortSync", Q_ARG(QString, aProfileName));
+    QMetaObject::invokeMethod(parent(), "abortSync", Q_ARG(QString, aProfileId));
 }
 
-void SyncDBusAdaptor::profileChanged(const QString &aProfileName)
+bool SyncDBusAdaptor::addProfile(const QString &aProfileAsXml)
 {
-    // handle method call com.nokia.msyncd.profileChanged
-    QMetaObject::invokeMethod(parent(), "profileChanged", Q_ARG(QString, aProfileName));
+    // handle method call com.nokia.msyncd.addProfile
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "addProfile", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileAsXml));
+    return out0;
 }
 
-void SyncDBusAdaptor::profileDeleted(const QString &aProfileName)
+bool SyncDBusAdaptor::getBackUpRestoreState()
 {
-    // handle method call com.nokia.msyncd.profileDeleted
-    QMetaObject::invokeMethod(parent(), "profileDeleted", Q_ARG(QString, aProfileName));
+    // handle method call com.nokia.msyncd.getBackUpRestoreState
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "getBackUpRestoreState", Q_RETURN_ARG(bool, out0));
+    return out0;
+}
+
+bool SyncDBusAdaptor::isLastSyncScheduled(const QString &aProfileId)
+{
+    // handle method call com.nokia.msyncd.isLastSyncScheduled
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "isLastSyncScheduled", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId));
+    return out0;
+}
+
+int SyncDBusAdaptor::lastSyncMajorCode(const QString &aProfileId)
+{
+    // handle method call com.nokia.msyncd.lastSyncMajorCode
+    int aMajorCode;
+    QMetaObject::invokeMethod(parent(), "lastSyncMajorCode", Q_RETURN_ARG(int, aMajorCode), Q_ARG(QString, aProfileId));
+    return aMajorCode;
+}
+
+int SyncDBusAdaptor::lastSyncMinorCode(const QString &aProfileId)
+{
+    // handle method call com.nokia.msyncd.lastSyncMinorCode
+    int aMinorCode;
+    QMetaObject::invokeMethod(parent(), "lastSyncMinorCode", Q_RETURN_ARG(int, aMinorCode), Q_ARG(QString, aProfileId));
+    return aMinorCode;
+}
+
+QString SyncDBusAdaptor::lastSyncTime(const QString &aProfileId)
+{
+    // handle method call com.nokia.msyncd.lastSyncTime
+    QString aTimeAsString;
+    QMetaObject::invokeMethod(parent(), "lastSyncTime", Q_RETURN_ARG(QString, aTimeAsString), Q_ARG(QString, aProfileId));
+    return aTimeAsString;
 }
 
 void SyncDBusAdaptor::releaseStorages(const QStringList &aStorageNames)
 {
     // handle method call com.nokia.msyncd.releaseStorages
     QMetaObject::invokeMethod(parent(), "releaseStorages", Q_ARG(QStringList, aStorageNames));
+}
+
+bool SyncDBusAdaptor::removeProfile(const QString &aProfileId)
+{
+    // handle method call com.nokia.msyncd.removeProfile
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "removeProfile", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId));
+    return out0;
 }
 
 bool SyncDBusAdaptor::requestStorages(const QStringList &aStorageNames)
@@ -97,11 +140,35 @@ QStringList SyncDBusAdaptor::runningSyncs()
     return out0;
 }
 
-bool SyncDBusAdaptor::startSync(const QString &aProfileName)
+bool SyncDBusAdaptor::saveSyncResults(const QString &aProfileId, const QString &aSyncResults)
+{
+    // handle method call com.nokia.msyncd.saveSyncResults
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "saveSyncResults", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId), Q_ARG(QString, aSyncResults));
+    return out0;
+}
+
+bool SyncDBusAdaptor::setSyncSchedule(const QString &aProfileId, const QString &aScheduleAsXml)
+{
+    // handle method call com.nokia.msyncd.setSyncSchedule
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "setSyncSchedule", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId), Q_ARG(QString, aScheduleAsXml));
+    return out0;
+}
+
+bool SyncDBusAdaptor::startSync(const QString &aProfileId)
 {
     // handle method call com.nokia.msyncd.startSync
     bool out0;
-    QMetaObject::invokeMethod(parent(), "startSync", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileName));
+    QMetaObject::invokeMethod(parent(), "startSync", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId));
+    return out0;
+}
+
+bool SyncDBusAdaptor::updateProfile(const QString &aProfileAsXml)
+{
+    // handle method call com.nokia.msyncd.updateProfile
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "updateProfile", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileAsXml));
     return out0;
 }
 

@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #include "ClientPlugin.h"
 
 using namespace Buteo;

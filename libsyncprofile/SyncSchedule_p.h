@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef SYNCSCHEDULE_P_H
 #define SYNCSCHEDULE_P_H
 
@@ -30,12 +28,18 @@
 
 namespace Buteo {
     
-// Private implementation class for SyncSchedule.
+//! Private implementation class for SyncSchedule.
 class SyncSchedulePrivate
 {
 public:
+	/*! \brief Constructor
+	 *
+	 */
     SyncSchedulePrivate();
 
+    /*! \brief Copy Constructor
+     *
+     */
     SyncSchedulePrivate(const SyncSchedulePrivate &aSource);
 
     /*! \brief Parses week day numbers from a string.
@@ -72,20 +76,28 @@ public:
      */
     bool isRush(const QDateTime &aTime) const;
 
+    //! Number of Days before the next sync starts
     DaySet iDays;
 
+    //! Last Sync Time
     QTime iTime;
 
+    //! Time interval
     unsigned iInterval;
 
+    //! indicates the schedule for rush hour - days
     DaySet iRushDays;
 
+    //! indicates the schedule for rush hour start
     QTime iRushBegin;
 
+    //! indicates the schedule for rush hour end
     QTime iRushEnd;
 
+    //! Rush Hour Time interval
     unsigned iRushInterval;
 
+    //! Indicates if Rush Hour is Enabled
     bool iRushEnabled;
 };
 

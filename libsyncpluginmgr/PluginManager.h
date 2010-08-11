@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 
@@ -41,7 +40,7 @@ class ClientPluginTest;
 class ServerPluginTest;
 class StoragePluginTest;
     
-/* !\brief Manages plugins
+/*! \brief Manages plugins
  *
  * Is responsible for creating and destroying storage,
  * server and client plugins.
@@ -49,6 +48,7 @@ class StoragePluginTest;
 class PluginManager
 {
 public:
+	//! default path where the plugins will be looked for
     static const QString DEFAULT_PLUGIN_PATH;
 
 
@@ -65,7 +65,7 @@ public:
 
     /*! \brief Creates a new storage plugin instance
      *
-     * @param aName Name of the plugin
+     * @param aPluginName Name of the plugin
      * @return Storage plugin if success, otherwise NULL
      */
     StoragePlugin* createStorage( const QString& aPluginName );
@@ -140,9 +140,11 @@ private:
 
     QReadWriteLock          iDllLock;
 
+#ifdef SYNCFW_UNIT_TESTS
     friend class ClientPluginTest;
     friend class ServerPluginTest;
     friend class StoragePluginTest;
+#endif
 
 };
 

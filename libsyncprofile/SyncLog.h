@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef SYNCLOG_H
 #define SYNCLOG_H
 

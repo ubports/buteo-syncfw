@@ -1,0 +1,14 @@
+/* \page introduction Introduction to Synchronization Framework 
+*
+* \section aboutsyncfw  About Synchronization Framework 
+*
+* The Synchronization framework subsystem provides a generic framework for
+* application developers wanting to develop Synchronization plug-ins for any
+* synchronization service. It provides a plug-in API for the client, server and the storage
+* plug-ins in the framework. It also provides services like profile management, sync
+* controller functionality for sequencing simultaneous sync requests, a sync daemon and
+* other common sync related functionality. This subsystem also provides an
+* implementation of the OMA DS SyncML specification. The SyncML engine is provided as a
+* public API for application developers. It also provides an implementation of the MTP 1.0
+* specification, but this library interface is not open.
+*/

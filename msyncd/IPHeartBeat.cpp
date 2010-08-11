@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #include "IPHeartBeat.h"
 #include <QStringList>
 #include "LogMacros.h"

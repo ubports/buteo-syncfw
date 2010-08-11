@@ -1,4 +1,4 @@
-#/**
+#/*
 # * This file is part of buteo-syncfw package
 # *
 # * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
@@ -20,5 +20,6 @@
 # * 02110-1301 USA
 # *
 # */
+#
 
 qdbusxml2cpp -p SyncDaemonProxy -N -c SyncDaemonProxy com.nokia.msyncd.xml

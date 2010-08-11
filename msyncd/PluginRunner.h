@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef PLUGINRUNNER_H
 #define PLUGINRUNNER_H
 
@@ -132,7 +131,7 @@ signals:
     //! @see SyncPluginBase::transferProgress
     void transferProgress(const QString &aProfileName,
         Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-        const QString &aMimeType);
+        const QString &aMimeType, int aCommittedItems);
 
     //! @see SyncPluginBase::error
     void error(const QString &aProfileName, const QString &aMessage, int aErrorCode);
@@ -140,7 +139,12 @@ signals:
     //! @see SyncPluginBase::success
     void success(const QString &aProfileName, const QString &aMessage);
 
+    //! @see SyncPluginBase::storageAcquired
     void storageAccquired (const QString &aMimeType);
+
+    //! @see SyncPluginBase::syncProgressDetail
+    void syncProgressDetail(const QString &aProfileName,int aProgressDetail);
+
     /*! \brief Signal sent when the plug-in runner has finished
      *
      * Sent when the thread or process running the plug-in has exited
@@ -154,19 +158,28 @@ signals:
     void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
 
 protected:
+
+    //! Initialization status of the plugin
     bool iInitialized;
 
+    //! pointer to an instance of plugin manager
     PluginManager *iPluginMgr;
 
+    //! pointer to an instance of synchronizer
     PluginCbInterface *iPluginCbIf;
 
+    //!  type of the plugin
     PluginType iType;
 
+    //! name of the plugin
     QString iPluginName;
 
 private:
 
+#ifdef SYNCFW_UNIT_TESTS
 	friend class PluginRunnerTest;
+#endif
+
 };
 
 }

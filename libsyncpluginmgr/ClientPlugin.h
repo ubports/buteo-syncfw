@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #ifndef CLIENTPLUGIN_H
 #define CLIENTPLUGIN_H
 
@@ -67,6 +66,7 @@ public:
 
 protected:
 
+    //! Sync Profile Object that the plugin is currently operating on
     SyncProfile iProfile;
 
 private:

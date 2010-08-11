@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef STORAGEPROFILE_H
 #define STORAGEPROFILE_H
 
@@ -30,7 +28,8 @@
 namespace Buteo {
 
 class StorageProfilePrivate;
-    
+
+/*! \brief Storage Profile Class */
 class StorageProfile : public Profile
 {
 public:

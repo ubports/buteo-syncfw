@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef PROFILE_P_H
 #define PROFILE_P_H
 
@@ -31,41 +29,45 @@
 #include "ProfileField.h"
 
 namespace Buteo {
-// Private implementation class for Profile class.
+
+//! Private implementation class for Profile class.
 class ProfilePrivate
 {
 public:
+	 //! \brief Constructor
     ProfilePrivate();
 
+    //! \brief Copy Constructor
     ProfilePrivate(const ProfilePrivate &aSource);
 
+    //! \brief Destructor
     ~ProfilePrivate();
 
-    // Profile name.
+    //! Profile name.
     QString iName;
 
-    // Profile type.
+    //! Profile type.
     QString iType;
 
-    // Is the profile fully loaded and constructed.
+    //! Is the profile fully loaded and constructed.
     bool iLoaded;
 
-    // Is the profile merged created by merging from sub-profile.
+    //! Is the profile merged created by merging from sub-profile.
     bool iMerged;
 
-    // Local keys, that are not merged from sub-profiles.
+    //! Local keys, that are not merged from sub-profiles.
     QMap<QString, QString> iLocalKeys;
 
-    // Keys that are merged from sub-profile files.
+    //! Keys that are merged from sub-profile files.
     QMap<QString, QString> iMergedKeys;
 
-    // Local fields, that are not merged from sub-profiles.
+    //! Local fields, that are not merged from sub-profiles.
     QList<const ProfileField*> iLocalFields;
 
-    // Fields that are merged from sub-profiles.
+    //! Fields that are merged from sub-profiles.
     QList<const ProfileField*> iMergedFields;
 
-    // List of sub-profiles.
+    //! List of sub-profiles.
     QList<Profile*> iSubProfiles;
 };
 }

@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef SERVERTHREAD_H
 #define SERVERTHREAD_H
 
@@ -89,6 +87,7 @@ signals:
 
 protected:
 
+    //! overriding method of QThread::run
     virtual void run();
 
 private:
@@ -99,7 +98,10 @@ private:
 
     mutable QMutex iMutex;
 
+#ifdef SYNCFW_UNIT_TESTS
 	friend class ServerThreadTest;
+#endif
+
 };
 
 }

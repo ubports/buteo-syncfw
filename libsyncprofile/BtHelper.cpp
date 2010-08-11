@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include <QDebug>
 #include <LogMacros.h>
 
@@ -55,7 +53,7 @@ bool BtHelper::isServiceSupported (const QList<QString>& servicesList, const QSt
 {
    LOG_DEBUG ("isServiceSupported");
    foreach (QString service, servicesList) {
-  	LOG_DEBUG ("Record : "  << service);
+  	//LOG_DEBUG ("Record : "  << service);
 	if (service.contains(serviceUUID)){   
    		LOG_DEBUG ("Service found " << serviceUUID);
 		return true;

@@ -23,7 +23,6 @@
 
 
 
-
 #include "Profile.h"
 #include "Profile_p.h"
 
@@ -43,6 +42,11 @@ const QString Profile::TYPE_SERVICE("service");
 const QString Profile::TYPE_SYNC("sync");
 
 
+Profile::Profile()
+: d_ptr(new ProfilePrivate())
+{
+
+}
 Profile::Profile(const QString &aName, const QString &aType)
 :   d_ptr(new ProfilePrivate())
 {
@@ -116,6 +120,12 @@ QString Profile::name() const
 void Profile::setName(const QString &aName)
 {
     d_ptr->iName = aName;
+}
+
+void Profile::setName(const QStringList &aKeys)
+{
+    	
+    d_ptr->iName = generateProfileId(aKeys);
 }
 
 QString Profile::type() const
@@ -542,3 +552,16 @@ bool Profile::isProtected() const
     return boolKey(KEY_PROTECTED);
 }
 
+QString Profile::displayname() const
+{
+    return key(KEY_DISPLAY_NAME);
+}
+
+QString Profile::generateProfileId(const QStringList &aKeys)
+{
+    if (aKeys.size() == 0)
+        return QString();
+    
+    QString aId = QString::number(qHash(aKeys.join(QString())));
+    return aId;    
+}

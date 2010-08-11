@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include "SyncResults.h"
 #include "LogMacros.h"
 #include <QDomDocument>
@@ -31,36 +29,40 @@
 
 namespace Buteo {
     
-// Private implementation class for SyncResults.
-class SyncResultsPrivate
-{
-public:
-    SyncResultsPrivate();
+	//! Private implementation class for SyncResults.
+	class SyncResultsPrivate
+	{
+	public:
+		//! Default Constructors
+		SyncResultsPrivate();
 
-    SyncResultsPrivate(const SyncResultsPrivate &aSource);
+		//! Copy Constructor
+		SyncResultsPrivate(const SyncResultsPrivate &aSource);
 
-    // List of target results.
-    QList<TargetResults> iTargetResults;
+		//! List of target results.
+		QList<TargetResults> iTargetResults;
 
-    // Sync time.
-    QDateTime iTime;
+		//! Sync time.
+		QDateTime iTime;
 
-    // Sync result code.
-    int iResultCode;
+		//! Sync major code.
+		int iMajorCode;
 
-    //Sync target id
-    QString iTargetId;
+		//! Sync minor reason.
+		int iMinorCode;
 
-    bool iScheduled;
-};
+		//! Sync target id
+		QString iTargetId;
 
-}
+		//! Are results for Scheduled Sync
+		bool iScheduled;
+	};
 
-using namespace Buteo;
 
 SyncResultsPrivate::SyncResultsPrivate()
 :   iTime(QDateTime::currentDateTime()),
-    iResultCode(0),
+    iMajorCode(0),
+    iMinorCode(0),
     iScheduled(false)
 {
 }
@@ -68,11 +70,17 @@ SyncResultsPrivate::SyncResultsPrivate()
 SyncResultsPrivate::SyncResultsPrivate(const SyncResultsPrivate &aSource)
 :   iTargetResults(aSource.iTargetResults),
     iTime(aSource.iTime),
-    iResultCode(aSource.iResultCode),
-    iScheduled(aSource.iScheduled),
-    iTargetId(aSource.iTargetId)
+    iMajorCode(aSource.iMajorCode),
+    iMinorCode(aSource.iMinorCode),
+    iTargetId(aSource.iTargetId),
+    iScheduled(aSource.iScheduled)
 {
 }
+
+
+}
+
+using namespace Buteo;
 
 SyncResults::SyncResults()
 :   d_ptr(new SyncResultsPrivate())
@@ -84,18 +92,20 @@ SyncResults::SyncResults(const SyncResults &aSource)
 {
 }
 
-SyncResults::SyncResults(QDateTime aTime, int aResultCode)
+SyncResults::SyncResults(QDateTime aTime, int aMajorCode, int aMinorCode)
 :   d_ptr(new SyncResultsPrivate())
 {
     d_ptr->iTime = aTime;
-    d_ptr->iResultCode = aResultCode;
+    d_ptr->iMajorCode = aMajorCode;
+    d_ptr->iMinorCode = aMinorCode;
 }
 
 SyncResults::SyncResults(const QDomElement &aRoot)
 :   d_ptr(new SyncResultsPrivate())
 {
     d_ptr->iTime = QDateTime::fromString(aRoot.attribute(ATTR_TIME), Qt::ISODate);
-    d_ptr->iResultCode = aRoot.attribute(ATTR_RESULT_CODE).toInt();
+    d_ptr->iMajorCode = aRoot.attribute(ATTR_MAJOR_CODE).toInt();
+    d_ptr->iMinorCode = aRoot.attribute(ATTR_MINOR_CODE).toInt();
     d_ptr->iScheduled = (aRoot.attribute(KEY_SYNC_SCHEDULED) == BOOLEAN_TRUE);
 
     QDomElement target = aRoot.firstChildElement(TAG_TARGET_RESULTS);
@@ -127,7 +137,8 @@ QDomElement SyncResults::toXml(QDomDocument &aDoc) const
 {
     QDomElement root = aDoc.createElement(TAG_SYNC_RESULTS);
     root.setAttribute(ATTR_TIME, d_ptr->iTime.toString(Qt::ISODate));
-    root.setAttribute(ATTR_RESULT_CODE, QString::number(d_ptr->iResultCode));
+    root.setAttribute(ATTR_MAJOR_CODE, QString::number(d_ptr->iMajorCode));
+    root.setAttribute(ATTR_MINOR_CODE, QString::number(d_ptr->iMinorCode));
     root.setAttribute(KEY_SYNC_SCHEDULED, d_ptr->iScheduled ? BOOLEAN_TRUE :
         BOOLEAN_FALSE);
 
@@ -138,6 +149,20 @@ QDomElement SyncResults::toXml(QDomDocument &aDoc) const
 
     return root;
 }
+
+QString SyncResults::toString() const
+{
+    QDomDocument doc;
+    QDomProcessingInstruction xmlHeading =
+        doc.createProcessingInstruction("xml",
+        "version=\"1.0\" encoding=\"UTF-8\"");
+    doc.appendChild(xmlHeading);
+    QDomElement root = toXml(doc);
+    doc.appendChild(root);
+
+    return doc.toString(PROFILE_INDENT);
+}
+
 
 QList<TargetResults> SyncResults::targetResults() const
 {
@@ -154,15 +179,26 @@ QDateTime SyncResults::syncTime() const
     return d_ptr->iTime;
 }
 
-int SyncResults::resultCode() const
+int SyncResults::majorCode() const
 {
-    return d_ptr->iResultCode;
+    return d_ptr->iMajorCode;
 }
 
-void SyncResults::setResultCode(int aResultCode)
+void SyncResults::setMajorCode(int aMajorCode)
 {
-  FUNCTION_CALL_TRACE;
-    d_ptr->iResultCode = aResultCode;
+    FUNCTION_CALL_TRACE;
+    d_ptr->iMajorCode = aMajorCode;
+}
+
+int SyncResults::minorCode() const
+{
+    return d_ptr->iMinorCode;
+}
+
+void SyncResults::setMinorCode(int aMinorCode)
+{
+    FUNCTION_CALL_TRACE;
+    d_ptr->iMinorCode = aMinorCode;
 }
 
 void SyncResults::setTargetId(const QString& aTargetId) 

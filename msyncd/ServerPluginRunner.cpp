@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "ServerPluginRunner.h"
 #include "ServerThread.h"
 #include "ServerActivator.h"
@@ -101,8 +100,8 @@ bool ServerPluginRunner::init()
 
     // Connect signals from the plug-in.
 
-    connect(iPlugin, SIGNAL(transferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &)),
-        this, SLOT(onTransferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &)));
+    connect(iPlugin, SIGNAL(transferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &,int)),
+        this, SLOT(onTransferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &,int)));
 
     connect(iPlugin, SIGNAL(error(const QString &, const QString &, int)),
         this, SLOT(onError(const QString &, const QString &, int)));
@@ -164,6 +163,26 @@ void ServerPluginRunner::abort()
     }
 }
 
+void ServerPluginRunner::suspend()
+{
+    FUNCTION_CALL_TRACE;
+
+    if (iPlugin != 0)
+    {
+        iPlugin->suspend();
+    }
+}
+
+void ServerPluginRunner::resume()
+{
+    FUNCTION_CALL_TRACE;
+
+    if (iPlugin != 0)
+    {
+        iPlugin->resume();
+    }
+}
+
 SyncPluginBase *ServerPluginRunner::plugin()
 {
     FUNCTION_CALL_TRACE;
@@ -211,11 +230,11 @@ void ServerPluginRunner::onNewSession(const QString &aDestination)
 
 void ServerPluginRunner::onTransferProgress(const QString &aProfileName,
     Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-    const QString &aMimeType)
+    const QString &aMimeType, int aCommittedItems)
 {
     FUNCTION_CALL_TRACE;
 
-    emit transferProgress(aProfileName, aDatabase, aType, aMimeType);
+    emit transferProgress(aProfileName, aDatabase, aType, aMimeType, aCommittedItems);
 }
 
 void ServerPluginRunner::onError(const QString &aProfileName,

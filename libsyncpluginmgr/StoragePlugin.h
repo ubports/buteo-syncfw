@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #ifndef STORAGEPLUGIN_H_89943984899843
 #define STORAGEPLUGIN_H_89943984899843
 
@@ -85,7 +84,7 @@ public:
      */
     void getProperties( QMap<QString, QString>& aProperties ) const;
 
-    /* !\brief Initializes the plugin
+    /*! \brief Initializes the plugin
     *
     * It is recommended that the plugin should do not do any thread insecure
     * initializations inside constructor, instead it should do inside this method.
@@ -125,7 +124,7 @@ public:
 
     /*! \brief Returns id's of all new items since aTime (creation time > aTime)
      *
-     * @param aNewItems Array where to place item id's
+     * @param aNewItemIds Array where to place item id's
      * @param aTime Items with creation time > aTime are returned
      * @return True on success, otherwise false
      */
@@ -133,7 +132,7 @@ public:
 
     /*! \brief Returns all modified items since aTime
      *
-     * @param aNewItems Array where to place items
+     * @param aModifiedItems Array where to place items
      * @param aTime Items with modification time > aTime and creation time <=
      *  aTime are returned.
      * @return True on success, otherwise false
@@ -142,7 +141,7 @@ public:
 
     /*! \brief Returns id's of all modified items since aTime
      *
-     * @param aNewItems Array where to place item id's
+     * @param aModifiedItemIds Array where to place item id's
      * @param aTime Items with modification time > aTime and creation time <=
      *  aTime are returned.
      * @return True on success, otherwise false
@@ -151,7 +150,7 @@ public:
 
     /*! \brief Returns id's of all deleted items since aTime
      *
-     * @param aDeletedItems Array where to place item id's
+     * @param aDeletedItemIds Array where to place item id's
      * @param aTime Items with deletion time > aTime and creation time <=
      *  aTime are returned.
      * @return True on success, otherwise false
@@ -225,8 +224,10 @@ public:
 
 protected:
 
+    //! Name of the plugin
     QString                   iPluginName;
 
+    //! Properties of the plugin as read from profile xml
     QMap<QString, QString>    iProperties;
 };
 

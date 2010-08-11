@@ -32,7 +32,7 @@ using namespace Buteo;
 
 TransportTracker::TransportTracker(QObject *aParent) :
     QObject(aParent),
-    iUSBProxy(0),
+//    iUSBProxy(0),
     iBt(0),
     iInternet(0)
 {
@@ -44,20 +44,20 @@ TransportTracker::TransportTracker(QObject *aParent) :
     iTransportStates[Sync::CONNECTIVITY_INTERNET] = true; //false;
 
     // USB
-//    iUSBProxy = new USBModedProxy(this);
-//    if (!iUSBProxy->isValid())
-//    {
-//        LOG_CRITICAL("Failed to connect to USB moded D-Bus interface");
-//        delete iUSBProxy;
-//        iUSBProxy = NULL;
-//    }
-//    else
-//    {
-//        QObject::connect(iUSBProxy, SIGNAL(usbConnection(bool)), this,
-//            SLOT(onUsbStateChanged(bool)));
-//        iTransportStates[Sync::CONNECTIVITY_USB] =
-//            iUSBProxy->isUSBConnected();
-//    }
+    /*iUSBProxy = new USBModedProxy(this);
+    if (!iUSBProxy->isValid())
+    {
+        LOG_CRITICAL("Failed to connect to USB moded D-Bus interface");
+        delete iUSBProxy;
+        iUSBProxy = NULL;
+    }
+    else
+    {
+        QObject::connect(iUSBProxy, SIGNAL(usbConnection(bool)), this,
+            SLOT(onUsbStateChanged(bool)));
+        iTransportStates[Sync::CONNECTIVITY_USB] =
+            iUSBProxy->isUSBConnected();
+    }*/
 
     // BT
     iBt = new ContextProperty("Bluetooth.Enabled", this);

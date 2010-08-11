@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 #ifndef IPHEARTBEAT_H
 #define IPHEARTBEAT_H
 
@@ -50,7 +49,7 @@ class IPHeartBeat : public QObject
 
 public:
     /*! \brief Constructor.
-     * \param pParent Parent object.
+     *  \param aParent Parent object.
      */
     IPHeartBeat(QObject *aParent);
 
@@ -113,7 +112,10 @@ private:
     ///Map of structures waiting for heart beat
     QMap<QString, BeatStruct> iBeatsWaiting;
 
+#ifdef SYNCFW_UNIT_TESTS
     friend class IPHeartBeatTest;
+#endif
+
 };
 
 }

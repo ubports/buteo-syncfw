@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef SYNCRESULTS_H_2
 #define SYNCRESULTS_H_2
 
@@ -46,16 +44,54 @@ class SyncResults
 {
 public:
 
-    enum SyncResultCode
-    {
-        SYNC_RESULT_SUCCESS,
-        SYNC_RESULT_FAILED
+    /*! \brief enum value
+     *
+     * Used to set the major code in *.log.xml file for profile
+     */
+    enum MajorCode {
+        SYNC_RESULT_INVALID = -1,
+        SYNC_RESULT_SUCCESS = 0,
+        SYNC_RESULT_FAILED,
+        SYNC_RESULT_CANCELLED
+    };
+
+    /*! \brief enum value
+     *
+     * Used to set the minor code in *.log.xml file for profile
+     */
+    enum MinorCode {
+
+        //NO-Error
+        NO_ERROR = 0,
+
+        //These error codes are mapped to syncAgentConsts.h
+        // Successful 3xx
+        SYNC_FINISHED = 301,
+
+        // Client/Configuration errors 4xx
+        INTERNAL_ERROR = 401,
+        AUTHENTICATION_FAILURE,
+        DATABASE_FAILURE,
+
+        // Server/Network errors 5xx
+        SUSPENDED = 501,
+        ABORTED,
+        CONNECTION_ERROR,
+        INVALID_SYNCML_MESSAGE,
+        //Upto here
+
+        //Context Error Code
+        LOW_BATTERY_POWER = 601,
+        POWER_SAVING_MODE,
+        OFFLINE_MODE,
+        BACKUP_IN_PROGRESS,
+        LOW_MEMORY
     };
 
     /*! \brief Constructs an empty sync results object.
      *
      * Sync time is set to current time, result code should be set later by
-     * calling setResultCode.
+     * calling setMajorCode , setMinorCode.
      */
     SyncResults();
 
@@ -68,9 +104,10 @@ public:
     /*! \brief Constructs sync results, sets sync time and result code.
      *
      * \param aTime Sync time for the results.
-     * \param aResultCode Sync result code.
+     * \param aMajorCode Sync result code.
+     * \param aMinorCode Sync Failed Reason.
      */
-    SyncResults(QDateTime aTime, int aResultCode);
+    SyncResults(QDateTime aTime, int aMajorCode, int aMinorCode);
 
     /*! \brief Constructs sync results from XML.
      *
@@ -97,6 +134,12 @@ public:
      */
     QDomElement toXml(QDomDocument &aDoc) const;
 
+    /*! \brief Exports the sync results to QString.
+     *
+     * \return return the Results as xml formatted string
+     */
+    QString toString() const;
+
     /*! \brief Gets the results of all targets.
      *
      * \return List of target results.
@@ -117,15 +160,28 @@ public:
 
     /*! \brief Gets the result code.
      *
-     * \return Result code.
+     * \return major code.
      */
-    int resultCode() const;
+    int majorCode() const;
 
     /*! \brief Sets the result code.
      *
-     * \param aResultCode The new result code.
+     * \param aMajorCode The result code.
      */
-    void setResultCode(int aResultCode);
+    void setMajorCode(int aMajorCode);
+
+    /*! \brief Gets the failed reason.
+     *
+     * \return failed Reason.
+     */
+    int minorCode() const;
+
+    /*! \brief Sets the failed Reason.
+     *
+     * \param aMinorCode - minor code or the reason
+     */
+    void setMinorCode(int aMinorCode);
+
     
     /*! \brief Sets the remote target Id.
      *
@@ -134,8 +190,6 @@ public:
     void setTargetId(const QString& aTargetId) ;
     
     /*! \brief Gets the remote target Id.
-     *
-     * \param TargetId The remote device Id.
      */
     QString getTargetId() const;
 
@@ -161,8 +215,10 @@ public:
 private:
 
     SyncResultsPrivate *d_ptr;
-    
+
+#ifdef SYNCFW_UNIT_TESTS
     friend class ClientThreadTest;
+#endif
 
 };
 

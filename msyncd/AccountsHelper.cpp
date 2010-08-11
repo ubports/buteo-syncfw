@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #include "AccountsHelper.h"
 #include "LogMacros.h"
 #include "ProfileManager.h"
@@ -38,7 +36,7 @@ AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent
     QObject::connect(iAccountManager, SIGNAL(accountCreated(Accounts::AccountId)),
                      this, SLOT(slotAccountCreated(Accounts::AccountId)));
     QObject::connect(iAccountManager, SIGNAL(accountRemoved(Accounts::AccountId)),
-                     this, SLOT(slotAccountCreated(Accounts::AccountId)));
+                     this, SLOT(slotAccountRemoved(Accounts::AccountId)));
     QObject::connect(iAccountManager, SIGNAL(enabledEvent(Accounts::AccountId)),
                      this, SLOT(slotAccountEnabled(Accounts::AccountId)));
 
@@ -49,12 +47,8 @@ AccountsHelper::~AccountsHelper()
 {
     delete iAccountManager;
     iAccountManager = 0;
-    // Delete all account objects in the accounts list
-    foreach(Accounts::Account *account, iAccountList)
-    {
-        delete account;
-        account = 0;
-    }
+    // There is no need to delete the accounts objects as they get deleted by
+    // their parent, aka, the manager
 }
 
 void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
@@ -92,6 +86,7 @@ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
     QList<SyncProfile*> syncProfiles = getProfilesByAccountId(id);
     foreach(SyncProfile *profile, syncProfiles)
     {
+        LOG_DEBUG("Removing profile" << profile->name());
         // Delete the profile
         iProfileManager.remove(profile->name(), Profile::TYPE_SYNC);
         // Emit signal over D-Bus to signal profile removal
@@ -198,13 +193,31 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
                                            const SyncProfile *baseProfile)
 {
     FUNCTION_CALL_TRACE;
-    SyncProfile *profile = iProfileManager.syncProfile(service->name() +
-                              "-" + account->displayName());
+
+    Profile *serviceProfile = iProfileManager.profile(service->name(), Profile::TYPE_SERVICE);
+    if (!serviceProfile) {
+    	LOG_DEBUG ("!!!! Service not supported !!!!");
+	return;
+    }
+    QString remote_database = serviceProfile->key(KEY_REMOTE_DATABASE);
+    
+    QString profileName ;
+    if (!remote_database.isEmpty() && !service->name().isEmpty()) {
+	    QStringList keys;
+	    keys << remote_database << service->name();
+	    serviceProfile->setName(keys);
+            profileName = serviceProfile->name();
+    }
+    delete serviceProfile;
+   
+    SyncProfile *profile = iProfileManager.syncProfile(profileName);
+    
     if(0 == profile)
     {
         // Create a new sync profile with username
         SyncProfile *newProfile = baseProfile->clone();
-        newProfile->setName(service->name() + "-" + account->displayName());
+        newProfile->setName(profileName);
+        newProfile->setKey(KEY_DISPLAY_NAME, service->name() + "-" + account->displayName());
         // Add the account ID to the profile
         newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
         // Set profile as enabled

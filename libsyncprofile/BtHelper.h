@@ -91,7 +91,8 @@ public:
       * \param servicesList List of remote device sdp records 
       * \param serviceUUID UUID of the service to be connected
       */
-     bool isServiceSupported (const QList<QString>& servicesList, const QString& serviceUUID);	
+     bool isServiceSupported (const QList<QString>& servicesList, const QString& serviceUUID);
+
     /*! \brief To find remote device BT properties.
       */
      QMap<QString, QVariant> getDeviceProperties();

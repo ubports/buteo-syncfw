@@ -20,8 +20,6 @@
  * 02110-1301 USA
  *
  */
-
-
 #ifndef COMMONDEFS_H
 #define COMMONDEFS_H
 
@@ -45,7 +43,8 @@ const QString ATTR_INTERVAL("interval");
 const QString ATTR_BEGIN("begin");
 const QString ATTR_END("end");
 const QString ATTR_DAYS("days");
-const QString ATTR_RESULT_CODE("resultcode");
+const QString ATTR_MAJOR_CODE("majorcode");
+const QString ATTR_MINOR_CODE("minorcode");
 const QString ATTR_ENABLED("enabled");
 
 const QString TAG_FIELD("field");
@@ -61,6 +60,7 @@ const QString TAG_SCHEDULE("schedule");
 const QString TAG_RUSH("rush");
 
 const QString KEY_ENABLED("enabled");
+const QString KEY_DISPLAY_NAME("displayname");
 const QString KEY_ACTIVE("active");
 const QString KEY_USE_ACCOUNTS("use_accounts");
 const QString KEY_SYNC_SCHEDULED("scheduled");
@@ -76,6 +76,7 @@ const QString KEY_SYNC_DIRECTION("Sync Direction");
 const QString KEY_CONFLICT_RESOLUTION_POLICY("conflictpolicy");
 const QString KEY_BT_ADDRESS("bt_address");
 const QString KEY_REMOTE_ID("remote_id");
+const QString KEY_REMOTE_DATABASE("Remote database");
 const QString KEY_BT_NAME("bt_name");
 const QString KEY_BT_TRANSPORT("bt_transport");
 const QString KEY_USB_TRANSPORT("usb_transport");
@@ -90,8 +91,8 @@ const QString VALUE_DEVICE("device");
 const QString VALUE_TWO_WAY("two-way");
 const QString VALUE_FROM_REMOTE("from-remote");
 const QString VALUE_TO_REMOTE("to-remote");
-const QString VALUE_PREFER_CLIENT("prefer client");
-const QString VALUE_PREFER_SERVER("prefer server");
+const QString VALUE_PREFER_REMOTE("prefer remote");
+const QString VALUE_PREFER_LOCAL("prefer local");
 
 // Indent size for profile XML output.
 const int PROFILE_INDENT = 4;

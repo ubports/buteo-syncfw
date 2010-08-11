@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef TRANSPORTTRACKER_H_
 #define TRANSPORTTRACKER_H_
 
@@ -34,7 +33,7 @@ class ContextProperty;
 
 namespace Buteo {
 
-class USBModedProxy;
+//class USBModedProxy;
 
     
 /*! \brief Class for tracking transport states
@@ -64,6 +63,11 @@ public:
 	bool isConnectivityAvailable(Sync::ConnectivityType aType) const;
 
 	// @todo: make private
+	/*! \brief updates the state of the given connectivity type to input value
+	 *
+	 * @param aType Connectivity type
+	 * @param aState Connectivity State
+	 */
 	void updateState(Sync::ConnectivityType aType, bool aState);
 
 signals:
@@ -87,7 +91,7 @@ private:
 
     QMap<Sync::ConnectivityType, bool> iTransportStates;
 
-    USBModedProxy *iUSBProxy;
+    //USBModedProxy *iUSBProxy;
 
     ContextProperty *iBt;
 
@@ -95,7 +99,9 @@ private:
 
     mutable QMutex iMutex;
 
+#ifdef SYNCFW_UNIT_TESTS
     friend class TransportTrackerTest;
+#endif
 
 };
 

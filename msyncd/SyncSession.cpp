@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "SyncSession.h"
 #include "PluginRunner.h"
 #include "StorageBooker.h"
@@ -34,12 +33,12 @@ SyncSession::SyncSession(SyncProfile *aProfile, QObject *aParent)
 :   QObject(aParent),
     iProfile(aProfile),
     iPluginRunner(0),
+    iStatus(Sync::SYNC_ERROR),
+    iErrorCode(0),
     iPluginRunnerOwned(false),
     iScheduled(false),
     iAborted(false),
     iFinished(false),
-    iStatus(Sync::SYNC_ERROR),
-    iErrorCode(0),
     iStorageBooker(0)
 {
     FUNCTION_CALL_TRACE;
@@ -81,18 +80,21 @@ void SyncSession::setPluginRunner(PluginRunner *aPluginRunner,
     {
         // Connect signals from plug-in runner.
         connect(iPluginRunner, SIGNAL(transferProgress(const QString &,
-            Sync::TransferDatabase, Sync::TransferType, const QString &)),
+            Sync::TransferDatabase, Sync::TransferType, const QString &,int)),
             this, SLOT(onTransferProgress(const QString &, Sync::TransferDatabase,
-            Sync::TransferType, const QString &)));
+            Sync::TransferType, const QString &,int)));
         connect(iPluginRunner, SIGNAL(error(const QString &, const QString &, int)),
             this, SLOT(onError(const QString &, const QString &, int)));
         connect(iPluginRunner, SIGNAL(success(const QString &, const QString &)),
             this, SLOT(onSuccess(const QString &, const QString &)));
         connect(iPluginRunner, SIGNAL(storageAccquired(const QString &)),
             this, SLOT(onStorageAccquired(const QString &)));
+        connect(iPluginRunner,SIGNAL(syncProgressDetail(const QString &,int)),
+        		this ,SLOT(onSyncProgressDetail(const QString &,int)));
         connect(iPluginRunner, SIGNAL(done()), this, SLOT(onDone()));
         connect(iPluginRunner, SIGNAL(destroyed(QObject*)),
             this, SLOT(onDestroyed(QObject*)));
+
     }
 }
 
@@ -116,7 +118,8 @@ bool SyncSession::start()
     if (!rv)
     {
         updateResults(SyncResults(QDateTime::currentDateTime(),
-            SyncResults::SYNC_RESULT_FAILED));
+                      SyncResults::SYNC_RESULT_FAILED,
+                      Buteo::SyncResults::INTERNAL_ERROR));
 
         if (iPluginRunner != 0)
         {
@@ -125,6 +128,16 @@ bool SyncSession::start()
     }
 
     return rv;
+}
+
+bool SyncSession::isFinished()
+{
+	return iFinished;
+}
+
+bool SyncSession::isAborted()
+{
+	return iAborted;
 }
 
 void SyncSession::abort()
@@ -137,6 +150,30 @@ void SyncSession::abort()
     {
         iPluginRunner->abort();
     }
+}
+
+QMap<QString,bool> SyncSession::getStorageMap()
+{
+	FUNCTION_CALL_TRACE
+	return iStorageMap;
+}
+
+void SyncSession::setStorageMap(QMap<QString,bool> &aStorageMap)
+{
+	FUNCTION_CALL_TRACE
+	iStorageMap = aStorageMap;
+}
+
+bool SyncSession::isProfileCreated()
+{
+	FUNCTION_CALL_TRACE
+	return iCreateProfile;
+}
+
+void SyncSession::setProfileCreated(bool aProfileCreated)
+{
+	FUNCTION_CALL_TRACE
+	iCreateProfile = aProfileCreated;
 }
 
 void SyncSession::stop()
@@ -194,6 +231,7 @@ bool SyncSession::isScheduled() const
 void SyncSession::onSuccess(const QString &aProfileName, const QString &aMessage)
 {
     FUNCTION_CALL_TRACE;
+    iErrorCode = 0;
 
     Q_UNUSED(aProfileName);
 
@@ -237,17 +275,23 @@ void SyncSession::onError(const QString &aProfileName, const QString &aMessage,
 
 void SyncSession::onTransferProgress(const QString &aProfileName,
     Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-    const QString &aMimeType)
+    const QString &aMimeType, int aCommittedItems)
 {
     FUNCTION_CALL_TRACE;
 
-    emit transferProgress(aProfileName, aDatabase, aType, aMimeType);
+    emit transferProgress(aProfileName, aDatabase, aType, aMimeType, aCommittedItems);
 }
 
 void SyncSession::onStorageAccquired (const QString &aMimeType)
 {
 	FUNCTION_CALL_TRACE;
 	emit storageAccquired (profileName(), aMimeType);
+}
+
+void SyncSession::onSyncProgressDetail(const QString &aProfileName,int aProgressDetail)
+{
+	FUNCTION_CALL_TRACE;
+	emit syncProgressDetail (aProfileName,aProgressDetail);
 }
 
 void SyncSession::onDone()
@@ -285,12 +329,12 @@ void SyncSession::updateResults(const SyncResults &aResults)
     iResults.setTargetId(aResults.getTargetId());
 }
 
-void SyncSession::setFailureResult(int aErrorCode)
+void SyncSession::setFailureResult(int aMajorCode, int aMinorCode)
 {
     FUNCTION_CALL_TRACE;
 
-    iResults = SyncResults();
-    iResults.setResultCode(aErrorCode);
+    iResults.setMajorCode(aMajorCode);
+    iResults.setMinorCode(aMinorCode);
 }
 
 bool SyncSession::reserveStorages(StorageBooker *aStorageBooker)

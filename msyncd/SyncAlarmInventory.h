@@ -39,24 +39,37 @@ class SyncAlarmInventory : public QObject
     Q_OBJECT
 
     public:
-        /*! The alarm inventory constructor */
+        /*! The alarm inventory constructor
+         * Always Call init()  before using other methods of this class */
         SyncAlarmInventory();
 
         /*! The alarm inventory destructor */
         ~SyncAlarmInventory();
 
-        /*! Initialize the alarms database */
+        /*! \brief Creates and Initialize the alarms database. also Creates the timers
+         * Please call this function to make sure the database is initialised properly
+         * @return - status of the initialisation
+         */
         bool init();
 
-        // FIXME! Change int to long for alarmId
-        /*! Method to add an alarm */
+        /*! \brief Method to add an alarm
+         *
+         * @param alarmTime - time of the alarm as QDateTime
+         * @return id of the alarm if alarm was added successfully. else 0
+         */
         int  addAlarm(QDateTime alarmTime);
 
-        /*! Method to remove an alarm */
+        /*! Method to remove an alarm
+         *
+         * @param alarmId - id of the alarm to remove
+         * @return status of the remove
+         */
         bool removeAlarm(int alarmId);
 
     signals:
-        /* Signal triggered when an alarm expired */
+        /*! \brief Signal triggered when an alarm expired
+         * @param alarmId  - id of the alarm that got triggered.
+         * */
         void triggerAlarm(int alarmId);
 
     private:
@@ -70,7 +83,7 @@ class SyncAlarmInventory : public QObject
         QSqlDatabase*  getDbHandle();
 
         /* Timer object to keep tracke of alarm timers */
-        QTimer*        timer;
+        QTimer*        iTimer;
 
         /* Current alarm that is under work */
         int            currentAlarm;
