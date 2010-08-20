@@ -88,17 +88,7 @@ bool SyncClientInterface::isValid()
 	return d_ptr->isValid();
 }
 
-void SyncClientInterface::lastSyncResultCode(const QString &aProfileId, int &majorCode, int &minorCode)
+Buteo::SyncResults SyncClientInterface::getLastSyncResult(const QString &aProfileId)
 {
-    d_ptr->lastSyncResultCode(aProfileId, majorCode, minorCode);
-}
-
-QDateTime SyncClientInterface::lastSyncTime(const QString &aProfileId)
-{
-    return d_ptr->lastSyncTime(aProfileId);
-}
-
-bool SyncClientInterface::isLastSyncScheduled(const QString &aProfileId) const
-{
-    return d_ptr->isLastSyncScheduled(aProfileId);
+    return d_ptr->getLastSyncResult(aProfileId);
 }

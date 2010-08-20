@@ -93,6 +93,7 @@ QT += testlib \
     core \
     xml \
     dbus \
+    network \
     sql
 QT -= gui
 QMAKE_CXXFLAGS += -Wall \

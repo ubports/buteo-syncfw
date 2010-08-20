@@ -258,31 +258,11 @@ public slots:
      */
     virtual bool saveSyncResults(QString aProfileId,QString aSyncResults) = 0;
 
-    /*! \brief Gets the Major code for the last.
-     *
-     * \return Major code.
+    /*! \brief To get lastSyncResult.
+     *  \param aProfileId
+     *  \return QString of syncResult.
      */
-    virtual int lastSyncMajorCode(const QString &aProfileId) = 0;
-
-    /*! \brief Gets the Minor code for the last.
-     *
-     * \return Minor code.
-     */
-    virtual int lastSyncMinorCode(const QString &aProfileId) = 0;
-
-    /*! \brief Gets the time of last completed sync session with this profile.
-     *
-     * \return Last sync time. Null object if this could not be determined.
-     */
-    virtual QString lastSyncTime(const QString &aProfileId) = 0;
-
-    /*! \brief Checks if the results are from a scheduled sync.
-     *
-     * \return True if scheduled.
-     */
-    virtual bool isLastSyncScheduled(const QString &aProfileId)= 0;
-
-
+    virtual QString getLastSyncResult(const QString &aProfileId) = 0;
 };
 
 }

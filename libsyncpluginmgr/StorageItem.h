@@ -61,7 +61,7 @@ public:
 
     /*! \brief Sets the id of the parent of this item
      *
-     * @param aId The id of the parent of item
+     * @param aParentId The id of the parent of item
      */
     void setParentId( const QString& aParentId );
 

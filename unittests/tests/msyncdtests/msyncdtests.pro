@@ -45,6 +45,7 @@ SOURCES += ServerThread.cpp \
     SynchronizerTest.cpp \
     SyncAlarmInventory.cpp \
     IPHeartBeat.cpp \
+    NetworkManager.cpp \
     IPHeartBeatTest.cpp
 
 HEADERS += ServerThread.h \
@@ -80,6 +81,7 @@ HEADERS += ServerThread.h \
     SyncAlarmInventory.h \
     SynchronizerTest.h \
     IPHeartBeat.h \
+    NetworkManager.h \
     IPHeartBeatTest.h
 
 OTHER_FILES += 

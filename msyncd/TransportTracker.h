@@ -33,12 +33,13 @@ class ContextProperty;
 
 namespace Buteo {
 
-//class USBModedProxy;
+class USBModedProxy;
+class NetworkManager;
 
     
 /*! \brief Class for tracking transport states
  *
- * USB state is tracked with HAL, BT and Internet states with Context Framework.
+ * USB state is tracked with HAL, BT with Context Framework and Internet states with Buteo::NetworkManager.
  */
 class TransportTracker : public QObject
 {
@@ -62,14 +63,6 @@ public:
 	 */
 	bool isConnectivityAvailable(Sync::ConnectivityType aType) const;
 
-	// @todo: make private
-	/*! \brief updates the state of the given connectivity type to input value
-	 *
-	 * @param aType Connectivity type
-	 * @param aState Connectivity State
-	 */
-	void updateState(Sync::ConnectivityType aType, bool aState);
-
 signals:
 
     /*! \brief Signal emitted when a connectivity state changes
@@ -79,28 +72,44 @@ signals:
      */
 	void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
 
+    /*! \brief Signal emitted when a network session is successfully opened
+     */
+    void sessionConnected();
+    
+    /*! \brief Signal emitted when opening a network session fails
+     */
+    void sessionError();
+
 private slots:
 
 	void onUsbStateChanged(bool aConnected);
 
     void onBtStateChanged();
 
-    void onInternetStateChanged();
+    void onInternetStateChanged(bool aConnected);
 
 private:
 
     QMap<Sync::ConnectivityType, bool> iTransportStates;
 
-    //USBModedProxy *iUSBProxy;
+    USBModedProxy *iUSBProxy;
 
     ContextProperty *iBt;
 
-    ContextProperty *iInternet;
+    NetworkManager *iInternet;
 
     mutable QMutex iMutex;
 
+	/*! \brief updates the state of the given connectivity type to input value
+	 *
+	 * @param aType Connectivity type
+	 * @param aState Connectivity State
+	 */
+	void updateState(Sync::ConnectivityType aType, bool aState);
+
 #ifdef SYNCFW_UNIT_TESTS
     friend class TransportTrackerTest;
+    friend class SynchronizerTest;
 #endif
 
 };

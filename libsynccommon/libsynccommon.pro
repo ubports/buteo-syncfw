@@ -10,7 +10,14 @@ INCLUDEPATH += .
 QT -= gui
 CONFIG += dll \
     debug \
-    silent
+    silent \
+    create_pc \
+    create_prl
+
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+QMAKE_PKGCONFIG_LIBDIR  = $$target.path
+QMAKE_PKGCONFIG_INCDIR  = $$headers.path
+pkgconfig.files = $${TARGET}.pc
 
 # Input
 SOURCES += Logger.cpp
@@ -28,7 +35,8 @@ QMAKE_CLEAN += $(TARGET) \
     $(TARGET0) \
     $(TARGET1) \
     $(TARGET2) \
-    $(OBJECTS_DIR)/moc_*
+    $(OBJECTS_DIR)/moc_* \
+    lib$${TARGET}.prl pkgconfig/*
 
 # install
 target.path = /usr/lib/

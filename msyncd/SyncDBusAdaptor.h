@@ -138,6 +138,10 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"s\" name=\"aTimeAsString\"/>\n"
 "      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
 "    </method>\n"
+"    <method name=\"getLastSyncResult\">\n"
+"      <arg direction=\"out\" type=\"s\" name=\"aSyncResultAsString\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
+"    </method>\n"
 "  </interface>\n"
         "");
 public:
@@ -158,6 +162,9 @@ public Q_SLOTS: // METHODS
 
     //! \see SyncDBusInterface::getBackUpRestoreState()
     bool getBackUpRestoreState();
+
+    //! \see SyncDBusInterface::getLastSyncResult()
+    QString getLastSyncResult(const QString &aProfileId);
 
     //! \see SyncDBusInterface::releaseStorages()
     Q_NOREPLY void releaseStorages(const QStringList &aStorageNames);

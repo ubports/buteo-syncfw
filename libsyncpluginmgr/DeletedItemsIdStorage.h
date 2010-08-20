@@ -70,10 +70,9 @@ public:
      *
      * @param aItems Item id's to store
      * @param aCreationTimes Creation times of the items
-     * @param clear clear snapshot table contents before setting a new one of true
      * @return True on success, otherwise false
      */
-    bool setSnapshot( const QList<QString>& aItems, const QList<QDateTime>& aCreationTimes, bool clear = true );
+    bool setSnapshot( const QList<QString>& aItems, const QList<QDateTime>& aCreationTimes );
 
     /*! \brief Adds a deleted item to backend
      *
@@ -82,6 +81,15 @@ public:
      * @param aDeleteTime Time of deletion
      */
     void addDeletedItem( const QString& aItem, const QDateTime& aCreationTime, const QDateTime& aDeleteTime );
+
+    /*! \brief Adds deleted items to backend
+     *
+     * @param aItems Items Ids
+     * @param aCreationTimes Times when the items were initially created
+     * @param aDeleteTimes Times of deletion
+     */
+    void addDeletedItems( const QList<QString>& aItems, const QList<QDateTime>& aCreationTimes,
+                          const QList<QDateTime>& aDeleteTimes );
 
     /*! \brief Returns the deleted items after given time
      *

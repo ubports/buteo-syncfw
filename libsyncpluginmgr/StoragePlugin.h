@@ -174,6 +174,13 @@ public:
      */
     virtual StorageItem* getItem( const QString& aItemId ) = 0;
 
+    /*! \brief Returns items based on ids
+     *
+     * @param aItemIdList List of id's
+     * @return List of items
+     */
+    virtual QList<StorageItem*> getItems( const QStringList& aItemIdList ) = 0;
+
     /*! \brief Adds an item to the storage
      *
      * Upon successful addition, item is updated with its

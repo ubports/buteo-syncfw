@@ -2,12 +2,21 @@ TEMPLATE = app
 TARGET = 
 QT += xml \
     dbus \
-    sql
+    sql \
+    network
 QT -= gui
 CONFIG += qdbus \
     debug \
     link_pkgconfig \
-    silent
+    silent \
+    create_pc \
+    create_prl
+
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+QMAKE_PKGCONFIG_LIBDIR  = $$target.path
+QMAKE_PKGCONFIG_INCDIR  = $$headers.path
+pkgconfig.files = $${TARGET}.pc
+
 DEPENDPATH += . 
 INCLUDEPATH += . \
     ../ \
@@ -15,7 +24,7 @@ INCLUDEPATH += . \
     ../libsyncpluginmgr \
     ../libsyncprofile \
     /usr/include/accounts-qt \
-    /usr/include/iphbd/ 
+    /usr/include/iphbd/ \
     
 PKGCONFIG += dbus-1
 QMAKE_LIBDIR_QT += ../libsyncprofile/
@@ -48,7 +57,7 @@ HEADERS += ServerActivator.h \
     SyncBackupAdaptor.h \
     ClientThread.h \
     ServerThread.h \
-#    USBModedProxy.h \
+    USBModedProxy.h \
     StorageBooker.h \
     SyncQueue.h \
     SyncScheduler.h \
@@ -59,6 +68,7 @@ HEADERS += ServerActivator.h \
     ClientPluginRunner.h \
     ServerPluginRunner.h \
     SyncAlarmInventory.h \
+    NetworkManager.h \
     IPHeartBeat.h
 SOURCES += ServerActivator.cpp \
     TransportTracker.cpp \
@@ -68,7 +78,7 @@ SOURCES += ServerActivator.cpp \
     SyncBackupAdaptor.cpp \
     ClientThread.cpp \
     ServerThread.cpp \
-#    USBModedProxy.cpp \
+    USBModedProxy.cpp \
     StorageBooker.cpp \
     SyncQueue.cpp \
     SyncScheduler.cpp \
@@ -79,6 +89,7 @@ SOURCES += ServerActivator.cpp \
     ClientPluginRunner.cpp \
     ServerPluginRunner.cpp \
     SyncAlarmInventory.cpp \
+    NetworkManager.cpp \
     IPHeartBeat.cpp
 QMAKE_CXXFLAGS = -Wall \
     -g \
@@ -96,6 +107,7 @@ INSTALLS += target \
 # clean
 QMAKE_CLEAN += $(TARGET)
 QMAKE_CLEAN += $(OBJECTS_DIR)/moc_*
+QMAKE_CLEAN += lib$${TARGET}.prl pkgconfig/*
 
 # #####################################################################
 # make coverage (debug)

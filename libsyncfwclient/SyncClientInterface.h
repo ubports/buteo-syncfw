@@ -155,25 +155,11 @@ public:
      */
     bool isValid();
 
-    /*! \brief Gets the Major code for the last.
-     *  \param profileID
-     *  \param major code as reference.
-     *  \param minor code as reference
-     *  \return void
+    /*! \brief To get lastSyncResult.
+     *  \param aProfileId
+     *  \return SyncResults of syncLastResult.
      */
-    void lastSyncResultCode(const QString &aProfileId, int &majorCode, int &minorCode);
-
-    /*! \brief Gets the time of last completed sync session with this profile.
-     *  \param profileID
-     * \return Last sync time. Null object if this could not be determined.
-     */
-    QDateTime lastSyncTime(const QString &aProfileId);
-
-    /*! \brief Checks if the results are from a scheduled sync.
-     *  \param profileID
-     * \return True if scheduled.
-     */
-    bool isLastSyncScheduled(const QString &aProfileId) const;
+    Buteo::SyncResults getLastSyncResult(const QString &aProfileId);
 
 signals:
 

@@ -1,0 +1,22 @@
+This package was debianized by Lassi Nieminen <lassi.ta.nieminen@nokiacom> on
+Thu, 19 Mar 2009 15:22:13 +0200.
+
+It was downloaded from <fill in http/ftp site>
+
+Upstream Author: 
+
+Copyright: <put the year(s) of the copyright, and the names of the
+            copyright holder(s) here>
+
+License:
+
+<Put the license of the package here>
+
+
+The Debian packaging is (C) 2009, N N <n.n@nn.com> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+
+
+# Please also look if there are files or directories which have a
+# different copyright/license attached and list them here.
+

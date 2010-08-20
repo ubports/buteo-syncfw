@@ -85,6 +85,14 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QLatin1String("getBackUpRestoreState"), argumentList);
     }
 
+    //! \see SyncDBusInterface::getLastSyncResult()
+    inline QDBusPendingReply<QString> getLastSyncResult(const QString &aProfileId)
+    {
+        QList<QVariant> argumentList;
+        argumentList << qVariantFromValue(aProfileId);
+        return asyncCallWithArgumentList(QLatin1String("getLastSyncResult"), argumentList);
+    }
+
     //! \see SyncDBusInterface::isLastSyncScheduled()
     inline QDBusPendingReply<bool> isLastSyncScheduled(const QString &aProfileId)
     {

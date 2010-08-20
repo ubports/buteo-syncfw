@@ -78,6 +78,8 @@ public:
         ABORTED,
         CONNECTION_ERROR,
         INVALID_SYNCML_MESSAGE,
+        UNSUPPORTED_SYNC_TYPE,
+        UNSUPPORTED_STORAGE_TYPE,
         //Upto here
 
         //Context Error Code

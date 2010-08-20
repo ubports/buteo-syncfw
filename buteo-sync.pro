@@ -1,12 +1,14 @@
-#include(doc/doc.pro)
+include(doc/doc.pro)
 
 TEMPLATE = subdirs
 
 SUBDIRS += libsynccommon \
            libsyncprofile \
            libsyncpluginmgr \
-           msyncd
-#           unittests
+           msyncd \
+           libsyncfwclient \
+           unittests \
+	   doc
 
 QT += testlib
 

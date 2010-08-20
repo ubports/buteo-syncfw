@@ -103,53 +103,59 @@ bool DeletedItemsIdStorage::getSnapshot( QList<QString>& aItems, QList<QDateTime
 }
 
 bool DeletedItemsIdStorage::setSnapshot( const QList<QString>& aItems,
-                                         const QList<QDateTime>& aCreationTimes,
-                                         bool clear )
+                                         const QList<QDateTime>& aCreationTimes )
 {
     FUNCTION_CALL_TRACE;
 
-    if( clear )
+    // Clear existing snapshot
+    const QString deleteQueryString( "DELETE FROM snapshot" );
+    QSqlQuery deleteQuery( iDb );
+    deleteQuery.prepare( deleteQueryString );
+
+    if( !deleteQuery.exec() ) {
+        LOG_WARNING("Could not clear item snapshot: " << deleteQuery.lastError() );
+        return false;
+    }
+
+    if( !aItems.isEmpty() )
     {
-        // Clear existing snapshot
-        const QString deleteQueryString( "DELETE FROM snapshot" );
-        QSqlQuery deleteQuery( iDb );
-        deleteQuery.prepare( deleteQueryString );
-    
-        if( !deleteQuery.exec() ) {
-            LOG_WARNING("Could not clear item snapshot: " << deleteQuery.lastError() );
-            return false;
+
+        const QString insertQueryString( "INSERT INTO snapshot VALUES (:itemid, :creationtime)" );
+        bool supportsTransaction = iDb.transaction();
+        if(!supportsTransaction)
+        {
+            LOG_DEBUG("SQL Db doesn't support transactions");
         }
-    }
 
-    const QString insertQueryString( "INSERT INTO snapshot VALUES (:itemid, :creationtime)" );
-    bool supportsTransaction = iDb.transaction();
-    if(!supportsTransaction)
-    {
-        LOG_DEBUG("SQL Db doesn't support transactions");
-    }
-    QSqlQuery insertQuery( iDb );
-    insertQuery.prepare( insertQueryString );
+        QSqlQuery insertQuery( iDb );
+        insertQuery.prepare( insertQueryString );
 
-    // Insert new snapshot
-    for( int i = 0; i < aItems.count(); ++i ) {
-        insertQuery.bindValue( ":itemid", aItems[i] );
-        insertQuery.bindValue( ":creationtime", aCreationTimes[i].toUTC() );
+        QVariantList itemIds;
+        QVariantList creationTimes;
 
+        for( int i = 0; i < aItems.count(); ++i ) {
+            itemIds << aItems[i];
+            creationTimes << aCreationTimes[i].toUTC();
+        }
 
-        if( insertQuery.exec() ) {
-            LOG_DEBUG("Added item to snapshot: " << aItems[i] );
+        insertQuery.addBindValue( itemIds );
+        insertQuery.addBindValue( creationTimes );
+
+        // Insert new snapshot
+        if( insertQuery.execBatch() ) {
+            LOG_DEBUG( itemIds.count() <<"items set to snapshot" );
         }
         else {
-            LOG_WARNING( "Could not add item" << aItems[i] <<"to snapshot" );
+            LOG_WARNING( "Could not set items snapshot" );
             LOG_WARNING( "Reason:" << insertQuery.lastError() );
         }
-    }
 
-    if(supportsTransaction)
-    {
-        if( !iDb.commit() )
+        if(supportsTransaction)
         {
-            LOG_DEBUG("Error while commiting : " << iDb.lastError());
+            if( !iDb.commit() )
+            {
+                LOG_WARNING("Error while commiting : " << iDb.lastError());
+            }
         }
     }
 
@@ -180,11 +186,59 @@ void DeletedItemsIdStorage::addDeletedItem( const QString& aItem, const QDateTim
 
 }
 
+void DeletedItemsIdStorage::addDeletedItems( const QList<QString>& aItems, const QList<QDateTime>& aCreationTimes,
+                                             const QList<QDateTime>& aDeleteTimes )
+{
+    FUNCTION_CALL_TRACE;
+
+    const QString queryString( "INSERT INTO deleteditems VALUES(:itemid, :creationtime, :deletetime)");
+
+    QSqlQuery query( iDb );
+
+    bool supportsTransaction = iDb.transaction();
+    if(!supportsTransaction)
+    {
+        LOG_DEBUG("SQL Db doesn't support transactions");
+    }
+
+    query.prepare( queryString );
+
+    QVariantList items;
+    QVariantList creationTimes;
+    QVariantList deleteTimes;
+
+    for( int i = 0; i < aItems.count(); ++i )
+    {
+        items << aItems[i];
+        creationTimes << aCreationTimes[i].toUTC();
+        deleteTimes << aDeleteTimes[i].toUTC();
+    }
+
+    query.addBindValue( items );
+    query.addBindValue( creationTimes );
+    query.addBindValue( deleteTimes );
+
+    if( query.execBatch() ) {
+        LOG_DEBUG( "Added" << items.count()  <<"items as deleted" );
+    }
+    else {
+        LOG_WARNING( "Could not add items as deleted" );
+        LOG_WARNING( "Reason:" << query.lastError() );
+    }
+
+    if(supportsTransaction)
+    {
+        if( !iDb.commit() )
+        {
+            LOG_WARNING("Error while commiting : " << iDb.lastError());
+        }
+    }
+}
+
 bool DeletedItemsIdStorage::getDeletedItems( QList<QString>& aItems, const QDateTime& aTime )
 {
     FUNCTION_CALL_TRACE;
 
-//     const QString queryString( "SELECT itemid FROM deleteditems WHERE creationtime < :creationtime AND :deletetime < deletetime" );
     const QString queryString( "SELECT itemid FROM deleteditems WHERE creationtime < :creationtime AND deletetime > :deletetime" );
     LOG_DEBUG(queryString);
     QSqlQuery query( iDb );

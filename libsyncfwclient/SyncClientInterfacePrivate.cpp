@@ -192,30 +192,22 @@ bool SyncClientInterfacePrivate::isValid()
 	return(iSyncDaemon && iSyncDaemon->isValid());
 }
 
-void SyncClientInterfacePrivate::lastSyncResultCode(const QString &aProfileId, int &majorCode, int &minorCode)
+Buteo::SyncResults SyncClientInterfacePrivate::getLastSyncResult(const QString &aProfileId)
 {
-    if (iSyncDaemon) {
-        majorCode = iSyncDaemon->lastSyncMajorCode(aProfileId);
-        minorCode = iSyncDaemon->lastSyncMinorCode(aProfileId);
-    }
-}
-
-QDateTime SyncClientInterfacePrivate::lastSyncTime(const QString &aProfileId)
-{
-    QDateTime time;
+    Buteo::SyncResults syncResult(QDateTime::currentDateTime(),
+         SyncResults::SYNC_RESULT_INVALID, Buteo::SyncResults::SYNC_RESULT_INVALID);
 
     if (iSyncDaemon) {
-        QString syncTime = iSyncDaemon->lastSyncTime(aProfileId);
-        time = QDateTime::fromString(syncTime, Qt::ISODate);
-    }
-    return time;
-}
+        QString resultASXmlString = iSyncDaemon->getLastSyncResult(aProfileId);
+        QDomDocument doc;
 
-bool SyncClientInterfacePrivate::isLastSyncScheduled(const QString &aProfileId) const
-{
-    bool scheduled = false;
-    if (iSyncDaemon) {
-        scheduled = iSyncDaemon->isLastSyncScheduled(aProfileId);
+        if (doc.setContent(resultASXmlString, true)) {
+            Buteo::SyncResults result(doc.documentElement());
+            return result;
+        }
+        else {
+            LOG_CRITICAL("Invalid Profile Xml Received from msyncd");
+        }
     }
-    return scheduled;
+    return syncResult;
 }

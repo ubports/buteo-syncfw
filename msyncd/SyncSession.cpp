@@ -25,6 +25,7 @@
 #include "PluginRunner.h"
 #include "StorageBooker.h"
 #include "SyncProfile.h"
+#include "NetworkManager.h"
 #include "LogMacros.h"
 
 using namespace Buteo;
@@ -38,8 +39,10 @@ SyncSession::SyncSession(SyncProfile *aProfile, QObject *aParent)
     iPluginRunnerOwned(false),
     iScheduled(false),
     iAborted(false),
+    iStarted(false),
     iFinished(false),
-    iStorageBooker(0)
+    iStorageBooker(0),
+    iNetworkManager(0)
 {
     FUNCTION_CALL_TRACE;
 }
@@ -53,6 +56,16 @@ SyncSession::~SyncSession()
         PluginRunner *runner = iPluginRunner;
         iPluginRunner = 0;
         delete runner;
+    }
+
+    if(iNetworkManager)
+    {
+        // Disconnect all slots connected to the network manager
+        disconnect(iNetworkManager, SIGNAL(connectionSuccess()),
+                    this, SLOT(onNetworkSessionOpened()));
+        disconnect(iNetworkManager, SIGNAL(connectionError()),
+                    this, SLOT(onNetworkSessionError()));
+        iNetworkManager->disconnectSession();
     }
 
     releaseStorages();
@@ -90,7 +103,7 @@ void SyncSession::setPluginRunner(PluginRunner *aPluginRunner,
         connect(iPluginRunner, SIGNAL(storageAccquired(const QString &)),
             this, SLOT(onStorageAccquired(const QString &)));
         connect(iPluginRunner,SIGNAL(syncProgressDetail(const QString &,int)),
-        		this ,SLOT(onSyncProgressDetail(const QString &,int)));
+                this ,SLOT(onSyncProgressDetail(const QString &,int)));
         connect(iPluginRunner, SIGNAL(done()), this, SLOT(onDone()));
         connect(iPluginRunner, SIGNAL(destroyed(QObject*)),
             this, SLOT(onDestroyed(QObject*)));
@@ -110,9 +123,35 @@ bool SyncSession::start()
     FUNCTION_CALL_TRACE;
 
     bool rv = false;
+    // If this is an online session, then we need to ensure that the network
+    // session is opened before starting our plugin runner
+    
+    if(iProfile->destinationType() == SyncProfile::DESTINATION_TYPE_ONLINE)
+    {
+        iNetworkManager = new NetworkManager(this);
+        Q_ASSERT(iNetworkManager);
+        Q_ASSERT(connect(iNetworkManager, SIGNAL(connectionSuccess()),
+                    SLOT(onNetworkSessionOpened())));
+        Q_ASSERT(connect(iNetworkManager, SIGNAL(connectionError()),
+                    SLOT(onNetworkSessionError())));
+        // Return true here and wait for the session open status
+        iNetworkManager->connectSession(iScheduled);
+        rv = true;
+    }
+    else
+    {
+        rv = tryStart();
+    }
+    return rv;
+}
+
+bool SyncSession::tryStart()
+{
+    bool rv = false;
+
     if (iPluginRunner != 0)
     {
-        rv = iPluginRunner->start();
+        iStarted = rv = iPluginRunner->start();
     }
 
     if (!rv)
@@ -126,61 +165,76 @@ bool SyncSession::start()
             disconnect(iPluginRunner, 0, this, 0);
         }
     }
-
     return rv;
 }
 
 bool SyncSession::isFinished()
 {
-	return iFinished;
+    return iFinished;
 }
 
 bool SyncSession::isAborted()
 {
-	return iAborted;
+    return iAborted;
 }
 
 void SyncSession::abort()
 {
     FUNCTION_CALL_TRACE;
 
-    iAborted = true;
-
-    if (iPluginRunner != 0)
+    if(!iStarted)
     {
-        iPluginRunner->abort();
+        LOG_DEBUG("Client plugin runner not started, ignore abort");
+        updateResults(SyncResults(QDateTime::currentDateTime(),
+                      SyncResults::SYNC_RESULT_FAILED,
+                      Buteo::SyncResults::ABORTED));
+        emit finished(profileName(), Sync::SYNC_ERROR, QString(), SyncResults::ABORTED);
+        return;
+    }
+    else
+    {
+        iAborted = true;
+
+        if (iPluginRunner != 0)
+        {
+            iPluginRunner->abort();
+        }
     }
 }
 
 QMap<QString,bool> SyncSession::getStorageMap()
 {
-	FUNCTION_CALL_TRACE
-	return iStorageMap;
+    FUNCTION_CALL_TRACE
+    return iStorageMap;
 }
 
 void SyncSession::setStorageMap(QMap<QString,bool> &aStorageMap)
 {
-	FUNCTION_CALL_TRACE
-	iStorageMap = aStorageMap;
+    FUNCTION_CALL_TRACE
+    iStorageMap = aStorageMap;
 }
 
 bool SyncSession::isProfileCreated()
 {
-	FUNCTION_CALL_TRACE
-	return iCreateProfile;
+    FUNCTION_CALL_TRACE
+    return iCreateProfile;
 }
 
 void SyncSession::setProfileCreated(bool aProfileCreated)
 {
-	FUNCTION_CALL_TRACE
-	iCreateProfile = aProfileCreated;
+    FUNCTION_CALL_TRACE
+    iCreateProfile = aProfileCreated;
 }
 
 void SyncSession::stop()
 {
     FUNCTION_CALL_TRACE;
 
-    if (iPluginRunner != 0)
+    if(!iStarted)
+    {
+        LOG_DEBUG("Plugin runner not yet started, ignoring stop.");
+    }
+    else if (iPluginRunner != 0)
     {
         iPluginRunner->stop();
     }
@@ -262,7 +316,7 @@ void SyncSession::onError(const QString &aProfileName, const QString &aMessage,
     Q_UNUSED(aProfileName);
 
     iFinished = true;
-    iStatus = Sync::SYNC_ERROR;
+    iStatus = mapToSyncStatusError(aErrorCode);
     iMessage = aMessage;
     iErrorCode = aErrorCode;
 
@@ -271,6 +325,27 @@ void SyncSession::onError(const QString &aProfileName, const QString &aMessage,
         updateResults(iPluginRunner->syncResults());
     }
     emit finished(profileName(), iStatus, iMessage, iErrorCode);
+}
+
+Sync::SyncStatus SyncSession::mapToSyncStatusError( int aErrorCode )
+{
+    Sync::SyncStatus status;
+    SyncResults::MinorCode code = static_cast<SyncResults::MinorCode>(aErrorCode);
+
+    switch(code)
+    {
+        case SyncResults::UNSUPPORTED_SYNC_TYPE:
+        {
+            status = Sync::SYNC_NOTPOSSIBLE;
+            break;
+        }
+        default:
+        {
+            status = Sync::SYNC_ERROR;
+            break;
+        }
+    }
+    return status;
 }
 
 void SyncSession::onTransferProgress(const QString &aProfileName,
@@ -284,14 +359,14 @@ void SyncSession::onTransferProgress(const QString &aProfileName,
 
 void SyncSession::onStorageAccquired (const QString &aMimeType)
 {
-	FUNCTION_CALL_TRACE;
-	emit storageAccquired (profileName(), aMimeType);
+    FUNCTION_CALL_TRACE;
+    emit storageAccquired (profileName(), aMimeType);
 }
 
 void SyncSession::onSyncProgressDetail(const QString &aProfileName,int aProgressDetail)
 {
-	FUNCTION_CALL_TRACE;
-	emit syncProgressDetail (aProfileName,aProgressDetail);
+    FUNCTION_CALL_TRACE;
+    emit syncProgressDetail (aProfileName,aProgressDetail);
 }
 
 void SyncSession::onDone()
@@ -364,5 +439,50 @@ void SyncSession::releaseStorages()
     // Set storage booker to NULL. This indicates that we don't hold any
     // storage reservations.
     iStorageBooker = 0;
+}
+
+void SyncSession::onNetworkSessionOpened()
+{
+    // Start the plugin runner now
+    FUNCTION_CALL_TRACE;
+
+    if(iNetworkManager)
+    {
+        // Disconnect all slots connected to the network manager
+        disconnect(iNetworkManager, SIGNAL(connectionSuccess()),
+                    this, SLOT(onNetworkSessionOpened()));
+        disconnect(iNetworkManager, SIGNAL(connectionError()),
+                    this, SLOT(onNetworkSessionError()));
+        iNetworkManager->disconnectSession();
+    }
+
+    if (false == tryStart())
+    {
+        updateResults(SyncResults(QDateTime::currentDateTime(),
+                      SyncResults::SYNC_RESULT_FAILED,
+                      Buteo::SyncResults::INTERNAL_ERROR));
+        emit finished(profileName(), Sync::SYNC_ERROR, QString(), SyncResults::INTERNAL_ERROR);
+    }
+}
+
+void SyncSession::onNetworkSessionError()
+{
+    FUNCTION_CALL_TRACE;
+
+    if(iNetworkManager)
+    {
+        // Disconnect all slots connected to the network manager
+        disconnect(iNetworkManager, SIGNAL(connectionSuccess()),
+                    this, SLOT(onNetworkSessionOpened()));
+        disconnect(iNetworkManager, SIGNAL(connectionError()),
+                    this, SLOT(onNetworkSessionError()));
+        iNetworkManager->disconnectSession();
+    }
+
+    updateResults(SyncResults(QDateTime::currentDateTime(),
+                  SyncResults::SYNC_RESULT_FAILED,
+                  Buteo::SyncResults::CONNECTION_ERROR));
+    // Update the session with connection error
+    emit finished(profileName(), Sync::SYNC_ERROR, QString(), SyncResults::CONNECTION_ERROR);
 }
 

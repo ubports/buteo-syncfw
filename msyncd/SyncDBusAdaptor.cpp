@@ -78,6 +78,14 @@ bool SyncDBusAdaptor::getBackUpRestoreState()
     return out0;
 }
 
+QString SyncDBusAdaptor::getLastSyncResult(const QString &aProfileId)
+{
+    // handle method call com.nokia.msyncd.getLastSyncResult
+    QString aSyncResultAsString;
+    QMetaObject::invokeMethod(parent(), "getLastSyncResult", Q_RETURN_ARG(QString, aSyncResultAsString), Q_ARG(QString, aProfileId));
+    return aSyncResultAsString;
+}
+
 bool SyncDBusAdaptor::isLastSyncScheduled(const QString &aProfileId)
 {
     // handle method call com.nokia.msyncd.isLastSyncScheduled

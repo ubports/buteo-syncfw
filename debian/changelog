@@ -1,0 +1,439 @@
+sync-fw (0.5.0-20) unstable; urgency=low
+
+  * Recompile.
+
+ -- Deepak Kodihalli <deepak.kodohalli@nokia.com>  Thu, 19 Aug 2010 12:06:17 +0530
+
+sync-fw (0.5.0-19) unstable; urgency=low
+
+  * Fixes: NB#179954 -  It took ~10 minutes to display device contacts from
+    NOS
+
+ -- Deepak Kodihalli <deepak.kodohalli@nokia.com>  Tue, 17 Aug 2010 12:06:17 +0530
+
+sync-fw (0.5.0-18) unstable; urgency=low
+
+  * Removed unnecessary stuff from debian/rules which was causing compilation
+    issues!
+  * Performance improvements to deleted items storage
+  * Fixes: NB#183589 -  Development packages libmeegosyncml-dev and
+    sync-fw-dev does not contain .pc files
+  * Added changes for client library interface by adding function getLastSyncResult
+
+ -- Deepak Kodihalli <deepak.kodohalli@nokia.com>  Mon, 16 Aug 2010 11:31:00 +0300
+
+
+sync-fw (0.5.0-17) unstable; urgency=low
+
+  * Fixes: NB#182380 - Select internet connection dialog does not come up when
+    online sync is done with internet connection set to off.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Thu, 12 Aug 2010 15:40:00 +0530
+
+sync-fw (0.5.0-16) unstable; urgency=low
+
+  * Fixes: NB#182064 - Stop synchronization button is not working.
+  * Adding changes for abortSync in case of no activeSession.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Wed, 11 Aug 2010 12:13:42 +0530
+
+sync-fw (0.5.0-15) unstable; urgency=low
+
+  * Fixes: NB#171728 -  Switch needs to fall back to sync if client does not
+    support one way sync.
+
+ -- Deepak <deepak.kodihalli@nokia.com>  Tue, 10 Aug 2010 12:13:42 +0530
+
+sync-fw (0.5.0-14) unstable; urgency=low
+
+  * Fixes: NB#183009 -  Optimize signals from sync backend to UI.
+
+ -- Deepak <deepak.kodihalli@nokia.com>  Mon, 09 Aug 2010 09:54:04 +0530
+
+sync-fw (0.5.0-13) unstable; urgency=low
+
+  * Fixes: NB#183225  deleted sync destinations appeared again when relaunch sync application
+  * Fixes: NB#183690 - Tapping on Switch launches synchronization application from device.
+  * Adding changes to make syncUi invisble in case of remote initiated sync.
+  * Made logging configurable. Logging level can be set in
+    /etc/sync/set_sync_log_level.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Fri, 06 Aug 2010 11:13:39 +0530
+
+sync-fw (0.5.0-12) unstable; urgency=low
+
+  * Fixes: NB#180774 -  Phone memory is displayed blank when device is
+    connected to PC and back-up is taken in device
+
+ -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Thu, 05 Aug 2010 11:13:39 +0530
+
+sync-fw (0.5.0-11) unstable; urgency=low
+
+  * Fixes: NB#183417 -  Sync log view doesnot update the sync details.
+  * Fixes: NB#183324 - Unable to integrate SyncScheduleSettingsDialog into MfE
+    accounts ui plugin.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Wed, 4 Aug 2010 19:45:00 +0530
+
+sync-fw (0.5.0-10) unstable; urgency=low
+
+  * Minor changes.  
+
+ -- Srikanth <ext-srikanth.kavoori@nokia.com>  Fri, 30 Jul 2010 19:45:00 +0530
+
+sync-fw (0.5.0-9) unstable; urgency=low
+
+  * Documentation updates. fixed warnings and updated some code  
+
+ -- Srikanth <ext-srikanth.kavoori@nokia.com>  Thu, 29 Jul 2010 19:44:55 +0530
+
+sync-fw (0.5.0-8) unstable; urgency=low
+
+  * Remove Postinst script for setting log level.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Wed, 28 Jul 2010 13:05:17 +0530
+
+sync-fw (0.5.0-7) unstable; urgency=low
+
+  * Fixes: NB#181030 Handle unsupported error condition as per UI spec. 
+  * Fixes: NB#174205 Last sync state needs to be saved in .sync/profiles/sync/logs/*.log.xml.
+  * Fixes: NB#169226 Sync log view does not display any of the failed sync labels.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Tue, 27 Jul 2010 13:05:17 +0530
+
+sync-fw (0.5.0-6) unstable; urgency=low
+
+  * Added changes needed for displaying sync progress detail 
+
+ -- Srikanth <ext-srikanth.kavoori@nokia.com>  Mon, 26 Jul 2010 13:05:17 +0530
+
+sync-fw (0.5.0-5) unstable; urgency=low
+
+  * Fxied Documentation issues with sync-fw  
+  * Fixes: NB#181500  -  Switch logs display transferred data as 
+    double the actual data transferred.   
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Fri, 23 Jul 2010 18:28:01 +0530
+
+sync-fw (0.5.0-4) unstable; urgency=low
+
+  * Adding changes for stopping sync.   
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Thu, 22 Jul 2010 18:28:01 +0530
+
+sync-fw (0.5.0-3) unstable; urgency=low
+
+  * Added logs to sync schedule to make debugging easy  
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Wed, 21 Jul 2010 18:28:01 +0530
+
+sync-fw (0.5.0-2) unstable; urgency=low
+
+  * Fixes: NB#180787 - Coreweb: Random Msyncd crash @
+    QObjectPrivate::deleteChildren ~QObject ~Synchronizer main
+  * Fixes: NB#180537  -  <coverity><MemLeak>  Memory leak in 
+    SyncProfile *ProfileManager::syncProfile()
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Tue, 20 Jul 2010 18:28:01 +0530
+
+sync-fw (0.5.0-1) unstable; urgency=low
+
+  * Added a New Sync Fw Client Interface Library 
+
+ -- Srikanth <ext-srikanth.kavoori@nokia.com>  Mon, 19 Jul 2010 11:01:01 +0530
+
+sync-fw (0.4.9-15) unstable; urgency=low
+
+  * TODO Wk 30 PR
+  * Fixes: NB#180523 -  WMP: msyncd crashes while synchronising
+
+ -- Deepak Kodihalli  <deepak.kodihalli@nokia.com>  Mon, 19 Jul 2010 15:42:56 +0530
+
+sync-fw (0.4.9-14) unstable; urgency=low
+
+  * Fixes: NB#179817 - Sync application is launched automatically when sync is initiated from NOS.
+
+ -- Amit  <amit.5.aggarwal@nokia.com>  Fri, 16 July 2010 17:29:00 +0530
+
+sync-fw (0.4.9-13) unstable; urgency=low
+
+  * Fixes: NB#172889  - Conflict resolution set for device/phone 
+    behaves in opposite way .
+  * Fixes: NB#175885  -  Device sync to N95-Bookmark modified in device is not reflected
+    in N95 when conflict resolution is set to device 
+
+ -- Amit  <amit.5.aggarwal@nokia.com>  Wed, 14 July 2010 17:29:00 +0530
+
+sync-fw (0.4.9-12) unstable; urgency=low
+
+  * Fixes: NB#179644  -  Creating backup takes lot of time and some times 
+    unable to create backup.
+
+ -- Amit  <amit.5.aggarwal@nokia.com>  Tue, 13 July 2010 17:29:00 +0530
+
+sync-fw (0.4.9-11) unstable; urgency=low
+
+  * Fixes: NB#179102 Device Freezes for few seconds when tap on Synchronize
+    button.
+
+ -- Amit  <amit.5.aggarwal@nokia.com>  Mon, 12 July 2010 17:29:00 +0530
+
+sync-fw (0.4.9-10) unstable; urgency=low
+
+  * Fixed a typo in AccountsHelper that caused deletion of account to not
+    delete the corresponding profiles.
+
+ -- Amit  <amit.5.aggarwal@nokia.com>  Fri, 09 July 2010 16:26:00 +0530
+
+sync-fw (0.4.9-9) unstable; urgency=low
+
+  * Sync Backup Restore implementation
+  * Logging to syslog .
+  * Added correct options for dh_strip
+
+ -- Amit  <amit.5.aggarwal@nokia.com>  Thu, 08 July 2010 15:03:00 +0530
+
+sync-fw (0.4.9-8) unstable; urgency=low
+
+  * Implemented: SWP#HSync-884 - Integration with Transfer UI.
+  * Log level set to log fatal and critical.
+  * FUNC_CALL_TRACE enabled if complied with debug option.
+
+ -- Amit  <amit.5.aggarwal@nokia.com>  Wed, 07 July 2010 15:03:00 +0530
+
+sync-fw (0.4.9-7) unstable; urgency=low
+
+  *  Profile id related change.
+  *  Fixes: NB#176603  sync-fw depends on libalarm2 
+
+ -- Sateesh Kavuri <sateesh.kavuri@nokia.com>  Sat, 03 Jun 2010 14:00:00 +0530
+
+sync-fw (0.4.9-6) unstable; urgency=low
+
+  *  Fixes: NB#176285 Sync profile created for PC after sync operation is done
+     from ovi suite to device via BT.
+
+ -- Hunalli Mallikarjun <mallikarjun.hunalli@nokia.com>  Mon, 28 Jun 2010 14:00:00 +0530
+
+sync-fw (0.4.9-5) unstable; urgency=low
+
+  *  Added SYNC_NOTPOSSIBLE status item in the SyncCommonDefs.h for SyncStatus().
+
+ -- Hunalli Mallikarjun <mallikarjun.hunalli@nokia.com>  Mon, 21 Jun 2010 14:00:00 +0530
+
+sync-fw (0.4.9-4) unstable; urgency=low
+
+  *  Removal of profile related changes.
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Fri, 18 Jun 2010 18:34:09 +0530
+
+sync-fw (0.4.9-2) unstable; urgency=low
+
+  *  Added new method for getting service name.
+  *  Unhide profile when the service/account gets enabled.
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Sun, 12 Jun 2010 18:34:09 +0530
+
+sync-fw (0.4.9-1) unstable; urgency=low
+
+  * Contacts Performance : commit the deleted items written to sql db once
+    instead of after each insert.
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Sun, 06 Jun 2010 18:34:09 +0530
+
+sync-fw (0.4.8-14) unstable; urgency=low
+
+  *  Fixes: NB#172517 Sync destination name created as 'Phone' in device when
+     remote sync is done 
+  *  Fixed problem when the onSessionFinished was called more than once by the
+     plugins
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Fri, 04 Jun 2010 16:00:17 +0530
+
+sync-fw (0.4.8-13) unstable; urgency=low
+
+  *  Version update for rebuild.
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Tue, 02 Jun 2010 20:33:17 +0530
+
+sync-fw (0.4.8-11) unstable; urgency=low
+
+  * Fixes: NB#171323  -  Remote initiated text message sync fails
+  * Fixes: NB#171340 Remote sync from S40 to device-S40 profile is not created
+    in device
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Mon, 31 May 2010 20:33:17 +0530
+
+sync-fw (0.4.8-9) unstable; urgency=low
+
+  * Fixes: NB#166702 -  msyncd crashed while synchronizing text messages with
+  S60 phone
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Wed, 19 May 2010 19:12:17 +0530
+
+sync-fw (0.4.8-8) unstable; urgency=low
+
+  * Fixes: NB#167760 -  Random crash observed when synchronizing bookmarks
+  S60 phone
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Tue, 18 May 2010 18:51:17 +0530
+
+sync-fw (0.4.8-7) unstable; urgency=low
+
+  * Week 19 PR
+  * Fixes: NB#166836 Sync profile is created instead of contran 
+  profile when synchronized with Sony Ericsson K850i  
+  * Fixes: NB#166458 msyncd crahed at
+  maemomtp1dot0::MTPResponder::getDevicePropValueReq
+  * Pass account ID to the sync plugins when starting sync. Needed by the
+  CalDAV plugin
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Thu, 06 May 2010 10:36:16 +0300
+
+sync-fw (0.4.9-10) unstable; urgency=low
+ 
+   * Fixed a typo in AccountsHelper that caused deletion of account to not
+
+sync-fw (0.4.9-10) unstable; urgency=low
+ 
+  * Week 38 Release 2
+  * Synchronizer now sends proper DBUS events
+  * SyncML server plugin on-demand storage loading
+  * Updates to sync profiles
+
+ -- Srikanth Kavoori <ext-srikanth.kavoori@nokia.com>  Mon, 21 Sep 2009 11:13:57 +0300
+
+sync-fw (0.2.7-0) unstable; urgency=low
+
+  * Week 38 Release 
+  * Added:
+  sync-fw/libsyncprofile/profiles/server/syncml.xml
+  * Synchronizer now sends dbus messages about sync progress
+  * Removed old profile engine (libprofiledb)
+  * Added storage profile class.
+  * Added:
+    sync-fw/libsyncprofile/StorageProfile.h
+    sync-fw/libsyncprofile/StorageProfile.cpp
+
+ -- Srikanth Kavoori <ext-srikanth.kavoori@nokia.com>  Tue, 15 Sep 2009 18:22:45 +0300
+
+sync-fw (0.2.6-0) unstable; urgency=low
+
+  * Week37 Release 2 
+  * New profile engine (libsyncprofile) integrated to sync-fw
+  * Fixed synchronizer to properly send sync finished event
+  * dynamic log level setting capability added 
+
+ -- Srikanth Kavoori <ext-srikanth.kavoori@nokia.com>  Thu, 10 Sep 2009 18:07:09 +0300
+
+sync-fw (0.2.5-0) unstable; urgency=low
+
+  * Week 37 Release  
+  * Updates to all client plugin APIs
+
+ -- Lassi Nieminen <lassi.ta.nieminen@nokia.com>  Tue,  8 Sep 2009 17:26:19 +0300
+
+sync-fw (0.2.4-2) unstable; urgency=low
+
+  * Week 36 Release 2 
+
+ -- Lassi Nieminen <lassi.ta.nieminen@nokia.com>  Thu,  3 Sep 2009 14:32:24 +0300
+
+sync-fw (0.2.4-1) unstable; urgency=low
+
+  * Patch to fix the synchronizer crash during bootup  
+  * Fixed synchronizer so that's no longer to restart it after each sync
+
+ -- Lassi Nieminen <lassi.ta.nieminen@nokia.com>  Thu,  3 Sep 2009 12:59:59 +0300
+
+sync-fw (0.2.4-0) unstable; urgency=low
+
+   * Week 36 Release 
+   * Added new profile engine code
+   * Added:
+   sync-fw/libprofileengine
+   sync-fw/libprofileengine/CommonDefs.h
+   sync-fw/libprofileengine/Profile.cpp
+   sync-fw/libprofileengine/Profile.h
+   sync-fw/libprofileengine/ProfileFactory.cpp
+   sync-fw/libprofileengine/ProfileFactory.h
+   sync-fw/libprofileengine/ProfileField.cpp
+   sync-fw/libprofileengine/ProfileField.h
+   sync-fw/libprofileengine/ProfileManager.cpp
+   sync-fw/libprofileengine/ProfileManager.h
+   sync-fw/libprofileengine/ProfileTest.pro
+   sync-fw/libprofileengine/SyncProfile.cpp
+   sync-fw/libprofileengine/SyncProfile.h
+   sync-fw/libprofileengine/main.cpp
+   sync-fw/libprofileengine/profiles
+   sync-fw/libprofileengine/profiles/client
+   sync-fw/libprofileengine/profiles/client/SyncML.xml
+   sync-fw/libprofileengine/profiles/service
+   sync-fw/libprofileengine/profiles/service/Ovi.com.xml
+   sync-fw/libprofileengine/profiles/storage
+   sync-fw/libprofileengine/profiles/storage/Bookmarks.xml
+   sync-fw/libprofileengine/profiles/storage/Calendar.xml
+   sync-fw/libprofileengine/profiles/sync
+   sync-fw/libprofileengine/profiles/sync/ovi.xml
+
+
+ -- Lassi Nieminen <lassi.ta.nieminen@nokia.com>  Tue,  1 Sep 2009 17:38:17 +0300
+
+sync-fw (0.2.3-1) unstable; urgency=low
+  
+  * Updated and cleaned plugin APIs
+  * Updated D-Bus interface implementation
+  * Added:
+    sync-fw/synchronizer/SyncDBusAdaptor.h
+    sync-fw/synchronizer/SyncDBusAdaptor.cpp
+    sync-fw/synchronizer/SyncDBusInterface.h
+    sync-fw/synchronizer/generate_dbus_adaptor.sh
+    sync-fw/synchronizer/generate_dbus_proxy.sh
+    sync-fw/synchronizer/com.nokia.msyncd.xml
+  * Removed:
+    sync-fw/synchronizer/DBusAdaptor.h
+    sync-fw/synchronizer/DBusAdaptor.cpp 
+
+ -- Lassi Nieminen <lassi.ta.nieminen@nokia.com>  Thu, 27 Aug 2009 15:59:03 +0300
+
+sync-fw (0.2.3-0) unstable; urgency=low
+
+  * Week 35 Release 
+  * Added: 
+    sync-fw/synchronizer/bin
+    sync-fw/synchronizer/bin/70msyncd
+    sync-fw/synchronizer/bin/msyncd
+    sync-fw/synchronizer/LogMacros.h
+    sync-fw/synchronizer/Logger.cpp
+    sync-fw/synchronizer/Logger.h
+  * Added support for starting synchronizer after Xsession post
+  * Added Logger support into framework 
+
+ -- Lassi Nieminen <lassi.ta.nieminen@nokia.com>  Tue, 25 Aug 2009 17:44:58 +0300
+
+sync-fw (0.2.2-0) unstable; urgency=low
+
+  * Week34 release  
+
+ -- Lassi Nieminen <lassi.ta.nieminen@nokia.com>  Fri, 21 Aug 2009 10:11:29 +0300
+
+sync-fw (0.2.1-1) unstable; urgency=low
+
+  * Added:
+    sync-fw/synchronizer/msyncd
+  * Added support to start the synchronizer during bootup
+  
+
+ -- Lassi Nieminen <lassi.ta.nieminen@nokia.com>  Wed, 19 Aug 2009 18:42:22 +0300
+
+sync-fw (0.2.1-0) unstable; urgency=low
+  * Week 33 Release : Fixes: NB#126837 
+  * moved com_hdrs/Logging.h to  synchronizer/Logging.h
+   
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+  * Week 32 Release : Modified the interfaces to Qt style interfaces 
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Lassi Nieminen <lassi.ta.nieminen@nokia.com>  Thu, 19 Mar 2009 15:22:13 +0200
+

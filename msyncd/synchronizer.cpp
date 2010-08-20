@@ -247,6 +247,9 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     if (!profile)
     {
         LOG_WARNING( "Profile not found" );
+        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
+        iProfileManager.saveSyncResults(aProfileName, syncResults);
+        emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error" , Buteo::SyncResults::INTERNAL_ERROR);
         return false;
     }
 
@@ -256,6 +259,8 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         LOG_WARNING( "Failed to create sync session object" );
         delete profile;
         profile = 0;
+        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
+        iProfileManager.saveSyncResults(aProfileName, syncResults);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error" , Buteo::SyncResults::INTERNAL_ERROR);
         return false;
     }
@@ -427,7 +432,7 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
                 {
                     if (session->isProfileCreated()) {
                         QMap<QString,bool> storageMap = session->getStorageMap();
-                        session->setFailureResult(SyncResults::SYNC_RESULT_SUCCESS, Buteo::SyncResults::NO_ERROR);
+                        //session->setFailureResult(SyncResults::SYNC_RESULT_SUCCESS, Buteo::SyncResults::NO_ERROR);
                         iProfileManager.enableStorages (*session->profile(),storageMap);
                         iProfileManager.save(*session->profile());
                     }
@@ -473,7 +478,7 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
     // Try starting new sync sessions waiting in the queue.
     while (startNextSync())
     {
-            //intentionally empty
+        //intentionally empty
     }
 }
 
@@ -487,8 +492,9 @@ bool Synchronizer::startNextSync()
 {
     FUNCTION_CALL_TRACE;
 
-    if (iSyncQueue.isEmpty() || isBackupRestoreInProgress())
+    if (iSyncQueue.isEmpty() || isBackupRestoreInProgress()) {
         return false;
+    }        
 
     bool tryNext = true;
 
@@ -596,6 +602,9 @@ void Synchronizer::abortSync(QString aProfileName)
     else
     {
         LOG_WARNING( "No sync in progress with the given profile" );
+        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_CANCELLED, Buteo::SyncResults::ABORTED);
+        iProfileManager.saveSyncResults(aProfileName, syncResults);
+        emit syncStatus(aProfileName, Sync::SYNC_CANCELLED, "", Buteo::SyncResults::ABORTED);
     }
 }
 
@@ -1169,10 +1178,10 @@ bool Synchronizer::isTransportAvailable(const SyncSession *aSession)
             break;
 
         case SyncProfile::DESTINATION_TYPE_ONLINE:
-            available = iTransportTracker->isConnectivityAvailable(
-                    Sync::CONNECTIVITY_INTERNET);
-            break;
-
+            // For online destinations, transport availability depends on the
+            // existence of a network session, thus always return true here and
+            // wait for a response from openSession
+            available = true;
         default:
             LOG_DEBUG("Destination type not defined, assuming transport available");
             available = true;
@@ -1277,71 +1286,26 @@ void Synchronizer::handleAccountsProfileChange(QString profile ,int aChangeType)
     }
 }
 
-
-int Synchronizer::lastSyncMajorCode(const QString &aProfileId)
+QString Synchronizer::getLastSyncResult(const QString &aProfileId)
 {
-    FUNCTION_CALL_TRACE
-    int lastSyncMajorCode = Buteo::SyncResults::SYNC_RESULT_INVALID;
-    SyncProfile *profile = iProfileManager.syncProfile (aProfileId);
+    FUNCTION_CALL_TRACE;
+    QString lastSyncResult;
 
-    if(!aProfileId.isEmpty() && profile)  {
-        const SyncResults * syncResults = profile->lastResults();
-        if (syncResults) {
-            lastSyncMajorCode = syncResults->majorCode();
+    if(!aProfileId.isEmpty()) {
+        SyncProfile *profile = iProfileManager.syncProfile (aProfileId);
+        if(profile) {
+            const SyncResults * syncResults = profile->lastResults();
+            if (syncResults) {
+                lastSyncResult = syncResults->toString();
+                LOG_DEBUG("SyncResults found:"<<lastSyncResult);
+            }
+            else {
+                LOG_DEBUG("SyncResults not Found!!!");
+            }
         }
         else {
-            LOG_DEBUG("SyncResults not Found!!!");
+            LOG_DEBUG("No profile found with aProfileId"<<aProfileId);
         }
     }
-    return lastSyncMajorCode;
-}
-
-int Synchronizer::lastSyncMinorCode(const QString &aProfileId)
-{
-    FUNCTION_CALL_TRACE
-    int lastSyncMinorCode = Buteo::SyncResults::SYNC_RESULT_INVALID;
-    SyncProfile *profile = iProfileManager.syncProfile (aProfileId);
-
-    if(!aProfileId.isEmpty() && profile)  {
-        const SyncResults * syncResults = profile->lastResults();
-        if (syncResults) {
-            lastSyncMinorCode = syncResults->minorCode();
-        }
-        else {
-            LOG_CRITICAL("SyncResults not Found!!! profileID"<<aProfileId);
-        }
-    }
-    return lastSyncMinorCode;
-}
-
-QString Synchronizer::lastSyncTime(const QString &aProfileId)
-{
-    FUNCTION_CALL_TRACE
-    QString lastSyncTime;
-    SyncProfile *profile = iProfileManager.syncProfile (aProfileId);
-
-    if(!aProfileId.isEmpty() && profile)  {
-        QDateTime time = profile->lastSyncTime();
-        lastSyncTime = time.toString(Qt::ISODate);
-    }
-    return lastSyncTime;
-}
-
-bool Synchronizer::isLastSyncScheduled(const QString &aProfileId)
-{
-    FUNCTION_CALL_TRACE
-    bool isScheduled = false;
-    SyncProfile *profile = iProfileManager.syncProfile (aProfileId);
-
-    if(!aProfileId.isEmpty() && profile)  {
-        const SyncResults * syncResults = profile->lastResults();
-        if (syncResults) {
-            isScheduled = syncResults->isScheduled();
-        }
-        else {
-            LOG_CRITICAL("SyncResults not Found!!!");
-        }
-    }
-    return isScheduled;
-
+    return lastSyncResult;
 }

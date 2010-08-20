@@ -59,6 +59,8 @@ public:
 
     virtual StorageItem* getItem( const QString& aItemId );
 
+    virtual QList<StorageItem*> getItems(const QStringList& aItemIdList );
+
     virtual OperationStatus addItem( StorageItem& aItem );
 
     virtual QList<OperationStatus> addItems( const QList<StorageItem*>& aItems );

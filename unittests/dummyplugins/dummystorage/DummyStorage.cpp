@@ -106,6 +106,12 @@ StorageItem* DummyStorage::getItem( const QString& /*aItemId*/ )
     return NULL;
 }
 
+QList<StorageItem*> DummyStorage::getItems(const QStringList& aItemIdList )
+{
+    QList<StorageItem*> items;
+    return items;
+}
+
 StoragePlugin::OperationStatus DummyStorage::addItem( StorageItem& /*aItem*/ )
 {
     return STATUS_OK;

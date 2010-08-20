@@ -103,7 +103,7 @@ else
         cd tests
         export LD_LIBRARY_PATH=../../libsyncprofile:../../libsyncpluginmgr
 	timed -d
-        dui-run ./sync-fw-tests >> $TEMPFILE1 2>&1
+        meego-run ./sync-fw-tests >> $TEMPFILE1 2>&1
         rm ../../msyncd/*Test.*
         rm ../../msyncd/tests.*
         cd ..

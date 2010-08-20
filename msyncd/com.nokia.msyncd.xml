@@ -115,5 +115,9 @@
       <arg name="aTimeAsString" type="s" direction="out"/>
       <arg name="aProfileId" type="s" direction="in"/>
     </method>
+    <method name="getLastSyncResult">
+      <arg name="aSyncResultAsString" type="s" direction="out"/>
+      <arg name="aProfileId" type="s" direction="in"/>
+    </method>
   </interface>
 </node>

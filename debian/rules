@@ -1,0 +1,50 @@
+#!/usr/bin/make -f
+export DH_VERBOSE=1    
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/qmake.mk
+
+# Add here any variable or target overrides you need.
+CFLAGS += -Wall -Wextra -Wno-unused-parameter 
+CXXFLAGS += -Wall -Wextra -Wno-unused-parameter 
+
+configure: configure-stamp
+configure-stamp:          
+	dh_testdir        
+	# Add here commands to configure the package.
+	/usr/bin/qmake -makefile buteo-sync.pro
+	touch configure-stamp   
+
+build: build-stamp
+build-stamp: configure-stamp 
+	dh_testdir           
+	# Add here commands to compile the package.
+	$(MAKE) $(PARALLEL_MAKEFLAGS) $(CURDIR)/doc
+	touch $@      
+
+install: build
+	dh_testdir
+	dh_testroot
+#	dh_clean -k 
+	$(MAKE) $(PARALLEL_MAKEFLAGS) DESTDIR=$(CURDIR)/debian/tmp install 
+
+binary-arch: build install                
+	dh_testdir                        
+	dh_testroot                       
+	dh_installdirs                    
+	dh_installchangelogs              
+	dh_installdocs                    
+	dh_installexamples
+	dh_install  --sourcedir=debian/tmp/ -v
+	dh_installman
+	dh_strip --dbg-package=sync-fw-dbg 
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps  ## TODO Disabled for now so the build succeeds
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+	
+DEB_DESTDIR := $(CURDIR)/debian/tmp
+DEB_DH_INSTALL_SOURCEDIR := debian/tmp

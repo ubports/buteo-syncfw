@@ -22,7 +22,8 @@
  */
 
 #include "TransportTracker.h"
-//#include "USBModedProxy.h"
+#include "USBModedProxy.h"
+#include "NetworkManager.h"
 #include "LogMacros.h"
 #include <contextsubscriber/contextproperty.h>
 #include <QMutexLocker>
@@ -32,7 +33,7 @@ using namespace Buteo;
 
 TransportTracker::TransportTracker(QObject *aParent) :
     QObject(aParent),
-//    iUSBProxy(0),
+    iUSBProxy(0),
     iBt(0),
     iInternet(0)
 {
@@ -40,11 +41,10 @@ TransportTracker::TransportTracker(QObject *aParent) :
 
     iTransportStates[Sync::CONNECTIVITY_USB] = false;
     iTransportStates[Sync::CONNECTIVITY_BT] = false;
-    // @todo: initialize to false
-    iTransportStates[Sync::CONNECTIVITY_INTERNET] = true; //false;
+    iTransportStates[Sync::CONNECTIVITY_INTERNET] = false;
 
     // USB
-    /*iUSBProxy = new USBModedProxy(this);
+    iUSBProxy = new USBModedProxy(this);
     if (!iUSBProxy->isValid())
     {
         LOG_CRITICAL("Failed to connect to USB moded D-Bus interface");
@@ -57,7 +57,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
             SLOT(onUsbStateChanged(bool)));
         iTransportStates[Sync::CONNECTIVITY_USB] =
             iUSBProxy->isUSBConnected();
-    }*/
+    }
 
     // BT
     iBt = new ContextProperty("Bluetooth.Enabled", this);
@@ -73,13 +73,17 @@ TransportTracker::TransportTracker(QObject *aParent) :
 
     // Internet
     // @todo: enable when internet state is reported correctly.
-    //iInternet = new ContextProperty("Internet.NetworkState", this);
+    iInternet = new NetworkManager(this);
     if (iInternet != 0)
     {
         iTransportStates[Sync::CONNECTIVITY_INTERNET] =
-            iInternet->value().toBool();
-        connect(iInternet, SIGNAL(valueChanged()),
-            this, SLOT(onInternetStateChanged()));
+            iInternet->isOnline();
+        connect(iInternet, SIGNAL(valueChanged(bool)),
+            this, SLOT(onInternetStateChanged(bool)));
+        connect(iInternet, SIGNAL(sessionConnected()),
+            this, SIGNAL(sessionOpened()));
+        connect(iInternet, SIGNAL(sessionError()),
+            this, SIGNAL(sessionError()));
     }
     else
     {
@@ -122,17 +126,12 @@ void TransportTracker::onBtStateChanged()
     updateState(Sync::CONNECTIVITY_BT, newState);
 }
 
-void TransportTracker::onInternetStateChanged()
+void TransportTracker::onInternetStateChanged(bool aConnected)
 {
     FUNCTION_CALL_TRACE;
 
-    bool newState = false;
-    if (iInternet != 0)
-    {
-        newState = iInternet->value().toBool();
-    }
-    LOG_DEBUG("Internet state changed:" << newState);
-    updateState(Sync::CONNECTIVITY_INTERNET, newState);
+    LOG_DEBUG("Internet state changed:" << aConnected);
+    updateState(Sync::CONNECTIVITY_INTERNET, aConnected);
 }
 
 void TransportTracker::updateState(Sync::ConnectivityType aType,

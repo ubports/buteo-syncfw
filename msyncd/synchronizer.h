@@ -132,29 +132,11 @@ public slots:
     //! \see SyncDBusInterface::saveSyncResults
     virtual bool saveSyncResults(QString aProfileId,QString aSyncResults);
 
-    /*! \brief Gets the Major code for the last.
-     *
-     * \return Major code.
+    /*! \brief To get lastSyncResult.
+     *  \param aProfileId
+     *  \return QString of syncResult.
      */
-    virtual int lastSyncMajorCode(const QString &aProfileId);
-
-    /*! \brief Gets the Minor code for the last.
-     *
-     * \return Minor code.
-     */
-    virtual int lastSyncMinorCode(const QString &aProfileId);
-
-    /*! \brief Gets the time of last completed sync session with this profile.
-     *
-     * \return Last sync time. Null object if this could not be determined.
-     */
-    virtual QString lastSyncTime(const QString &aProfileId);
-
-    /*! \brief Checks if the results are from a scheduled sync.
-     *
-     * \return True if scheduled.
-     */
-    virtual bool isLastSyncScheduled(const QString &aProfileId);
+    virtual QString getLastSyncResult(const QString &aProfileId);
 // --------------------------------------------------------------------------
 
     //! Called  starts a schedule sync.
