@@ -22,7 +22,9 @@
  */
 
 #include "TransportTracker.h"
+#if __USBMODED__
 #include "USBModedProxy.h"
+#endif
 #include "NetworkManager.h"
 #include "LogMacros.h"
 #include <contextsubscriber/contextproperty.h>
@@ -43,6 +45,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
     iTransportStates[Sync::CONNECTIVITY_BT] = false;
     iTransportStates[Sync::CONNECTIVITY_INTERNET] = false;
 
+#if __USBMODED__
     // USB
     iUSBProxy = new USBModedProxy(this);
     if (!iUSBProxy->isValid())
@@ -58,7 +61,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
         iTransportStates[Sync::CONNECTIVITY_USB] =
             iUSBProxy->isUSBConnected();
     }
-
+#endif
     // BT
     iBt = new ContextProperty("Bluetooth.Enabled", this);
     if (iBt != 0)

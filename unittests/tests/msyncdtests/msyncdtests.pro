@@ -27,7 +27,6 @@ SOURCES += ServerThread.cpp \
     PluginRunner.cpp \
     ClientThread.cpp \
     ClientThreadTest.cpp\
-    USBModedProxy.cpp \
     TransportTracker.cpp \
     TransportTrackerTest.cpp \
     PluginRunnerTest.cpp \
@@ -61,7 +60,6 @@ HEADERS += ServerThread.h \
     PluginRunner.h \
     ClientThread.h \
     ClientThreadTest.h\
-    USBModedProxy.h \
     TransportTracker.h \
     TransportTrackerTest.h \
     PluginRunnerTest.h \
@@ -86,4 +84,13 @@ HEADERS += ServerThread.h \
 
 OTHER_FILES += 
 
+# for compiling on meego
+linux-g++-maemo {
+  message("Compiling with USBModed support")
+  DEFINES += __USBMODED__
+  HEADERS += USBModedProxy.h
+  SOURCES += USBModedProxy.cpp
+} else {
+  message("Compiling without USBModed")
+}
 

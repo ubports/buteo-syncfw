@@ -57,7 +57,6 @@ HEADERS += ServerActivator.h \
     SyncBackupAdaptor.h \
     ClientThread.h \
     ServerThread.h \
-    USBModedProxy.h \
     StorageBooker.h \
     SyncQueue.h \
     SyncScheduler.h \
@@ -78,7 +77,6 @@ SOURCES += ServerActivator.cpp \
     SyncBackupAdaptor.cpp \
     ClientThread.cpp \
     ServerThread.cpp \
-    USBModedProxy.cpp \
     StorageBooker.cpp \
     SyncQueue.cpp \
     SyncScheduler.cpp \
@@ -137,4 +135,14 @@ CONFIG(debug,debug|release) {
     QMAKE_CLEAN += $(OBJECTS_DIR)/*.gcda \
         $(OBJECTS_DIR)/*.gcno \
         $(OBJECTS_DIR)/*.gcov
+}
+
+# for compiling on meego
+linux-g++-maemo {
+  message("Compiling with USBModed support")
+  DEFINES += __USBMODED__
+  HEADERS += USBModedProxy.h
+  SOURCES += USBModedProxy.cpp
+} else {
+  message("Compiling without USBModed")
 }
