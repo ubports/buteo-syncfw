@@ -99,6 +99,8 @@ QMAKE_CXXFLAGS = -Wall \
 target.path = /usr/bin/
 loglevel.files = bin/set_sync_log_level
 loglevel.path = /etc/sync/
+meego.files = bin/msyncd.desktop
+meego.path = /etc/xdg/autostart/
 INSTALLS += target \
     loglevel
 
@@ -139,10 +141,11 @@ CONFIG(debug,debug|release) {
 
 # for compiling on meego
 linux-g++-maemo {
-  message("Compiling with USBModed support")
+  message("Maemo specific install")
   DEFINES += __USBMODED__
   HEADERS += USBModedProxy.h
   SOURCES += USBModedProxy.cpp
 } else {
-  message("Compiling without USBModed")
+  message("Meego specific install")
+  INSTALLS += meego
 }
