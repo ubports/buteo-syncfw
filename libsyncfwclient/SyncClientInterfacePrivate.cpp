@@ -194,7 +194,9 @@ bool SyncClientInterfacePrivate::isValid()
 
 Buteo::SyncResults SyncClientInterfacePrivate::getLastSyncResult(const QString &aProfileId)
 {
-    Buteo::SyncResults syncResult(QDateTime::currentDateTime(),
+    // Default construct with invalid values
+    // Using default constructor for QDateTime() creates "null" date.
+    Buteo::SyncResults syncResult(QDateTime(),
          SyncResults::SYNC_RESULT_INVALID, Buteo::SyncResults::SYNC_RESULT_INVALID);
 
     if (iSyncDaemon) {
