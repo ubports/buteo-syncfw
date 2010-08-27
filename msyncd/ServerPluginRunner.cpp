@@ -30,9 +30,6 @@
 
 using namespace Buteo;
 
-// Maximum time in milliseconds to wait for a thread to stop
-static const unsigned long long MAX_THREAD_STOP_WAIT_TIME = 5000;
-
 ServerPluginRunner::ServerPluginRunner(const QString &aPluginName,
     Profile *aProfile, PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf,
     ServerActivator *aServerActivator, QObject *aParent)
@@ -149,7 +146,7 @@ void ServerPluginRunner::stop()
     if (iThread != 0)
     {
         iThread->stopThread();
-        iThread->wait(MAX_THREAD_STOP_WAIT_TIME);
+        iThread->wait();
     }
 }
 

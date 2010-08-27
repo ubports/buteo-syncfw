@@ -1,3 +1,9 @@
+sync-fw (0.5.0-22) unstable; urgency=low
+
+  * Fixes: NB#184746
+
+ -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Fri, 27 Aug 2010 15:36:34 +0530
+
 sync-fw (0.5.0-21) unstable; urgency=low
 
   * Tag for Meego.
