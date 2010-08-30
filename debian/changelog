@@ -1,3 +1,9 @@
+sync-fw (0.5.1-1) unstable; urgency=low
+
+  * Changed the dbus interface name  
+
+ -- Srikanth <ext-srikanth.kavoori@nokia.com>  Mon, 30 Aug 2010 14:41:52 +0530
+
 sync-fw (0.5.1-0) unstable; urgency=low
 
   * Added functions to retrieve a private thread specific dbus connection 

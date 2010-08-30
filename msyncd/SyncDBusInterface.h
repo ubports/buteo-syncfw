@@ -39,7 +39,7 @@ namespace Buteo {
 class SyncDBusInterface : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "com.nokia.msyncd")
+    Q_CLASSINFO("D-Bus Interface", "com.meego.msyncd")
 
 public:
 

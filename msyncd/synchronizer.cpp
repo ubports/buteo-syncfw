@@ -47,7 +47,7 @@
 using namespace Buteo;
 
 static const QString SYNC_DBUS_OBJECT = "/synchronizer";
-static const QString SYNC_DBUS_SERVICE = "com.nokia.msyncd";
+static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
 
 // Maximum time in milliseconds to wait for a thread to stop
 static const unsigned long long MAX_THREAD_STOP_WAIT_TIME = 5000;
