@@ -1,29 +1,31 @@
 TEMPLATE = lib
-
 VER_MAJ = 0
 VER_MIN = 4
 VER_PAT = 4
-
 TARGET = synccommon
 DEPENDPATH += .
 INCLUDEPATH += .
+QT += dbus 
 QT -= gui
 CONFIG += dll \
     debug \
     silent \
     create_pc \
     create_prl
-
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
-QMAKE_PKGCONFIG_LIBDIR  = $$target.path
-QMAKE_PKGCONFIG_INCDIR  = $$headers.path
+QMAKE_PKGCONFIG_LIBDIR = $$target.path
+QMAKE_PKGCONFIG_INCDIR = $$headers.path
 pkgconfig.files = $${TARGET}.pc
 
 # Input
-SOURCES += Logger.cpp
+SOURCES += SyncDBusConnection.cpp \
+    Logger.cpp
+    
 HEADERS += Logger.h \
     LogMacros.h \
-    SyncCommonDefs.h
+    SyncCommonDefs.h \
+    SyncDBusConnection.h 
+    
 QMAKE_CXXFLAGS += -Wall \
     -g \
     -Wno-cast-align \
@@ -36,14 +38,17 @@ QMAKE_CLEAN += $(TARGET) \
     $(TARGET1) \
     $(TARGET2) \
     $(OBJECTS_DIR)/moc_* \
-    lib$${TARGET}.prl pkgconfig/*
+    lib$${TARGET}.prl \
+    pkgconfig/*
 
 # install
 target.path = /usr/lib/
-headers.path = /usr/include/libsynccommon
+headers.path = /usr/include/libsynccommon/
 headers.files = LogMacros.h \
     Logger.h \
-    SyncCommonDefs.h
+    SyncCommonDefs.h \
+    SyncDBusConnection.h
+    
 INSTALLS += target \
     headers
 

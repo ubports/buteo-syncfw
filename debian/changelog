@@ -1,3 +1,11 @@
+sync-fw (0.5.1-0) unstable; urgency=low
+
+  * Added functions to retrieve a private thread specific dbus connection 
+  * Added: libsyncommon/SyncDBusConnection.h 
+           libsyncommon/SyncDBusConnection.cpp 
+
+ -- Srikanth Kavoori <ext-srikanth.kavoori@nokia.com>  Mon, 30 Aug 2010 11:36:34 +0530
+
 sync-fw (0.5.0-22) unstable; urgency=low
 
   * Fixes: NB#184746

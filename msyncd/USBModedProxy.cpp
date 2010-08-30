@@ -34,6 +34,7 @@
 #include <usb-moded/usb_moded-dbus.h>
 #include "USBModedProxy.h"
 #include "LogMacros.h"
+#include "SyncDBusConnection.h"
 
 using namespace Buteo;
 
@@ -42,7 +43,7 @@ using namespace Buteo;
  */
 
 USBModedProxy::USBModedProxy(QObject *parent)
-    : QDBusAbstractInterface(USB_MODE_SERVICE, USB_MODE_OBJECT, staticInterfaceName(), QDBusConnection::systemBus(), parent)
+    : QDBusAbstractInterface(USB_MODE_SERVICE, USB_MODE_OBJECT, staticInterfaceName(), SyncDBusConnection::systemBus(), parent)
 {
     FUNCTION_CALL_TRACE;
     if(false == QObject::connect(this, SIGNAL(sig_usb_state_ind(const QString&)), this, SLOT(slotModeChanged(const QString&))))

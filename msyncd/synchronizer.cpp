@@ -37,6 +37,7 @@
 #include "ProfileFactory.h"
 #include "ProfileEngineDefs.h"
 #include "LogMacros.h"
+#include "SyncDBusConnection.h"
 
 #include <contextsubscriber/contextproperty.h>
 #include <QtDebug>
@@ -86,7 +87,7 @@ bool Synchronizer::initialize()
     new SyncDBusAdaptor(this);
 
     // Register our object on the session bus and expose interface to others.
-    QDBusConnection dbus = QDBusConnection::sessionBus();
+    QDBusConnection dbus = SyncDBusConnection::sessionBus();
     if (!dbus.registerObject(SYNC_DBUS_OBJECT, this) ||
             !dbus.registerService(SYNC_DBUS_SERVICE))
     {
@@ -164,7 +165,7 @@ void Synchronizer::close()
 
 
     // Unregister from D-Bus.
-    QDBusConnection dbus = QDBusConnection::sessionBus();
+    QDBusConnection dbus = SyncDBusConnection::sessionBus();
     dbus.unregisterObject(SYNC_DBUS_OBJECT);
     if (!dbus.unregisterService(SYNC_DBUS_SERVICE))
     {
@@ -383,7 +384,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
             if (iSyncUIInterface == NULL) {
                 LOG_DEBUG( "iSyncUIInterface is Null" );
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                        "com.nokia.MApplicationIf", QDBusConnection::sessionBus() );
+                        "com.nokia.MApplicationIf", SyncDBusConnection::sessionBus() );
                 Q_ASSERT(iSyncUIInterface);
             }
             else if(!iSyncUIInterface->isValid()) {
@@ -391,7 +392,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
                 delete iSyncUIInterface;
                 iSyncUIInterface = NULL;
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                        "com.nokia.MApplicationIf", QDBusConnection::sessionBus() );
+                        "com.nokia.MApplicationIf", SyncDBusConnection::sessionBus() );
                 Q_ASSERT(iSyncUIInterface);
             }
             //calling launch with argument list
@@ -1080,7 +1081,7 @@ void Synchronizer::onNewSession(const QString &aDestination)
         if (iSyncUIInterface == NULL) {
             LOG_DEBUG( "iSyncUIInterface is NULL" );
             iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                    "com.nokia.MApplicationIf", QDBusConnection::sessionBus() );
+                    "com.nokia.MApplicationIf", SyncDBusConnection::sessionBus() );
             Q_ASSERT(iSyncUIInterface);
         }
         else if(!iSyncUIInterface->isValid()) {
@@ -1088,7 +1089,7 @@ void Synchronizer::onNewSession(const QString &aDestination)
             delete iSyncUIInterface;
             iSyncUIInterface = NULL;
             iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                    "com.nokia.MApplicationIf", QDBusConnection::sessionBus() );
+                    "com.nokia.MApplicationIf", SyncDBusConnection::sessionBus() );
             Q_ASSERT(iSyncUIInterface);
 
         }
