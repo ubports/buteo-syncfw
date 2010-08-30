@@ -33,7 +33,7 @@
 using namespace Buteo;
 
 static const QString SYNC_DBUS_OBJECT = "/synchronizer";
-static const QString SYNC_DBUS_SERVICE = "com.nokia.msyncd";
+static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
 
 SyncClientInterfacePrivate::SyncClientInterfacePrivate(SyncClientInterface *aParent) :
 			iParent(aParent) {

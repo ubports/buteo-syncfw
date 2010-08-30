@@ -22,5 +22,5 @@
 # */
 #
 
-qdbuscpp2xml -M -S SyncDBusInterface.h -o com.nokia.msyncd.xml
-qdbusxml2cpp -a SyncDBusAdaptor -c SyncDBusAdaptor com.nokia.msyncd.xml
+qdbuscpp2xml -M -S SyncDBusInterface.h -o com.meego.msyncd.xml
+qdbusxml2cpp -a SyncDBusAdaptor -c SyncDBusAdaptor com.meego.msyncd.xml

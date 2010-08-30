@@ -22,4 +22,4 @@
 # */
 #
 
-qdbusxml2cpp -p SyncDaemonProxy -N -c SyncDaemonProxy com.nokia.msyncd.xml
+qdbusxml2cpp -p SyncDaemonProxy -N -c SyncDaemonProxy com.meego.msyncd.xml
