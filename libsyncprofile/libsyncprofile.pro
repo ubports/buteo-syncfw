@@ -17,11 +17,6 @@ CONFIG += dll \
     create_pc \
     create_prl
 
-QMAKE_PKGCONFIG_DESTDIR = pkgconfig
-QMAKE_PKGCONFIG_LIBDIR  = $$target.path
-QMAKE_PKGCONFIG_INCDIR  = $$headers.path
-pkgconfig.files = $${TARGET}.pc
-
 # Input
 HEADERS += Profile.h \
     ProfileFactory.h \
@@ -85,6 +80,11 @@ utility.files = bin/*.pl \
 INSTALLS += target \
     headers \
     utility
+
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+QMAKE_PKGCONFIG_LIBDIR  = $$target.path
+QMAKE_PKGCONFIG_INCDIR  = $$headers.path
+pkgconfig.files = $${TARGET}.pc
 
 # #####################################################################
 # make coverage (debug)
