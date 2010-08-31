@@ -199,12 +199,11 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
     	LOG_DEBUG ("!!!! Service not supported !!!!");
 	return;
     }
-    QString remote_database = serviceProfile->key(KEY_REMOTE_DATABASE);
     
     QString profileName ;
-    if (!remote_database.isEmpty() && !service->name().isEmpty()) {
+    if (!service->name().isEmpty()) {
 	    QStringList keys;
-	    keys << remote_database << service->name();
+	    keys << QString::number(account->id()) << service->name();
 	    serviceProfile->setName(keys);
             profileName = serviceProfile->name();
     }
