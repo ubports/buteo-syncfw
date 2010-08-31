@@ -12,10 +12,6 @@ CONFIG += dll \
     silent \
     create_pc \
     create_prl
-QMAKE_PKGCONFIG_DESTDIR = pkgconfig
-QMAKE_PKGCONFIG_LIBDIR = $$target.path
-QMAKE_PKGCONFIG_INCDIR = $$headers.path
-pkgconfig.files = $${TARGET}.pc
 
 # Input
 SOURCES += SyncDBusConnection.cpp \
@@ -51,6 +47,11 @@ headers.files = LogMacros.h \
     
 INSTALLS += target \
     headers
+
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+QMAKE_PKGCONFIG_LIBDIR = $$target.path
+QMAKE_PKGCONFIG_INCDIR = $$headers.path
+pkgconfig.files = $${TARGET}.pc
 
 # #####################################################################
 # make coverage (debug)

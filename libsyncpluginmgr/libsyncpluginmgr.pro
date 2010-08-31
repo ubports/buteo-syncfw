@@ -18,11 +18,6 @@ QMAKE_LFLAGS += -ldl
 
 CONFIG += dll debug silent create_pc create_prl
 
-QMAKE_PKGCONFIG_DESTDIR = pkgconfig
-QMAKE_PKGCONFIG_LIBDIR  = $$target.path
-QMAKE_PKGCONFIG_INCDIR  = $$headers.path
-pkgconfig.files = $${TARGET}.pc
-
 QT+=sql
 QT -= gui
 
@@ -73,6 +68,11 @@ headers.files = ClientPlugin.h \
     SyncPluginBase.h \
     DeletedItemsIdStorage.h
 INSTALLS += target headers
+
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+QMAKE_PKGCONFIG_LIBDIR  = $$target.path
+QMAKE_PKGCONFIG_INCDIR  = $$headers.path
+pkgconfig.files = $${TARGET}.pc
 
 # #####################################################################
 # make coverage (debug)

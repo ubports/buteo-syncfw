@@ -1,8 +1,11 @@
 sync-fw (0.5.1-1) unstable; urgency=low
 
+  * TODO : PR
+  * Fixes: NB#183589 -  Development packages libmeegosyncml-dev and
+    sync-fw-dev does not contain .pc files
   * Changed the dbus interface name  
 
- -- Srikanth <ext-srikanth.kavoori@nokia.com>  Mon, 30 Aug 2010 14:41:52 +0530
+ -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Mon, 30 Aug 2010 14:41:52 +0530
 
 sync-fw (0.5.1-0) unstable; urgency=low
 
