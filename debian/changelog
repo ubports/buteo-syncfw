@@ -1,6 +1,5 @@
 sync-fw (0.5.1-1) unstable; urgency=low
 
-  * TODO : PR
   * Fixes: NB#183589 -  Development packages libmeegosyncml-dev and
     sync-fw-dev does not contain .pc files
   * Changed the dbus interface name  
