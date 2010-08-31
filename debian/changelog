@@ -1,3 +1,9 @@
+sync-fw (0.5.1-2) unstable; urgency=low
+
+  * Fixes: NB#188990 - Sync profile under ~/.sync
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Tue, 31 Aug 2010 19:08:00 +0530
+
 sync-fw (0.5.1-1) unstable; urgency=low
 
   * Fixes: NB#183589 -  Development packages libmeegosyncml-dev and
