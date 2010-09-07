@@ -1,3 +1,9 @@
+sync-fw (0.5.1-3) unstable; urgency=low
+
+  * Added missing headers to libsynccommon files 
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Tue, 07 Sep 2010 10:08:00 +0530
+
 sync-fw (0.5.1-2) unstable; urgency=low
 
   * Fixes: NB#188990 - Sync profile under ~/.sync
