@@ -1,0 +1,6 @@
+<aegis>
+     <request>
+         <for path="/usr/bin/msyncd"/>
+     </request>
+</aegis>
+
