@@ -254,7 +254,6 @@ private:
      *
      */
     void initializeScheduler();
-    bool isTransportAvailable(const SyncSession *aSession);
 
     bool isBackupRestoreInProgress ();
     

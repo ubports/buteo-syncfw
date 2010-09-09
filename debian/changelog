@@ -1,3 +1,9 @@
+sync-fw (0.5.1-4) unstable; urgency=low
+
+  * removed a function internal to synchronizer that is not needed anymore    
+
+ -- Srikanth <ext-srikanth.kavoori@nokia.com>  Thu, 09 Sep 2010 10:51:14 +0530
+
 sync-fw (0.5.1-3) unstable; urgency=low
 
   * Added missing headers to libsynccommon files 
