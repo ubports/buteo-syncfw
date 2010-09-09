@@ -2,7 +2,7 @@ Source: sync-fw
 Section: utils
 Priority: optional
 Maintainer: Srikanth Kavoori <ext-srikanth.kavoori@nokia.com>
-Build-Depends: debhelper (>= 5), cdbs, doxygen, libqt4-dev, libdbus-1-dev , accounts-qt-dev, libcontextsubscriber-dev, libqttracker-dev , libiphb-dev ,usb-moded-dev, libsignon-qt-dev
+Build-Depends: debhelper (>= 5), cdbs, doxygen, libqt4-dev, libdbus-1-dev , accounts-qt-dev, libcontextsubscriber-dev, libqttracker-dev , libiphb-dev ,usb-moded-dev, libsignon-qt-dev, aegis-builder
 Standards-Version: 3.7.2
 
 Package: sync-fw
