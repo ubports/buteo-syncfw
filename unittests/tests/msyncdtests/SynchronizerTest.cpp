@@ -160,7 +160,6 @@ void SynchronizerTest::testSync()
 
 	QVERIFY(iSync->iTransportTracker != 0);
 	iSync->iTransportTracker->updateState(Sync::CONNECTIVITY_USB, true);
-	QCOMPARE(iSync->isConnectivityAvailable(Sync::CONNECTIVITY_USB), true);
 
 	//test startServers()
 	QVERIFY(iSync->iServerActivator != 0);
@@ -206,7 +205,6 @@ void SynchronizerTest::testSync()
 	QVERIFY(iSyncSession != 0);
 	QVERIFY(iSync->iTransportTracker != 0);
 	QVERIFY(iSyncSession->profile() != 0);
-	QCOMPARE(iSync->isTransportAvailable(iSyncSession), true);
 }
 void SynchronizerTest::testSignals()
 {

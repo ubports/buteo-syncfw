@@ -283,13 +283,6 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Low battery", Buteo::SyncResults::LOW_BATTERY_POWER);
     }
-    else if (!isTransportAvailable(session))
-    {
-        LOG_DEBUG( "Required transport not available" );
-        session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::CONNECTION_ERROR);
-        emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Connection Error", Buteo::SyncResults::CONNECTION_ERROR);
-
-    }
     else if (!session->reserveStorages(&iStorageBooker))
     {
         LOG_DEBUG( "Needed storage(s) already in use, queuing sync request" );
@@ -526,15 +519,6 @@ bool Synchronizer::startNextSync()
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
         cleanupSession(session);
         emit syncStatus(profileName, Sync::SYNC_ERROR, "Low Battery", Buteo::SyncResults::LOW_BATTERY_POWER);
-        tryNext = true;
-    }
-    else if (!isTransportAvailable(session))
-    {
-        LOG_DEBUG( "Required transport not available, aborting sync request" );
-        iSyncQueue.dequeue();
-        session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::CONNECTION_ERROR);
-        cleanupSession(session);
-        emit syncStatus(profileName, Sync::SYNC_ERROR, "", Buteo::SyncResults::CONNECTION_ERROR);
         tryNext = true;
     }
     else if (!session->reserveStorages(&iStorageBooker))
@@ -1164,33 +1148,6 @@ void Synchronizer::reschedule(const QString &aProfileName)
     {
         iSyncScheduler->removeProfile(aProfileName);
     }
-}
-
-bool Synchronizer::isTransportAvailable(const SyncSession *aSession)
-{
-    bool available = false;
-    if (aSession != 0 && iTransportTracker != 0 && aSession->profile() != 0)
-    {
-        switch (aSession->profile()->destinationType())
-        {
-        case SyncProfile::DESTINATION_TYPE_DEVICE:
-            available = iTransportTracker->isConnectivityAvailable(
-                    Sync::CONNECTIVITY_BT);
-            break;
-
-        case SyncProfile::DESTINATION_TYPE_ONLINE:
-            // For online destinations, transport availability depends on the
-            // existence of a network session, thus always return true here and
-            // wait for a response from openSession
-            available = true;
-        default:
-            LOG_DEBUG("Destination type not defined, assuming transport available");
-            available = true;
-            break;
-        }
-    }
-
-    return available;
 }
 
 bool Synchronizer::isBackupRestoreInProgress ()
