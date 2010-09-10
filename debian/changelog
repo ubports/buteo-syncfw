@@ -1,5 +1,6 @@
 sync-fw (0.5.1-5) unstable; urgency=low
 
+  * Fixes: NB#191123 -  Sync, Switch and MTP does not work
   * Removed Aegis Manifest file.
 
  -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Fri, 10 Sep 2010 10:51:14 +0530
