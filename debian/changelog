@@ -8,7 +8,7 @@ sync-fw (0.5.1-5) unstable; urgency=low
 sync-fw (0.5.1-4) unstable; urgency=low
 
   * removed a function internal to synchronizer that is not needed anymore
-  * Fixes: NB190114 - sync-fw Needs to have an Aegis Manifest file.
+  * Fixes: NB#190114 - sync-fw Needs to have an Aegis Manifest file.
 
  -- Srikanth <ext-srikanth.kavoori@nokia.com>  Thu, 09 Sep 2010 10:51:14 +0530
 
