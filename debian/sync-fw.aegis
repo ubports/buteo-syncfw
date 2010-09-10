@@ -1,0 +1,6 @@
+<aegis>
+     <request>
+         <credential name="GRP::dialout"/>
+         <for path="/usr/bin/msyncd"/>
+     </request>
+</aegis>
