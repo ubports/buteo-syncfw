@@ -1,3 +1,9 @@
+sync-fw (0.5.1-6) unstable; urgency=low
+
+  * Fixes: NB#192811 -  Deleted sync destination still persists when close and open sync application
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Fri, 17 Sep 2010 14:16:14 +0530
+
 sync-fw (0.5.1-5) unstable; urgency=low
 
   * Fixes: NB#191123 -  Sync, Switch and MTP does not work
