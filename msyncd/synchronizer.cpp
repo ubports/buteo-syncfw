@@ -645,7 +645,7 @@ bool Synchronizer::removeProfile(QString aProfileId)
         }
 
 	const SyncResults * syncResults = profile->lastResults();
-        if (!pluginRunner->cleanUp() && !syncResults){
+        if (!pluginRunner->cleanUp() && syncResults){
             LOG_CRITICAL ("Error in removing anchors, sync session ");
         } else {
             LOG_DEBUG("Removing the profile");
