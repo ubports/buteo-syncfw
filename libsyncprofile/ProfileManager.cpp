@@ -88,6 +88,12 @@ public:
 	bool matchKey(const Profile &aProfile,
 			const ProfileManager::SearchCriteria &aCriteria);
 
+    bool save(const Profile &aProfile);
+
+    bool remove(const QString &aName, const QString &aType);
+
+    bool profileExists(const QString &aProfileId ,const QString &aType);
+
 	// Primary path for profiles.
 	QString iPrimaryPath;
 
@@ -593,9 +599,9 @@ QList<SyncProfile*> ProfileManager::getSyncProfilesByStorage(
 }
 
 
-bool ProfileManager::save(const Profile &aProfile)
+bool ProfileManagerPrivate::save(const Profile &aProfile)
 {
-	QDomDocument doc = d_ptr->constructProfileDocument(aProfile);
+    QDomDocument doc = constructProfileDocument(aProfile);
 	if (doc.isNull())
 	{
 		LOG_WARNING("No profile data to write");
@@ -604,22 +610,22 @@ bool ProfileManager::save(const Profile &aProfile)
 
 	// Create path for the new profile file.
 	QDir dir;
-	dir.mkpath(d_ptr->iPrimaryPath + QDir::separator() + aProfile.type());
-	QString profilePath(d_ptr->iPrimaryPath + QDir::separator() +
+    dir.mkpath(iPrimaryPath + QDir::separator() + aProfile.type());
+    QString profilePath(iPrimaryPath + QDir::separator() +
 			aProfile.type() + QDir::separator() + aProfile.name() + FORMAT_EXT);
 
 	// Create a backup of the existing profile file.
-	QString oldProfilePath = d_ptr->findProfileFile(aProfile.type(), aProfile.name());
+    QString oldProfilePath = findProfileFile(aProfile.type(), aProfile.name());
 	QString backupPath = profilePath + BACKUP_EXT;
 
 	if (QFile::exists(oldProfilePath) &&
-			!d_ptr->createBackup(oldProfilePath, backupPath))
+            !createBackup(oldProfilePath, backupPath))
 	{
 		LOG_WARNING("Failed to create profile backup");
 	}
 
 	bool profileWritten = false;
-	if (d_ptr->writeProfileFile(profilePath, doc))
+    if (writeProfileFile(profilePath, doc))
 	{
 		QFile::remove(backupPath);
 		profileWritten = true;
@@ -631,6 +637,46 @@ bool ProfileManager::save(const Profile &aProfile)
 	}
 
 	return profileWritten;
+}
+
+Profile* ProfileManager::profileFromXml(const QString &aProfileAsXml)
+{
+    Profile *profile = NULL;
+    if(!aProfileAsXml.isEmpty()) {
+        QDomDocument doc;
+        if(doc.setContent(aProfileAsXml,true)) {
+            ProfileFactory pf;
+            profile = pf.createProfile(doc.documentElement());
+        }
+    }
+    return profile;
+}
+
+QString ProfileManager::addProfile(Profile &aProfile)
+{
+    QString profileId("");
+    // just check to see if the profile exists. then send an update
+    /// signal instead of added signal .
+    if(d_ptr->profileExists(aProfile.name(),aProfile.type())){
+        LOG_DEBUG("Profile Exists ... Overwriting it ... ");
+        profileId = updateProfile(aProfile);
+    } else {
+        if(d_ptr->save(aProfile)) {
+            profileId=aProfile.name();
+        }
+        emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_ADDED,aProfile.toString());
+    }
+    return profileId;
+}
+
+QString ProfileManager::updateProfile(const Profile &aProfile)
+{
+    QString profileId("");
+    if(d_ptr->save(aProfile)) {
+        profileId=aProfile.name();
+    }
+    emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_MODIFIED,aProfile.toString());
+    return profileId;
 }
 
 SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, bool &saveNewProfile)
@@ -697,21 +743,37 @@ void ProfileManager::enableStorages (Profile &aProfile,
 	return ;
 }
 
-bool ProfileManager::remove(const QString &aName, const QString &aType)
+bool ProfileManager::removeProfile(const QString &aProfileId)
+{
+    bool success = false;
+
+    SyncProfile *profile = syncProfile(aProfileId);
+    if(profile){
+       success = d_ptr->remove(aProfileId,profile->type());
+       if(success) {
+           emit signalProfileChanged(aProfileId,ProfileManager::PROFILE_REMOVED, QString(""));
+       }
+       delete profile;
+       profile = NULL;
+    }
+    return success;
+}
+
+bool ProfileManagerPrivate::remove(const QString &aName, const QString &aType)
 {
 	bool success = false;
-	QString filePath = d_ptr->iPrimaryPath + QDir::separator() + aType + QDir::separator() + aName + FORMAT_EXT;
+    QString filePath = iPrimaryPath + QDir::separator() + aType + QDir::separator() + aName + FORMAT_EXT;
 
 	// Try to load profile without expanding it. We need to check from the
 	// profile data if the profile is protected before removing it.
-	Profile *p = d_ptr->load(aName, aType);
+    Profile *p = load(aName, aType);
 	if (p)
 	{
 		if (!p->isProtected())
 		{
 			success = QFile::remove(filePath);
 			if (success){
-				QString logFilePath = d_ptr->iPrimaryPath + QDir::separator() + aType + QDir::separator() +
+                QString logFilePath = iPrimaryPath + QDir::separator() + aType + QDir::separator() +
 						LOG_DIRECTORY + QDir::separator() + aName + LOG_EXT + FORMAT_EXT;
 				success = QFile::remove(logFilePath);
 			}
@@ -818,7 +880,7 @@ void ProfileManager::saveRemoteTargetId(Profile &aProfile,const QString& aTarget
 {
 	LOG_DEBUG("saveRemoteTargetId :" << aTargetId);
 	aProfile.setKey (KEY_REMOTE_ID, aTargetId);
-	save (aProfile);
+    addProfile(aProfile);
 }
 
 
@@ -888,7 +950,7 @@ bool ProfileManager::setSyncSchedule(QString aProfileId , QString aScheduleAsXml
 		if(doc.setContent(aScheduleAsXml,true)) {
 			SyncSchedule schedule(doc.documentElement());
 			profile->setSyncSchedule(schedule);
-			save(*profile);
+            addProfile(*profile);
 			status = true;
 		}
 		delete profile;
@@ -897,21 +959,6 @@ bool ProfileManager::setSyncSchedule(QString aProfileId , QString aScheduleAsXml
 		LOG_WARNING("Invalid Profile Supplied");
 	}
 	return status;
-}
-
-
-QString ProfileManager::addProfile(QString &aProfileAsXml)
-{
-	QString profileId;
-	if(!aProfileAsXml.isEmpty()) {
-		QDomDocument doc;
-		if(doc.setContent(aProfileAsXml,true)) {
-			SyncProfile profile(doc.documentElement());
-			save(profile);
-			profileId = profile.name();
-		}
-	}
-	return profileId;
 }
 
 bool ProfileManagerPrivate::parseFile(const QString &aPath, QDomDocument &aDoc)
@@ -1037,6 +1084,15 @@ QString ProfileManagerPrivate::findProfileFile(const QString &aName, const QStri
 	{
 		return secondaryPath;
 	}
+}
+
+// this function checks to see if its a new profile or an
+// existing profile being modified under $HOME/.sync/profiles directory.
+bool ProfileManagerPrivate::profileExists(const QString &aProfileId ,const QString &aType)
+{
+    QString profileFile = iPrimaryPath + QDir::separator() + aType + QDir::separator() + aProfileId + FORMAT_EXT;
+    LOG_DEBUG("profileFile:" << profileFile);
+    return QFile::exists(profileFile);
 }
 
 

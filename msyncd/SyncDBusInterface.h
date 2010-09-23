@@ -263,6 +263,24 @@ public slots:
      *  \return QString of syncResult.
      */
     virtual QString getLastSyncResult(const QString &aProfileId) = 0;
+
+    /*! \brief Gets all visible sync profiles.
+     *
+     * Returns all sync profiles that should be visible in sync ui. A profile
+     * is visible if it has not been explicitly set as hidden.
+     * \return The list of sync profiles.
+     */
+    virtual QStringList allVisibleSyncProfiles() = 0;
+
+    /*! \brief Gets a sync profile.
+     *
+     * Loads and merges also all sub-profiles that are referenced from the
+     * main profile. Loads the log of finished synchronization sessions with
+     * this profile.
+     * \param aProfileId Name of the profile to get.
+     * \return The sync profile as Xml string.
+     */
+    virtual QString syncProfile(const QString &aProfileId) = 0;
 };
 
 }

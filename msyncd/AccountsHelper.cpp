@@ -88,9 +88,8 @@ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
     {
         LOG_DEBUG("Removing profile" << profile->name());
         // Delete the profile
-        iProfileManager.remove(profile->name(), Profile::TYPE_SYNC);
-        // Emit signal over D-Bus to signal profile removal
-        emit profileChanged(profile->name(), 2);
+        iProfileManager.removeProfile(profile->name());
+
         delete profile;
     }
 }
@@ -111,8 +110,7 @@ void AccountsHelper::slotAccountEnabled(Accounts::AccountId id)
             foreach(SyncProfile *profile, profiles)
             {
                 profile->setKey(KEY_HIDDEN, BOOLEAN_TRUE);
-                iProfileManager.save(*profile);
-                emit profileChanged(profile->name(), 1);
+                iProfileManager.updateProfile(*profile);
                 delete profile;
             }
         }
@@ -142,12 +140,12 @@ void AccountsHelper::slotAccountEnabled(Accounts::AccountId id)
                     }
                 }
             }
+
             // Now disable all remaining profiles
             foreach(SyncProfile *profile, profiles)
             {
                 profile->setKey(KEY_ACTIVE, BOOLEAN_FALSE);
-                iProfileManager.save(*profile);
-                emit profileChanged(profile->name(), 1);
+                iProfileManager.updateProfile(*profile);
                 delete profile;
             }
         }
@@ -223,8 +221,7 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         newProfile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
         newProfile->setKey(KEY_ACTIVE, BOOLEAN_TRUE);
         // Save the newly created profile
-        iProfileManager.save(*newProfile);
-        emit profileChanged(newProfile->name(), 0);
+        iProfileManager.addProfile(*newProfile);
         delete newProfile;
     }
     else if(true == profile->boolKey(KEY_USE_ACCOUNTS, false))
@@ -232,8 +229,7 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         // Set profile as enabled
         profile->setKey(KEY_ACTIVE, BOOLEAN_FALSE);
         profile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
-        iProfileManager.save(*profile);
-        emit profileChanged(profile->name(), 1);
+        iProfileManager.addProfile(*profile);
         delete profile;
     }
 }

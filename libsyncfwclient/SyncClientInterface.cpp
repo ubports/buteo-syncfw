@@ -92,3 +92,15 @@ Buteo::SyncResults SyncClientInterface::getLastSyncResult(const QString &aProfil
 {
     return d_ptr->getLastSyncResult(aProfileId);
 }
+
+
+QList<QString /*profileAsXml*/> SyncClientInterface::allVisibleSyncProfiles()
+{
+    return d_ptr->allVisibleSyncProfiles();
+}
+
+
+QString SyncClientInterface::syncProfile(const QString &aProfileId)
+{
+    return d_ptr->syncProfile(aProfileId);
+}

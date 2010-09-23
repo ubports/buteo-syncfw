@@ -1,3 +1,12 @@
+sync-fw (0.5.1-7) unstable; urgency=low
+
+  * API name change for save , remove for profileMangaer.
+  * Profile change signals are emitted from ProfileManager on add/change/remove
+  * ProfileChanged Signal is removed from Accounts Helper.
+  * Added client Libraray function to be used by backendHelper of sync-ui-libs.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Thu, 23 Sep 2010 14:16:14 +0530
+
 sync-fw (0.5.1-6) unstable; urgency=low
 
   * Fixes: NB#192811 -  Deleted sync destination still persists when close and open sync application

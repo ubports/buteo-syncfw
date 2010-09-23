@@ -142,6 +142,13 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"s\" name=\"aSyncResultAsString\"/>\n"
 "      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
 "    </method>\n"
+"    <method name=\"syncProfile\">\n"
+"      <arg direction=\"out\" type=\"s\" name=\"aProfileAsXml\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aProfileId\"/>\n"
+"    </method>\n"
+"    <method name=\"allVisibleSyncProfiles\">\n"
+"      <arg direction=\"out\" type=\"as\" name=\"aProfilesAsXml\"/>\n"
+"    </method>\n"
 "  </interface>\n"
         "");
 public:
@@ -159,6 +166,9 @@ public Q_SLOTS: // METHODS
 
     //! \see SyncDBusInterface::addProfile()
     bool addProfile(const QString &aProfileAsXml);
+
+    //! \see SyncDBusInterface::allVisibleSyncProfiles()
+    QStringList allVisibleSyncProfiles();
 
     //! \see SyncDBusInterface::getBackUpRestoreState()
     bool getBackUpRestoreState();
@@ -198,6 +208,9 @@ public Q_SLOTS: // METHODS
 
     //! \see SyncDBusInterface::startSync()
     bool startSync(const QString &aProfileId);
+
+    //! \see SyncDBusInterface::syncProfile()
+    QString syncProfile(const QString &aProfileId);
 
     //! \see SyncDBusInterface::updateProfile()
     bool updateProfile(const QString &aProfileAsXml);

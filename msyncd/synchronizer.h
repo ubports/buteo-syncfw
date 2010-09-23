@@ -137,6 +137,24 @@ public slots:
      *  \return QString of syncResult.
      */
     virtual QString getLastSyncResult(const QString &aProfileId);
+
+    /*! \brief Gets all visible sync profiles.
+     *
+     * Returns all sync profiles that should be visible in sync ui. A profile
+     * is visible if it has not been explicitly set as hidden.
+     * \return The list of sync profiles.
+     */
+    virtual QStringList allVisibleSyncProfiles();
+
+    /*! \brief Gets a sync profile.
+     *
+     * Loads and merges also all sub-profiles that are referenced from the
+     * main profile. Loads the log of finished synchronization sessions with
+     * this profile.
+     * \param aProfileId Name of the profile to get.
+     * \return The sync profile as Xml string.
+     */
+    virtual QString syncProfile(const QString &aProfileId);
 // --------------------------------------------------------------------------
 
     //! Called  starts a schedule sync.
@@ -156,9 +174,6 @@ public slots:
 
     //! Called to get the current backup/restore state
     virtual bool getBackUpRestoreState();
-
-    //! handles any changes in the accounts profile
-    virtual void handleAccountsProfileChange(QString,int);
 
 signals:
 

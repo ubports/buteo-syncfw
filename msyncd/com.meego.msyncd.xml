@@ -119,5 +119,12 @@
       <arg name="aSyncResultAsString" type="s" direction="out"/>
       <arg name="aProfileId" type="s" direction="in"/>
     </method>
+    <method name="syncProfile">
+      <arg name="aProfileAsXml" type="s" direction="out"/>
+      <arg name="aProfileId" type="s" direction="in"/>
+    </method>
+    <method name="allVisibleSyncProfiles">
+      <arg name="aProfilesAsXml" type="as" direction="out"/>
+    </method>
   </interface>
 </node>
