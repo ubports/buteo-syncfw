@@ -33,7 +33,7 @@
 #include "synchronizer.h"
 
 const QString LOGGER_CONFIG_FILE( "/etc/sync/set_sync_log_level" );
-const QString SYNC_LOG_FILE_PATH( "/home/user/.sync/synchronizer.log" );
+const QString SYNC_LOG_FILE_PATH( QDir::homePath () + QDir::separator() + ".sync" + QDir::separator() + "synchronizer.log");
 
 // Linux signal handler. This application is shutdown by sending a
 // SIGTERM to it
