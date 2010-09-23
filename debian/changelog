@@ -1,3 +1,9 @@
+sync-fw (0.5.1-8) unstable; urgency=low
+
+  * Updated tag for meego.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Thu, 23 Sep 2010 16:16:14 +0530
+
 sync-fw (0.5.1-7) unstable; urgency=low
 
   * API name change for save , remove for profileMangaer.
