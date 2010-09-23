@@ -598,7 +598,7 @@ void ProfileManagerTest::testSave()
         QVERIFY(p != 0);
         QCOMPARE(p->isEnabled(), true);
         p->setEnabled(false);
-        pm.save(*p);
+        pm.addProfile(*p);
     }
 
     {
@@ -615,7 +615,7 @@ void ProfileManagerTest::testSave()
         }
 
         p->setEnabled(true);
-        pm.save(*p);
+        pm.updateProfile(*p);
     }
 }
 
@@ -633,7 +633,7 @@ void ProfileManagerTest::testHiddenProfiles()
     QScopedPointer<SyncProfile> p(pm.syncProfile(OVI_CALENDAR));
     QVERIFY(p != 0);
     p->setBoolKey(KEY_HIDDEN, true);
-    pm.save(*p);
+    pm.addProfile(*p);
 
     // Verify that number of visible profiles is reduced.
     profiles = pm.allVisibleSyncProfiles();
@@ -643,7 +643,7 @@ void ProfileManagerTest::testHiddenProfiles()
 
     // Make profile visible again.
     p->removeKey(KEY_HIDDEN);
-    pm.save(*p);
+    pm.updateProfile(*p);
 }
 
 void ProfileManagerTest::testRemovingProfiles()
@@ -655,20 +655,17 @@ void ProfileManagerTest::testRemovingProfiles()
     QScopedPointer<SyncProfile> p(pm.syncProfile(OVI_CALENDAR));
     QVERIFY(p != 0);
     p->setName(TEMP_NAME);
-    pm.save(*p);
-
-    // Try removing with wrong type.
-    QCOMPARE(pm.remove(TEMP_NAME, Profile::TYPE_STORAGE), false);
+    pm.addProfile(*p);
 
     // Try removing protected profile.
     p->setBoolKey(KEY_PROTECTED, true);
-    pm.save(*p);
-    QCOMPARE(pm.remove(TEMP_NAME, Profile::TYPE_SYNC), false);
+    pm.updateProfile(*p);
+    QCOMPARE(pm.removeProfile(TEMP_NAME), false);
 
     // Disable protectiong and remove profile.
     p->removeKey(KEY_PROTECTED);
-    pm.save(*p);
-    QCOMPARE(pm.remove(TEMP_NAME, Profile::TYPE_SYNC), true);
+    pm.updateProfile(*p);
+    QCOMPARE(pm.removeProfile(TEMP_NAME), true);
 }
 
 void ProfileManagerTest::testOverrideKey()

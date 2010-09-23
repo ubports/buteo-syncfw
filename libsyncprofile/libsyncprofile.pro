@@ -34,13 +34,13 @@ HEADERS += Profile.h \
     BtHelper.h
 
 SOURCES += Profile.cpp \
+    ProfileManager.cpp \
     ProfileFactory.cpp \
     ProfileField.cpp \
     TargetResults.cpp \
     SyncResults.cpp \
     SyncProfile.cpp \
     SyncLog.cpp \
-    ProfileManager.cpp \
     StorageProfile.cpp \
     SyncSchedule.cpp \
     BtHelper.cpp

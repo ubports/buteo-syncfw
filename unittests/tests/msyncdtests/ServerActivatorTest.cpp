@@ -42,10 +42,10 @@ void ServerActivatorTest::initTestCase()
 
     // add server profiles through Profile class
     Profile myProfile("sampleServerProfile", Profile::TYPE_SERVER);
-    QVERIFY(iProfileManager->save(myProfile));
+    QVERIFY(!iProfileManager->updateProfile(myProfile).isEmpty());
 
     Profile myProfile2("sampleServerProfile2", Profile::TYPE_SERVER);
-    iProfileManager->save(myProfile2);
+    iProfileManager->updateProfile(myProfile2);
 
     iServerActivator = new ServerActivator(*iProfileManager, *iTransportTracker, this);
 
@@ -123,7 +123,7 @@ void ServerActivatorTest :: testConnectivityStateChanged()
     sampleServerProfile.setName("sampleProfile");
     const QString PROFILE_PATH("syncprofiletests/testprofiles/user");
     ProfileManager myProfileManager(PROFILE_PATH, PROFILE_PATH);
-    myProfileManager.save(sampleServerProfile);
+    myProfileManager.updateProfile(sampleServerProfile);
     TransportTracker myTrasportTracker(this);
 
     ServerActivator sampleServerActivator(myProfileManager, myTrasportTracker, this);
@@ -143,7 +143,7 @@ void ServerActivatorTest :: testConnectivityStateChanged()
     sampleServerActivator.onConnectivityStateChanged(Sync::CONNECTIVITY_USB, false);
     QCOMPARE(disabledSpy.count(), 1);
 
-    QVERIFY(myProfileManager.remove("sampleProfile", Profile::TYPE_SERVER));
+    QVERIFY(myProfileManager.removeProfile("sampleProfile"));
 }
 
 void ServerActivatorTest :: testTransportsFromProfile()

@@ -78,6 +78,13 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QLatin1String("addProfile"), argumentList);
     }
 
+    //! \see SyncDBusInterface::allVisibleSyncProfiles()
+    inline QDBusPendingReply<QStringList> allVisibleSyncProfiles()
+    {
+        QList<QVariant> argumentList;
+        return callWithArgumentList(QDBus::Block, QLatin1String("allVisibleSyncProfiles"), argumentList);
+    }
+
     //! \see SyncDBusInterface::getBackUpRestoreState()
     inline QDBusPendingReply<bool> getBackUpRestoreState()
     {
@@ -177,6 +184,14 @@ public Q_SLOTS: // METHODS
         QList<QVariant> argumentList;
         argumentList << qVariantFromValue(aProfileId);
         return asyncCallWithArgumentList(QLatin1String("startSync"), argumentList);
+    }
+
+    //! \see SyncDBusInterface::syncProfile()
+    inline QDBusPendingReply<QString> syncProfile(const QString &aProfileId)
+    {
+        QList<QVariant> argumentList;
+        argumentList << qVariantFromValue(aProfileId);
+        return callWithArgumentList(QDBus::Block, QLatin1String("syncProfile"), argumentList);
     }
 
     //! \see SyncDBusInterface::updateProfile()

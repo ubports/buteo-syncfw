@@ -40,8 +40,9 @@ class ProfileManagerPrivate;
  * that it makes no difference if the profiles are stored to simple XML-files
  * or to a database. Profiles can be queried by name and type.
  */
-class ProfileManager
+class ProfileManager: public QObject
 {
+    Q_OBJECT
 public:
 
     //! Primary profile path where profiles will be searched.
@@ -94,6 +95,17 @@ public:
 
         //! Key value. This must be given if criteria type is EQUAL or NOT_EQUAL.
         QString iValue;
+    };
+
+    //! \brief  Enum to indicate the change type of the Profile Operation
+    enum ProfileChangeType
+    {
+        //! a New Profile has been added
+        PROFILE_ADDED = 0,
+        //! a Existing Profile has been modified
+        PROFILE_MODIFIED,
+        //! Profile has been Removed
+        PROFILE_REMOVED
     };
 
     /*! \brief Constructor.
@@ -190,13 +202,6 @@ public:
     QList<SyncProfile*> getSyncProfilesByStorage(
         const QString &aStorageName, bool aStorageMustBeEnabled = false);
 
-    /*! \brief Saves a profile to a persistent storage.
-     *
-     * \param aProfile Profile to save.
-     * \return True if saving was successful.
-     */
-    bool save(const Profile &aProfile);
-
     /*! \brief Expands the given profile.
      *
      * Loads and merges all sub-profiles that are referenced from the main
@@ -230,9 +235,19 @@ public:
      * \return Pointer to the profile. If the profile is not found, NULL is
      *  returned. Caller is responsible for deleting the returned object.
      *  Changes made to the profile are not saved to profile storage, unless
-     *  save function of this class is called
+     *  updateProfile function of this class is called
      */
     Profile *profile(const QString &aName, const QString &aType);
+
+    /*! \brief Gets a profile object from an xml document.
+     *
+     * \param aProfileAsXml Name of the profile to get.
+     * \return Pointer to the profile. If the xml is not valid, NULL is
+     *  returned. Caller is responsible for deleting the returned object.
+     *  Changes made to the profile are not saved to profile storage, unless
+     *  updateProfile function of this class is called
+     */
+    Profile *profileFromXml(const QString &aProfileAsXml);
      
     /*! \brief Gets a temporary profile (saved if sync is sucessfull).
      *
@@ -247,19 +262,32 @@ public:
     /*! \brief used to create a profile and save it to persistent storage.
      * 	if a profile with the same name and type exists , this API
      *  overwrites it.
+     *  if a profile with the same name and type exists , this API calls updateProfile
+     *  NOTE: only Sync Profiles can be added using ProfileManger
      *
      * \param aProfileAsXml  - sync profile object passed as xml
      * \return profileId
      */
-    QString addProfile(QString &aProfileAsXml);
+    QString addProfile(Profile &aProfile);
+
+    /*! \brief Updates the existing profile with the profile
+     * given as parameter and emits profileChanged Signal
+     * NOTE: only Sync Profiles can be updated using ProfileManger
+     *
+     * \param aProfile  - Profile Object
+     * \return profileId - this will be empty if the update Failed.
+     */
+    QString updateProfile(const Profile &aProfile);
 
     /*! \brief Deletes a profile from the persistent storage.
      *
-     * \param aName Name of the profile to remove.
-     * \param aType Type of the profile to remove.
+     * This will emit a signalProfileChanged with ChangeType
+     * as Removed if Removal is successful
+     * NOTE: only Sync Profiles can be updated using ProfileManger
+     * \param aProfileId Profile to be remove.
      * \return Success indicator.
      */
-    bool remove(const QString &aName, const QString &aType);
+    bool removeProfile(const QString &aProfileId);
 
     /*! \brief Renames a profile, and the associated log too
      *
@@ -298,9 +326,21 @@ public:
     friend class ProfileManagerTest;
 #endif
 
+signals:
+
+    /*! \brief Notifies about a change in profile.
+    *
+    * This signal is sent when the profile data is modified or when a profile
+    * is added or deleted in msyncd.
+    * \param aProfileName Name of the changed profile.
+    * \param aChangeType \see ProfileManager::ProfileChangeType
+    * \param aProfileAsXml Updated Profile Object is sent as xml
+    *
+    */
+    void signalProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
+
 private:
     
-
     ProfileManager& operator=(const ProfileManager &aRhs);
     
     ProfileManagerPrivate *d_ptr;

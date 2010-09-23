@@ -23,6 +23,7 @@
 
 #include <QString>
 #include <QDomDocument>
+#include <libsyncprofile/ProfileManager.h>
 #include <libsyncprofile/SyncProfile.h>
 #include <libsyncprofile/SyncResults.h>
 #include <libsyncprofile/SyncSchedule.h>
@@ -36,28 +37,39 @@ static const QString SYNC_DBUS_OBJECT = "/synchronizer";
 static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
 
 SyncClientInterfacePrivate::SyncClientInterfacePrivate(SyncClientInterface *aParent) :
-			iParent(aParent) {
+            iParent(aParent)
+{
+    FUNCTION_CALL_TRACE;
 	iSyncDaemon = new SyncDaemonProxy(SYNC_DBUS_SERVICE, SYNC_DBUS_OBJECT,
 			QDBusConnection::sessionBus(), this);
 	if (iSyncDaemon) {
 		connect(iSyncDaemon,SIGNAL(signalProfileChanged(QString,int,QString)),
-				this,SLOT(profileChanged(QString,int,QString)));
+                this,SLOT(slotProfileChanged(QString,int,QString)));
+
 		connect(iSyncDaemon, SIGNAL(resultsAvailable(QString, QString)), this,
 				SLOT(resultsAvailable(QString, QString)));
-		connect(this,SIGNAL(profileChanged(QString,int,Buteo::SyncProfile)),
-				iParent,SIGNAL(profileChanged(QString,int,Buteo::SyncProfile)));
+
+        connect(this,SIGNAL(profileChanged(QString, int, QString)),
+                iParent,SIGNAL(profileChanged(QString, int, QString)));
+
 		connect(this,SIGNAL(resultsAvailable(QString,Buteo::SyncResults)),
 				iParent,SIGNAL(resultsAvailable(QString,Buteo::SyncResults)));
+
 		connect	(iSyncDaemon,SIGNAL(syncStatus(QString,int,QString,int)),
 				iParent,SIGNAL(syncStatus(QString,int,QString,int)));
+
 		connect(iSyncDaemon,SIGNAL(transferProgress(QString,int,int,QString,int)),
 				iParent,SIGNAL(transferProgress(QString,int,int,QString,int)));
+
 		connect(iSyncDaemon, SIGNAL(backupInProgress()),
 				iParent, SIGNAL(backupInProgress()));
+
 		connect(iSyncDaemon, SIGNAL(backupDone()),
 				iParent, SIGNAL(backupDone()));
+
 		connect(iSyncDaemon, SIGNAL(restoreInProgress()),
 				iParent, SIGNAL(restoreInProgress()));
+
 		connect(iSyncDaemon, SIGNAL(restoreDone()),
 				iParent, SIGNAL(restoreDone()));
 	}
@@ -67,12 +79,14 @@ SyncClientInterfacePrivate::SyncClientInterfacePrivate(SyncClientInterface *aPar
 
 SyncClientInterfacePrivate::~SyncClientInterfacePrivate()
 {
+    FUNCTION_CALL_TRACE;
 	delete iSyncDaemon;
 	iSyncDaemon = NULL;
 }
 
 bool SyncClientInterfacePrivate::startSync(const QString &aProfileId) const
 {
+    FUNCTION_CALL_TRACE;
 	bool syncStatus = false;
 
 	if (iSyncDaemon && !aProfileId.isEmpty()) {
@@ -84,6 +98,7 @@ bool SyncClientInterfacePrivate::startSync(const QString &aProfileId) const
 
 void SyncClientInterfacePrivate::abortSync(const QString &aProfileId) const
 {
+    FUNCTION_CALL_TRACE;
 	if (iSyncDaemon && !aProfileId.isEmpty()) {
 		iSyncDaemon->abortSync(aProfileId);
 	}
@@ -91,6 +106,7 @@ void SyncClientInterfacePrivate::abortSync(const QString &aProfileId) const
 
 QStringList SyncClientInterfacePrivate::getRunningSyncList()
 {
+    FUNCTION_CALL_TRACE;
 	QStringList runningSyncList;
 	if (iSyncDaemon) {
 		runningSyncList = iSyncDaemon->runningSyncs();
@@ -100,6 +116,7 @@ QStringList SyncClientInterfacePrivate::getRunningSyncList()
 
 bool SyncClientInterfacePrivate::addProfile(Buteo::SyncProfile &aProfile)
 {
+    FUNCTION_CALL_TRACE;
 	bool status = false;
 	if (iSyncDaemon) {
 		QString profileAsXmlString = aProfile.toString();
@@ -110,6 +127,7 @@ bool SyncClientInterfacePrivate::addProfile(Buteo::SyncProfile &aProfile)
 
 bool SyncClientInterfacePrivate::removeProfile(QString &aProfileId)
 {
+    FUNCTION_CALL_TRACE;
 	bool status = false;
 	if (iSyncDaemon) {
 		status = iSyncDaemon->removeProfile(aProfileId);
@@ -119,6 +137,7 @@ bool SyncClientInterfacePrivate::removeProfile(QString &aProfileId)
 
 bool SyncClientInterfacePrivate::updateProfile(Buteo::SyncProfile &aProfile)
 {
+    FUNCTION_CALL_TRACE;
 	bool status = false;
 	if (iSyncDaemon) {
 		QString profileAsXmlString = aProfile.toString();
@@ -127,21 +146,17 @@ bool SyncClientInterfacePrivate::updateProfile(Buteo::SyncProfile &aProfile)
 	return status;
 }
 
-void SyncClientInterfacePrivate::profileChanged(QString aProfileId,int aChangeType,
+void SyncClientInterfacePrivate::slotProfileChanged(QString aProfileId,int aChangeType,
 		QString aProfileAsXml)
 {
-	QDomDocument doc;
-	if (doc.setContent(aProfileAsXml, true)) {
-		Buteo::SyncProfile profile(doc.documentElement());
-		emit profileChanged(aProfileId,aChangeType,profile);
-	} else {
-		LOG_DEBUG("Invalid Profile Xml Received from msyncd");
-	}
+    FUNCTION_CALL_TRACE;
+    emit profileChanged(aProfileId,aChangeType,aProfileAsXml);
 }
 
 void SyncClientInterfacePrivate::resultsAvailable(QString aProfileId,
 		QString aLastResultsAsXml)
 {
+    FUNCTION_CALL_TRACE;
 	QDomDocument doc;
 	if (doc.setContent(aLastResultsAsXml, true)) {
 		Buteo::SyncResults results(doc.documentElement());
@@ -154,6 +169,7 @@ void SyncClientInterfacePrivate::resultsAvailable(QString aProfileId,
 bool SyncClientInterfacePrivate::setSyncSchedule(QString &aProfileId,
 		SyncSchedule &aSchedule)
 {
+    FUNCTION_CALL_TRACE;
 	bool status = false;
 	if (iSyncDaemon) {
 		QString scheduleAsXmlString = aSchedule.toString();
@@ -168,6 +184,7 @@ bool SyncClientInterfacePrivate::setSyncSchedule(QString &aProfileId,
 bool SyncClientInterfacePrivate::saveSyncResults(const QString &aProfileId,
         const Buteo::SyncResults &aSyncResults)
 {
+    FUNCTION_CALL_TRACE;
     bool status = false;
     if (iSyncDaemon) {
         QString resultsAsXmlString = aSyncResults.toString();
@@ -180,6 +197,7 @@ bool SyncClientInterfacePrivate::saveSyncResults(const QString &aProfileId,
 
 bool  SyncClientInterfacePrivate::getBackUpRestoreState()
 {
+    FUNCTION_CALL_TRACE;
 	bool status = false;
 	if (iSyncDaemon) {
 		status = iSyncDaemon->getBackUpRestoreState();
@@ -194,6 +212,7 @@ bool SyncClientInterfacePrivate::isValid()
 
 Buteo::SyncResults SyncClientInterfacePrivate::getLastSyncResult(const QString &aProfileId)
 {
+    FUNCTION_CALL_TRACE;
     // Default construct with invalid values
     // Using default constructor for QDateTime() creates "null" date.
     Buteo::SyncResults syncResult(QDateTime(),
@@ -212,4 +231,33 @@ Buteo::SyncResults SyncClientInterfacePrivate::getLastSyncResult(const QString &
         }
     }
     return syncResult;
+}
+
+QList<QString /*profilesAsXml*/> SyncClientInterfacePrivate::allVisibleSyncProfiles()
+{
+    FUNCTION_CALL_TRACE;
+    QList <QString> profilesAsXml;
+    if (iSyncDaemon) {
+        QStringList profilesList = iSyncDaemon->allVisibleSyncProfiles();
+        if (!profilesList.isEmpty()) {
+            foreach(QString profileAsXml, profilesList) {
+                profilesAsXml.append(profileAsXml);
+            }
+        }
+    }
+    LOG_DEBUG("allVisibleSyncProfiles "<<profilesAsXml);
+    return profilesAsXml;
+}
+
+
+QString SyncClientInterfacePrivate::syncProfile(const QString &aProfileId)
+{
+    FUNCTION_CALL_TRACE;
+    QString profileAsXml;
+    if (iSyncDaemon) {
+        profileAsXml = iSyncDaemon->syncProfile(aProfileId);
+    }
+
+    LOG_DEBUG("syncProfile "<<profileAsXml);
+    return profileAsXml;
 }

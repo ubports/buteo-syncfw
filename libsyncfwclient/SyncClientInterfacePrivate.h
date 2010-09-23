@@ -125,6 +125,24 @@ public:
      */
     Buteo::SyncResults getLastSyncResult(const QString &aProfileId);
 
+    /*! \brief Gets all visible sync profiles.
+     *
+     * Returns all sync profiles that should be visible in sync ui. A profile
+     * is visible if it has not been explicitly set as hidden.
+     * \return The list of sync profiles.
+     */
+    QList<QString /*profileAsXml*/> allVisibleSyncProfiles();
+
+    /*! \brief Gets a sync profile.
+     *
+     * Loads and merges also all sub-profiles that are referenced from the
+     * main profile. Loads the log of finished synchronization sessions with
+     * this profile.
+     * \param aProfileId Name of the profile to get.
+     * \return The sync profile as Xml string.
+     */
+    QString syncProfile(const QString &aProfileId);
+
 public slots:
 
 	/*! \brief this is the slot where we will receive the xml data for profile from msyncd.
@@ -151,7 +169,7 @@ public slots:
 	 * @param  aChangedProfileAsXml - changed profile arrives as xml
 	 *
 	 */
-	void profileChanged(QString aProfileId , int aChangeType , QString aChangedProfileAsXml);
+    void slotProfileChanged(QString aProfileId , int aChangeType , QString aChangedProfileAsXml);
 
 	/*! \brief this is the slot where we will receive the xml data for results from msyncd
 	 * the xml looks like this
@@ -173,9 +191,9 @@ signals:
 	 *
 	 * @param 	aProfileId - id of the profile
 	 * @param   aChangeType - change type whether addition , deletion or modification
-	 * @param  aChangedProfile - changed sync profile object
+     * @param  aChangedProfile - changed sync profie as XMl string.
 	 */
-	void profileChanged(QString aProfileId,int aChangeType,Buteo::SyncProfile aChangedProfile);
+    void profileChanged(QString aProfileId,int aChangeType, QString aChangedProfile);
 
 	/*! \brief Signal that gets emitted on receiving resultsAvailable from msyncd
 	 *

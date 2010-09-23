@@ -34,7 +34,7 @@ void ServerPluginRunnerTest::initTestCase()
     iTransportTracker = new TransportTracker(this);
     iProfileManager = new ProfileManager("profile1", "profile2");
     iProfile = new Profile("dummyprofile", Profile::TYPE_SERVER);
-    iProfileManager->save(*iProfile);
+    iProfileManager->updateProfile(*iProfile);
 
     iServerActivator = new ServerActivator(*iProfileManager, *iTransportTracker);
 

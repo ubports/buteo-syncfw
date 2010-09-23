@@ -70,6 +70,14 @@ bool SyncDBusAdaptor::addProfile(const QString &aProfileAsXml)
     return out0;
 }
 
+QStringList SyncDBusAdaptor::allVisibleSyncProfiles()
+{
+    // handle method call com.meego.msyncd.allVisibleSyncProfiles
+    QStringList aProfilesAsXml;
+    QMetaObject::invokeMethod(parent(), "allVisibleSyncProfiles", Q_RETURN_ARG(QStringList, aProfilesAsXml));
+    return aProfilesAsXml;
+}
+
 bool SyncDBusAdaptor::getBackUpRestoreState()
 {
     // handle method call com.meego.msyncd.getBackUpRestoreState
@@ -170,6 +178,14 @@ bool SyncDBusAdaptor::startSync(const QString &aProfileId)
     bool out0;
     QMetaObject::invokeMethod(parent(), "startSync", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId));
     return out0;
+}
+
+QString SyncDBusAdaptor::syncProfile(const QString &aProfileId)
+{
+    // handle method call com.meego.msyncd.syncProfile
+    QString aProfileAsXml;
+    QMetaObject::invokeMethod(parent(), "syncProfile", Q_RETURN_ARG(QString, aProfileAsXml), Q_ARG(QString, aProfileId));
+    return aProfileAsXml;
 }
 
 bool SyncDBusAdaptor::updateProfile(const QString &aProfileAsXml)

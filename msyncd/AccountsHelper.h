@@ -82,17 +82,6 @@ public Q_SLOTS:
 	 */
     void slotAccountNameChanged(const QString &newName);
 
-Q_SIGNALS:
-    /*! \brief The signal is emitted when a profile gets added, removed, or modified
-     *
-     * \param profileName The name of the profile that changed
-     * \param changeType
-     *          0 -- Profile added
-     *          1 -- Profile modified
-     *          2 -- Profile deleted
-     */
-    void profileChanged(QString profileName, int changeType);
-
 private:
 
     QList<SyncProfile*> getProfilesByAccountId(Accounts::AccountId);
