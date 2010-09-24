@@ -41,6 +41,7 @@ SyncSession::SyncSession(SyncProfile *aProfile, QObject *aParent)
     iAborted(false),
     iStarted(false),
     iFinished(false),
+    iCreateProfile(false),
     iStorageBooker(0),
     iNetworkManager(0)
 {
