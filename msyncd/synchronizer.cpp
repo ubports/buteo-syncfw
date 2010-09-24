@@ -1152,12 +1152,15 @@ void Synchronizer::reschedule(const QString &aProfileName)
     if (profile && profile->syncType() == SyncProfile::SYNC_SCHEDULED)
     {
         iSyncScheduler->addProfile(profile);
-        delete profile;
-        profile = NULL;
     }
     else
     {
         iSyncScheduler->removeProfile(aProfileName);
+    }
+    if(profile)
+    {
+        delete profile;
+        profile = NULL;
     }
 }
 
