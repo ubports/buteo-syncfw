@@ -72,6 +72,11 @@ void SyncSessionTest :: cleanup()
     // profile name will be deallocated in SyncSession. So, not deallocating
     delete iSyncSession ;
     iSyncSession = NULL;
+
+    if(iSyncSessionPluginRunnerTest) {
+        delete iSyncSessionPluginRunnerTest;
+        iSyncSessionPluginRunnerTest = NULL;
+    }
 }
 
 
@@ -238,6 +243,11 @@ void SyncSessionTest :: testStorages()
     // releaseStorages() can be verified
     iSyncSession->releaseStorages();
     QVERIFY(myTestStorageBooker->isStorageAvailable(oneStorage, iSyncProfile->name()));
+
+    if(myTestStorageBooker) {
+        delete myTestStorageBooker;
+        myTestStorageBooker = NULL;
+    }
 }
 
 void SyncSessionTest :: testOnSuccess()

@@ -49,6 +49,8 @@ void ClientPluginRunnerTest::cleanupTestCase()
 	delete iClientPrunner;
 	QVERIFY(iPluginMgr);
 	delete iPluginMgr;
+    QVERIFY(iPluginCbIf);
+    delete iPluginCbIf;
 
 	iSprofile = 0;
 	iPluginMgr = 0;

@@ -1,6 +1,7 @@
 sync-fw (0.5.1-9) unstable; urgency=low
 
   * Fixes: NB#191081 - Memory leak in sync-fw.
+  * Fixes: NB#190205 -  <MemLeak>. 
 
  -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Mon, 27 Sep 2010 16:16:14 +0530
 
