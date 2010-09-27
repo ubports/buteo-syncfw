@@ -1,7 +1,12 @@
+sync-fw (0.5.1-9) unstable; urgency=low
+
+  * Fixes: NB#191081 - Memory leak in sync-fw.
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Mon, 27 Sep 2010 16:16:14 +0530
+
 sync-fw (0.5.1-8) unstable; urgency=low
 
   * Updated tag for meego.
-  * Fixes: NB#191081 - Memory leak in sync-fw.
 
  -- Amit <amit.5.aggarwal@nokia.com>  Thu, 23 Sep 2010 16:16:14 +0530
 
