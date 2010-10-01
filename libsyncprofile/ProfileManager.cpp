@@ -112,6 +112,7 @@ ProfileManagerPrivate::ProfileManagerPrivate(const QString &aPrimaryPath,
 :   iPrimaryPath(aPrimaryPath),
     iSecondaryPath(aSecondaryPath)
 {
+    FUNCTION_CALL_TRACE;
 	if (iPrimaryPath.endsWith(QDir::separator()))
 	{
 		iPrimaryPath.chop(1);
@@ -127,6 +128,7 @@ ProfileManagerPrivate::ProfileManagerPrivate(const QString &aPrimaryPath,
 
 Profile *ProfileManagerPrivate::load(const QString &aName, const QString &aType)
 {
+    FUNCTION_CALL_TRACE;
 	QString profilePath = findProfileFile(aName, aType);
 	QString backupProfilePath = profilePath + BACKUP_EXT;
 
@@ -154,6 +156,8 @@ Profile *ProfileManagerPrivate::load(const QString &aName, const QString &aType)
 
 SyncLog *ProfileManagerPrivate::loadLog(const QString &aProfileName)
 {
+    FUNCTION_CALL_TRACE;
+
 	QString fileName = iPrimaryPath + QDir::separator() + Profile::TYPE_SYNC + QDir::separator() +
 			LOG_DIRECTORY + QDir::separator() + aProfileName + LOG_EXT + FORMAT_EXT;
 
@@ -186,6 +190,7 @@ SyncLog *ProfileManagerPrivate::loadLog(const QString &aProfileName)
 bool ProfileManagerPrivate::matchProfile(const Profile &aProfile,
 		const ProfileManager::SearchCriteria &aCriteria)
 {
+    FUNCTION_CALL_TRACE;
 	bool matched = false;
 
 	const Profile *testProfile = &aProfile;
@@ -333,21 +338,26 @@ ProfileManager::ProfileManager(const QString &aPrimaryPath,
 		const QString &aSecondaryPath)
 :   d_ptr(new ProfileManagerPrivate(aPrimaryPath, aSecondaryPath))
 {
+    FUNCTION_CALL_TRACE;
 }
 
 ProfileManager::~ProfileManager()
 {
+    FUNCTION_CALL_TRACE;
 	delete d_ptr;
 	d_ptr = 0;
 }
 
 Profile *ProfileManager::profile(const QString &aName, const QString &aType)
 {
+    FUNCTION_CALL_TRACE;
 	return d_ptr->load(aName, aType);
 }
 
 SyncProfile *ProfileManager::syncProfile(const QString &aName)
 {
+    FUNCTION_CALL_TRACE;
+
 	Profile *p = profile(aName, Profile::TYPE_SYNC);
 	SyncProfile *syncProfile = 0;
 	if (p != 0 && p->type() == Profile::TYPE_SYNC)
@@ -380,6 +390,8 @@ SyncProfile *ProfileManager::syncProfile(const QString &aName)
 
 QStringList ProfileManager::profileNames(const QString &aType)
 {
+    FUNCTION_CALL_TRACE;
+
 	// Search for all profile files from the primary directory
 	QStringList names;
 	QString nameFilter = QString("*") + FORMAT_EXT;
@@ -414,6 +426,8 @@ QStringList ProfileManager::profileNames(const QString &aType)
 
 QList<SyncProfile*> ProfileManager::allSyncProfiles()
 {
+    FUNCTION_CALL_TRACE;
+
 	QList<SyncProfile*> profiles;
 
 	QStringList names = profileNames(Profile::TYPE_SYNC);
@@ -431,6 +445,8 @@ QList<SyncProfile*> ProfileManager::allSyncProfiles()
 
 QList<SyncProfile*> ProfileManager::allVisibleSyncProfiles()
 {
+    FUNCTION_CALL_TRACE;
+
 	QList<SyncProfile*> profiles = allSyncProfiles();
 	QList<SyncProfile*> visibleProfiles;
 	foreach (SyncProfile *p, profiles)
@@ -453,6 +469,8 @@ QList<SyncProfile*> ProfileManager::getSyncProfilesByData(
 		const QString &aSubProfileType,
 		const QString &aKey, const QString &aValue)
 {
+    FUNCTION_CALL_TRACE;
+
 	QList<SyncProfile*> allProfiles = allSyncProfiles();
 	QList<SyncProfile*> matchingProfiles;
 
@@ -512,6 +530,8 @@ QList<SyncProfile*> ProfileManager::getSyncProfilesByData(
 QList<SyncProfile*> ProfileManager::getSyncProfilesByData(
 		const QList<SearchCriteria> &aCriteria)
 {
+    FUNCTION_CALL_TRACE;
+
 	QList<SyncProfile*> allProfiles = allSyncProfiles();
 	QList<SyncProfile*> matchingProfiles;
 
@@ -547,6 +567,8 @@ QList<SyncProfile*> ProfileManager::getSyncProfilesByData(
 QList<SyncProfile*> ProfileManager::getSyncProfilesByStorage(
 		const QString &aStorageName, bool aStorageMustBeEnabled)
 {
+    FUNCTION_CALL_TRACE;
+
 	QList<SearchCriteria> criteriaList;
 
 	// Require that the profile is not disabled.
@@ -601,6 +623,8 @@ QList<SyncProfile*> ProfileManager::getSyncProfilesByStorage(
 
 bool ProfileManagerPrivate::save(const Profile &aProfile)
 {
+    FUNCTION_CALL_TRACE;
+
     QDomDocument doc = constructProfileDocument(aProfile);
 	if (doc.isNull())
 	{
@@ -641,6 +665,8 @@ bool ProfileManagerPrivate::save(const Profile &aProfile)
 
 Profile* ProfileManager::profileFromXml(const QString &aProfileAsXml)
 {
+    FUNCTION_CALL_TRACE;
+
     Profile *profile = NULL;
     if(!aProfileAsXml.isEmpty()) {
         QDomDocument doc;
@@ -654,6 +680,8 @@ Profile* ProfileManager::profileFromXml(const QString &aProfileAsXml)
 
 QString ProfileManager::addProfile(Profile &aProfile)
 {
+    FUNCTION_CALL_TRACE;
+
     QString profileId("");
     // just check to see if the profile exists. then send an update
     /// signal instead of added signal .
@@ -671,6 +699,8 @@ QString ProfileManager::addProfile(Profile &aProfile)
 
 QString ProfileManager::updateProfile(const Profile &aProfile)
 {
+    FUNCTION_CALL_TRACE;
+
     QString profileId("");
     if(d_ptr->save(aProfile)) {
         profileId=aProfile.name();
@@ -681,6 +711,8 @@ QString ProfileManager::updateProfile(const Profile &aProfile)
 
 SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, bool &saveNewProfile)
 {
+    FUNCTION_CALL_TRACE;
+
 	saveNewProfile = true;
 	if (destAddress.contains("USB")) { //USB - PCSUite no requirement to save profile
 		LOG_INFO("USB connect - pc");
@@ -729,6 +761,7 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
 void ProfileManager::enableStorages (Profile &aProfile, 
 		QMap<QString , bool> &aStorageMap)
 {
+    FUNCTION_CALL_TRACE;
 
 	QMapIterator<QString, bool> i(aStorageMap);
 	LOG_INFO("ProfileManager::enableStorages");
@@ -745,6 +778,8 @@ void ProfileManager::enableStorages (Profile &aProfile,
 
 bool ProfileManager::removeProfile(const QString &aProfileId)
 {
+    FUNCTION_CALL_TRACE;
+
     bool success = false;
 
     SyncProfile *profile = syncProfile(aProfileId);
@@ -761,6 +796,8 @@ bool ProfileManager::removeProfile(const QString &aProfileId)
 
 bool ProfileManagerPrivate::remove(const QString &aName, const QString &aType)
 {
+    FUNCTION_CALL_TRACE;
+
 	bool success = false;
     QString filePath = iPrimaryPath + QDir::separator() + aType + QDir::separator() + aName + FORMAT_EXT;
 
@@ -795,6 +832,8 @@ bool ProfileManagerPrivate::remove(const QString &aName, const QString &aType)
 
 void ProfileManager::expand(Profile &aProfile)
 {
+    FUNCTION_CALL_TRACE;
+
 	if (aProfile.isLoaded())
 		return; // Already expanded.
 
@@ -839,6 +878,8 @@ void ProfileManager::expand(Profile &aProfile)
 
 bool ProfileManager::saveLog(const SyncLog &aLog)
 {
+    FUNCTION_CALL_TRACE;
+
 	QDir dir;
 	QString fullPath = d_ptr->iPrimaryPath + QDir::separator() + Profile::TYPE_SYNC + QDir::separator() +
 			LOG_DIRECTORY;
@@ -878,6 +919,8 @@ bool ProfileManager::saveLog(const SyncLog &aLog)
 
 void ProfileManager::saveRemoteTargetId(Profile &aProfile,const QString& aTargetId )
 {
+    FUNCTION_CALL_TRACE;
+
 	LOG_DEBUG("saveRemoteTargetId :" << aTargetId);
 	aProfile.setKey (KEY_REMOTE_ID, aTargetId);
     addProfile(aProfile);
@@ -886,6 +929,8 @@ void ProfileManager::saveRemoteTargetId(Profile &aProfile,const QString& aTarget
 
 bool ProfileManager::rename(const QString &aName, const QString &aNewName)
 {
+    FUNCTION_CALL_TRACE;
+
 	bool ret = false;
 	// Rename the sync profile
 	QString source = d_ptr->iPrimaryPath + QDir::separator() +  Profile::TYPE_SYNC + QDir::separator() +
@@ -917,6 +962,7 @@ bool ProfileManager::rename(const QString &aName, const QString &aNewName)
 bool ProfileManager::saveSyncResults(QString aProfileName,
 		const SyncResults &aResults)
 {
+
 	FUNCTION_CALL_TRACE;
 	bool success = false;
 
@@ -963,6 +1009,8 @@ bool ProfileManager::setSyncSchedule(QString aProfileId , QString aScheduleAsXml
 
 bool ProfileManagerPrivate::parseFile(const QString &aPath, QDomDocument &aDoc)
 {
+    FUNCTION_CALL_TRACE;
+
 	bool parsingOk = false;
 
 	if (QFile::exists(aPath))
@@ -995,6 +1043,8 @@ bool ProfileManagerPrivate::parseFile(const QString &aPath, QDomDocument &aDoc)
 
 QDomDocument ProfileManagerPrivate::constructProfileDocument(const Profile &aProfile)
 {
+    FUNCTION_CALL_TRACE;
+
 	QDomDocument doc;
 	QDomElement root = aProfile.toXml(doc);
 
@@ -1017,7 +1067,9 @@ QDomDocument ProfileManagerPrivate::constructProfileDocument(const Profile &aPro
 
 bool ProfileManagerPrivate::writeProfileFile(const QString &aProfilePath,
 		const QDomDocument &aDoc)
-{   
+{
+    FUNCTION_CALL_TRACE;
+
 	QFile file(aProfilePath);
 	bool profileWritten = false;
 
@@ -1040,6 +1092,8 @@ bool ProfileManagerPrivate::writeProfileFile(const QString &aProfilePath,
 void ProfileManagerPrivate::restoreBackupIfFound(const QString &aProfilePath,
 		const QString &aBackupPath)
 {
+    FUNCTION_CALL_TRACE;
+
 	if (QFile::exists(aBackupPath))
 	{
 		LOG_WARNING("Profile backup file found. The actual profile may be corrupted.");
@@ -1063,6 +1117,7 @@ void ProfileManagerPrivate::restoreBackupIfFound(const QString &aProfilePath,
 bool ProfileManagerPrivate::createBackup(const QString &aProfilePath,
 		const QString &aBackupPath)
 {
+    FUNCTION_CALL_TRACE;
 	return QFile::copy(aProfilePath, aBackupPath);
 }
 

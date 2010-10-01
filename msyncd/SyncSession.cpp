@@ -367,7 +367,8 @@ void SyncSession::onStorageAccquired (const QString &aMimeType)
 void SyncSession::onSyncProgressDetail(const QString &aProfileName,int aProgressDetail)
 {
     FUNCTION_CALL_TRACE;
-    emit syncProgressDetail (aProfileName,aProgressDetail);
+    Q_UNUSED(aProfileName);
+    emit syncProgressDetail (profileName(), aProgressDetail);
 }
 
 void SyncSession::onDone()
