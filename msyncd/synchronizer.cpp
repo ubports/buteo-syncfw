@@ -478,7 +478,8 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
 void Synchronizer::onSyncProgressDetail(const QString &aProfileName,int aProgressDetail)
 {
     FUNCTION_CALL_TRACE;
-    emit syncStatus(aProfileName,Sync::SYNC_PROGRESS,"Sync Progress",aProgressDetail);
+    LOG_DEBUG("aProfileName"<<aProfileName);
+    emit syncStatus(aProfileName, Sync::SYNC_PROGRESS, "Sync Progress", aProgressDetail);
 }
 
 bool Synchronizer::startNextSync()
@@ -617,6 +618,7 @@ bool Synchronizer::removeProfile(QString aProfileId)
     bool status = false;
     // We assume this call is made on a Sync Profile
     SyncProfile *profile = iProfileManager.syncProfile (aProfileId);
+
     if(!aProfileId.isEmpty() && profile)  {
 
         bool client = true ;
@@ -1123,6 +1125,8 @@ void Synchronizer::onNewSession(const QString &aDestination)
                     const QString &, int)),
                     this, SLOT(onSessionFinished(const QString &, Sync::SyncStatus,
                             const QString &, int)));
+            connect(session, SIGNAL(syncProgressDetail(const QString &,int)),
+                    this, SLOT(onSyncProgressDetail(const QString &,int)));
 
             // Associate plug-in runner with the new session.
             session->setPluginRunner(pluginRunner, false);

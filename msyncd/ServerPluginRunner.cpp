@@ -109,6 +109,9 @@ bool ServerPluginRunner::init()
     connect(iPlugin, SIGNAL(accquiredStorage(const QString &)),
         this, SLOT(onStorageAccquired(const QString &)));
 
+    connect(iPlugin,SIGNAL(syncProgressDetail(const QString &,int)),
+            this ,SIGNAL(syncProgressDetail(const QString &,int)));
+
     // Connect signals from the thread.
 
     connect(iThread, SIGNAL(initError(const QString &, const QString &, int)),

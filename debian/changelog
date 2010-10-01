@@ -1,3 +1,9 @@
+sync-fw (0.5.1-10) unstable; urgency=low
+
+  * Fixes: NB#186227 -  Synchronization Progress displays only initializing label till sync ends from remote side
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Fri, 1 Oct 2010 16:16:14 +0530
+
 sync-fw (0.5.1-9) unstable; urgency=low
 
   * Fixes: NB#191081 - Memory leak in sync-fw.
