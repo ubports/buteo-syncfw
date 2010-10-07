@@ -1,3 +1,9 @@
+sync-fw (0.5.1-11) unstable; urgency=low
+
+  * Tests deb pkg dependency changes to testrunner->testrunner-line 
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Thu, 07 Oct 2010 17:16:14 +0330
+
 sync-fw (0.5.1-10) unstable; urgency=low
 
   * Fixes: NB#186227 -  Synchronization Progress displays only initializing label till sync ends from remote side
