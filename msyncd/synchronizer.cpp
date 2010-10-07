@@ -594,23 +594,7 @@ void Synchronizer::abortSync(QString aProfileName)
     }
 }
 
-bool Synchronizer::addProfile(QString aProfileAsXml)
-{
-    FUNCTION_CALL_TRACE
-    bool status = false;
-    if(!aProfileAsXml.isEmpty())  {
-        // save the changes to persistent storage
-        Profile *profile = iProfileManager.profileFromXml(aProfileAsXml);
-        if(profile) {
-            QString profileId = iProfileManager.addProfile(*profile);
-            if(!profileId.isEmpty()) {
-                status = true;
-            }
-            delete profile;
-        }
-    }
-    return status;
-}
+
 
 bool Synchronizer::removeProfile(QString aProfileId)
 {
