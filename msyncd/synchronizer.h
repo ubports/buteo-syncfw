@@ -108,9 +108,6 @@ public slots:
     //! \see SyncDBusInterface::abortSync
     virtual void abortSync(QString aProfileName);
 
-    //! \see SyncDBusInterface::addProfile
-    virtual bool addProfile(QString aProfileAsXml);
-
     //! \see SyncDBusInterface::removeProfile
     virtual bool removeProfile(QString aProfileAsXml);
 

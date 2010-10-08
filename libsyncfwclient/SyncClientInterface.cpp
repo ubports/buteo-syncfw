@@ -53,11 +53,6 @@ QStringList SyncClientInterface::getRunningSyncList()
 	return d_ptr->getRunningSyncList();
 }
 
-bool SyncClientInterface::addProfile(Buteo::SyncProfile &aProfile)
-{
-	return d_ptr->addProfile(aProfile);
-}
-
 bool SyncClientInterface::removeProfile(QString &aProfileId)
 {
 	return d_ptr->removeProfile(aProfileId);

@@ -259,19 +259,10 @@ public:
      */
     SyncProfile *createTempSyncProfile (const QString &btAddress, bool &saveNewProfile);
 
-    /*! \brief used to create a profile and save it to persistent storage.
-     * 	if a profile with the same name and type exists , this API
-     *  overwrites it.
-     *  if a profile with the same name and type exists , this API calls updateProfile
-     *  NOTE: only Sync Profiles can be added using ProfileManger
-     *
-     * \param aProfileAsXml  - sync profile object passed as xml
-     * \return profileId
-     */
-    QString addProfile(Profile &aProfile);
-
     /*! \brief Updates the existing profile with the profile
-     * given as parameter and emits profileChanged Signal
+     * given as parameter and emits profileChanged() Signal with appropriate value
+     * depening if profile was newly added (0) or updated (1)
+     * 
      * NOTE: only Sync Profiles can be updated using ProfileManger
      *
      * \param aProfile  - Profile Object

@@ -1,4 +1,4 @@
-<!--
+-<!--
 /*
  * This file is part of buteo-syncfw package
  *
@@ -21,7 +21,7 @@
  * 02110-1301 USA
  *
  */
--->
+--->
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
   <interface name="com.meego.msyncd">
@@ -29,7 +29,7 @@
       <arg name="aProfileName" type="s" direction="out"/>
       <arg name="aStatus" type="i" direction="out"/>
       <arg name="aMessage" type="s" direction="out"/>
-      <arg name="aErrorCode" type="i" direction="out"/>
+      <arg name="aMoreDetails" type="i" direction="out"/>
     </signal>
     <signal name="transferProgress">
       <arg name="aProfileName" type="s" direction="out"/>
@@ -63,10 +63,6 @@
       <arg name="aProfileId" type="s" direction="in"/>
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
     </method>
-    <method name="addProfile">
-      <arg type="b" direction="out"/>
-      <arg name="aProfileAsXml" type="s" direction="in"/>
-    </method>
     <method name="removeProfile">
       <arg type="b" direction="out"/>
       <arg name="aProfileId" type="s" direction="in"/>
@@ -74,11 +70,6 @@
     <method name="updateProfile">
       <arg type="b" direction="out"/>
       <arg name="aProfileAsXml" type="s" direction="in"/>
-    </method>
-    <method name="saveSyncResults">
-      <arg type="b" direction="out"/>
-      <arg name="aProfileId" type="s" direction="in"/>
-      <arg name="aSyncResults" type="s" direction="in"/>
     </method>
     <method name="requestStorages">
       <arg type="b" direction="out"/>
@@ -99,32 +90,21 @@
       <arg name="aProfileId" type="s" direction="in"/>
       <arg name="aScheduleAsXml" type="s" direction="in"/>
     </method>
-    <method name="isLastSyncScheduled">
+    <method name="saveSyncResults">
       <arg type="b" direction="out"/>
       <arg name="aProfileId" type="s" direction="in"/>
-    </method>
-    <method name="lastSyncMinorCode">
-      <arg name="aMinorCode" type="i" direction="out"/>
-      <arg name="aProfileId" type="s" direction="in"/>
-    </method>
-    <method name="lastSyncMajorCode">
-      <arg name="aMajorCode" type="i" direction="out"/>
-      <arg name="aProfileId" type="s" direction="in"/>
-    </method>
-    <method name="lastSyncTime">
-      <arg name="aTimeAsString" type="s" direction="out"/>
-      <arg name="aProfileId" type="s" direction="in"/>
+      <arg name="aSyncResults" type="s" direction="in"/>
     </method>
     <method name="getLastSyncResult">
-      <arg name="aSyncResultAsString" type="s" direction="out"/>
+      <arg name="aResultAsXml" type="s" direction="out"/>
       <arg name="aProfileId" type="s" direction="in"/>
+    </method>
+    <method name="allVisibleSyncProfiles">
+      <arg name="aProfileAsXml" type="as" direction="out"/>
     </method>
     <method name="syncProfile">
       <arg name="aProfileAsXml" type="s" direction="out"/>
       <arg name="aProfileId" type="s" direction="in"/>
-    </method>
-    <method name="allVisibleSyncProfiles">
-      <arg name="aProfilesAsXml" type="as" direction="out"/>
     </method>
   </interface>
 </node>
