@@ -68,12 +68,6 @@ public:
 	 */
 	QStringList getRunningSyncList();
 
-	/*! \brief function to add a new profile
-	 *
-	 * @param aProfile profile to add
-	 */
-	bool addProfile(Buteo::SyncProfile &aProfile);
-
 	/*! \brief function to remove a profile
 	 *
 	 * @param aProfileId id of the profule to remove to add

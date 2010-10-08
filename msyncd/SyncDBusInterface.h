@@ -169,14 +169,6 @@ public slots:
     virtual Q_NOREPLY void abortSync(QString aProfileId) = 0;
 
     /*!
-     * \brief This function should be called when a new profile has to be created.
-     *
-     * \param aProfileAsXml Profile Object sent as xml over dbus
-     * \return status of the add operation
-     */
-    virtual bool addProfile(QString aProfileAsXml) = 0;
-
-    /*!
      * \brief This function should be called when sync profile has to be deleted
      *
      * \param aProfileId Id of the profile to be deleted.
@@ -187,6 +179,7 @@ public slots:
     /*!
      * \brief This function should be called when sync profile information has
      *  been changed by someone else than the sync daemon.
+     * \note If profile does not exist prior to calling this function, a new profile file is created
      *
      * \param aProfileAsXml - Modified Profile Object as XML.
      * \return status of the update operation

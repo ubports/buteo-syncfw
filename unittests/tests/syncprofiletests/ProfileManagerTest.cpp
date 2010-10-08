@@ -598,7 +598,8 @@ void ProfileManagerTest::testSave()
         QVERIFY(p != 0);
         QCOMPARE(p->isEnabled(), true);
         p->setEnabled(false);
-        pm.addProfile(*p);
+        // NOTE: removed addProfile()
+//        pm.addProfile(*p);
     }
 
     {
@@ -633,7 +634,7 @@ void ProfileManagerTest::testHiddenProfiles()
     QScopedPointer<SyncProfile> p(pm.syncProfile(OVI_CALENDAR));
     QVERIFY(p != 0);
     p->setBoolKey(KEY_HIDDEN, true);
-    pm.addProfile(*p);
+//    pm.addProfile(*p);
 
     // Verify that number of visible profiles is reduced.
     profiles = pm.allVisibleSyncProfiles();
@@ -655,7 +656,7 @@ void ProfileManagerTest::testRemovingProfiles()
     QScopedPointer<SyncProfile> p(pm.syncProfile(OVI_CALENDAR));
     QVERIFY(p != 0);
     p->setName(TEMP_NAME);
-    pm.addProfile(*p);
+//    pm.addProfile(*p);
 
     // Try removing protected profile.
     p->setBoolKey(KEY_PROTECTED, true);

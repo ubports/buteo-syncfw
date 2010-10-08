@@ -114,17 +114,6 @@ QStringList SyncClientInterfacePrivate::getRunningSyncList()
 	return runningSyncList;
 }
 
-bool SyncClientInterfacePrivate::addProfile(Buteo::SyncProfile &aProfile)
-{
-    FUNCTION_CALL_TRACE;
-	bool status = false;
-	if (iSyncDaemon) {
-		QString profileAsXmlString = aProfile.toString();
-		status = iSyncDaemon->addProfile(profileAsXmlString);
-	}
-	return status;
-}
-
 bool SyncClientInterfacePrivate::removeProfile(QString &aProfileId)
 {
     FUNCTION_CALL_TRACE;

@@ -221,7 +221,7 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         newProfile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
         newProfile->setKey(KEY_ACTIVE, BOOLEAN_TRUE);
         // Save the newly created profile
-        iProfileManager.addProfile(*newProfile);
+        iProfileManager.updateProfile(*newProfile);
         delete newProfile;
     }
     else if(true == profile->boolKey(KEY_USE_ACCOUNTS, false))
@@ -229,7 +229,7 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         // Set profile as enabled
         profile->setKey(KEY_ACTIVE, BOOLEAN_FALSE);
         profile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
-        iProfileManager.addProfile(*profile);
+        iProfileManager.updateProfile(*profile);
         delete profile;
     }
 }
