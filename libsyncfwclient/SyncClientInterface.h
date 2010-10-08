@@ -116,14 +116,6 @@ public:
     bool saveSyncResults(const QString &aProfileId,const Buteo::SyncResults &aSyncResults);
 
     /*!
-     * \brief This function should be called when a new profile has to be created.
-     *
-     * \param aSyncProfile Sync Profile Object
-     * \return status of the add operation
-     */
-    bool addProfile(Buteo::SyncProfile &aSyncProfile);
-
-    /*!
      * \brief This function should be called when sync profile has to be deleted
      *
      * \param aProfileId Id of the profile to be deleted.

@@ -678,34 +678,25 @@ Profile* ProfileManager::profileFromXml(const QString &aProfileAsXml)
     return profile;
 }
 
-QString ProfileManager::addProfile(Profile &aProfile)
-{
-    FUNCTION_CALL_TRACE;
-
-    QString profileId("");
-    // just check to see if the profile exists. then send an update
-    /// signal instead of added signal .
-    if(d_ptr->profileExists(aProfile.name(),aProfile.type())){
-        LOG_DEBUG("Profile Exists ... Overwriting it ... ");
-        profileId = updateProfile(aProfile);
-    } else {
-        if(d_ptr->save(aProfile)) {
-            profileId=aProfile.name();
-        }
-        emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_ADDED,aProfile.toString());
-    }
-    return profileId;
-}
-
 QString ProfileManager::updateProfile(const Profile &aProfile)
 {
     FUNCTION_CALL_TRACE;
 
+    // We must have a profile exiting before updating it...
+
+    bool exists = d_ptr->profileExists(aProfile.name(),aProfile.type());
+
     QString profileId("");
-    if(d_ptr->save(aProfile)) {
-        profileId=aProfile.name();
+    // Profile did not exist, it was a new one. Add it and emit signal with "added" value:
+    if (!exists) {
+        emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_ADDED,aProfile.toString());
+    } else {
+        emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_MODIFIED,aProfile.toString());
     }
-    emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_MODIFIED,aProfile.toString());
+
+    if(d_ptr->save(aProfile)) {
+        profileId = aProfile.name();
+    }
     return profileId;
 }
 
@@ -923,7 +914,8 @@ void ProfileManager::saveRemoteTargetId(Profile &aProfile,const QString& aTarget
 
 	LOG_DEBUG("saveRemoteTargetId :" << aTargetId);
 	aProfile.setKey (KEY_REMOTE_ID, aTargetId);
-    addProfile(aProfile);
+    updateProfile(aProfile);
+    //addProfile(aProfile);
 }
 
 
@@ -996,7 +988,7 @@ bool ProfileManager::setSyncSchedule(QString aProfileId , QString aScheduleAsXml
 		if(doc.setContent(aScheduleAsXml,true)) {
 			SyncSchedule schedule(doc.documentElement());
 			profile->setSyncSchedule(schedule);
-            addProfile(*profile);
+            updateProfile(*profile);
 			status = true;
 		}
 		delete profile;
