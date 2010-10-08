@@ -1,8 +1,9 @@
 sync-fw (0.5.1-12) unstable; urgency=low
 
+  * Fixes: NB#197152 -  API file missing from sync-fw package
   * Removed addProfile() because of duplicate functionality with updateProfile()
 
- -- Lassi Vaatamoinen <ext-lassi.vaatamoinen@nokia.com>  Fri, 08 Oct 2010 14:58:11 +0300
+ -- Sateesh Kavuri <sateesh.kavuri@nokia.com>  Fri, 08 Oct 2010 14:58:11 +0300
 
 sync-fw (0.5.1-11) unstable; urgency=low
 
