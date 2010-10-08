@@ -35,7 +35,9 @@ const QString ALARM_CONNECTION_NAME( "alarms" );
 // For now, we just divide the next trigger time by 2 and use that value
 const int TRIGGER_COUNT = 2;
 
-SyncAlarmInventory::SyncAlarmInventory()
+SyncAlarmInventory::SyncAlarmInventory():
+        currentAlarm(0),
+        triggerCount(TRIGGER_COUNT)
 {
   // empty.explicitly call init
 }
