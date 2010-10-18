@@ -39,8 +39,6 @@ namespace Buteo {
         }
         ~AutoDBusConnection()
         {
-            FUNCTION_CALL_TRACE;
-            LOG_DEBUG("Disconnecting dbus connection" << name());
             disconnectFromBus(name());
         }
     };
