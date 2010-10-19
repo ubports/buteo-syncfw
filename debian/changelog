@@ -1,6 +1,7 @@
 sync-fw (0.5.1-13) unstable; urgency=low
 
   * Fix for memory leak NB#196459.
+  * Fixes: NB#197152 -  API file missing from sync-fw package
 
  -- Santosh Puranik <santosh.puranik@nokia.com>  Mon, 18 Oct 2010 19:31:00 +0530
 
