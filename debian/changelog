@@ -8,7 +8,6 @@ sync-fw (0.5.1-13) unstable; urgency=low
 sync-fw (0.5.1-12) unstable; urgency=low
 
   * Fixes: NB#196989 -  <coverity> defects from libmaemomtp/1.0.15_0m6 and sync-fw/0.5.1-5_0m6. 
-  * Fixes: NB#197152 -  API file missing from sync-fw package
   * Removed addProfile() because of duplicate functionality with updateProfile()
 
  -- Amit <amit.5.aggarwal@nokia.com>  Fri, 08 Oct 2010 14:24:29 +0530
