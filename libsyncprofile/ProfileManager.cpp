@@ -789,36 +789,37 @@ bool ProfileManagerPrivate::remove(const QString &aName, const QString &aType)
 {
     FUNCTION_CALL_TRACE;
 
-	bool success = false;
+    bool success = false;
     QString filePath = iPrimaryPath + QDir::separator() + aType + QDir::separator() + aName + FORMAT_EXT;
 
-	// Try to load profile without expanding it. We need to check from the
-	// profile data if the profile is protected before removing it.
+    // Try to load profile without expanding it. We need to check from the
+    // profile data if the profile is protected before removing it.
     Profile *p = load(aName, aType);
-	if (p)
-	{
-		if (!p->isProtected())
-		{
-			success = QFile::remove(filePath);
-			if (success){
-                QString logFilePath = iPrimaryPath + QDir::separator() + aType + QDir::separator() +
-						LOG_DIRECTORY + QDir::separator() + aName + LOG_EXT + FORMAT_EXT;
-				success = QFile::remove(logFilePath);
-			}
-		}
-		else
-		{
-			LOG_DEBUG( "Cannot remove protected profile:" << aName );
-		}
-		delete p;
-		p = 0;
-	}
-	else
-	{
-		LOG_DEBUG( "Profile not found from the primary path, cannot remove:" << aName );
-	}
-
-	return success;
+    if (p)
+    {
+        if (!p->isProtected())
+    	{
+            success = QFile::remove(filePath);
+            if (success){
+               QString logFilePath = iPrimaryPath + QDir::separator() + aType + QDir::separator() +
+    					LOG_DIRECTORY + QDir::separator() + aName + LOG_EXT + FORMAT_EXT;
+               //Initial the will be no log this will fail.
+               QFile::remove(logFilePath);
+            }
+    	}
+    	else
+    	{
+    	    LOG_DEBUG( "Cannot remove protected profile:" << aName );
+    	}
+    	delete p;
+    	p = 0;
+    }
+    else
+    {
+    	LOG_DEBUG( "Profile not found from the primary path, cannot remove:" << aName );
+    }
+    
+    return success;
 }
 
 void ProfileManager::expand(Profile &aProfile)
