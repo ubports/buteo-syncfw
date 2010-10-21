@@ -1,3 +1,9 @@
+sync-fw (0.5.1-15) unstable; urgency=low
+
+  * Fix for meego bug 8656 : log level reported incorrectly.
+
+ -- Deepak <deepak.kodihalli@nokia.com>  Thu, 21 Oct 2010 18:57:50 +0530
+
 sync-fw (0.5.1-14) unstable; urgency=low
 
   * Fixes: NB#192811 -  Deleted sync destination still persists when close and open sync application.
