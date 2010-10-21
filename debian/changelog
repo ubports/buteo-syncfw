@@ -1,3 +1,9 @@
+sync-fw (0.5.1-14) unstable; urgency=low
+
+  * Fixes: NB#192811 -  Deleted sync destination still persists when close and open sync application.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Mon, 20 Oct 2010 19:31:00 +0530
+
 sync-fw (0.5.1-13) unstable; urgency=low
 
   * Fix for memory leak NB#196459.
