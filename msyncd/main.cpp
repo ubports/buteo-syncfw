@@ -72,7 +72,7 @@ int main( int argc, char* argv[] )
     if (logger) {
         setLogLevelFromFile(logger);
         qDebug() << "Current log level is " <<
-            (logger->getLogLevelArray().count(true) - 1);
+            (logger->getLogLevelArray().count(true));
         qDebug() << "Logs will be logged to " << SYNC_LOG_FILE_PATH;
     }
 
