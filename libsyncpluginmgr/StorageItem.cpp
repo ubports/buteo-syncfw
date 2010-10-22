@@ -61,3 +61,14 @@ const QString& StorageItem::getType() const
 {
     return iType;
 }
+
+void StorageItem::setVersion( const QString& aVersion )
+{
+    iVersion = aVersion;
+}
+
+const QString& StorageItem::getVersion() const
+{
+    return iVersion;
+}
+
