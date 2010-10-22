@@ -1,3 +1,10 @@
+sync-fw (0.5.1-16) unstable; urgency=low
+
+  * Fixes: NB#180964 - SMS messages synced from N95 all have today's time
+    stamp
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Fri, 22 Oct 2010 20:43:50 +0530
+
 sync-fw (0.5.1-15) unstable; urgency=low
 
   * Fix for meego bug 8656 : log level reported incorrectly.
