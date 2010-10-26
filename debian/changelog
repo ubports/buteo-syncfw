@@ -1,3 +1,9 @@
+sync-fw (0.5.1-17) unstable; urgency=low
+
+  * Fixes: NB#181440 - Content type is not enabled properly in sync destination profile after remote sync.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Fri, 26 Oct 2010 20:43:50 +0530
+
 sync-fw (0.5.1-16) unstable; urgency=low
 
   * Fixes: NB#180964 - SMS messages synced from N95 all have today's time
