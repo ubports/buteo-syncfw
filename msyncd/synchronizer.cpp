@@ -423,12 +423,10 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
             {
             case Sync::SYNC_DONE:
             {
-                if (session->isProfileCreated()) {
-                    QMap<QString,bool> storageMap = session->getStorageMap();
-                    //session->setFailureResult(SyncResults::SYNC_RESULT_SUCCESS, Buteo::SyncResults::NO_ERROR);
-                    iProfileManager.enableStorages (*session->profile(),storageMap);
-                    iProfileManager.updateProfile(*session->profile());
-                }
+                QMap<QString,bool> storageMap = session->getStorageMap();
+                //session->setFailureResult(SyncResults::SYNC_RESULT_SUCCESS, Buteo::SyncResults::NO_ERROR);
+                iProfileManager.enableStorages (*session->profile(),storageMap);
+                iProfileManager.updateProfile(*session->profile());
                 break;
             }
 
