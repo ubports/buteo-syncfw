@@ -749,8 +749,8 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
 }
 
 
-void ProfileManager::enableStorages (Profile &aProfile, 
-		QMap<QString , bool> &aStorageMap)
+void ProfileManager::enableStorages(Profile &aProfile,
+                                    QMap<QString, bool> &aStorageMap)
 {
     FUNCTION_CALL_TRACE;
 
@@ -765,6 +765,27 @@ void ProfileManager::enableStorages (Profile &aProfile,
 			LOG_WARNING("No storage profile by key :" << i.key());
 	}
 	return ;
+}
+
+void ProfileManager::setStoragesVisible(Profile &aProfile, 
+                                        QMap<QString, bool> &aStorageMap)
+{
+    FUNCTION_CALL_TRACE;
+
+    QMapIterator<QString, bool> i(aStorageMap);
+    LOG_INFO("ProfileManager::enableStorages");
+    while (i.hasNext()) {
+        i.next();
+        Profile *profile = aProfile.subProfile(i.key(), Profile::TYPE_STORAGE);
+        
+        if (profile) {
+            // For setting the "hidden" value to correspond visiblity, invert the value from map.
+            profile->setBoolKey(Buteo::KEY_HIDDEN, !i.value());
+        } else { 
+            LOG_WARNING("No storage profile by key :" << i.key());
+        }
+    }
+    return ;
 }
 
 bool ProfileManager::removeProfile(const QString &aProfileId)
