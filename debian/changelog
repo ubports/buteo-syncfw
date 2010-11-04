@@ -1,15 +1,10 @@
-sync-fw (0.5.1-19) unstable; urgency=low
-
-  * Fixes: NB#202418 - Blank profile is created in Sync application when
-    device is connected to NOS via BT/USB.
-
- -- Santosh Puranik <santosh.puranik@nokia.com>  Thu, 04 Nov 2010 15:00:00 +0530
-
 sync-fw (0.5.1-18) unstable; urgency=low
 
   * Added function to set visibility of storage profiles.
   * Added caps_modified attribute to profile.
   * Remotely diabled storages profiles are being hidden, if remote capabilites have not been fetched for a device profile
+  * Fixes: NB#202418 - Blank profile is created in Sync application when
+    device is connected to NOS via BT/USB.
 
  -- Lassi Vaatamoinen <ext-lassi.vaatamoinen@nokia.com>  Wed, 03 Nov 2010 12:22:30 +0200
 
