@@ -82,6 +82,7 @@ const QString KEY_BT_TRANSPORT("bt_transport");
 const QString KEY_USB_TRANSPORT("usb_transport");
 const QString KEY_INTERNET_TRANSPORT("internet_transport");
 const QString KEY_LOAD_WITHOUT_TRANSPORT("load_without_transport");
+const QString KEY_CAPS_MODIFIED("caps_modified");
 
 const QString BOOLEAN_TRUE("true");
 const QString BOOLEAN_FALSE("false");

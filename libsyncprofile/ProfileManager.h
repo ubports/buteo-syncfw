@@ -297,6 +297,14 @@ public:
      */ 
     void enableStorages (Profile &aProfile, QMap<QString , bool> &aStorageMap); 
    
+     /*! \brief Sets storage subprofiles hidden status for the given profile
+     *
+     * \param aProfile Profile of the remote device
+     * \param aStorageMap Map of storage names (hcalendar, hcontacts) and visibility status. With value \e true
+     * the storage will be set visible (equals profile attribute hidden=false)
+     */ 
+    void setStoragesVisible(Profile &aProfile, QMap<QString, bool> &aStorageMap);
+    
     /*! \brief Sets remote target in profile
      *
      * \param aProfile Profile of the remote device
