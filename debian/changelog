@@ -9,9 +9,10 @@ sync-fw (0.5.1-18) unstable; urgency=low
   * Added function to set visibility of storage profiles.
   * Added caps_modified attribute to profile.
   * Remotely diabled storages profiles are being hidden, if remote capabilites have not been fetched for a device profile
+  * Fixes: NB#202418 - Blank profile is created in Sync application when
+    device is connected to NOS via BT/USB.
 
  -- Lassi Vaatamoinen <ext-lassi.vaatamoinen@nokia.com>  Wed, 03 Nov 2010 12:22:30 +0200
-
 
 sync-fw (0.5.1-17) unstable; urgency=low
 
