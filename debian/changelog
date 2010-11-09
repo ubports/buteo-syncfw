@@ -1,3 +1,9 @@
+sync-fw (0.5.1-20) unstable; urgency=low
+
+  * Added SIG_IGN for SIGHUP.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Tue, 09 Nov 2010 13:00:00 +0530
+
 sync-fw (0.5.1-19) unstable; urgency=low
 
   * Fixes: NB#203048 -  All the supported contents are not shown if remote sync is initiated
