@@ -170,7 +170,7 @@ public:
      * \return The sync profile as Xml string.
      */
     QString syncProfile(const QString &aProfileId);
-
+    QString syncProfileByKey(const QString &aKey, const QString &aValue);
 signals:
 
 	/*! \brief Notifies about Backup start.

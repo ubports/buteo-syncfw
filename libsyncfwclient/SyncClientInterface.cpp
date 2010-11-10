@@ -99,3 +99,8 @@ QString SyncClientInterface::syncProfile(const QString &aProfileId)
 {
     return d_ptr->syncProfile(aProfileId);
 }
+
+QString SyncClientInterface::syncProfileByKey(const QString &aKey, const QString &aValue)
+{
+    return d_ptr->syncProfileByKey(aKey, aValue);
+}

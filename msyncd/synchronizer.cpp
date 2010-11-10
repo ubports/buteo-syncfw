@@ -1310,3 +1310,34 @@ QString Synchronizer::syncProfile(const QString &aProfileId)
     LOG_DEBUG("syncProfile profileAsXml"<<profileAsXml<<"aProfileId"<<aProfileId);
     return profileAsXml;
 }
+
+QString Synchronizer::syncProfileByKey(const QString &aKey, const QString &aValue)
+{
+    FUNCTION_CALL_TRACE;
+    LOG_DEBUG("syncProfile key : "<< aKey <<"Value :"<< aValue);
+    QString profileAsXml;
+
+    if(!aKey.isEmpty() && !aValue.isEmpty()) {
+        QList<ProfileManager::SearchCriteria> filters;
+        ProfileManager::SearchCriteria filter;
+        filter.iType = ProfileManager::SearchCriteria::EQUAL;
+        filter.iKey = aKey;
+        filter.iValue = aValue;
+        filters.append(filter);
+	QList<SyncProfile*> profiles = iProfileManager.getSyncProfilesByData(filters);
+
+	if (profiles.size() > 0) {
+	    LOG_DEBUG("Found matching profiles  :" << profiles.size());	
+	    SyncProfile *profile = profiles.first();
+            if(profile) {
+               profileAsXml.append(profile->toString());
+	       delete profile;
+               profile = NULL;
+            }
+	} else {
+            LOG_DEBUG("No profile found with key :" << aKey << "Value : " << aValue );
+        }
+    }
+    LOG_DEBUG("syncProfile profileAsXml  :" <<profileAsXml);
+    return profileAsXml;
+}

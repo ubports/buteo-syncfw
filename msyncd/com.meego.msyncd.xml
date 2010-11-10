@@ -106,5 +106,10 @@
       <arg name="aProfileAsXml" type="s" direction="out"/>
       <arg name="aProfileId" type="s" direction="in"/>
     </method>
+    <method name="syncProfileByKey">
+      <arg name="aProfileAsXml" type="s" direction="out"/>
+      <arg name="aKey" type="s" direction="in"/>
+      <arg name="aValue" type="s" direction="in"/>
+    </method>
   </interface>
 </node>

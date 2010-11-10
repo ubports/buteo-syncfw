@@ -152,6 +152,7 @@ public slots:
      * \return The sync profile as Xml string.
      */
     virtual QString syncProfile(const QString &aProfileId);
+    virtual QString syncProfileByKey(const QString &aKey, const QString &aValue);
 // --------------------------------------------------------------------------
 
     //! Called  starts a schedule sync.
