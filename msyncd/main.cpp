@@ -91,6 +91,7 @@ int main( int argc, char* argv[] )
 
     signal(SIGTERM, signalHandler);
     signal(SIGINT, signalHandler);
+    signal(SIGHUP, SIG_IGN);
 
     LOG_DEBUG("Entering event loop");
     int returnValue = app.exec();

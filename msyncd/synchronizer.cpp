@@ -738,18 +738,19 @@ void Synchronizer::onStorageAccquired ( const QString &aProfileName,
         SyncSession *session = qobject_cast<SyncSession*>(QObject::sender());
         if (session){
             QMap<QString,bool> storageMap = session->getStorageMap();
-            if (aMimeType.compare(QString("text/x-vcard")) == 0)
+            if (aMimeType.compare(QString("text/x-vcard"), Qt::CaseInsensitive) == 0)
                 storageMap["hcontacts"] = true;
-            else if (aMimeType.compare(QString("text/x-vcalendar")) == 0)
+            else if (aMimeType.compare(QString("text/x-vcalendar"), Qt::CaseInsensitive) == 0)
                 storageMap["hcalendar"] = true;
-            else if (aMimeType.compare(QString("text/plain")) == 0)
+            else if (aMimeType.compare(QString("text/plain"), Qt::CaseInsensitive) == 0)
                 storageMap["hnotes"] = true;
-            else if (aMimeType.compare(QString("text/x-vbookmark")) == 0)
+            else if (aMimeType.compare(QString("text/x-vbookmark"), Qt::CaseInsensitive) == 0)
                 storageMap["hbookmarks"] = true;
-            else if (aMimeType.compare(QString("text/x-vmsg")) == 0)
+            else if (aMimeType.compare(QString("text/x-vmsg"), Qt::CaseInsensitive) == 0)
                 storageMap["hsms"] = true;
             else 
                 LOG_DEBUG( "Unsupported mime type" << aMimeType );
+            
             session->setStorageMap(storageMap);
         }
     }
