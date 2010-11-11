@@ -402,4 +402,4 @@ bool SyncSessionPluginRunnerTest :: cleanUp()
 	return true;
 }
 
-TESTLOADER_ADD_TEST(SyncSessionTest);
+//TESTLOADER_ADD_TEST(SyncSessionTest);

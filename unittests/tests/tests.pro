@@ -51,6 +51,7 @@ LIBS += -lsynccommon \
     -lsyncpluginmgr \
     -lsyncfwclient \
     -ldbus-1 \
+    -lgcov \
     -laccounts-qt
 
 # install
@@ -97,7 +98,9 @@ QT += testlib \
     sql
 QT -= gui
 QMAKE_CXXFLAGS += -Wall \
-    -g -O0
+        -fprofile-arcs \
+        -ftest-coverage \
+         -g -O0
 
 # #####################################################################
 # make coverage (debug)

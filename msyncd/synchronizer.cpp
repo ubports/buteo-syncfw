@@ -1332,13 +1332,13 @@ QString Synchronizer::syncProfileByKey(const QString &aKey, const QString &aValu
 	    SyncProfile *profile = profiles.first();
             if(profile) {
                profileAsXml.append(profile->toString());
-	       delete profile;
-               profile = NULL;
             }
+            qDeleteAll(profiles);
 	} else {
             LOG_DEBUG("No profile found with key :" << aKey << "Value : " << aValue );
         }
     }
+    
     LOG_DEBUG("syncProfile profileAsXml  :" <<profileAsXml);
     return profileAsXml;
 }
