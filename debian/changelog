@@ -1,3 +1,9 @@
+sync-fw (0.5.1-21) unstable; urgency=low
+
+  * API added to fetch profile by key .
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Fri, 12 Nov 2010 13:00:00 +0530
+
 sync-fw (0.5.1-20) unstable; urgency=low
 
   * Added SIG_IGN for SIGHUP.
