@@ -274,6 +274,17 @@ public slots:
      * \return The sync profile as Xml string.
      */
     virtual QString syncProfile(const QString &aProfileId) = 0;
+    
+    /*! \brief Gets a sync profile.
+     *
+     * Loads and merges also all sub-profiles that are referenced from the
+     * main profile. Loads the log of finished synchronization sessions with
+     * this profile.
+     * \param aKey Key to match for profile.
+     * \param aValue Value to match for profile.
+     * \return The sync profile as Xml string.
+     */
+    virtual QString syncProfileByKey(const QString &aKey, const QString &aValue) = 0;
 };
 
 }
