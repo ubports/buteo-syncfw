@@ -42,6 +42,11 @@ void signalHandler(int /*signal*/)
     QCoreApplication::exit(0);
 }
 
+static void sighupHandler(int /*signal*/)
+{
+    // Do nothing
+}
+
 void setLogLevelFromFile(Buteo::Logger *aLogger)
 {
     if(QFile::exists(LOGGER_CONFIG_FILE)) {
@@ -88,10 +93,9 @@ int main( int argc, char* argv[] )
         synchronizer = 0;
         return -1;
     }
-
     signal(SIGTERM, signalHandler);
     signal(SIGINT, signalHandler);
-    signal(SIGHUP, SIG_IGN);
+    signal(SIGHUP, sighupHandler);
 
     LOG_DEBUG("Entering event loop");
     int returnValue = app.exec();
