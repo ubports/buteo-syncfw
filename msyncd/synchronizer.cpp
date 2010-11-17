@@ -1065,29 +1065,33 @@ void Synchronizer::onNewSession(const QString &aDestination)
             qDeleteAll(syncProfiles);
         }
 
-        // Get the DBUS interface for sync-UI.
-        LOG_DEBUG( "sync-ui dbus interface is getting called" );
-        if (iSyncUIInterface == NULL) {
-            LOG_DEBUG( "iSyncUIInterface is NULL" );
-            iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                    "com.nokia.MApplicationIf", SyncDBusConnection::sessionBus() );
-            Q_ASSERT(iSyncUIInterface);
-        }
-        else if(!iSyncUIInterface->isValid()) {
-            LOG_DEBUG( "iSyncUIInterface is not Valid()" );
-            delete iSyncUIInterface;
-            iSyncUIInterface = NULL;
-            iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                    "com.nokia.MApplicationIf", SyncDBusConnection::sessionBus() );
-            Q_ASSERT(iSyncUIInterface);
+    // If the profile is not hidden, UI must be informed.
+	if(!profile->isHidden())
+	{
+	    // Get the DBUS interface for sync-UI.
+	    LOG_DEBUG( "sync-ui dbus interface is getting called" );
+	    if (iSyncUIInterface == NULL) {
+		LOG_DEBUG( "iSyncUIInterface is NULL" );
+		iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
+			"com.nokia.MApplicationIf", SyncDBusConnection::sessionBus() );
+		Q_ASSERT(iSyncUIInterface);
+	    }
+	    else if(!iSyncUIInterface->isValid()) {
+		LOG_DEBUG( "iSyncUIInterface is not Valid()" );
+		delete iSyncUIInterface;
+		iSyncUIInterface = NULL;
+		iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
+			"com.nokia.MApplicationIf", SyncDBusConnection::sessionBus() );
+		Q_ASSERT(iSyncUIInterface);
 
-        }
-        //calling launch with argument list
-        QStringList list;
-        list.append("launching");
-        QList<QVariant> argumentList;
-        argumentList << qVariantFromValue(list);
-        iSyncUIInterface->asyncCallWithArgumentList(QLatin1String("launch"), argumentList);
+	    }
+	    //calling launch with argument list
+	    QStringList list;
+	    list.append("launching");
+	    QList<QVariant> argumentList;
+	    argumentList << qVariantFromValue(list);
+	    iSyncUIInterface->asyncCallWithArgumentList(QLatin1String("launch"), argumentList);
+	}
 
         SyncSession *session = new SyncSession(profile, this);
         if (session != 0)
