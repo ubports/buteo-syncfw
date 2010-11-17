@@ -170,7 +170,17 @@ public:
      * \return The sync profile as Xml string.
      */
     QString syncProfile(const QString &aProfileId);
-    QString syncProfileByKey(const QString &aKey, const QString &aValue);
+    
+    /*! \brief Gets a sync profiles which matches the key-value.
+     *
+     * Loads and merges also all sub-profiles that are referenced from the
+     * main profile. Loads the log of finished synchronization sessions with
+     * this profile.
+     * \param aKey Key to match for profile.
+     * \param aValue Value to match for profile.
+     * \return The sync profiles as Xml string list.
+     */
+    QStringList syncProfilesByKey(const QString &aKey, const QString &aValue);
 signals:
 
 	/*! \brief Notifies about Backup start.

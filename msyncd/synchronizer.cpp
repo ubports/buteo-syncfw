@@ -1312,11 +1312,11 @@ QString Synchronizer::syncProfile(const QString &aProfileId)
     return profileAsXml;
 }
 
-QString Synchronizer::syncProfileByKey(const QString &aKey, const QString &aValue)
+QStringList Synchronizer::syncProfilesByKey(const QString &aKey, const QString &aValue)
 {
     FUNCTION_CALL_TRACE;
     LOG_DEBUG("syncProfile key : "<< aKey <<"Value :"<< aValue);
-    QString profileAsXml;
+    QStringList profilesAsXml;
 
     if(!aKey.isEmpty() && !aValue.isEmpty()) {
         QList<ProfileManager::SearchCriteria> filters;
@@ -1329,16 +1329,14 @@ QString Synchronizer::syncProfileByKey(const QString &aKey, const QString &aValu
 
 	if (profiles.size() > 0) {
 	    LOG_DEBUG("Found matching profiles  :" << profiles.size());	
-	    SyncProfile *profile = profiles.first();
-            if(profile) {
-               profileAsXml.append(profile->toString());
-            }
+            foreach (SyncProfile *profile, profiles) {
+               profilesAsXml.append(profile->toString());
+	    }
             qDeleteAll(profiles);
 	} else {
             LOG_DEBUG("No profile found with key :" << aKey << "Value : " << aValue );
         }
     }
     
-    LOG_DEBUG("syncProfile profileAsXml  :" <<profileAsXml);
-    return profileAsXml;
+    return profilesAsXml;
 }

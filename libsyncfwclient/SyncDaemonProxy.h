@@ -194,12 +194,12 @@ public Q_SLOTS: // METHODS
         return callWithArgumentList(QDBus::Block, QLatin1String("syncProfile"), argumentList);
     }
     
-    //! \see SyncDBusInterface::syncProfileByKey
-    inline QDBusPendingReply<QString> syncProfileByKey(const QString &aKey, const QString &aValue)
+    //! \see SyncDBusInterface::syncProfilesByKey
+    inline QDBusPendingReply<QStringList> syncProfilesByKey(const QString &aKey, const QString &aValue)
     {
         QList<QVariant> argumentList;
         argumentList << qVariantFromValue(aKey) << qVariantFromValue(aValue);
-        return asyncCallWithArgumentList(QLatin1String("syncProfileByKey"), argumentList);
+        return asyncCallWithArgumentList(QLatin1String("syncProfilesByKey"), argumentList);
     }
 
     //! \see SyncDBusInterface::updateProfile()
