@@ -16,7 +16,7 @@ QMAKE_CLEAN += ./doc/html/*
                
 # Install rules
 htmldocs.files = ./doc/html/*
-htmldocs.path = /${DEB_DESTDIR}/usr/share/doc/sync-fw-doc/
+htmldocs.path = /usr/share/doc/sync-fw-doc/
 htmldocs.CONFIG += no_check_exist
 
 INSTALLS += htmldocs    

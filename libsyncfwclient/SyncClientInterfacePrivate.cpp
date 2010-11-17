@@ -251,13 +251,12 @@ QString SyncClientInterfacePrivate::syncProfile(const QString &aProfileId)
     return profileAsXml;
 }
 
-QString SyncClientInterfacePrivate::syncProfileByKey(const QString &aKey, const QString &aValue)
+QStringList SyncClientInterfacePrivate::syncProfilesByKey(const QString &aKey, const QString &aValue)
 {
     FUNCTION_CALL_TRACE;
-    QString profileAsXml;
+    QStringList profileAsXml;
     if (iSyncDaemon) {
-	profileAsXml = iSyncDaemon->syncProfileByKey(aKey, aValue);
+	profileAsXml = iSyncDaemon->syncProfilesByKey(aKey, aValue);
     }
-    LOG_DEBUG("syncProfile "<<profileAsXml);
     return profileAsXml;	    
 }

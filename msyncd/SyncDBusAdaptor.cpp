@@ -148,11 +148,11 @@ QString SyncDBusAdaptor::syncProfile(const QString &aProfileId)
     return out0;
 }
 
-QString SyncDBusAdaptor::syncProfileByKey(const QString &aKey, const QString &aValue)
+QStringList SyncDBusAdaptor::syncProfilesByKey(const QString &aKey, const QString &aValue)
 {
-    // handle method call com.meego.msyncd.syncProfileByKey
-    QString aProfileAsXml;
-    QMetaObject::invokeMethod(parent(), "syncProfileByKey", Q_RETURN_ARG(QString, aProfileAsXml), Q_ARG(QString, aKey), Q_ARG(QString, aValue));
+    // handle method call com.meego.msyncd.syncProfilesByKey
+    QStringList aProfileAsXml;
+    QMetaObject::invokeMethod(parent(), "syncProfilesByKey", Q_RETURN_ARG(QStringList, aProfileAsXml), Q_ARG(QString, aKey), Q_ARG(QString, aValue));
     return aProfileAsXml;
 }
 

@@ -137,16 +137,16 @@ public:
      */
     QString syncProfile(const QString &aProfileId);
     
-    /*! \brief Gets a sync profile.
+    /*! \brief Gets a sync profiles which matches the key-value.
      *
      * Loads and merges also all sub-profiles that are referenced from the
      * main profile. Loads the log of finished synchronization sessions with
      * this profile.
      * \param aKey Key to match for profile.
      * \param aValue Value to match for profile.
-     * \return The sync profile as Xml string.
+     * \return The sync profiles as Xml string list.
      */
-    QString syncProfileByKey(const QString &aKey, const QString &aValue);
+    QStringList syncProfilesByKey(const QString &aKey, const QString &aValue);
 
 public slots:
 
