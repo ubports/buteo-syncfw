@@ -1,6 +1,8 @@
 sync-fw (0.5.1-23) unstable; urgency=low
 
   * Fixes: NB#193634 - SyncML/Connectivity error.
+  * Changed method getProfileByKey to getProfilesByKey
+    as in few cases we can have multiple profiles
 
  -- Santosh Puranik <santosh.puranik@nokia.com>  Mon, 15 Nov 2010 15:15:00 +0530
 
