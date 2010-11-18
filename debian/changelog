@@ -1,3 +1,9 @@
+sync-fw (0.5.1-24) unstable; urgency=low
+
+  * Fixes: NB#205650 - msyncd prints debugs and criticals to console.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Thu, 18 Nov 2010 19:55:00 +0530
+
 sync-fw (0.5.1-23) unstable; urgency=low
 
   * Fixes: NB#193634 - SyncML/Connectivity error.
