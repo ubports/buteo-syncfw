@@ -39,6 +39,8 @@ AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent
                      this, SLOT(slotAccountRemoved(Accounts::AccountId)));
     QObject::connect(iAccountManager, SIGNAL(enabledEvent(Accounts::AccountId)),
                      this, SLOT(slotAccountEnabled(Accounts::AccountId)));
+    QObject::connect(iAccountManager, SIGNAL(accountUpdated(Accounts::AccountId)),
+                     this, SLOT(slotAccountUpdated(Accounts::AccountId)));
 
     registerAccountListeners();
 }
@@ -174,6 +176,69 @@ void AccountsHelper::slotAccountNameChanged(const QString &newName)
     }
 }
 
+void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew)
+{
+    FUNCTION_CALL_TRACE;
+    Q_UNUSED (aCreateNew);
+    Accounts::Account *account = iAccountManager->account(id);
+    if(0 != account) {
+        //Sync schedule settings should be global
+        account->selectService();
+        SyncSchedule syncSchedule;
+
+        int peakStart = account->valueAsInt(Buteo::SYNC_SCHEDULE_PEAK_START_TIME_KEY_INT);
+        QTime startTime(peakStart/60 , peakStart%60);
+
+        int peakEnd = account->valueAsInt(Buteo::SYNC_SCHEDULE_PEAK_END_TIME_KEY_INT);
+        QTime endTime(peakEnd/60 , peakEnd%60);
+        LOG_DEBUG ("Start time:" << startTime << "End Time :" << endTime);
+        syncSchedule.setRushTime(startTime, endTime);
+
+        SyncProfile::SyncType syncType = account->valueAsBool (Buteo::SYNC_SCHEDULE_ENABLED_KEY_BOOL) ? SyncProfile::SYNC_SCHEDULED:SyncProfile::SYNC_MANUAL ;
+        syncProfile->setSyncType (syncType);
+        LOG_DEBUG ("Sync Type :" << syncType );
+
+        syncSchedule.setInterval (account->valueAsInt (Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT));
+        LOG_DEBUG ("Sync Interval :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT));
+        if (syncSchedule.interval() == 0)
+            syncSchedule.setRushEnabled (false);
+
+        syncSchedule.setRushInterval (account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT));
+        LOG_DEBUG ("Sync Rush Interval :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT));
+
+        int map = account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_DAYS_KEY_INT);
+        LOG_DEBUG ("Sync Days :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_DAYS_KEY_INT));
+        Buteo::DaySet rdays;
+        Buteo::DaySet days;
+        int lastDay = Qt::Sunday;
+        while (lastDay > 0) {
+            int val = 0;
+            val |= (1 << lastDay);
+            days.insert(lastDay);
+            if ((val & map)) {
+                days.insert(lastDay);
+                LOG_DEBUG ("Day :" << lastDay);
+            }
+            --lastDay;
+        }
+        syncSchedule.setRushDays(rdays);
+        syncSchedule.setDays(days);
+        syncProfile->setSyncSchedule (syncSchedule);
+    }
+}
+
+void AccountsHelper::slotAccountUpdated(Accounts::AccountId id)
+{
+    FUNCTION_CALL_TRACE;
+    QList<SyncProfile*> syncProfiles = getProfilesByAccountId(id);
+    foreach(SyncProfile *syncProfile, syncProfiles)
+    {
+        setSyncSchedule(syncProfile, id);
+        iProfileManager.updateProfile(*syncProfile);
+        delete syncProfile;
+    }
+}
+
 QList<SyncProfile*> AccountsHelper::getProfilesByAccountId(Accounts::AccountId id)
 {
     FUNCTION_CALL_TRACE;
@@ -220,6 +285,7 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         // Set profile as enabled
         newProfile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
         newProfile->setKey(KEY_ACTIVE, BOOLEAN_TRUE);
+	setSyncSchedule (newProfile, account->id(), true);
         // Save the newly created profile
         iProfileManager.updateProfile(*newProfile);
         delete newProfile;

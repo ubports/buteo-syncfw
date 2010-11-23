@@ -81,6 +81,14 @@ public Q_SLOTS:
 	 * \param newName of the accounts
 	 */
     void slotAccountNameChanged(const QString &newName);
+    
+	/*! \brief slot for Accounts::Manager displayNameChanged signal
+	 * *
+	 * \param id of the accounts
+	 */
+    void slotAccountUpdated(Accounts::AccountId id);
+
+
 
 private:
 
@@ -90,6 +98,7 @@ private:
                                const Accounts::Service *service,
                                const SyncProfile *baseProfile);
 
+    void setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew = false);
     void registerAccountListeners();
 
     void registerAccountListener(Accounts::AccountId id);
