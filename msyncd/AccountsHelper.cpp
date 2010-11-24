@@ -224,6 +224,7 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
         syncSchedule.setRushDays(rdays);
         syncSchedule.setDays(days);
         syncProfile->setSyncSchedule (syncSchedule);
+        delete account;
     }
 }
 
@@ -233,9 +234,11 @@ void AccountsHelper::slotAccountUpdated(Accounts::AccountId id)
     QList<SyncProfile*> syncProfiles = getProfilesByAccountId(id);
     foreach(SyncProfile *syncProfile, syncProfiles)
     {
-        setSyncSchedule(syncProfile, id);
-        iProfileManager.updateProfile(*syncProfile);
-        delete syncProfile;
+        if (syncProfile) {
+            setSyncSchedule(syncProfile, id);
+            iProfileManager.updateProfile(*syncProfile);
+            delete syncProfile;
+        }
     }
 }
 
