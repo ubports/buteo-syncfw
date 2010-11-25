@@ -10,6 +10,8 @@ CXXFLAGS += -Wall -Wextra -Wno-unused-parameter
 # architecture we're building for
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
+# This line is for including the Aegis manifest. 
+binary:
 
 ifeq ($(DEB_HOST_ARCH), arm)
 	aegis-deb-add -control debian/sync-fw/DEBIAN/control .. debian/sync-fw.aegis=_aegis
