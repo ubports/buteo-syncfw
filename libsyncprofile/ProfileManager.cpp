@@ -721,7 +721,9 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
     if (classType & pcsuiteClass) {
         LOG_INFO("Device major class is Computer"); // not required to save profile 
         saveNewProfile = false;
-        return new SyncProfile(destAddress);
+        SyncProfile *profile = new SyncProfile(destAddress);
+        profile->setBoolKey(KEY_HIDDEN, true);
+        return profile;
     }
 
     QString profileDisplayName = mapVal.value("Name").toString();
