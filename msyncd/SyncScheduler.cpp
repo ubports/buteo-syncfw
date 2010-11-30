@@ -76,7 +76,8 @@ bool SyncScheduler::addProfile(const SyncProfile* aProfile)
     removeProfile(aProfile->name());
     
     if (aProfile->isEnabled() &&
-        aProfile->syncType() == SyncProfile::SYNC_SCHEDULED) {
+        ((aProfile->syncType() == SyncProfile::SYNC_SCHEDULED) ||
+         (aProfile->needNextAttempt()))) {
 
         int alarmId = setNextAlarm(aProfile);
         if (alarmId > 0) {
