@@ -274,6 +274,8 @@ private:
 
     QMap<QString, ServerPluginRunner*> iServers;
 
+    QMap<QString, int> iCountersStorage;
+
     PluginManager iPluginManager;
 
     ProfileManager iProfileManager;
@@ -295,6 +297,18 @@ private:
     ContextProperty *iLowPower;
 
     bool iClosing;
+
+    /*! \brief Save the counter for given profile
+     *
+     * @param aProfile profile to save counter
+     */
+    void saveProfileCounter(const SyncProfile* aProfile);
+
+    /*! \brief Restore the counter for given profile
+     *
+     * @param aProfile profile to restore counter
+     */
+    void restoreProfileCounter(SyncProfile* aProfile);
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class SynchronizerTest;

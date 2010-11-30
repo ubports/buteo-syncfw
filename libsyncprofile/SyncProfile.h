@@ -293,6 +293,48 @@ public:
      */
     QString serviceName() const;
 
+    /*! \brief Get the number of retries for profile.
+     *
+     * \return Return maximum number of sync retries.
+     */
+    int syncRetryAttemptsCount() const;
+
+    /*! \brief Get the current retry attempt for profile.
+     *
+     * \return Return the current retry attempt.
+     */
+    int syncCurrentAttempt() const;
+
+    /*! \brief Get the time interval in minutes for given retry attempt.
+     *
+     * \param aRetry attempt number
+     *
+     * \return Return delay of retry attempt in minutes or -1 if aRetry <0 or >syncRetryAttemptsCount
+     */
+    int syncRetryDelay(int aRetry) const;
+
+    /*! \brief Set a current sync attempt.
+     *
+     * \param aRetry attempt number
+     *
+     */
+    void setSyncRetryAttemp(int aRetry);
+
+    /*! \brief Determine if next retry attempt is needed
+     *
+     * \return true in case of need next retry attempt false if not
+     *
+     */
+    bool needNextAttempt() const;
+
+    /*! \brief Increase attempts counter
+     */
+    void setNextAttempt();
+
+    /*! \brief Clear attempts counter
+     */
+    void resetAttempts();
+
 private:
 
     SyncProfile& operator=(const SyncProfile &aRhs);

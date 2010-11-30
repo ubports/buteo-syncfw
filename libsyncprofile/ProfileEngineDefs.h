@@ -58,6 +58,8 @@ const QString TAG_LOCAL("local");
 const QString TAG_REMOTE("remote");
 const QString TAG_SCHEDULE("schedule");
 const QString TAG_RUSH("rush");
+const QString TAG_ERROR_ATTEMPTS("attempts");
+const QString TAG_ATTEMPT_DELAY("attemptdelay");
 
 const QString KEY_ENABLED("enabled");
 const QString KEY_DISPLAY_NAME("displayname");

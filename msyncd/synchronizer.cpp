@@ -264,7 +264,11 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error" , Buteo::SyncResults::INTERNAL_ERROR);
         return false;
     }
-    session->setScheduled(aScheduled);
+    restoreProfileCounter(profile);
+    if ( profile->syncCurrentAttempt() == 0 )
+        session->setScheduled(aScheduled);
+    else
+        session->setScheduled(false);
 
     // @todo: Complete profile with data from account manager.
     //iAccounts->addAccountData(*profile);
@@ -436,6 +440,7 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
                 }
                 
                 iProfileManager.updateProfile(*sessionProf);
+                sessionProf->resetAttempts();
                 break;
             }
 
@@ -443,12 +448,20 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
             case Sync::SYNC_CANCELLED:
             {
                 session->setFailureResult(SyncResults::SYNC_RESULT_CANCELLED, Buteo::SyncResults::ABORTED);
+                    session->profile()->resetAttempts();
                 break;
             }
-
             case Sync::SYNC_ERROR:
             {
                 session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, aErrorCode);
+                    restoreProfileCounter(session->profile());
+                    session->profile()->setNextAttempt();
+                    saveProfileCounter(session->profile());
+                    if ( !session->profile()->needNextAttempt() )
+                    {
+                        session->profile()->resetAttempts();
+                        saveProfileCounter(session->profile());
+                    }
                 break;
             }
 
@@ -570,7 +583,7 @@ void Synchronizer::cleanupSession(SyncSession *aSession)
             // UI needs to know that Sync Log has been updated.
             emit resultsAvailable(profileName,aSession->results().toString());
 
-            if (aSession->isScheduled())
+            if ( aSession->isScheduled() || aSession->profile()->needNextAttempt() )
             {
                 reschedule(profileName);
                 emit signalProfileChanged(profileName, 1 ,QString());
@@ -1149,7 +1162,8 @@ void Synchronizer::reschedule(const QString &aProfileName)
         return;
 
     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
-    if (profile && profile->syncType() == SyncProfile::SYNC_SCHEDULED)
+    restoreProfileCounter(profile);
+    if (profile && ((profile->syncType() == SyncProfile::SYNC_SCHEDULED) || (profile->needNextAttempt())))
     {
         iSyncScheduler->addProfile(profile);
     }
@@ -1344,3 +1358,18 @@ QStringList Synchronizer::syncProfilesByKey(const QString &aKey, const QString &
     
     return profilesAsXml;
 }
+
+void Synchronizer::saveProfileCounter(const SyncProfile* aProfile)
+{
+    int current = aProfile->syncCurrentAttempt();
+    iCountersStorage[aProfile->name()] = current;
+}
+
+void Synchronizer::restoreProfileCounter(SyncProfile* aProfile)
+{
+    if (iCountersStorage.contains(aProfile->name()))
+        aProfile->setSyncRetryAttemp(iCountersStorage.value(aProfile->name()));
+    else
+        aProfile->setSyncRetryAttemp(0);
+}
+
