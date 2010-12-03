@@ -89,11 +89,11 @@ void SyncSession::setPluginRunner(PluginRunner *aPluginRunner,
 
     iPluginRunner = aPluginRunner;
     iPluginRunnerOwned = aTransferOwnership;
-    // As we are setting a plugin runner, the pluginrunner should have
-    // been started already
-    iStarted = true;
     if (iPluginRunner != 0)
     {
+        // As we are setting a plugin runner, the pluginrunner should have
+        // been started already
+        iStarted = true;
         // Connect signals from plug-in runner.
         connect(iPluginRunner, SIGNAL(transferProgress(const QString &,
             Sync::TransferDatabase, Sync::TransferType, const QString &,int)),
