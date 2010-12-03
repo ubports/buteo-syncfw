@@ -89,7 +89,9 @@ void SyncSession::setPluginRunner(PluginRunner *aPluginRunner,
 
     iPluginRunner = aPluginRunner;
     iPluginRunnerOwned = aTransferOwnership;
-
+    // As we are setting a plugin runner, the pluginrunner should have
+    // been started already
+    iStarted = true;
     if (iPluginRunner != 0)
     {
         // Connect signals from plug-in runner.

@@ -1,3 +1,10 @@
+sync-fw (0.5.1-30) unstable; urgency=low
+
+  * Fixes: NB#194886 - Sync does not stop at DUT1 when Sync is stopped from DUT2,
+    sync initiated from DUT1.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Thu, 03 Dec 2010 17:55:00 +0530
+
 sync-fw (0.5.1-29) unstable; urgency=low
 
   * Minor change in test execution script.
