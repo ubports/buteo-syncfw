@@ -135,6 +135,10 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"in\" type=\"s\" name=\"aKey\"/>\n"
 "      <arg direction=\"in\" type=\"s\" name=\"aValue\"/>\n"
 "    </method>\n"
+"    <method name=\"syncProfilesByType\">\n"
+"      <arg direction=\"out\" type=\"as\" name=\"aProfileId\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aType\"/>\n"
+"    </method>\n"
 "  </interface>\n"
         "")
 public:
@@ -186,6 +190,9 @@ public Q_SLOTS: // METHODS
     
     //! \see SyncDBusInterface::syncProfilesByKey()
     QStringList syncProfilesByKey(const QString &aKey, const QString &aValue);
+    
+    //! \see SyncDBusInterface::syncProfilesByType()
+    virtual QStringList syncProfilesByType(const QString &aType);
     
     //! \see SyncDBusInterface::updateProfile()
     bool updateProfile(const QString &aProfileAsXml);

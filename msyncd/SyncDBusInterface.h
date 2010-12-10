@@ -285,6 +285,13 @@ public slots:
      * \return The sync profiles as Xml string list.
      */
     virtual QStringList syncProfilesByKey(const QString &aKey, const QString &aValue) = 0;
+    
+    /*! \brief Gets a profiles  matching the profile type.
+     *
+     * \param aType Type of the profile service/storage/sync.
+     * \return The sync profile ids as string list.
+     */
+    virtual QStringList syncProfilesByType(const QString &aType) = 0;
 };
 
 }

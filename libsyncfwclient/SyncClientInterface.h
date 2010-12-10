@@ -181,6 +181,13 @@ public:
      * \return The sync profiles as Xml string list.
      */
     QStringList syncProfilesByKey(const QString &aKey, const QString &aValue);
+    
+    /*! \brief Gets a profiles  matching the profile type.
+     *
+     * \param aType Type of the profile service/storage/sync.
+     * \return The sync profile ids as string list.
+     */
+    QStringList syncProfilesByType(const QString &aType);
 signals:
 
 	/*! \brief Notifies about Backup start.

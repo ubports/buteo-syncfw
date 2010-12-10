@@ -1359,6 +1359,13 @@ QStringList Synchronizer::syncProfilesByKey(const QString &aKey, const QString &
     return profilesAsXml;
 }
 
+QStringList Synchronizer::syncProfilesByType(const QString &aType)
+{
+    FUNCTION_CALL_TRACE;
+    LOG_DEBUG("Profile Type : "<< aType);
+    return iProfileManager.profileNames(aType);     
+}
+
 void Synchronizer::saveProfileCounter(const SyncProfile* aProfile)
 {
     int current = aProfile->syncCurrentAttempt();
