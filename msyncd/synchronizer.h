@@ -153,6 +153,7 @@ public slots:
      */
     virtual QString syncProfile(const QString &aProfileId);
     virtual QStringList syncProfilesByKey(const QString &aKey, const QString &aValue);
+    virtual QStringList syncProfilesByType(const QString &aType);
 // --------------------------------------------------------------------------
 
     //! Called  starts a schedule sync.

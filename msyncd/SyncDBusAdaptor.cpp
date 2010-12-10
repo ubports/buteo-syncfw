@@ -156,6 +156,14 @@ QStringList SyncDBusAdaptor::syncProfilesByKey(const QString &aKey, const QStrin
     return aProfileAsXml;
 }
 
+QStringList SyncDBusAdaptor::syncProfilesByType(const QString &aType)
+{
+    // handle method call com.meego.msyncd.syncProfilesByType
+    QStringList aProfileIds;
+    QMetaObject::invokeMethod(parent(), "syncProfilesByType", Q_RETURN_ARG(QStringList, aProfileIds), Q_ARG(QString, aType));
+    return aProfileIds;
+}
+
 bool SyncDBusAdaptor::updateProfile(const QString &aProfileAsXml)
 {
     // handle method call com.meego.msyncd.updateProfile

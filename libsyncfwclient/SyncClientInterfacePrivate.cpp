@@ -243,6 +243,7 @@ QString SyncClientInterfacePrivate::syncProfile(const QString &aProfileId)
 {
     FUNCTION_CALL_TRACE;
     QString profileAsXml;
+    
     if (iSyncDaemon) {
         profileAsXml = iSyncDaemon->syncProfile(aProfileId);
     }
@@ -255,8 +256,22 @@ QStringList SyncClientInterfacePrivate::syncProfilesByKey(const QString &aKey, c
 {
     FUNCTION_CALL_TRACE;
     QStringList profileAsXml;
+    
     if (iSyncDaemon) {
-	profileAsXml = iSyncDaemon->syncProfilesByKey(aKey, aValue);
+        profileAsXml = iSyncDaemon->syncProfilesByKey(aKey, aValue);
     }
-    return profileAsXml;	    
+    
+    return profileAsXml;
+}
+
+QStringList SyncClientInterfacePrivate::syncProfilesByType(const QString &aType)
+{
+    FUNCTION_CALL_TRACE;
+    QStringList profileIds;
+    
+    if (iSyncDaemon) {
+        profileIds = iSyncDaemon->syncProfilesByType(aType);
+    }
+    
+    return profileIds;
 }

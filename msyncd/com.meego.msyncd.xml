@@ -111,5 +111,9 @@
       <arg name="aKey" type="s" direction="in"/>
       <arg name="aValue" type="s" direction="in"/>
     </method>
+    <method name="syncProfilesByType">
+      <arg name="aProfileIds" type="as" direction="out"/>
+      <arg name="aType" type="s" direction="in"/>
+    </method>
   </interface>
 </node>
