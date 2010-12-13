@@ -1,3 +1,9 @@
+sync-fw (0.5.1-31) unstable; urgency=low
+
+  * Fixes: NB#210459 - Bookmarks option is available for S40 destination.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Mon, 13 Dec 2010 17:55:00 +0530
+
 sync-fw (0.5.1-30) unstable; urgency=low
 
   * Fixes: NB#194886 - Sync does not stop at DUT1 when Sync is stopped from DUT2,

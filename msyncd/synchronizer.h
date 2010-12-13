@@ -233,7 +233,12 @@ private:
      */
     bool startNextSync();
 
-    void cleanupSession(SyncSession *aSession);
+    /*! \brief To clean up session
+     *  \param aSession
+     *  \param aStatus of sync
+     *  \return None
+     */
+    void cleanupSession(SyncSession *aSession, Sync::SyncStatus aStatus);
 
     /*! \brief Start all server plug-ins
      *
