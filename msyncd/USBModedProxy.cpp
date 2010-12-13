@@ -30,13 +30,14 @@
  * If this file is to be regenerated, the changes must be backed up and merged
  */
 
-#include <usb-moded/usb_moded-modes.h>
-#include <usb-moded/usb_moded-dbus.h>
 #include "USBModedProxy.h"
 #include "LogMacros.h"
 #include "SyncDBusConnection.h"
 
 using namespace Buteo;
+static const QString USB_MODE_SERVICE("com.meego.usb_moded");
+static const QString USB_MODE_OBJECT("/com/meego/usb_moded");
+static const QString MODE_OVI_SUITE("ovi_suite");
 
 /*
  * Implementation of interface class USBModedProxy
