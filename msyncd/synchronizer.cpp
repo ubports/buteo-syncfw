@@ -265,10 +265,12 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         return false;
     }
     restoreProfileCounter(profile);
-    if ( profile->syncCurrentAttempt() == 0 )
+    if ( profile->syncCurrentAttempt() == 0 ) {
         session->setScheduled(aScheduled);
-    else
+    }
+    else {
         session->setScheduled(false);
+    }
 
     // @todo: Complete profile with data from account manager.
     //iAccounts->addAccountData(*profile);
@@ -310,7 +312,7 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
 
     if (!success)
     {
-        cleanupSession(session);
+        cleanupSession(session, Sync::SYNC_ERROR );
     } // no else
 
     return success;
@@ -448,20 +450,20 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
             case Sync::SYNC_CANCELLED:
             {
                 session->setFailureResult(SyncResults::SYNC_RESULT_CANCELLED, Buteo::SyncResults::ABORTED);
-                    session->profile()->resetAttempts();
+                session->profile()->resetAttempts();
                 break;
             }
             case Sync::SYNC_ERROR:
             {
                 session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, aErrorCode);
-                    restoreProfileCounter(session->profile());
-                    session->profile()->setNextAttempt();
+                restoreProfileCounter(session->profile());
+                session->profile()->setNextAttempt();
+                saveProfileCounter(session->profile());
+                if ( !session->profile()->needNextAttempt() )
+                {
+                    session->profile()->resetAttempts();
                     saveProfileCounter(session->profile());
-                    if ( !session->profile()->needNextAttempt() )
-                    {
-                        session->profile()->resetAttempts();
-                        saveProfileCounter(session->profile());
-                    }
+                }
                 break;
             }
 
@@ -471,7 +473,7 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
             }
 
             iActiveSessions.remove(aProfileName);
-            cleanupSession(session);
+            cleanupSession(session, aStatus);
             if (session->isAborted() && (iActiveSessions.size() == 0) && isBackupRestoreInProgress()) {
                 stopServers();
                 iSyncBackup->sendReply(0);
@@ -524,7 +526,7 @@ bool Synchronizer::startNextSync()
     if (profile == 0)
     {
         LOG_WARNING( "Null profile found from queued session" );
-        cleanupSession(session);
+        cleanupSession(session, Sync::SYNC_ERROR);
         iSyncQueue.dequeue();
         return true;
     }
@@ -537,7 +539,7 @@ bool Synchronizer::startNextSync()
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         iSyncQueue.dequeue();
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
-        cleanupSession(session);
+        cleanupSession(session, Sync::SYNC_ERROR);
         emit syncStatus(profileName, Sync::SYNC_ERROR, "Low Battery", Buteo::SyncResults::LOW_BATTERY_POWER);
         tryNext = true;
     }
@@ -557,7 +559,7 @@ bool Synchronizer::startNextSync()
         else
         {
             session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
-            cleanupSession(session);
+            cleanupSession(session, Sync::SYNC_ERROR);
             emit syncStatus(profileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
         }
         tryNext = true;
@@ -566,7 +568,7 @@ bool Synchronizer::startNextSync()
     return tryNext;
 }
 
-void Synchronizer::cleanupSession(SyncSession *aSession)
+void Synchronizer::cleanupSession(SyncSession *aSession, Sync::SyncStatus aStatus)
 {
     FUNCTION_CALL_TRACE;
 
@@ -575,7 +577,8 @@ void Synchronizer::cleanupSession(SyncSession *aSession)
         QString profileName = aSession->profileName();
         if (!profileName.isEmpty())
         {
-            if (aSession->isProfileCreated()) {
+            LOG_DEBUG("aStatus"<<aStatus);
+            if (aSession->isProfileCreated() && (aStatus == Sync::SYNC_DONE)) {
                 iProfileManager.saveRemoteTargetId(*aSession->profile(), aSession->results().getTargetId());
             }
             iProfileManager.saveSyncResults(profileName, aSession->results());
@@ -1162,6 +1165,7 @@ void Synchronizer::reschedule(const QString &aProfileName)
         return;
 
     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+
     restoreProfileCounter(profile);
     if (profile && ((profile->syncType() == SyncProfile::SYNC_SCHEDULED) || (profile->needNextAttempt())))
     {
@@ -1361,15 +1365,21 @@ QStringList Synchronizer::syncProfilesByKey(const QString &aKey, const QString &
 
 void Synchronizer::saveProfileCounter(const SyncProfile* aProfile)
 {
+    FUNCTION_CALL_TRACE;
     int current = aProfile->syncCurrentAttempt();
     iCountersStorage[aProfile->name()] = current;
 }
 
 void Synchronizer::restoreProfileCounter(SyncProfile* aProfile)
 {
-    if (iCountersStorage.contains(aProfile->name()))
-        aProfile->setSyncRetryAttemp(iCountersStorage.value(aProfile->name()));
-    else
-        aProfile->setSyncRetryAttemp(0);
+    FUNCTION_CALL_TRACE;
+    if (aProfile) {
+        if ( iCountersStorage.contains(aProfile->name()) )  {
+            aProfile->setSyncRetryAttemp(iCountersStorage.value(aProfile->name()));
+        }
+        else {
+            aProfile->setSyncRetryAttemp(0);
+        }
+    }
 }
 
