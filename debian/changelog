@@ -1,6 +1,7 @@
-sync-fw (0.5.1-31) unstable; urgency=low
+sync-fw (0.5.2) stable; urgency=low
 
   * Fixes: NB#210459 - Bookmarks option is available for S40 destination.
+  * Marking package as stable.
 
  -- Amit <amit.5.aggarwal@nokia.com>  Mon, 13 Dec 2010 17:55:00 +0530
 

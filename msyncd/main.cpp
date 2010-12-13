@@ -72,6 +72,11 @@ int main( int argc, char* argv[] )
 
     QCoreApplication app(argc, argv);
 
+    // The below two lines are added as a workaround for QT bug 11413
+    // http://bugreports.qt.nokia.com/browse/QTBUG-11413
+    QDBusConnection::sessionBus();
+    QDBusConnection::systemBus();
+
     Buteo::Logger::createInstance(SYNC_LOG_FILE_PATH);
     Buteo::Logger *logger = Buteo::Logger::instance();
     if (logger) {
