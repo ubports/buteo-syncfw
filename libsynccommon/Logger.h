@@ -78,7 +78,7 @@ public:
      * @param aIndentSize Number of spaces that each indent level inserts.
      */
     static void createInstance(const QString &aLogFileName = "",
-                               bool aUseStdOut = true,
+                               bool aUseStdOut = false,
                                int aIndentSize = DEFAULT_INDENT_SIZE);
 
     //! Deletes the logger instance. Closes the log file in a controlled way.
