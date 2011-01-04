@@ -1,3 +1,9 @@
+sync-fw (0.5.2-2) stable; urgency=low
+
+  * Removed "Debug:" output to stdout by default to avoid serial console spamming.
+
+ -- Lassi Vaatamoinen <ext-lassi.vaatamoinen@nokia.com>  Tue, 04 Jan 2011 11:34:01 +0200
+
 sync-fw (0.5.2-1) stable; urgency=low
 
   * Added functions to get service IDs based on profile type
