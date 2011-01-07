@@ -71,8 +71,8 @@ namespace Buteo {
         // creating a local variable only for debugging problems with strange backtraces.
         QDBusConnection dbus = *sessionBusConnection.localData();
         //warning level only to be sure this is printed always
-        LOG_WARNING("DBus Connection Address:" << &dbus );
-        LOG_WARNING("DBus Connection Name:" << dbus.name() );
+        LOG_DEBUG("DBus Connection Address:" << &dbus );
+        LOG_DEBUG("DBus Connection Name:" << dbus.name() );
         LOG_DEBUG("DBus is Connected:" << dbus.isConnected() );
         LOG_DEBUG("DBus Connection ID:" << dbus.baseService() );
 #endif
@@ -97,8 +97,8 @@ namespace Buteo {
         // creating a local variable only for debugging problems with strange backtraces.
         QDBusConnection dbus = *systemBusConnection.localData();
         //warning level only to be sure this is printed always
-        LOG_WARNING("DBus Connection Address:" << &dbus );
-        LOG_WARNING("DBus Connection Name:" << dbus.name() );
+        LOG_DEBUG("DBus Connection Address:" << &dbus );
+        LOG_DEBUG("DBus Connection Name:" << dbus.name() );
         LOG_DEBUG("DBus is Connected:" << dbus.isConnected() );
         LOG_DEBUG("DBus Connection ID:" << dbus.baseService() );
 #endif
