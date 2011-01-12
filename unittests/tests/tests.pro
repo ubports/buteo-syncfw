@@ -17,7 +17,7 @@ INCLUDEPATH += . \
     pluginmanagertests \
     syncprofiletests \
     msyncdtests \
-    syncfwclienttests \    
+    syncfwclienttests \
     /usr/include/accounts-qt
 
 DEFINES += SYNCFW_UNIT_TESTS 
