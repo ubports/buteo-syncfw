@@ -98,6 +98,7 @@ uchar SyncBackup::sendDelayReply (const QDBusMessage &message)
 #ifdef UNIT_TEST
          return 0;
 #endif 
+    // coverity[unreachable]  //Suppressing false positives with code annotations
     message.setDelayedReply(true);
     if (!iReply)
 	    iReply = new QDBusMessage;
@@ -110,7 +111,8 @@ void SyncBackup::sendReply (uchar aResult)
     FUNCTION_CALL_TRACE;
 #ifdef UNIT_TEST
          return ;
-#endif 
+#endif
+    // coverity[unreachable]  //Suppressing false positives with code annotations
     if (iReply) {
 	    LOG_DEBUG ("Send Reply");
 	    QList<QVariant>  arguments;

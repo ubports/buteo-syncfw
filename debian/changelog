@@ -1,6 +1,7 @@
 sync-fw (0.5.2-3) stable; urgency=low
 
   * Adding changes for unix signal handling.
+  * Adding changes for coverity unreachable.
 
  -- Amit <amit.5.aggarwal@nokia.com>  Wed, 12 Jan 2011 11:34:01 +0200
 
