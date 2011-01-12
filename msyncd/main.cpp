@@ -25,27 +25,15 @@
 #include <QtDebug>
 #include <QDateTime>
 
-#include <signal.h>
 #include <dbus/dbus.h>
 
 #include "LogMacros.h"
 #include "Logger.h"
 #include "synchronizer.h"
+#include "SyncSigHandler.h"
 
 const QString LOGGER_CONFIG_FILE( "/etc/sync/set_sync_log_level" );
 const QString SYNC_LOG_FILE_PATH( QDir::homePath () + QDir::separator() + ".sync" + QDir::separator() + "synchronizer.log");
-
-// Linux signal handler. This application is shutdown by sending a
-// SIGTERM to it
-void signalHandler(int /*signal*/)
-{
-    QCoreApplication::exit(0);
-}
-
-static void sighupHandler(int /*signal*/)
-{
-    // Do nothing
-}
 
 void setLogLevelFromFile(Buteo::Logger *aLogger)
 {
@@ -98,9 +86,10 @@ int main( int argc, char* argv[] )
         synchronizer = 0;
         return -1;
     }
-    signal(SIGTERM, signalHandler);
-    signal(SIGINT, signalHandler);
-    signal(SIGHUP, sighupHandler);
+
+    //Note:- Since we can't call Qt functions from Unix signal handlers.
+    // This class provide hanlding unix  signal.
+    SyncSigHandler *sigHandler = new SyncSigHandler();
 
     LOG_DEBUG("Entering event loop");
     int returnValue = app.exec();
@@ -109,6 +98,11 @@ int main( int argc, char* argv[] )
     synchronizer->close();
     delete synchronizer;
     synchronizer = 0;
+
+    if (sigHandler) {
+        delete sigHandler;
+        sigHandler = 0;
+    }
 
     LOG_DEBUG("Stopping logger");
 

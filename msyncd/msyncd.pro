@@ -68,7 +68,9 @@ HEADERS += ServerActivator.h \
     ServerPluginRunner.h \
     SyncAlarmInventory.h \
     NetworkManager.h \
-    IPHeartBeat.h
+    IPHeartBeat.h \
+    SyncSigHandler.h
+
 SOURCES += ServerActivator.cpp \
     TransportTracker.cpp \
     main.cpp \
@@ -88,7 +90,9 @@ SOURCES += ServerActivator.cpp \
     ServerPluginRunner.cpp \
     SyncAlarmInventory.cpp \
     NetworkManager.cpp \
-    IPHeartBeat.cpp
+    IPHeartBeat.cpp \
+    SyncSigHandler.cpp
+
 QMAKE_CXXFLAGS = -Wall \
     -g \
     -Wno-cast-align \

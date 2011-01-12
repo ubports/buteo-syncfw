@@ -290,7 +290,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
 
     // Get profiles by sub-profile, no match.
     criteria.iType = ProfileManager::SearchCriteria::EXISTS;
-    criteria.iSubProfileName = "hbookmarks";
+    criteria.iSubProfileName = "hsms";
     criteria.iSubProfileType = Profile::TYPE_STORAGE;
     criteria.iKey = QString::null;
     criteria.iValue = QString::null;
@@ -330,7 +330,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
 
     // Get profiles by sub-profile.
     criteria.iType = ProfileManager::SearchCriteria::NOT_EXISTS;
-    criteria.iSubProfileName = "hbookmarks";
+    criteria.iSubProfileName = "hsms";
     criteria.iSubProfileType = Profile::TYPE_STORAGE;
     criteria.iKey = QString::null;
     criteria.iValue = QString::null;

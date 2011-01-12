@@ -1,3 +1,9 @@
+sync-fw (0.5.2-3) stable; urgency=low
+
+  * Adding changes for unix signal handling.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Wed, 12 Jan 2011 11:34:01 +0200
+
 sync-fw (0.5.2-2) stable; urgency=low
 
   * Removed "Debug:" output to stdout by default to avoid serial console spamming.
