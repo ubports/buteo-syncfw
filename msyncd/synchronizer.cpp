@@ -264,6 +264,14 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error" , Buteo::SyncResults::INTERNAL_ERROR);
         return false;
     }
+
+    // If profile hasn't been used before, we set profileCreated to true
+    // so that we save remote Id when we clean up after the sync.
+    if (profile->lastResults()==0) {
+        LOG_DEBUG( "Setting ProfileCreated true");
+        session->setProfileCreated(true);
+    }
+
     restoreProfileCounter(profile);
     if ( profile->syncCurrentAttempt() == 0 ) {
         session->setScheduled(aScheduled);
