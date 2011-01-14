@@ -1,3 +1,9 @@
+sync-fw (0.5.2-4) stable; urgency=low
+
+  * Fixes NB#216241 - Fast sync is done when slow sync is performed after deleting a profile
+
+ -- Katila Tuomas <ext-tuomas.2.katila@nokia.com>  Fri, 14 Jan 2011 11:46:18 +0200
+
 sync-fw (0.5.2-3) stable; urgency=low
 
   * Adding changes for unix signal handling.
