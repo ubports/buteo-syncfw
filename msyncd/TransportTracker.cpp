@@ -27,7 +27,6 @@
 #endif
 #include "NetworkManager.h"
 #include "LogMacros.h"
-#include <contextsubscriber/contextproperty.h>
 #include <QMutexLocker>
 
 
@@ -36,7 +35,6 @@ using namespace Buteo;
 TransportTracker::TransportTracker(QObject *aParent) :
     QObject(aParent),
     iUSBProxy(0),
-    iBt(0),
     iInternet(0)
 {
     FUNCTION_CALL_TRACE;
@@ -63,16 +61,10 @@ TransportTracker::TransportTracker(QObject *aParent) :
     }
 #endif
     // BT
-    iBt = new ContextProperty("Bluetooth.Enabled", this);
-    if (iBt != 0)
-    {
-        iTransportStates[Sync::CONNECTIVITY_BT] = iBt->value().toBool();
-        connect(iBt, SIGNAL(valueChanged()), this, SLOT(onBtStateChanged()));
-    }
-    else
-    {
-        LOG_WARNING("Failed to listen for BT state changes");
-    }
+    iTransportStates[Sync::CONNECTIVITY_BT] = iDeviceInfo.currentBluetoothPowerState();
+    bool status = connect(&iDeviceInfo, SIGNAL(bluetoothStateChanged(bool)), this, SLOT(onBtStateChanged(bool)));
+    LOG_DEBUG("Connect status"<<status<<"and current bluetoothPowerState"<<iDeviceInfo.currentBluetoothPowerState());
+
 
     // Internet
     // @todo: enable when internet state is reported correctly.
@@ -116,17 +108,12 @@ void TransportTracker::onUsbStateChanged(bool aConnected)
     updateState(Sync::CONNECTIVITY_USB, aConnected);
 }
 
-void TransportTracker::onBtStateChanged()
+void TransportTracker::onBtStateChanged(bool aState)
 {
     FUNCTION_CALL_TRACE;
 
-    bool newState = false;
-    if (iBt != 0)
-    {
-        newState = iBt->value().toBool();
-    }
-    LOG_DEBUG("BT state changed:" << newState);
-    updateState(Sync::CONNECTIVITY_BT, newState);
+    LOG_DEBUG("BT state changed:" << aState);
+    updateState(Sync::CONNECTIVITY_BT, aState);
 }
 
 void TransportTracker::onInternetStateChanged(bool aConnected)

@@ -24,7 +24,6 @@
 
 #include "TransportTrackerTest.h"
 #include <SyncCommonDefs.h>
-#include <contextsubscriber/contextproperty.h>
 #include <QtTest/QtTest>
 #include <QSignalSpy>
 #include "SyncFwTestLoader.h"
@@ -43,7 +42,6 @@ void TransportTrackerTest :: initTestCase()
     // check memory allocation for HalProxy
     QVERIFY(iTransportTracker->iHalProxy);
     // check memory allocation for USB
-    QVERIFY(iTransportTracker->iBt);
     // check for valid pointer of iInternet
     QVERIFY(iTransportTracker->iInternet);
     */
@@ -97,9 +95,8 @@ void TransportTrackerTest :: testStateChanged()
 
     // change BT state and verify
 
-    bool setBTState = iTransportTracker->iBt->value().toBool();
-    QVERIFY(iTransportTracker->iBt);
-    iTransportTracker->onBtStateChanged();
+    bool setBTState = iTransportTracker->iDeviceInfo.currentBluetoothPowerState();
+    iTransportTracker->onBtStateChanged(setBTState);
     QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT), setBTState);
 
 

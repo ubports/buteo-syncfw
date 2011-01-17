@@ -10,7 +10,10 @@ CONFIG += qdbus \
     link_pkgconfig \
     silent \
     create_pc \
-    create_prl
+    create_prl \
+    mobility
+
+MOBILITY += systeminfo
 
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 QMAKE_PKGCONFIG_LIBDIR  = $$target.path
@@ -36,7 +39,6 @@ LIBS += -L../libsyncpluginmgr \
     -lsyncprofile \
     -lsynccommon \
     -laccounts-qt \
-    -lcontextsubscriber \
 # libqttracker has a bug (158705) that causes a crash when tracker is used from
 # a library (storage plug-in in our case), which is then unloaded after use. To
 # prevent that crash we need to link with libqttracker here also, so that the
