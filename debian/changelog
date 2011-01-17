@@ -1,3 +1,10 @@
+sync-fw (0.5.2-5) stable; urgency=low
+
+  * Fixes NB#218600 - crash due to context property.
+  * Removed dependency from context property.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Mon, 17 Jan 2011 11:46:18 +0200
+
 sync-fw (0.5.2-4) stable; urgency=low
 
   * Fixes NB#216241 - Fast sync is done when slow sync is performed after deleting a profile

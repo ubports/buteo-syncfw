@@ -8,9 +8,13 @@ QT += xml \
     dbus
 CONFIG += qdbus \
     link_pkgconfig \
-    silent
+    silent \
+    mobility
+
+MOBILITY += systeminfo
+
 PKGCONFIG += dbus-1
-LIBS += -lcontextsubscriber -liphb -lqttracker -lsignon-qt
+LIBS += -liphb -lqttracker -lsignon-qt
 
 SOURCES += ServerThread.cpp \
     ServerThreadTest.cpp \

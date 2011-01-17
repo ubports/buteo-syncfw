@@ -41,9 +41,8 @@
 #include <QMap>
 #include <QString>
 #include <QDBusInterface>
+#include <QtSystemInfo/QSystemDeviceInfo>
 
-
-class ContextProperty;
 
 namespace Buteo {
 
@@ -300,7 +299,7 @@ private:
 
     AccountsHelper *iAccounts;
 
-    ContextProperty *iLowPower;
+    QtMobility::QSystemDeviceInfo iDeviceInfo;
 
     bool iClosing;
 

@@ -28,8 +28,7 @@
 #include <QObject>
 #include <QMap>
 #include <QMutex>
-
-class ContextProperty;
+#include <QtSystemInfo/QSystemDeviceInfo>
 
 namespace Buteo {
 
@@ -84,7 +83,7 @@ private slots:
 
 	void onUsbStateChanged(bool aConnected);
 
-    void onBtStateChanged();
+    void onBtStateChanged(bool aState);
 
     void onInternetStateChanged(bool aConnected);
 
@@ -94,7 +93,7 @@ private:
 
     USBModedProxy *iUSBProxy;
 
-    ContextProperty *iBt;
+    QtMobility::QSystemDeviceInfo iDeviceInfo;
 
     NetworkManager *iInternet;
 

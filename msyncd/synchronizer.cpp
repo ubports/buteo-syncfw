@@ -39,7 +39,6 @@
 #include "LogMacros.h"
 #include "SyncDBusConnection.h"
 
-#include <contextsubscriber/contextproperty.h>
 #include <QtDebug>
 #include <fcntl.h>
 #include <termios.h>
@@ -112,9 +111,6 @@ bool Synchronizer::initialize()
 
     // Initialize account manager.
     iAccounts = new AccountsHelper(iProfileManager, this); // Deleted with parent.
-
-    // Context property for low battery situation.
-    iLowPower = new ContextProperty("Battery.LowBattery", this);
 
     connect(this, SIGNAL(storageReleased()),
             this, SLOT(onStorageReleased()), Qt::QueuedConnection);
@@ -283,6 +279,9 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     // @todo: Complete profile with data from account manager.
     //iAccounts->addAccountData(*profile);
 
+    QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
+    //LOG_DEBUG("Battery status:"<<batteryStat);
+
     if (!profile->isValid())
     {
         LOG_WARNING( "Profile is not valid" );
@@ -290,7 +289,7 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
     }
 
-    else if (aScheduled && iLowPower != 0 && iLowPower->value().toBool())
+    else if( aScheduled && (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) )
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
@@ -542,7 +541,9 @@ bool Synchronizer::startNextSync()
     QString profileName = session->profileName();
     LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName );
 
-    if (session->isScheduled() && iLowPower != 0 && iLowPower->value().toBool())
+    QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
+
+    if (session->isScheduled() && (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal))
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         iSyncQueue.dequeue();

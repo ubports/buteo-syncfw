@@ -77,7 +77,6 @@ void SynchronizerTest::testInitialize()
 	QVERIFY(iSync->iServerActivator != 0);
 	QVERIFY(iSync->iAccounts != 0);
 	QVERIFY(iSync->iSyncBackup != 0);
-	QVERIFY(iSync->iLowPower != 0);
 }
 void SynchronizerTest::testSync()
 {
@@ -111,7 +110,6 @@ void SynchronizerTest::testSync()
 	QCOMPARE(iSync->startScheduledSync("Profile1"), true);
 	QCOMPARE(sigStatus1.count(), 1);
 
-	QVERIFY(iSync->iLowPower != 0);
 	QCOMPARE(iSync->startSync("S40"), false);
 	QCOMPARE(iSync->requestStorages(alist), true);
 
