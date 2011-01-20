@@ -116,6 +116,13 @@ public:
      */
     void setTime(const QTime &aTime);
 
+
+    /*! \brief Sets the next time for sync.
+    *
+    * \param QDateTime Sync time.
+    */
+    void setNextSyncTime(const QDateTime &aDateTime);
+
     /*! \brief Gets sync interval in minutes.
      *
      * \return Interval.
@@ -187,11 +194,10 @@ public:
     /*! \brief Gets next sync time based on the sync schedule settings.
      *
      * \param aPrevSync Previous sync time.
-     * \param aCurrentTime Current time.
+     * \param aPrevious sync time.
      * \return Next sync time. Null object if schedule is not defined.
      */
-    QDateTime nextSyncTime(const QDateTime &aPrevSync,
-                          const QDateTime &aCurrentTime = QDateTime::currentDateTime()) const;
+    QDateTime nextSyncTime(const QDateTime &aPrevSync) const;
 
 private:
 

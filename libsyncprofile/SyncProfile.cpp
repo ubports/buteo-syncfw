@@ -170,11 +170,11 @@ void SyncProfile::setName(const QStringList &aKeys)
 
 
 QDateTime SyncProfile::lastSyncTime() const
-{
+{    
     QDateTime lastSync;
 
     if (d_ptr->iLog != 0 && d_ptr->iLog->lastResults() != 0)
-    {
+    {        
         return d_ptr->iLog->lastResults()->syncTime();
     } // no else
 

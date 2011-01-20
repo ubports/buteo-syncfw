@@ -112,6 +112,7 @@ void SyncScheduleTest::testProperties()
     QVERIFY(s.rushInterval() == rushInterval);
 }
 
+
 void SyncScheduleTest::testNextSyncTime()
 {
     const unsigned INTERVAL = 30;
@@ -121,43 +122,43 @@ void SyncScheduleTest::testNextSyncTime()
     QDateTime now(QDate(2009, 10, 7), QTime(12, 0, 0, 0));
 
     // No schedule settings.
-    QVERIFY(s.nextSyncTime(previous, now).isNull());
+    QVERIFY(s.nextSyncTime(previous).isNull());
 
     // Exact time.
     QTime exact(15, 0, 0, 0);
     s.setTime(exact);
-    QDateTime next = s.nextSyncTime(previous, now);
+    QDateTime next = s.nextSyncTime(previous);
     QVERIFY(next.isNull());
     DaySet days;
     days.insert(Qt::Wednesday);
     days.insert(Qt::Monday);
     s.setDays(days);
-    next = s.nextSyncTime(previous, now);
+    next = s.nextSyncTime(previous);
     QVERIFY(!next.isNull());
     QVERIFY(next.date() == now.date());
     QVERIFY(next.time() == exact);
     now.setTime(QTime(15, 0, 1, 0));
-    next = s.nextSyncTime(previous, now);
+    next = s.nextSyncTime(previous);
     QVERIFY(next.date() == now.date().addDays(5));
     QVERIFY(next.time() == exact);
 
     // Interval.
     s.setTime(QTime());
     s.setInterval(INTERVAL);
-    next = s.nextSyncTime(previous, previous);
+    next = s.nextSyncTime(previous);
     QVERIFY(next == previous.addSecs(INTERVAL * 60));
 
     // Interval, no previous sync.
-    next = s.nextSyncTime(QDateTime(), now);
+    next = s.nextSyncTime(QDateTime());
     QVERIFY(next == now);
 
     // Interval, sync missed.
-    next = s.nextSyncTime(previous, now); // now = previous + 1h
+    next = s.nextSyncTime(previous); // now = previous + 1h
     QVERIFY(next == now);
 
     // Interval, across day boundary, disabled days in the middle.
     previous.setTime(QTime(23, 50, 0, 0));
-    next = s.nextSyncTime(previous, previous);
+    next = s.nextSyncTime(previous);
     QVERIFY(next.date() == previous.addDays(5).date()); // Disabled days are skipped.
     QVERIFY(next.time() == QTime(0, 0, 0, 0)); // Sync as soon as day starts.
 
@@ -170,43 +171,43 @@ void SyncScheduleTest::testNextSyncTime()
     s.setRushTime(QTime(8, 0, 0, 0), QTime(16, 0, 0, 0));
     s.setRushInterval(RUSH_INTERVAL);
     previous.setTime(QTime(11, 50, 0, 0));
-    next = s.nextSyncTime(previous, previous);
+    next = s.nextSyncTime(previous);
     QVERIFY(next == previous.addSecs(INTERVAL * 60));
 
     // No previous sync.
     s.setInterval(0);
-    next = s.nextSyncTime(QDateTime(), now);
+    next = s.nextSyncTime(QDateTime());
     QVERIFY(next == now);
     s.setInterval(INTERVAL);
 
     // Currently in rush, sync missed.
     now.setDate(QDate(2009, 10, 9));
-    next = s.nextSyncTime(previous, now);
+    next = s.nextSyncTime(previous);
     QVERIFY(next == now);
 
     // Currently in rush, previous in rush.
     now.setTime(QTime(12, 0, 0, 0));
     QVERIFY(s.d_ptr->isRush(now));
-    next = s.nextSyncTime(now, now);
+    next = s.nextSyncTime(now);
     QCOMPARE(next, now.addSecs(RUSH_INTERVAL * 60));
 
     // Currently in rush, next out of rush.
     now.setTime(QTime(15, 55, 0, 0));
-    next = s.nextSyncTime(now, now);
+    next = s.nextSyncTime(now);
     QCOMPARE(next.date().dayOfWeek(), (int)Qt::Monday);
     QCOMPARE(next.time(), QTime(0, 0, 0, 0));
     s.setInterval(0);
-    next = s.nextSyncTime(now, now);
+    next = s.nextSyncTime(now);
     QCOMPARE(next.date().dayOfWeek(), (int)Qt::Monday);
     QCOMPARE(next.time(), s.rushBegin());
 
     // Not currently in rush.
     now.setTime(QTime(6, 0, 0, 0));
-    next = s.nextSyncTime(now, now.addSecs(RUSH_INTERVAL * 3));
+    next = s.nextSyncTime(now);
     QCOMPARE(next.date(), now.date());
     QCOMPARE(next.time(), s.rushBegin());
     now.setTime(QTime(17, 0, 0, 0));
-    next = s.nextSyncTime(now, now);
+    next = s.nextSyncTime(now);
     QCOMPARE(next.date().dayOfWeek(), (int)Qt::Monday);
     QCOMPARE(next.time(), s.rushBegin());
 }
