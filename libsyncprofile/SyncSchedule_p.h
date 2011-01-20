@@ -82,6 +82,10 @@ public:
     //! Last Sync Time
     QTime iTime;
 
+    //! sync schedule configure time for intial update
+    QDateTime iNextSyncTime;
+
+
     //! Time interval
     unsigned iInterval;
 

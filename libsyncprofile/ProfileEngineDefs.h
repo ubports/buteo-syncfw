@@ -46,6 +46,7 @@ const QString ATTR_DAYS("days");
 const QString ATTR_MAJOR_CODE("majorcode");
 const QString ATTR_MINOR_CODE("minorcode");
 const QString ATTR_ENABLED("enabled");
+const QString ATTR_SYNC_CONFIGURE("nextsynctime");
 
 const QString TAG_FIELD("field");
 const QString TAG_PROFILE("profile");
