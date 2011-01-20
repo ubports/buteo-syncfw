@@ -769,8 +769,10 @@ void Synchronizer::onStorageAccquired ( const QString &aProfileName,
                 storageMap["hcalendar"] = true;
             else if (aMimeType.compare(QString("text/plain"), Qt::CaseInsensitive) == 0)
                 storageMap["hnotes"] = true;
+            #ifdef BM_SYNC
             else if (aMimeType.compare(QString("text/x-vbookmark"), Qt::CaseInsensitive) == 0)
                 storageMap["hbookmarks"] = true;
+            #endif
             else if (aMimeType.compare(QString("text/x-vmsg"), Qt::CaseInsensitive) == 0)
                 storageMap["hsms"] = true;
             else 
@@ -1128,7 +1130,9 @@ void Synchronizer::onNewSession(const QString &aDestination)
             storageMap["hcontacts"] = 0;
             storageMap["hcalendar"] = 0;
             storageMap["hnotes"] = 0;
+            #ifdef BM_SYNC
             storageMap["hbookmarks"] = 0;
+            #endif
             storageMap["hsms"] = 0;
 
             session->setStorageMap(storageMap);

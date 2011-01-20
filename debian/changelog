@@ -1,6 +1,7 @@
 sync-fw (0.5.2-6) stable; urgency=low
 
-  * Fixes NB#218016 - Next Synchronization time of scheduled ovi.com sync is updating with the current time
+  * Fixes: NB#218016 - Next Synchronization time of scheduled ovi.com sync is updating with the current time
+  * Fixes - bookmark sync related section is commented-out
 
  -- Mallikarjun Hunalli <mallikarjun.hunalli@nokia.com>  Thu, 20 Jan 2011 11:46:18 +0530
 
