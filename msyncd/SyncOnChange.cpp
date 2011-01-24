@@ -2,6 +2,7 @@
 #include "SyncOnChangeScheduler.h"
 #include "SyncProfile.h"
 #include "StorageChangeNotifier.h"
+#include "LogMacros.h"
 
 #include <QStringList>
 
@@ -11,10 +12,12 @@ SyncOnChange::SyncOnChange() :
 iStorageChangeNotifier(new StorageChangeNotifier()),
 iSOCScheduler(0)
 {
+    FUNCTION_CALL_TRACE;
 }
 
 SyncOnChange::~SyncOnChange()
 {
+    FUNCTION_CALL_TRACE;
     QStringList storages;
 
     storages = getSOCStorageNames();
@@ -31,6 +34,7 @@ bool SyncOnChange::enable(const QHash<QString,QList<SyncProfile*> >& aSOCStorage
                           PluginManager* aPluginManager,
                           QStringList& aFailedStorages)
 {
+    FUNCTION_CALL_TRACE;
     bool enabled = false;
     QStringList storages;
 
@@ -54,11 +58,13 @@ bool SyncOnChange::enable(const QHash<QString,QList<SyncProfile*> >& aSOCStorage
 
 void SyncOnChange::disable()
 {
+    FUNCTION_CALL_TRACE;
     iStorageChangeNotifier->stopListen();
 }
 
 void SyncOnChange::cleanup(const QString& aStorageName)
 {
+    FUNCTION_CALL_TRACE;
     QList<SyncProfile*> profilesList;
 
     if(iSOCStorageMap.contains(aStorageName))
@@ -75,6 +81,7 @@ void SyncOnChange::cleanup(const QString& aStorageName)
 
 QStringList SyncOnChange::getSOCStorageNames()
 {
+    FUNCTION_CALL_TRACE;
     QStringList storages;
 
     for(QHash<QString,QList<SyncProfile*> >::const_iterator storageNameItr = iSOCStorageMap.constBegin();
@@ -87,6 +94,7 @@ QStringList SyncOnChange::getSOCStorageNames()
 
 void SyncOnChange::sync(QString aStorageName)
 {
+    FUNCTION_CALL_TRACE;
     QList<SyncProfile*> profilesList;
 
     if(iSOCStorageMap.contains(aStorageName))
@@ -96,6 +104,8 @@ void SyncOnChange::sync(QString aStorageName)
     for(QList<SyncProfile*>::iterator profileItr = profilesList.begin();
         profileItr != profilesList.end(); ++profileItr)
     {
+        LOG_DEBUG("Schedule sync on change for storage" << aStorageName
+                   << "for profile" << (*profileItr)->name());
         iSOCScheduler->addProfile(*profileItr);
     }
 }

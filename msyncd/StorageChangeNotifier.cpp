@@ -1,6 +1,7 @@
 #include "StorageChangeNotifier.h"
 #include "StorageChangeNotifierPlugin.h"
 #include "PluginManager.h"
+#include "LogMacros.h"
 
 #include <QStringList>
 
@@ -8,15 +9,18 @@ using namespace Buteo;
 
 StorageChangeNotifier::StorageChangeNotifier()
 {
+    FUNCTION_CALL_TRACE;
 }
 
 StorageChangeNotifier::~StorageChangeNotifier()
 {
+    FUNCTION_CALL_TRACE;
 }
 
 void StorageChangeNotifier::loadNotifiers(PluginManager* aPluginManager,
                                           const QStringList& aStorageNames)
 {
+    FUNCTION_CALL_TRACE;
     StorageChangeNotifierPlugin* plugin = 0;
 
     for(QStringList::const_iterator storageNameItr = aStorageNames.constBegin();
@@ -29,6 +33,7 @@ void StorageChangeNotifier::loadNotifiers(PluginManager* aPluginManager,
 
 bool StorageChangeNotifier::startListen(QStringList& aFailedStorages)
 {
+    FUNCTION_CALL_TRACE;
     bool success = true;
     StorageChangeNotifierPlugin* plugin = 0;
 
@@ -56,14 +61,17 @@ bool StorageChangeNotifier::startListen(QStringList& aFailedStorages)
 
 void StorageChangeNotifier::stopListen()
 {
+    FUNCTION_CALL_TRACE;
     QObject::disconnect();
 }
 
 void StorageChangeNotifier::storageChanged()
 {
+    FUNCTION_CALL_TRACE;
     StorageChangeNotifierPlugin* plugin = qobject_cast<StorageChangeNotifierPlugin*>(sender());
     if(plugin)
     {
+        LOG_DEBUG("Change in storage" << plugin->name());
         emit storageChange(plugin->name());
     }
 }
