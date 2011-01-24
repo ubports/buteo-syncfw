@@ -28,6 +28,8 @@
 #include "StorageBooker.h"
 #include "SyncScheduler.h"
 #include "SyncBackup.h"
+#include "SyncOnChange.h"
+#include "SyncOnChangeScheduler.h"
 
 #include "SyncCommonDefs.h"
 #include "ProfileManager.h"
@@ -302,6 +304,10 @@ private:
     QtMobility::QSystemDeviceInfo iDeviceInfo;
 
     bool iClosing;
+
+    SyncOnChange iSyncOnChange;
+
+    SyncOnChangeScheduler iSyncOnChangeScheduler;
 
     /*! \brief Save the counter for given profile
      *
