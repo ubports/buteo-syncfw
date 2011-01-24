@@ -137,8 +137,15 @@ bool Synchronizer::initialize()
     //have to be well known this way
     aSOCStorageMap["hcontacts"] = iProfileManager.getSOCProfilesForStorage("hcontacts");
     QStringList aFailedStorages;
-    bool SOCenabled = iSyncOnChange.enable(aSOCStorageMap, &iSyncOnChangeScheduler,
+    bool isSOCEnabled = iSyncOnChange.enable(aSOCStorageMap, &iSyncOnChangeScheduler,
                                            &iPluginManager, aFailedStorages);
+    if(!isSOCEnabled)
+    {
+        foreach(const QString& aStorageName, aFailedStorages)
+        {
+            LOG_WARNING("Sync on change couldn't be enabled for storage" << aStorageName);
+        }
+    }
     return true;
 }
 
@@ -151,6 +158,8 @@ void Synchronizer::close()
     iClosing = true;
 
     // Stop running sessions
+    iSyncOnChange.disable();
+
     QList<SyncSession*> sessions = iActiveSessions.values();
     foreach (SyncSession* session, sessions)
     {

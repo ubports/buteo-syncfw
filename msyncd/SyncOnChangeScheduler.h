@@ -9,7 +9,7 @@
 
 /*! \brief default timeout (in seconds) for initiating SOC
  */
-const quint32 SOC_SCHEDULE_TIMEOUT(300);
+const quint32 SOC_SCHEDULE_TIMEOUT(60);
 
 namespace Buteo
 {
@@ -84,7 +84,7 @@ private Q_SLOTS:
      *
      * @param aProfile sync profile
      */
-    void scheduleSync(const SyncProfile* aProfile);
+    void sync(const SyncProfile* aProfile);
 
 private:
     quint32 iTimeout;
