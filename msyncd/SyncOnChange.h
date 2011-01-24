@@ -10,6 +10,7 @@ namespace Buteo
 class SyncProfile;
 class StorageChangeNotifier;
 class PluginManager;
+class SyncOnChangeScheduler;
 
 /*! \brief this class initiates a sync if there are changes
  * in storage(s) it's asked to monitor
@@ -33,6 +34,7 @@ public:
      * Destroys the profile objects when they are no longer needed
      *
      * @param aPluginManager Used to load SOC storage plug-ins
+     * @param aSOCScheduler used to schedule SOC
      * @param aSOCStorageMap map of well-known storage name
      * to list of sync profiles insterested in SOC for that
      * storage
@@ -41,6 +43,7 @@ public:
      * storages
      */
     bool enable(const QHash<QString,QList<SyncProfile*> >& aSOCStorageMap,
+                SyncOnChangeScheduler* aSOCScheduler,
                 PluginManager* aPluginManager, QStringList& aFailedStorages);
 
     /*! \brief disable sync on change
@@ -66,6 +69,7 @@ private:
 
     StorageChangeNotifier* iStorageChangeNotifier;
     QHash<QString,QList<SyncProfile*> > iSOCStorageMap;
+    SyncOnChangeScheduler* iSOCScheduler;
 };
 
 }

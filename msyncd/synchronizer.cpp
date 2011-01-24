@@ -127,6 +127,18 @@ bool Synchronizer::initialize()
     connect(iSyncBackup, SIGNAL(startRestore()),this, SLOT(restoreStarts()));
     connect(iSyncBackup, SIGNAL(restoreDone()),this, SLOT(restoreFinished()));
 
+    //For Sync On Change
+    iSyncOnChangeScheduler.setSOCScheduleCriterion(SyncOnChangeScheduler::SYNC_NOW);
+    QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(QString)),
+                     this, SLOT(startSync(QString)));
+    // enable SOC for contacts only as of now
+    QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
+    //TODO can we do away with hard coding storage names, in other words do they
+    //have to be well known this way
+    aSOCStorageMap["hcontacts"] = iProfileManager.getSOCProfilesForStorage("hcontacts");
+    QStringList aFailedStorages;
+    bool SOCenabled = iSyncOnChange.enable(aSOCStorageMap, &iSyncOnChangeScheduler,
+                                           &iPluginManager, aFailedStorages);
     return true;
 }
 

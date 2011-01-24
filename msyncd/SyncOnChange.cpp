@@ -1,4 +1,5 @@
 #include "SyncOnChange.h"
+#include "SyncOnChangeScheduler.h"
 #include "SyncProfile.h"
 #include "StorageChangeNotifier.h"
 
@@ -6,7 +7,9 @@
 
 using namespace Buteo;
 
-SyncOnChange::SyncOnChange() : iStorageChangeNotifier(new StorageChangeNotifier())
+SyncOnChange::SyncOnChange() :
+iStorageChangeNotifier(new StorageChangeNotifier()),
+iSOCScheduler(0)
 {
 }
 
@@ -24,6 +27,7 @@ SyncOnChange::~SyncOnChange()
 }
 
 bool SyncOnChange::enable(const QHash<QString,QList<SyncProfile*> >& aSOCStorageMap,
+                          SyncOnChangeScheduler* aSOCScheduler,
                           PluginManager* aPluginManager,
                           QStringList& aFailedStorages)
 {
@@ -31,6 +35,7 @@ bool SyncOnChange::enable(const QHash<QString,QList<SyncProfile*> >& aSOCStorage
     QStringList storages;
 
     iSOCStorageMap = aSOCStorageMap;
+    iSOCScheduler = aSOCScheduler;
     storages = getSOCStorageNames();
     iStorageChangeNotifier->loadNotifiers(aPluginManager, storages);
     enabled = iStorageChangeNotifier->startListen(aFailedStorages);
@@ -82,4 +87,15 @@ QStringList SyncOnChange::getSOCStorageNames()
 
 void SyncOnChange::sync(QString aStorageName)
 {
+    QList<SyncProfile*> profilesList;
+
+    if(iSOCStorageMap.contains(aStorageName))
+    {
+        profilesList = iSOCStorageMap.value(aStorageName);
+    }
+    for(QList<SyncProfile*>::iterator profileItr = profilesList.begin();
+        profileItr != profilesList.end(); ++profileItr)
+    {
+        iSOCScheduler->addProfile(*profileItr);
+    }
 }
