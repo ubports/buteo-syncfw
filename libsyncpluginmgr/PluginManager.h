@@ -29,6 +29,7 @@
 
 namespace Buteo {
 
+class StorageChangeNotifierPlugin;
 class StoragePlugin;
 class ClientPlugin;
 class ServerPlugin;
@@ -40,6 +41,37 @@ class ClientPluginTest;
 class ServerPluginTest;
 class StoragePluginTest;
     
+// Location filters of plugin maps
+const QString STORAGEMAP_LOCATION = "-storage.so";
+const QString CLIENTMAP_LOCATION = "-client.so";
+const QString SERVERMAP_LOCATION = "-server.so";
+const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
+
+// Default directory from which to look for plugins
+const QString DEFAULT_PLUGIN_PATH = "/usr/lib/sync/";
+
+// The name of the function which is used to create a plugin
+const QString CREATE_FUNCTION = "createPlugin";
+
+// The name of the function which is used to destroy a plugin
+const QString DESTROY_FUNCTION = "destroyPlugin";
+
+typedef ClientPlugin* (*FUNC_CREATE_CLIENT)( const QString&,
+                                             const SyncProfile&,
+                                             PluginCbInterface* );
+typedef void (*FUNC_DESTROY_CLIENT)( ClientPlugin* );
+
+typedef ServerPlugin* (*FUNC_CREATE_SERVER)( const QString&,
+                                             const Profile&,
+                                             PluginCbInterface* );
+typedef void (*FUNC_DESTROY_SERVER)( ServerPlugin* );
+
+typedef StoragePlugin* (*FUNC_CREATE_STORAGE)(const QString&);
+typedef void (*FUNC_DESTROY_STORAGE)(StoragePlugin*);
+
+typedef StorageChangeNotifierPlugin* (*FUNC_CREATE_STORAGECHANGENOTIFIER)(const QString&);
+typedef void (*FUNC_DESTROY_STORAGECHANGENOTIFIER)(StorageChangeNotifierPlugin*);
+
 /*! \brief Manages plugins
  *
  * Is responsible for creating and destroying storage,
@@ -48,10 +80,6 @@ class StoragePluginTest;
 class PluginManager
 {
 public:
-	//! default path where the plugins will be looked for
-    static const QString DEFAULT_PLUGIN_PATH;
-
-
     /*! \brief Constructor
      *
      * @param aPluginPath Path where plugins are stored
@@ -62,6 +90,19 @@ public:
      *
      */
     ~PluginManager();
+
+    /*! \brief Creates a new storage change notifier plugin
+     * for the storage aStoragName
+     *
+     * @param aStorageName well-known name of the storage
+     */
+    StorageChangeNotifierPlugin* createStorageChangeNotifier( const QString& aStorageName );
+
+    /*! \brief Destroys a storage change notifier plugin instance
+     *
+     * @param aStorageName well-known storage name of the plugin to be destroyed
+     */
+    void destroyStorageChangeNotifier( StorageChangeNotifierPlugin *aPlugin );
 
     /*! \brief Creates a new storage plugin instance
      *
@@ -132,6 +173,7 @@ private:
 
     QString                 iPluginPath;
 
+    QMap<QString, QString>  iStorageChangeNotifierMaps;
     QMap<QString, QString>  iStorageMaps;
     QMap<QString, QString>  iClientMaps;
     QMap<QString, QString>  iServerMaps;
