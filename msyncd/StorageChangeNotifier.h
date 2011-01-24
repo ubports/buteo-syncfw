@@ -49,7 +49,7 @@ public:
      */
     void stopListen();
 
-public Q_SLOTS:
+private Q_SLOTS:
     /*! \brief process a storage change notification
      */
     void storageChanged();

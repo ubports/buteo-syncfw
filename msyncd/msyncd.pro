@@ -73,7 +73,8 @@ HEADERS += ServerActivator.h \
     IPHeartBeat.h \
     SyncSigHandler.h \
     StorageChangeNotifier.h \
-    SyncOnChange.h
+    SyncOnChange.h \
+    SyncOnChangeScheduler.h
 
 SOURCES += ServerActivator.cpp \
     TransportTracker.cpp \
@@ -97,7 +98,8 @@ SOURCES += ServerActivator.cpp \
     IPHeartBeat.cpp \
     SyncSigHandler.cpp \
     StorageChangeNotifier.cpp \
-    SyncOnChange.cpp
+    SyncOnChange.cpp \
+    SyncOnChangeScheduler.cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \

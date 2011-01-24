@@ -40,9 +40,12 @@ bool StorageChangeNotifier::startListen(QStringList& aFailedStorages)
         storageNameItr != iNotifierMap.end(); ++storageNameItr)
     {
         plugin = storageNameItr.value();
-        if(!(plugin &&
-           QObject::connect(plugin, SIGNAL(storageChange()),
-                            this, SLOT(storageChanged()))));
+        if(plugin)
+        {
+            QObject::connect(plugin, SIGNAL(storageChange()),
+                             this, SLOT(storageChanged()));
+        }
+        else
         {
             aFailedStorages << storageNameItr.key();
             success = false;
@@ -59,5 +62,8 @@ void StorageChangeNotifier::stopListen()
 void StorageChangeNotifier::storageChanged()
 {
     StorageChangeNotifierPlugin* plugin = qobject_cast<StorageChangeNotifierPlugin*>(sender());
-    emit storageChange(plugin->name());
+    if(plugin)
+    {
+        emit storageChange(plugin->name());
+    }
 }
