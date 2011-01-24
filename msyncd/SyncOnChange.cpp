@@ -1,4 +1,5 @@
 #include "SyncOnChange.h"
+#include "SyncProfile.h"
 #include "StorageChangeNotifier.h"
 
 #include <QStringList>
@@ -62,7 +63,7 @@ void SyncOnChange::cleanup(const QString& aStorageName)
     for(QList<SyncProfile*>::iterator profileItr = profilesList.begin();
         profileItr != profilesList.end(); ++profileItr)
     {
-        delete *profileItr;
+        delete (*profileItr);
     }
     iSOCStorageMap.remove(aStorageName);
 }

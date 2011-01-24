@@ -76,7 +76,7 @@ public:
     void removeProfile(const QString &aProfileName);
     
     
-public slots:
+private slots:
     /**
      * \brief Performs needed actions when scheduled alarm is triggered
      * 
