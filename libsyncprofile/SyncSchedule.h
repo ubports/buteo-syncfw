@@ -121,7 +121,7 @@ public:
     *
     * \param QDateTime Sync time.
     */
-    void setNextSyncTime(const QDateTime &aDateTime);
+    void setScheduleConfiguredTime(const QDateTime &aDateTime);
 
     /*! \brief Gets sync interval in minutes.
      *

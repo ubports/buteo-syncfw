@@ -44,6 +44,8 @@ SyncAlarmInventory::SyncAlarmInventory():
 
 bool SyncAlarmInventory::init()
 {
+    FUNCTION_CALL_TRACE;
+
     static unsigned connectionNumber = 0;
     iConnectionName = ALARM_CONNECTION_NAME + QString::number( connectionNumber++ );
     iDbHandle = QSqlDatabase::addDatabase( "QSQLITE", iConnectionName );
@@ -65,10 +67,14 @@ bool SyncAlarmInventory::init()
     // Create the alarms table
     const QString createTableQuery( "CREATE TABLE IF NOT EXISTS alarms(alarmid INTEGER PRIMARY KEY AUTOINCREMENT, synctime DATETIME)" );
     QSqlQuery query( createTableQuery, iDbHandle );
+    LOG_DEBUG("SQL Query::" << query.lastQuery());
     if ( !query.exec() ) {
     	LOG_WARNING("Failed to execute the createTableQuery");
     	return false;
     }
+
+    // Clear any old alarms that may have lingered
+    removeAllAlarms();
 
     // Create the iTimer object
     iTimer = new QTimer(this);
@@ -84,6 +90,8 @@ bool SyncAlarmInventory::init()
 
 SyncAlarmInventory::~SyncAlarmInventory()
 {
+    FUNCTION_CALL_TRACE;
+
     iDbHandle.close();
     iDbHandle = QSqlDatabase();
     QSqlDatabase::removeDatabase( iConnectionName );
@@ -97,6 +105,8 @@ SyncAlarmInventory::~SyncAlarmInventory()
 
 int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
 {
+    FUNCTION_CALL_TRACE;
+
     // Check if alarmDate < QDateTime::currentDateTime()
     if ( QDateTime::currentDateTime().secsTo(alarmDate) < 0 ) {
     	return 0;
@@ -117,6 +127,7 @@ int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
     // Select all the alarms from the db sorted by alarm time
     QSqlQuery selectQuery( iDbHandle );
     if ( selectQuery.exec("SELECT alarmid,synctime FROM alarms ORDER BY synctime ASC") ) {
+        LOG_DEBUG("SQL Query::" << selectQuery.lastQuery());
         if ( selectQuery.first() ) {
             int newAlarm = selectQuery.value(0).toInt();
             QDateTime alarmTime = selectQuery.value(1).toDateTime();
@@ -145,13 +156,29 @@ int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
 
 bool SyncAlarmInventory::removeAlarm(int alarmId)
 {
+    FUNCTION_CALL_TRACE;
+
     if( alarmId <= 0 ) return false;
     deleteAlarmFromDb( alarmId );
     return true;
 }
 
+void SyncAlarmInventory::removeAllAlarms()
+{
+    FUNCTION_CALL_TRACE;
+
+    QSqlQuery deleteAllQuery(QString("DELETE FROM alarms"), iDbHandle);
+    LOG_DEBUG("SQL Query::" << deleteAllQuery.lastQuery());
+    if(!deleteAllQuery.exec())
+    {
+        LOG_WARNING("Failed query to delete all alarms");
+    }
+}
+
 void SyncAlarmInventory::timerTriggered()
 {
+    FUNCTION_CALL_TRACE;
+
     // Decrement the alarm counter
     triggerCount--;
 
@@ -170,6 +197,7 @@ void SyncAlarmInventory::timerTriggered()
         // Select all the alarms from the db sorted by alarm time
         QSqlQuery selectQuery( iDbHandle );
         if ( selectQuery.exec("SELECT alarmid,synctime FROM alarms ORDER BY synctime ASC") ) {
+            LOG_DEBUG("SQL Query::" << selectQuery.lastQuery());
             if ( selectQuery.first() ) {
                 currentAlarm = selectQuery.value(0).toInt();
                 QDateTime alarmTime = selectQuery.value(1).toDateTime();
@@ -178,6 +206,7 @@ void SyncAlarmInventory::timerTriggered()
                 QDateTime now = QDateTime::currentDateTime();
                 int iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
                 triggerCount = TRIGGER_COUNT;
+                LOG_DEBUG("Starting timer with interval::" << iTimerInterval);
                 iTimer->setInterval( iTimerInterval );
                 iTimer->start();
             }
@@ -187,10 +216,13 @@ void SyncAlarmInventory::timerTriggered()
 
 bool SyncAlarmInventory::deleteAlarmFromDb( int alarmId )
 {
+    FUNCTION_CALL_TRACE;
+
     QSqlQuery removeQuery ( iDbHandle );
     removeQuery.prepare( "DELETE FROM alarms WHERE alarmid=:alarmid" );
     removeQuery.bindValue( ":alarmid", alarmId );
 
+    LOG_DEBUG("SQL Query::" << removeQuery.lastQuery());
     if ( !removeQuery.exec() )
         return false;
     else
@@ -199,12 +231,16 @@ bool SyncAlarmInventory::deleteAlarmFromDb( int alarmId )
 
 int SyncAlarmInventory::addAlarmToDb( QDateTime timeStamp )
 {
+    FUNCTION_CALL_TRACE;
+
     QSqlQuery insertQuery( iDbHandle );
     insertQuery.prepare( "INSERT INTO alarms(synctime) VALUES(:synctime)" );
     insertQuery.bindValue( ":synctime", timeStamp );
 
+    LOG_DEBUG("SQL Query::" << insertQuery.lastQuery());
     if ( insertQuery.exec() )
         return insertQuery.lastInsertId().toInt();
     else
         return 0;
 }
+
