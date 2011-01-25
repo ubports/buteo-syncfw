@@ -177,11 +177,7 @@ void SyncScheduler::removeAlarmEvent(int aAlarmEventID)
 void SyncScheduler::removeAllAlarms()
 {
     FUNCTION_CALL_TRACE;
-    
-    QList<int> alarmList = iSyncScheduleProfiles.values();
-    
-    foreach (int alarmID, alarmList) {
-        removeAlarmEvent(alarmID);
-    }
+
+    iAlarmInventory->removeAllAlarms();    
 }
 

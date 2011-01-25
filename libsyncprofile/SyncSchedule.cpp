@@ -39,7 +39,7 @@ SyncSchedulePrivate::SyncSchedulePrivate()
 SyncSchedulePrivate::SyncSchedulePrivate(const SyncSchedulePrivate &aSource)
 :   iDays(aSource.iDays),
     iTime(aSource.iTime),
-    iNextSyncTime(aSource.iNextSyncTime),
+    iScheduleConfiguredTime(aSource.iScheduleConfiguredTime),
     iInterval(aSource.iInterval),
     iRushDays(aSource.iRushDays),
     iRushBegin(aSource.iRushBegin),
@@ -65,7 +65,7 @@ SyncSchedule::SyncSchedule(const QDomElement &aRoot)
     d_ptr->iTime = QTime::fromString(aRoot.attribute(ATTR_TIME), Qt::ISODate);
     d_ptr->iInterval = aRoot.attribute(ATTR_INTERVAL).toUInt();
     d_ptr->iDays = d_ptr->parseDays(aRoot.attribute(ATTR_DAYS));
-    d_ptr->iNextSyncTime = QDateTime::fromString(aRoot.attribute(ATTR_SYNC_CONFIGURE),Qt::ISODate);
+    d_ptr->iScheduleConfiguredTime = QDateTime::fromString(aRoot.attribute(ATTR_SYNC_CONFIGURE),Qt::ISODate);
 
     QDomElement rush = aRoot.firstChildElement(TAG_RUSH);
     if (!rush.isNull())
@@ -106,7 +106,7 @@ QDomElement SyncSchedule::toXml(QDomDocument &aDoc) const
     root.setAttribute(ATTR_TIME, d_ptr->iTime.toString(Qt::ISODate));
     root.setAttribute(ATTR_INTERVAL, QString::number(d_ptr->iInterval));
     root.setAttribute(ATTR_DAYS, d_ptr->createDays(d_ptr->iDays));
-    root.setAttribute(ATTR_SYNC_CONFIGURE,d_ptr->iNextSyncTime.toString(Qt::ISODate));
+    root.setAttribute(ATTR_SYNC_CONFIGURE,d_ptr->iScheduleConfiguredTime.toString(Qt::ISODate));
 
     QDomElement rush = aDoc.createElement(TAG_RUSH);
     rush.setAttribute(ATTR_ENABLED, d_ptr->iRushEnabled ? BOOLEAN_TRUE :
@@ -143,9 +143,9 @@ void SyncSchedule::setDays(const DaySet &aDays)
     d_ptr->iDays = aDays;
 }
 
-void SyncSchedule::setNextSyncTime(const QDateTime &aDateTime)
+void SyncSchedule::setScheduleConfiguredTime(const QDateTime &aDateTime)
 {
-    d_ptr->iNextSyncTime = aDateTime;
+    d_ptr->iScheduleConfiguredTime = aDateTime;
 }
 
 
@@ -218,19 +218,20 @@ void SyncSchedule::setRushInterval(unsigned aInterval)
 QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const                                 
 {
     QDateTime nextSync;
+    QDateTime scheduleConfiguredTime = d_ptr->iScheduleConfiguredTime;
+    QDateTime now = QDateTime::currentDateTime();
 
-    //Current time will be the configure time. i.e QDateTime::currentDateTime()
-    QDateTime aNextSyncTime = d_ptr->iNextSyncTime;
 
-
-    LOG_DEBUG("aPrevSync" << aPrevSync.toString() << "Current Time " << aNextSyncTime.toString());
+    LOG_DEBUG("aPrevSync" << aPrevSync.toString() << "Last Configured Time " << scheduleConfiguredTime.toString());
 
     if (d_ptr->iTime.isValid() && !d_ptr->iDays.isEmpty())
     {
+        // The sync time is defined explicitly (for ex. every Mon, Wed, at
+        // 5:30PM). So choose the next applicable day from now.
     	LOG_DEBUG("Explicit sync time defined.");
         nextSync.setTime(d_ptr->iTime);
-        nextSync.setDate(aNextSyncTime.date());
-        if (aNextSyncTime.time() > d_ptr->iTime)
+        nextSync.setDate(now.date());
+        if (now.time() > d_ptr->iTime)
         {
             nextSync = nextSync.addDays(1);
         } // no else
@@ -238,51 +239,68 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
     }
     else if (d_ptr->iInterval > 0)
     {
-
+        // Sync time is defined in terms of interval (for ex. every 15 minutes)
     	LOG_DEBUG("Sync interval defined as" << d_ptr->iInterval);
-        if (!aPrevSync.isValid())
+        // Last sync time is not available/valid (Could happen if the device
+        // is shut down for an extended period before the first sync can be
+        // performed). Hence use the time the
+        // sync was last scheduled as the reference
+        // Figure out the number of intervals passed
+        QDateTime reference;
+        reference = (aPrevSync.isValid()) ? aPrevSync : scheduleConfiguredTime;
+        if(reference > now)
         {
-            nextSync = aNextSyncTime.addSecs(d_ptr->iInterval * 60);
+            // If the clock was rolled back...
+            reference = now;
         }
-        else
+        int numberOfIntervals = 0;
+        if(0 != d_ptr->iInterval)
         {
-        	LOG_DEBUG("Prev Sync is valid ");
-            nextSync = aPrevSync.addSecs(d_ptr->iInterval * 60);
-            if (d_ptr->adjustDate(nextSync, d_ptr->iDays))
+            int secs = reference.secsTo(now);
+            numberOfIntervals = secs/(d_ptr->iInterval * 60);
+            if(secs % (d_ptr->iInterval * 60))
             {
-                nextSync.setTime(QTime(0, 0, 0, 0));
-            } // no else
-            if (nextSync.isValid() && nextSync < aNextSyncTime)
-            {
-                nextSync = aNextSyncTime.addSecs(d_ptr->iInterval * 60);;
-            } // no else
+                numberOfIntervals++;
+            }
         }
+        nextSync = reference.addSecs(numberOfIntervals * d_ptr->iInterval * 60);
     }
 
-    LOG_DEBUG("next sync is " << nextSync);
+    LOG_DEBUG("next non rush hour sync is at:: " << nextSync);
+
     if (d_ptr->iRushEnabled && d_ptr->iRushInterval > 0)
     {
     	LOG_DEBUG("Calculating next sync time with rush settings.Rush Interval is " << d_ptr->iRushInterval);
         // Calculate next sync time with rush settings.
         QDateTime nextSyncRush;
-        if (!aPrevSync.isValid())
+        if (d_ptr->isRush(now))
         {
-        	LOG_DEBUG("PrevSync is invalid");
-            nextSyncRush = aNextSyncTime.addSecs(d_ptr->iRushInterval * 60);
-        }
-        else if (d_ptr->isRush(aNextSyncTime))
-        {
-        	LOG_DEBUG("PrevSync is valid and isRush true.. ");
-            nextSyncRush = aPrevSync.addSecs(d_ptr->iRushInterval * 60);
-            if (nextSyncRush < aNextSyncTime)
+            LOG_DEBUG("Current time is in rush");
+            // We are in rush hour
+            if(aPrevSync.isValid())
             {
-                nextSyncRush = aNextSyncTime.addSecs(d_ptr->iRushInterval * 60);
+                LOG_DEBUG("PrevSync is valid and isRush true.. ");
+                nextSyncRush = aPrevSync.addSecs(d_ptr->iRushInterval * 60);
+                if ((nextSyncRush < now) || (aPrevSync > now))
+                {
+                    // Use current time if the previous sync time is too old, or
+                    // the clock has been rolled back
+                    nextSyncRush = now.addSecs(d_ptr->iRushInterval * 60);
+                }
             }
-            else if (!d_ptr->isRush(nextSyncRush))
+            else
             {
+                nextSyncRush = now.addSecs(d_ptr->iRushInterval * 60);
+            }
+            
+            if (!d_ptr->isRush(nextSyncRush))
+            {
+                // If the calculated rush time does not lie in the rush
+                // interval, choose the next available rush time as the begin
+                // time for the rush interval
             	LOG_DEBUG("isRush False");
                 nextSyncRush.setTime(d_ptr->iRushBegin);
-                if (nextSyncRush < aPrevSync)
+                if (nextSyncRush < now)
                 {
                     nextSyncRush = nextSyncRush.addDays(1);
                 } // no else
@@ -293,8 +311,8 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         {
         	LOG_DEBUG("Current Time is Not Rush");
             nextSyncRush.setTime(d_ptr->iRushBegin);
-            nextSyncRush.setDate(aNextSyncTime.date());
-            if (aNextSyncTime.time() > d_ptr->iRushBegin)
+            nextSyncRush.setDate(now.date());
+            if (now.time() > d_ptr->iRushBegin)
             {
                 nextSyncRush = nextSyncRush.addDays(1);
             } // no else
@@ -307,6 +325,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         if (nextSyncRush.isValid() &&
             (!nextSync.isValid() || nextSyncRush < nextSync))
         {
+            LOG_DEBUG("Using rush time as the next sync time");
             nextSync = nextSyncRush;
         } // no else
     } // no else

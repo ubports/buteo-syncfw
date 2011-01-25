@@ -79,11 +79,11 @@ public:
     //! Number of Days before the next sync starts
     DaySet iDays;
 
-    //! Last Sync Time
+    //! Sync Time
     QTime iTime;
 
     //! sync schedule configure time for intial update
-    QDateTime iNextSyncTime;
+    QDateTime iScheduleConfiguredTime;
 
 
     //! Time interval

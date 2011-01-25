@@ -66,6 +66,11 @@ class SyncAlarmInventory : public QObject
          */
         bool removeAlarm(int alarmId);
 
+        /*! Method to remove all alarms
+         *
+         */
+        void removeAllAlarms();
+
     signals:
         /*! \brief Signal triggered when an alarm expired
          * @param alarmId  - id of the alarm that got triggered.
