@@ -86,6 +86,7 @@ const QString KEY_INTERNET_TRANSPORT("internet_transport");
 const QString KEY_LOAD_WITHOUT_TRANSPORT("load_without_transport");
 const QString KEY_CAPS_MODIFIED("caps_modified");
 const QString KEY_SOC("sync_on_change");
+const QString KEY_SOC_AFTER("sync_on_change_after");
 
 const QString BOOLEAN_TRUE("true");
 const QString BOOLEAN_FALSE("false");

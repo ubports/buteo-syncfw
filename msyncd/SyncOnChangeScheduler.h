@@ -9,7 +9,7 @@
 
 /*! \brief default timeout (in seconds) for initiating SOC
  */
-const quint32 SOC_SCHEDULE_TIMEOUT(60);
+const quint32 DEFAULT_SOC_AFTER_TIME(60);
 
 namespace Buteo
 {
@@ -31,8 +31,12 @@ public:
 
     /*! \brief Call this method to schedule SOC for a profile
      *
-     * There are 3 scheduling criteria - SOC schedule info from the
-     * profile, scheduling info from the profile, a timeout(the default)
+     * There are 3 scheduling criteria - SOC after info from the
+     * profile, default SOC after and sync now.
+     *
+     * The profile is first checked for sync on change after time, which
+     * should be specified in seconds (0 means sync now). If none is specified
+     * then we use a default of DEFAULT_SOC_AFTER_TIME
      *
      * If the profile has already been added and if it's SOC is scheduled,
      * calling this method again will just use the previous schedule, and in
@@ -56,27 +60,9 @@ public:
     /*! \brief call this method to set your own default timeout for
      * the timeout schedule criterion
      *
-     * @param aTimeout timeout in seconds
+     * @param aTime time in seconds
      */
-    void setTimeout(const quint32& aTimeout);
-
-    /*! \brief SOC schedule criteria
-     */
-    enum SOCScheduleCriteria
-    {
-        NO_SCHEDULE = -1,
-        USE_TIMEOUT,
-        USE_SOC_INFO_FROM_PROFILE,
-        USE_SCHEDULE_INFO_FROM_PROFILE,
-        SYNC_NOW,
-        NUMBER_OF_CRITERIA /* the limit */
-    };
-
-    /* \brief Set the SOC schedule criterion
-     *
-     * @param aSOCScheduleCriterion a criterion from the SOCScheduleCriteria enum
-     */
-    void setSOCScheduleCriterion(SOCScheduleCriteria aSOCScheduleCriterion);
+    void setDefaultSOCAfterTime(const quint32& aTime);
 
 private Q_SLOTS:
     /*! \brief slot to initiate sync when timeout criterion is being used
@@ -87,9 +73,8 @@ private Q_SLOTS:
     void sync(const SyncProfile* aProfile);
 
 private:
-    quint32 iTimeout;
+    quint32 iDefaultSOCAfterTime;
     QStringList iSOCProfileNames;
-    SOCScheduleCriteria iSOCScheduleCriterion;
 };
 
 class SyncOnChangeTimer : public QObject
