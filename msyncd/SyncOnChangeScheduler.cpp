@@ -7,8 +7,7 @@
 using namespace Buteo;
 
 SyncOnChangeScheduler::SyncOnChangeScheduler() :
-iTimeout(SOC_SCHEDULE_TIMEOUT),
-iSOCScheduleCriterion(USE_TIMEOUT)
+iDefaultSOCAfterTime(DEFAULT_SOC_AFTER_TIME)
 {
     FUNCTION_CALL_TRACE;
 }
@@ -22,27 +21,21 @@ bool SyncOnChangeScheduler::addProfile(const SyncProfile* aProfile)
 {
     FUNCTION_CALL_TRACE;
     bool scheduled = false;
-    // Only timeout and sync now criterion supported as of now
-    if(USE_TIMEOUT == iSOCScheduleCriterion &&
-       aProfile && !iSOCProfileNames.contains(aProfile->name()))
+    if(aProfile && !iSOCProfileNames.contains(aProfile->name()))
     {
+        qint32 time = aProfile->syncOnChangeAfter();
+        time = time != -1 ? time : iDefaultSOCAfterTime;
         iSOCProfileNames << aProfile->name();
-        SyncOnChangeTimer *SOCtimer = new SyncOnChangeTimer(aProfile, iTimeout);
+        SyncOnChangeTimer *SOCtimer = new SyncOnChangeTimer(aProfile, time);
         QObject::connect(SOCtimer, SIGNAL(timeout(SyncProfile*)),
                          this, SLOT(sync(SyncProfile*)));
         SOCtimer->fire();
         scheduled = true;
         LOG_DEBUG("Sync on change scheduled for profile"<< aProfile->name());
     }
-    else if(SYNC_NOW == iSOCScheduleCriterion &&
-             aProfile)
+    else if(aProfile)
     {
-        emit syncNow(aProfile->name());
-        scheduled = true;
-    }
-    else
-    {
-        LOG_DEBUG("Sync on change couldn't be scheduled for profile"<< aProfile->name());
+        LOG_DEBUG("Sync on change couldn't be scheduled for profile" << aProfile->name());
     }
     return scheduled;
 }
@@ -53,21 +46,10 @@ void SyncOnChangeScheduler::removeProfile(const QString &aProfileName)
     iSOCProfileNames.removeAll(aProfileName);
 }
 
-void SyncOnChangeScheduler::setTimeout(const quint32& aTimeout)
+void SyncOnChangeScheduler::setDefaultSOCAfterTime(const quint32& aTime)
 {
     FUNCTION_CALL_TRACE;
-    iTimeout = aTimeout;
-}
-
-void SyncOnChangeScheduler::setSOCScheduleCriterion(SOCScheduleCriteria aSOCScheduleCriterion)
-{
-    FUNCTION_CALL_TRACE;
-    if(aSOCScheduleCriterion > NO_SCHEDULE &&
-       aSOCScheduleCriterion < NUMBER_OF_CRITERIA)
-    {
-        iSOCScheduleCriterion = aSOCScheduleCriterion;
-    }
-    // else silently ignore
+    iDefaultSOCAfterTime = aTime;
 }
 
 void SyncOnChangeScheduler::sync(const SyncProfile* aProfile)
