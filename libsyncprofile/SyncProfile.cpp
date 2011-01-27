@@ -473,6 +473,7 @@ quint32 SyncProfile::syncOnChangeAfter() const
             }
         }
     }
+    LOG_DEBUG("Sync on change after time from profile :" << syncOnChangeAfterTime);
     return syncOnChangeAfterTime;
 }
 

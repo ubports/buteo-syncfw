@@ -27,8 +27,9 @@ bool SyncOnChangeScheduler::addProfile(const SyncProfile* aProfile)
         time = time != -1 ? time : iDefaultSOCAfterTime;
         iSOCProfileNames << aProfile->name();
         SyncOnChangeTimer *SOCtimer = new SyncOnChangeTimer(aProfile, time);
-        QObject::connect(SOCtimer, SIGNAL(timeout(SyncProfile*)),
-                         this, SLOT(sync(SyncProfile*)));
+        QObject::connect(SOCtimer, SIGNAL(timeout(const SyncProfile*)),
+                         this, SLOT(sync(const SyncProfile*)),
+                         Qt::QueuedConnection);
         SOCtimer->fire();
         scheduled = true;
         LOG_DEBUG("Sync on change scheduled for profile"<< aProfile->name());
