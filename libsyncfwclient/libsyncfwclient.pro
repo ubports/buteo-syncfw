@@ -11,7 +11,6 @@ QT += xml \
 QT -= gui
 CONFIG += dll \
     debug \
-    silent \
     create_pc \
     create_prl
 

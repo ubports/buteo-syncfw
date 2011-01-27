@@ -8,7 +8,6 @@ QT -= gui
 CONFIG += qdbus \
     debug \
     link_pkgconfig \
-    silent \
     create_pc \
     create_prl \
     mobility

@@ -9,7 +9,7 @@ QT += xml \
     dbus
 CONFIG += qdbus \
     link_pkgconfig \
-    silent
+
 PKGCONFIG += dbus-1
 LIBS += 
 
