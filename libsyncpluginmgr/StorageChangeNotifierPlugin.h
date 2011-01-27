@@ -2,6 +2,7 @@
 #define STORAGECHANGENOTIFIERPLUGIN_H
 
 #include <QObject>
+#include <QString>
 
 namespace Buteo
 {
@@ -17,12 +18,14 @@ class StorageChangeNotifierPlugin : public QObject
 
 public: 
     /*! \brief constructor
+     * @param aStorageName pass the well known sync storage name
      */
-    StorageChangeNotifierPlugin();
+    StorageChangeNotifierPlugin(const QString& aStorageName):
+    iStorageName(aStorageName){}
 
     /*! \brief destructor
      */
-    virtual ~StorageChangeNotifierPlugin() = 0;
+    virtual ~StorageChangeNotifierPlugin(){};
 
     /*! \brief the name should be a well-known name
      * which buteo sync-fw knows about as a storage that
@@ -30,7 +33,7 @@ public:
      *
      * @return well-known storage name
      */
-    virtual const QString& name() const = 0;
+    virtual QString name() const = 0;
 
     /*! \brief Check if this storage has changes since the
      * last time it was asked for the same
@@ -51,6 +54,9 @@ Q_SIGNALS:
      * it wants to emit this signal
      */
     void storageChange();
+
+protected:
+    QString iStorageName;
 };
 
 }

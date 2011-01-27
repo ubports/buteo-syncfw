@@ -129,7 +129,8 @@ bool Synchronizer::initialize()
 
     //For Sync On Change
     QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(QString)),
-                     this, SLOT(startSync(QString)));
+                     this, SLOT(startSync(QString)),
+                     Qt::QueuedConnection);
     // enable SOC for contacts only as of now
     QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
     //TODO can we do away with hard coding storage (plug-in) names, in other words do they
