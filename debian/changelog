@@ -1,3 +1,9 @@
+sync-fw (0.5.2-8) stable; urgency=low
+
+  * Fixes - removed silent option set in pro files. 
+
+ -- Mallikarjun Hunalli <mallikarjun.hunalli@nokia.com>  Thu, 27 Jan 2011 17:29:00 +0530
+
 sync-fw (0.5.2-7) stable; urgency=low
 
   * Fixes: NB#214109 - schedule synchronize is not initiating when schedule
