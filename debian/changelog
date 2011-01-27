@@ -1,6 +1,7 @@
 sync-fw (0.5.2-8) stable; urgency=low
 
   * Fixes - removed silent option set in pro files. 
+  * Use Qt::QueuedConnection to handle signals from the NetworkManager.
 
  -- Mallikarjun Hunalli <mallikarjun.hunalli@nokia.com>  Thu, 27 Jan 2011 17:29:00 +0530
 
