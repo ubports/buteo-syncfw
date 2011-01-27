@@ -8,7 +8,6 @@ QT += xml \
     dbus
 CONFIG += qdbus \
     link_pkgconfig \
-    silent \
     mobility
 
 MOBILITY += systeminfo

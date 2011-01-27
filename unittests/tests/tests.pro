@@ -36,7 +36,6 @@ include(syncfwclienttests/syncfwclienttests.pro)
 CONFIG += qtestlib \
     link_prl \
     debug \
-    silent \
     qdbus
 
 # This is needed to avoid adding the /usr/lib link directory before the
