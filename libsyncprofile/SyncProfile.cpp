@@ -574,7 +574,9 @@ void SyncProfile::setSyncRetryAttemp(int aRetry)
 
 bool SyncProfile::needNextAttempt() const
 {
-    return d_ptr->mSyncRetryCount < d_ptr->mSyncRetryIntervals.count();
+    //return d_ptr->mSyncRetryCount < d_ptr->mSyncRetryIntervals.count();
+    // TODO: AAB guys need to rework the patch. Not allowing next attempts now.
+    return false;
 }
 
 void SyncProfile::setNextAttempt()
