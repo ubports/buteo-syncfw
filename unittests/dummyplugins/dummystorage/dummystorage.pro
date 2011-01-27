@@ -7,8 +7,7 @@ INCLUDEPATH += . \
     ../../../libsyncpluginmgr \
     ../../../libsyncprofile
 
-CONFIG += plugin silent
-
+CONFIG += plugin
 QT -= gui
 
 #input
