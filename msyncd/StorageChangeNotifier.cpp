@@ -62,7 +62,17 @@ bool StorageChangeNotifier::startListen(QStringList& aFailedStorages)
 void StorageChangeNotifier::stopListen()
 {
     FUNCTION_CALL_TRACE;
-    QObject::disconnect();
+    StorageChangeNotifierPlugin* plugin = 0;
+    this->disconnect();
+    for(QHash<QString,StorageChangeNotifierPlugin*>::iterator storageNameItr = iNotifierMap.begin();
+        storageNameItr != iNotifierMap.end(); ++storageNameItr)
+    {
+        plugin = storageNameItr.value();
+        if(plugin)
+        {
+            QObject::disconnect(plugin, 0, this, 0);
+        }
+    }
 }
 
 void StorageChangeNotifier::storageChanged()
@@ -72,6 +82,23 @@ void StorageChangeNotifier::storageChanged()
     if(plugin)
     {
         LOG_DEBUG("Change in storage" << plugin->name());
+        plugin->changesReceived();
         emit storageChange(plugin->name());
+    }
+}
+
+void StorageChangeNotifier::checkForChanges()
+{
+    FUNCTION_CALL_TRACE;
+    StorageChangeNotifierPlugin* plugin = 0;
+    for(QHash<QString,StorageChangeNotifierPlugin*>::iterator storageNameItr = iNotifierMap.begin();
+        storageNameItr != iNotifierMap.end(); ++storageNameItr)
+    {
+        plugin = storageNameItr.value();
+        if(plugin && plugin->hasChanges())
+        {
+            plugin->changesReceived();
+            emit storageChange(plugin->name());
+        }
     }
 }

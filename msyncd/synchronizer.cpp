@@ -378,6 +378,12 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
         LOG_WARNING( "Could not find client sub-profile" );
         return false;
     }
+
+    LOG_DEBUG("Disable sync on change");
+    //As sync is ongoing, disable sync on change for now, we can query later if
+    //there are changes.
+    iSyncOnChange.disable();
+
     PluginRunner *pluginRunner = new ClientPluginRunner(
             clientProfile->name(), aSession->profile(), &iPluginManager, this,
             this);
@@ -525,6 +531,10 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
     }
 
     emit syncStatus(aProfileName, aStatus, aMessage, aErrorCode);
+
+    //Re-enable sync on change
+    iSyncOnChange.disableNextSyncOnChange(aProfileName);
+    iSyncOnChange.reenable(); 
 
     // Try starting new sync sessions waiting in the queue.
     while (startNextSync())
@@ -1150,6 +1160,11 @@ void Synchronizer::onNewSession(const QString &aDestination)
         SyncSession *session = new SyncSession(profile, this);
         if (session != 0)
         {
+            LOG_DEBUG("Disable sync on change");
+            //As sync is ongoing, disable sync on change for now, we can query later if
+            //there are changes.
+            iSyncOnChange.disable();
+
             session->setProfileCreated(createNewProfile);
             // disable all storages
             // @todo : Can we remove hardcoding of the storageNames ???

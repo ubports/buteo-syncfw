@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QHash>
+#include <QStringList>
 
 namespace Buteo
 {
@@ -46,9 +47,23 @@ public:
                 SyncOnChangeScheduler* aSOCScheduler,
                 PluginManager* aPluginManager, QStringList& aFailedStorages);
 
+    /*! If the storage change notifier plug-in's have already been loaded,
+     * call this to re-enable sync on change. Handy to call after a disable.
+     *
+     * This also checks if there were changes when SOC was disabled, and notifies
+     * if there were any
+     */
+    void reenable();
+
     /*! \brief disable sync on change
      */
     void disable();
+
+    /*! \brief disable the next (only the next one) sync on change for a profile
+     *
+     * @param aProfileName name of the profile
+     */
+    void disableNextSyncOnChange(const QString& aProfileName);
 
 public Q_SLOTS:
     /*! initiate sync for this storage
@@ -70,6 +85,7 @@ private:
     StorageChangeNotifier* iStorageChangeNotifier;
     QHash<QString,QList<SyncProfile*> > iSOCStorageMap;
     SyncOnChangeScheduler* iSOCScheduler;
+    QStringList iSOCDisabledProfiles;
 };
 
 }

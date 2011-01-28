@@ -7,9 +7,9 @@
 
 #include "SyncScheduler.h"
 
-/*! \brief default timeout (in seconds) for initiating SOC
+/*! \brief default timeout (in seconds) for initiating SOC - 5 mins
  */
-const quint32 DEFAULT_SOC_AFTER_TIME(60);
+const quint32 DEFAULT_SOC_AFTER_TIME(5*60);
 
 namespace Buteo
 {
