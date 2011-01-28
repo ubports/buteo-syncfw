@@ -4,8 +4,6 @@
 #include "StorageChangeNotifier.h"
 #include "LogMacros.h"
 
-#include <QStringList>
-
 using namespace Buteo;
 
 SyncOnChange::SyncOnChange() :
@@ -19,6 +17,8 @@ SyncOnChange::~SyncOnChange()
 {
     FUNCTION_CALL_TRACE;
     QStringList storages;
+
+    disable();
 
     storages = getSOCStorageNames();
     for(QStringList::const_iterator storageItr = storages.constBegin();
@@ -54,6 +54,20 @@ bool SyncOnChange::enable(const QHash<QString,QList<SyncProfile*> >& aSOCStorage
                          this, SLOT(sync(QString)));
     }
     return enabled;
+}
+
+void SyncOnChange::reenable()
+{
+    FUNCTION_CALL_TRACE;
+    if(iStorageChangeNotifier)
+    {
+        QObject::connect(iStorageChangeNotifier, SIGNAL(storageChange(QString)),
+                         this, SLOT(sync(QString)));
+        QStringList aFailedStorages;
+        bool enabled = iStorageChangeNotifier->startListen(aFailedStorages);
+        Q_UNUSED(enabled);
+        iStorageChangeNotifier->checkForChanges();
+    }
 }
 
 void SyncOnChange::disable()
@@ -104,8 +118,23 @@ void SyncOnChange::sync(QString aStorageName)
     for(QList<SyncProfile*>::iterator profileItr = profilesList.begin();
         profileItr != profilesList.end(); ++profileItr)
     {
-        LOG_DEBUG("Schedule sync on change for storage" << aStorageName
-                   << "for profile" << (*profileItr)->name());
-        iSOCScheduler->addProfile(*profileItr);
+        if(!iSOCDisabledProfiles.contains((*profileItr)->name()))
+        {
+            LOG_DEBUG("Schedule sync on change for storage" << aStorageName
+                       << "for profile" << (*profileItr)->name());
+            iSOCScheduler->addProfile(*profileItr);
+        }
+        else
+        {
+            LOG_DEBUG("sync on change disabled for profile" << aStorageName);
+            iSOCDisabledProfiles.removeAll((*profileItr)->name());
+        }
     }
+}
+
+void SyncOnChange::disableNextSyncOnChange(const QString& aProfileName)
+{
+    FUNCTION_CALL_TRACE;
+    LOG_DEBUG("Disable next SOC for profile" << aProfileName);
+    iSOCDisabledProfiles << aProfileName;
 }

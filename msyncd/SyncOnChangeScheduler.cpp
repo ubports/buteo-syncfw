@@ -36,7 +36,7 @@ bool SyncOnChangeScheduler::addProfile(const SyncProfile* aProfile)
     }
     else if(aProfile)
     {
-        LOG_DEBUG("Sync on change couldn't be scheduled for profile" << aProfile->name());
+        LOG_DEBUG("Sync on change already scheduled for profile" << aProfile->name());
     }
     return scheduled;
 }

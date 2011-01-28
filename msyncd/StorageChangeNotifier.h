@@ -49,6 +49,10 @@ public:
      */
     void stopListen();
 
+    /*! Manually check and notify changes in storage
+     */
+    void checkForChanges();
+
 private Q_SLOTS:
     /*! \brief process a storage change notification
      */
