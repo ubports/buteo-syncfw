@@ -1,3 +1,13 @@
+sync-fw (0.5.3) stable; urgency=low
+
+  * 1. Please try to use 3 digits for the version x.y.z - 0.0.1
+  * 2. When something significant happens (sprint, X-something review) increase second digit - 0.1.0
+  * 3. When something very significant happens (dali release, etc) increase  first digit - 1.0.0
+  * 4. Whenever regular changes in the code are done (bugfixes, minor
+       features implemented) please always increment the last digit - 0.0.2.
+
+ -- Mallikarjun Hunalli <mallikarjun.hunalli@nokia.com>  Mon, 31 Jan 2011 17:29:00 +0530
+
 sync-fw (0.5.2-8) stable; urgency=low
 
   * Fixes - removed silent option set in pro files. 
