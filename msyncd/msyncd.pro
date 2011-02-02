@@ -70,7 +70,10 @@ HEADERS += ServerActivator.h \
     SyncAlarmInventory.h \
     NetworkManager.h \
     IPHeartBeat.h \
-    SyncSigHandler.h
+    SyncSigHandler.h \
+    StorageChangeNotifier.h \
+    SyncOnChange.h \
+    SyncOnChangeScheduler.h
 
 SOURCES += ServerActivator.cpp \
     TransportTracker.cpp \
@@ -92,7 +95,10 @@ SOURCES += ServerActivator.cpp \
     SyncAlarmInventory.cpp \
     NetworkManager.cpp \
     IPHeartBeat.cpp \
-    SyncSigHandler.cpp
+    SyncSigHandler.cpp \
+    StorageChangeNotifier.cpp \
+    SyncOnChange.cpp \
+    SyncOnChangeScheduler.cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \

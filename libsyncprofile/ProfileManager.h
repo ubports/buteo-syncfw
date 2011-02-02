@@ -202,6 +202,17 @@ public:
     QList<SyncProfile*> getSyncProfilesByStorage(
         const QString &aStorageName, bool aStorageMustBeEnabled = false);
 
+    /*! \brief Gets profiles interested in sync on change for a storage
+     *
+     * Returns all enabled and visible sync profiles of online destinations
+     * Device-to-device sync profiles are not returned.
+     * \param aStorageName Name of the storage
+     * \return List of matching profiles. Caller is responsible for deleting
+     *  the returned profile objects.
+     */
+    QList<SyncProfile*> getSOCProfilesForStorage(
+        const QString &aStorageName);
+
     /*! \brief Expands the given profile.
      *
      * Loads and merges all sub-profiles that are referenced from the main

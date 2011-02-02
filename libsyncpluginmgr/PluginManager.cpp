@@ -30,39 +30,11 @@
 #include "StoragePlugin.h"
 #include "ServerPlugin.h"
 #include "ClientPlugin.h"
+#include "StorageChangeNotifierPlugin.h"
 
 #include "LogMacros.h"
 
 using namespace Buteo;
-
-// Location filters of plugin maps
-const QString STORAGEMAP_LOCATION = "-storage.so";
-const QString CLIENTMAP_LOCATION = "-client.so";
-const QString SERVERMAP_LOCATION = "-server.so";
-
-// Default directory from which to look for plugins
-const QString PluginManager::DEFAULT_PLUGIN_PATH = "/usr/lib/sync/";
-
-// The name of the function which is used to create a plugin
-const QString CREATE_FUNCTION = "createPlugin";
-
-// The name of the function which is used to destroy a plugin
-const QString DESTROY_FUNCTION = "destroyPlugin";
-
-typedef ClientPlugin* (*FUNC_CREATE_CLIENT)( const QString&,
-                                             const SyncProfile&,
-                                             PluginCbInterface* );
-typedef void (*FUNC_DESTROY_CLIENT)( ClientPlugin* );
-
-typedef ServerPlugin* (*FUNC_CREATE_SERVER)( const QString&,
-                                             const Profile&,
-                                             PluginCbInterface* );
-typedef void (*FUNC_DESTROY_SERVER)( ServerPlugin* );
-
-typedef StoragePlugin* (*FUNC_CREATE_STORAGE)(const QString&);
-typedef void (*FUNC_DESTROY_STORAGE)(StoragePlugin*);
-
-
 
 PluginManager::PluginManager( const QString &aPluginPath )
  : iPluginPath( aPluginPath )
@@ -74,6 +46,7 @@ PluginManager::PluginManager( const QString &aPluginPath )
         iPluginPath.append('/');
     }
 
+    loadPluginMaps( STORAGECHANGENOTIFIERMAP_LOCATION, iStorageChangeNotifierMaps );
     loadPluginMaps( STORAGEMAP_LOCATION, iStorageMaps );
     loadPluginMaps( CLIENTMAP_LOCATION, iClientMaps );
     loadPluginMaps( SERVERMAP_LOCATION, iServerMaps );
@@ -93,6 +66,81 @@ PluginManager::~PluginManager()
 
 }
 
+StorageChangeNotifierPlugin* PluginManager::createStorageChangeNotifier( const QString& aStorageName )
+{
+    FUNCTION_CALL_TRACE;
+
+    QString libraryName = iStorageChangeNotifierMaps[aStorageName];
+
+    if( libraryName.isEmpty() )
+    {
+        LOG_CRITICAL( "Library for the storage change notifier" << aStorageName << "does not exist" );
+        return NULL;
+    }
+
+    void* handle = loadDll( libraryName );
+
+    if( !handle ) {
+        return NULL;
+    }
+
+    FUNC_CREATE_STORAGECHANGENOTIFIER storageChangeNotifierPointer = ( FUNC_CREATE_STORAGECHANGENOTIFIER)dlsym(
+                                                                       handle,
+                                                                       CREATE_FUNCTION.toStdString().
+                                                                       c_str() );
+
+    if( dlerror() )
+    {
+        LOG_CRITICAL( "Library" << libraryName << "does not have a create function" );
+        unloadDll( libraryName );
+        return NULL;
+    }
+
+    StorageChangeNotifierPlugin* plugin = (*storageChangeNotifierPointer)(aStorageName);
+
+    if( plugin ) {
+        return plugin;
+    }
+    else {
+        LOG_CRITICAL( "Could not create plugin instance" );
+        unloadDll( libraryName );
+        return NULL;
+    }
+}
+
+void PluginManager::destroyStorageChangeNotifier( StorageChangeNotifierPlugin* aPlugin )
+{
+    FUNCTION_CALL_TRACE;
+
+    if ( aPlugin == 0 )
+        return;
+
+    QString storageName = aPlugin->name();
+
+    QString path = iStorageChangeNotifierMaps[storageName];
+
+    void* handle = getDllHandle( path );
+
+    if( !handle ) {
+        LOG_CRITICAL( "Could not find library for storage plugin" << storageName );
+        return;
+    }
+
+    FUNC_DESTROY_STORAGECHANGENOTIFIER storageChangeNotifierDestroyer = (FUNC_DESTROY_STORAGECHANGENOTIFIER)dlsym(
+                                                                         handle,
+                                                                         DESTROY_FUNCTION.toStdString().
+                                                                         c_str());
+
+    if (dlerror()) {
+        unloadDll( path );
+        LOG_CRITICAL( "Library" << path << "does not have a destroy function" );
+    }
+    else {
+        (*storageChangeNotifierDestroyer)(aPlugin);
+        unloadDll( path );
+    }
+
+}
 StoragePlugin* PluginManager::createStorage( const QString& aPluginName )
 {
     FUNCTION_CALL_TRACE;
