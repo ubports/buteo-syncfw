@@ -27,6 +27,9 @@
 #include <QMutex>
 #include <SyncResults.h>
 
+#include "SignOn/AuthService"
+#include "SignOn/Identity"
+
 namespace Buteo {
 
 class ClientPlugin;
@@ -102,16 +105,38 @@ private:
 
     SyncResults iSyncResults;
     
-    bool iRunning;
+    SignOn::Identity *iIdentity;
+    SignOn::AuthService *iService;
+    SignOn::AuthSession *iSession;
+    QString iProvider;
     
+    bool iRunning;
+
     mutable QMutex iMutex;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class ClientThreadTest;
 #endif
 
+    /*!
+     * \brief invokes iClientPlugin->startSync()
+     *
+     * It should be called when profile is ready for use, with
+     * credentials set in the Username/Password keys.  It is called
+     * either in run() or, if the Username key starts with the
+     * "sso-provider=" prefix, after retrieving the credentials from
+     * SSO (queryIdentities() -> identities() -> session ->
+     * identityResponse() -> startSync()).
+     *
+     * @return true for success (run thread), else failure (running
+     * thread is no longer necessary)
+     */
+    bool startSync();
 
-
+private slots:
+    void identities(const QList<SignOn::IdentityInfo> &identityList);
+    void identityResponse(const SignOn::SessionData &session);
+    void identityError(SignOn::Error error);
 };
 
 }

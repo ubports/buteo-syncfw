@@ -1,3 +1,10 @@
+sync-fw (0.5.4) stable; urgency=low
+
+  * Retrieve username and plaintext password from the SSO framework for online
+    sync profiles.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Wed, 02 Feb 2011 17:29:00 +0530
+
 sync-fw (0.5.3) stable; urgency=low
 
   * 1. Please try to use 3 digits for the version x.y.z - 0.0.1

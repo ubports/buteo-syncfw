@@ -28,7 +28,8 @@ INCLUDEPATH += . \
     /usr/include/accounts-qt \
     /usr/include/iphbd/ \
     
-PKGCONFIG += dbus-1
+PKGCONFIG += dbus-1 libsignon-qt
+
 QMAKE_LIBDIR_QT += ../libsyncprofile/
 
 LIBS += -L../libsyncpluginmgr \
