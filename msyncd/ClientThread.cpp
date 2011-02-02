@@ -29,6 +29,9 @@ using namespace Buteo;
 
 ClientThread::ClientThread()
  : iClientPlugin( 0 ),
+   iIdentity(NULL),
+   iService(NULL),
+   iSession(NULL),
    iRunning(false)
 {
     FUNCTION_CALL_TRACE;
@@ -37,6 +40,10 @@ ClientThread::ClientThread()
 ClientThread::~ClientThread()
 {
     FUNCTION_CALL_TRACE;
+    if (iSession) {
+        iIdentity->destroySession(iSession);
+    }
+    delete iIdentity;
 }
 
 QString ClientThread::getProfileName() const
@@ -78,11 +85,31 @@ bool ClientThread::startThread( ClientPlugin* aClientPlugin )
     }
 
     iClientPlugin = aClientPlugin;
+    if (iClientPlugin == 0)
+    {
+        LOG_CRITICAL("Client plugin is NULL");
+        return false;
+    }
 
-    // Move to client thread
-    iClientPlugin->moveToThread( this );
-
-    start();
+    SyncProfile &profile = iClientPlugin->profile();
+    const QString prefix("sso-provider=");
+    QString username = profile.key("Username");
+    if (username.startsWith(prefix)) {
+        // Look up real username/password in SSO first,
+        // before starting sync. This is better done
+        // in the application thread, because this is where
+        // this instance lives.
+        iProvider = username.mid(prefix.size());
+        LOG_DEBUG("SSO provider::" << iProvider);
+        iService = new SignOn::AuthService(this);
+        connect(iService, SIGNAL(identities(const QList<SignOn::IdentityInfo> &)),
+                this, SLOT(identities(const QList<SignOn::IdentityInfo> &)));
+        iService->queryIdentities();
+    } else {
+        // Move to client thread
+        iClientPlugin->moveToThread( this );
+        start();
+    }
 
     return true;
 }
@@ -98,18 +125,12 @@ void ClientThread::run()
 {
     FUNCTION_CALL_TRACE;
 
-    if (iClientPlugin == 0)
-    {
-        LOG_CRITICAL("Client plugin is NULL");
-        return;
-    }
-
     if( !iClientPlugin->init() ) {
         LOG_DEBUG( "Could not initialize client plugin:" << iClientPlugin->getPluginName() );
         emit initError( getProfileName(), "", 0 );
         return;
     }
-
+    
     if( !iClientPlugin->startSync() ) {
         LOG_DEBUG( "Could not start client plugin:" << iClientPlugin->getPluginName() );
         emit initError( getProfileName(), "", 0 );
@@ -132,11 +153,56 @@ void ClientThread::run()
 
 }
 
-
 SyncResults ClientThread::getSyncResults()
 {
     FUNCTION_CALL_TRACE;
 
 	return iSyncResults;
+}
+
+void ClientThread::identities(const QList<SignOn::IdentityInfo> &identityList)
+{
+    FUNCTION_CALL_TRACE;
+
+    for (int i = 0; i < identityList.size(); ++i) {
+        const SignOn::IdentityInfo &info = identityList.at(i);
+        LOG_DEBUG("Signon identity::" << info.caption());
+        if (info.caption() == iProvider) {
+            iIdentity = SignOn::Identity::existingIdentity(info.id(), this);
+            // Setup an authentication session using the "password" method
+            iSession =
+                iIdentity->createSession(QLatin1String("password"));
+            connect(iSession, SIGNAL(response(const SignOn::SessionData &)),
+                    this, SLOT(identityResponse(const SignOn::SessionData &)));
+            connect(iSession, SIGNAL(error(SignOn::Error)),
+                    this, SLOT(identityError(SignOn::Error)));
+            // Get the password!
+            iSession->process(SignOn::SessionData(), QLatin1String("password"));
+            return;
+        }
+    }
+    emit initError( getProfileName(), "credentials not found in SSO", 0 );
+}
+
+void ClientThread::identityResponse(const SignOn::SessionData &sessionData)
+{
+    FUNCTION_CALL_TRACE;
+
+    // temporarily set real username/password, then invoke client
+    SyncProfile &profile = iClientPlugin->profile();
+    LOG_DEBUG("Username::" << sessionData.UserName());
+    profile.setKey("Username", sessionData.UserName());
+    profile.setKey("Password", sessionData.Secret());
+
+    // delayed starting of thread
+    iClientPlugin->moveToThread( this );
+    start();
+}
+
+void ClientThread::identityError(SignOn::Error err)
+{
+    FUNCTION_CALL_TRACE;
+
+    emit initError( getProfileName(), err.message(), 0 );
 }
 

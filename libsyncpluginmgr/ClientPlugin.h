@@ -63,6 +63,9 @@ public:
      */
     virtual bool startSync() = 0;
 
+    /*! \brief access to profile owned and used by this instance
+     */
+    SyncProfile &profile() { return iProfile; }
 
 protected:
 
