@@ -56,7 +56,7 @@ bool SyncOnChange::enable(const QHash<QString,QList<SyncProfile*> >& aSOCStorage
     return enabled;
 }
 
-void SyncOnChange::reenable()
+void SyncOnChange::enable()
 {
     FUNCTION_CALL_TRACE;
     if(iStorageChangeNotifier)
