@@ -7,10 +7,6 @@
 
 #include "SyncScheduler.h"
 
-/*! \brief default timeout (in seconds) for initiating SOC - 5 mins
- */
-const quint32 DEFAULT_SOC_AFTER_TIME(5*60);
-
 namespace Buteo
 {
 
@@ -57,13 +53,6 @@ public:
      */
     void removeProfile(const QString &aProfileName);
 
-    /*! \brief call this method to set your own default timeout for
-     * the timeout schedule criterion
-     *
-     * @param aTime time in seconds
-     */
-    void setDefaultSOCAfterTime(const quint32& aTime);
-
 private Q_SLOTS:
     /*! \brief slot to initiate sync when timeout criterion is being used
      * and the timeout occurs
@@ -73,7 +62,6 @@ private Q_SLOTS:
     void sync(const SyncProfile* aProfile);
 
 private:
-    quint32 iDefaultSOCAfterTime;
     QStringList iSOCProfileNames;
 };
 

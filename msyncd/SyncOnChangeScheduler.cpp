@@ -6,8 +6,7 @@
 
 using namespace Buteo;
 
-SyncOnChangeScheduler::SyncOnChangeScheduler() :
-iDefaultSOCAfterTime(DEFAULT_SOC_AFTER_TIME)
+SyncOnChangeScheduler::SyncOnChangeScheduler()
 {
     FUNCTION_CALL_TRACE;
 }
@@ -24,7 +23,6 @@ bool SyncOnChangeScheduler::addProfile(const SyncProfile* aProfile)
     if(aProfile && !iSOCProfileNames.contains(aProfile->name()))
     {
         qint32 time = aProfile->syncOnChangeAfter();
-        time = time != -1 ? time : iDefaultSOCAfterTime;
         iSOCProfileNames << aProfile->name();
         SyncOnChangeTimer *SOCtimer = new SyncOnChangeTimer(aProfile, time);
         QObject::connect(SOCtimer, SIGNAL(timeout(const SyncProfile*)),
@@ -45,12 +43,6 @@ void SyncOnChangeScheduler::removeProfile(const QString &aProfileName)
 {
     FUNCTION_CALL_TRACE;
     iSOCProfileNames.removeAll(aProfileName);
-}
-
-void SyncOnChangeScheduler::setDefaultSOCAfterTime(const quint32& aTime)
-{
-    FUNCTION_CALL_TRACE;
-    iDefaultSOCAfterTime = aTime;
 }
 
 void SyncOnChangeScheduler::sync(const SyncProfile* aProfile)

@@ -135,14 +135,12 @@ bool Synchronizer::initialize()
     QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
     //TODO can we do away with hard coding storage (plug-in) names, in other words do they
     //have to be well known this way
-    QList<SyncProfile*> SOCProfiles = iProfileManager.getSOCProfilesForStorage("hcontacts");
+    QList<SyncProfile*> SOCProfiles = iProfileManager.getSOCProfilesForStorage("./contacts");
     if(SOCProfiles.count())
     {
+        // TODO Come up with a scheme to avoid hard-coding, this is not done just here
+        // but also for storage plug-ins in onStorageAquired
         aSOCStorageMap["hcontacts"] = SOCProfiles;
-        foreach(const SyncProfile* aProfile, SOCProfiles)
-        {
-            LOG_DEBUG("Profile" << aProfile->name() <<"interested in SOC for contacts");
-        }
         QStringList aFailedStorages;
         bool isSOCEnabled = iSyncOnChange.enable(aSOCStorageMap, &iSyncOnChangeScheduler,
                                                  &iPluginManager, aFailedStorages);
@@ -150,9 +148,13 @@ bool Synchronizer::initialize()
         {
             foreach(const QString& aStorageName, aFailedStorages)
             {
-                LOG_WARNING("Sync on change couldn't be enabled for storage" << aStorageName);
+                LOG_CRITICAL("Sync on change couldn't be enabled for storage" << aStorageName);
             }
         }
+    }
+    else
+    {
+        LOG_DEBUG("No profiles interested in SOC");
     }
     return true;
 }
@@ -534,7 +536,7 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
 
     //Re-enable sync on change
     iSyncOnChange.disableNextSyncOnChange(aProfileName);
-    iSyncOnChange.reenable(); 
+    iSyncOnChange.enable(); 
 
     // Try starting new sync sessions waiting in the queue.
     while (startNextSync())

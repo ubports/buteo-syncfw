@@ -53,7 +53,7 @@ public:
      * This also checks if there were changes when SOC was disabled, and notifies
      * if there were any
      */
-    void reenable();
+    void enable();
 
     /*! \brief disable sync on change
      */

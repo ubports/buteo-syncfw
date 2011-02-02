@@ -598,14 +598,20 @@ QList<SyncProfile*> ProfileManager::getSOCProfilesForStorage(
     onlineService.iValue = VALUE_ONLINE;
     criteriaList.append(onlineService);
 
-    // Storage must be supported and the profile should be interested
-    // in SOC for this storage
+    // The profile should be interested
+    // in SOC
+    SearchCriteria socSupported;
+    socSupported.iSubProfileType = Profile::TYPE_SERVICE;
+    socSupported.iType = SearchCriteria::EQUAL;
+    socSupported.iKey = KEY_SOC;
+    socSupported.iValue = BOOLEAN_TRUE;
+    criteriaList.append(socSupported);
+
     SearchCriteria storageSupported;
-    storageSupported.iSubProfileName = aStorageName;
     storageSupported.iSubProfileType = Profile::TYPE_STORAGE;
     storageSupported.iType = SearchCriteria::EQUAL;
-    storageSupported.iKey = KEY_SOC;
-    storageSupported.iValue = BOOLEAN_TRUE;
+    storageSupported.iKey = KEY_LOCAL_URI;
+    storageSupported.iValue = aStorageName;
     criteriaList.append(storageSupported);
 
     return getSyncProfilesByData(criteriaList);
