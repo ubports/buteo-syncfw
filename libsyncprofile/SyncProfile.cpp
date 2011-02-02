@@ -455,6 +455,28 @@ SyncProfile::SyncDirection SyncProfile::syncDirection() const
     return dir;
 }
 
+quint32 SyncProfile::syncOnChangeAfter() const
+{
+    quint32 syncOnChangeAfterTime = -1;
+
+    const Profile *client = clientProfile();
+    if (client)
+    {
+        QString time = client->key(KEY_SOC_AFTER);
+        if(!time.isEmpty())
+        {
+            bool ok = false;
+            syncOnChangeAfterTime = time.toUInt(&ok);
+            if(false == ok)
+            {
+                syncOnChangeAfterTime = -1;
+            }
+        }
+    }
+    LOG_DEBUG("Sync on change after time from profile :" << syncOnChangeAfterTime);
+    return syncOnChangeAfterTime;
+}
+
 void SyncProfile::setSyncDirection(SyncDirection aDirection)
 {
     QString dirStr;

@@ -33,7 +33,8 @@ HEADERS += ClientPlugin.h \
 	StorageItem.h \
 	StoragePlugin.h \
 	SyncPluginBase.h \
-    DeletedItemsIdStorage.h   
+    DeletedItemsIdStorage.h \
+    StorageChangeNotifierPlugin.h
 
 SOURCES += ClientPlugin.cpp \
 	PluginManager.cpp \
@@ -66,7 +67,8 @@ headers.files = ClientPlugin.h \
     StorageItem.h \
     StoragePlugin.h \
     SyncPluginBase.h \
-    DeletedItemsIdStorage.h
+    DeletedItemsIdStorage.h \
+    StorageChangeNotifierPlugin.h
 INSTALLS += target headers
 
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig

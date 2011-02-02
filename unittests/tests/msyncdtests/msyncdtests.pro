@@ -50,7 +50,10 @@ SOURCES += ServerThread.cpp \
     NetworkManager.cpp \
     IPHeartBeatTest.cpp \
     SyncSigHandler.cpp \
-    SyncSigHandlerTest.cpp
+    SyncSigHandlerTest.cpp \
+    SyncOnChange.cpp \
+    SyncOnChangeScheduler.cpp \
+    StorageChangeNotifier.cpp
 
 HEADERS += ServerThread.h \
     ServerThreadTest.h \
@@ -87,7 +90,10 @@ HEADERS += ServerThread.h \
     NetworkManager.h \
     IPHeartBeatTest.h \
     SyncSigHandler.h \
-    SyncSigHandlerTest.h
+    SyncSigHandlerTest.h \
+    SyncOnChange.h \
+    SyncOnChangeScheduler.h \
+    StorageChangeNotifier.h
 
 OTHER_FILES += 
 
