@@ -1,3 +1,9 @@
+sync-fw (0.5.5) stable; urgency=low
+
+   * Fixes: NB#201619 - Synchronization is stuck in the progress indicator screen when the internet is interrupted while sync.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Thu, 03 Feb 2011 17:29:00 +0530
+
 sync-fw (0.5.4) stable; urgency=low
 
   * Retrieve username and plaintext password from the SSO framework for online

@@ -973,6 +973,9 @@ void Synchronizer::startServer(const QString &aProfileName)
     connect(iTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)),
             pluginRunner, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)));
 
+    connect(iTransportTracker, SIGNAL(networkStateChanged(bool)),
+            this, SLOT(onNetworkStateChanged(bool)));
+
     connect(pluginRunner, SIGNAL(done()), this, SLOT(onServerDone()));
 
     connect(pluginRunner, SIGNAL(newSession(const QString &)),
@@ -1402,4 +1405,29 @@ void Synchronizer::restoreProfileCounter(SyncProfile* aProfile)
         }
     }
 }
+
+void Synchronizer::onNetworkStateChanged(bool aState)
+{
+    FUNCTION_CALL_TRACE;
+    if(!aState) {
+        QList<QString> profiles = iActiveSessions.keys();        
+        foreach(QString profileId, profiles)
+        {
+            //Getting profile
+            SyncProfile *profile = iProfileManager.syncProfile (profileId);
+            if ((profile) && (profile->destinationType() ==
+                            Buteo::SyncProfile::DESTINATION_TYPE_ONLINE))
+            {
+                iActiveSessions[profileId]->abort(Sync::SYNC_ERROR);
+                delete profile;
+                profile = NULL;
+            }
+            else {
+
+                LOG_DEBUG("No profile found with aProfileId"<<profileId);
+            }
+        }
+    }
+}
+
 

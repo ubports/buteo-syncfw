@@ -147,13 +147,13 @@ void ClientPluginRunner::stop()
     }
 }
 
-void ClientPluginRunner::abort()
+void ClientPluginRunner::abort(Sync::SyncStatus aStatus)
 {
     FUNCTION_CALL_TRACE;
 
     if (iPlugin != 0)
     {
-        iPlugin->abortSync();
+        iPlugin->abortSync(aStatus);
     }
 }
 

@@ -173,7 +173,6 @@ void NetworkManager::slotSessionState(QNetworkSession::State status)
         break;
     case QNetworkSession::Disconnected:
         LOG_WARNING("QNetworkSession::Disconnected");
-        emit connectionError();
         m_isSessionActive = false;
         break;
     case QNetworkSession::Roaming:

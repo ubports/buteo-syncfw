@@ -71,6 +71,12 @@ signals:
      */
 	void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
 
+    /*! \brief Signal emitted when a n/w state changes
+     *
+     * @param aState New state. True if available, false if not.
+     */
+    void networkStateChanged(bool aState);
+
     /*! \brief Signal emitted when a network session is successfully opened
      */
     void sessionConnected();

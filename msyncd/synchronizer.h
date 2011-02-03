@@ -214,6 +214,8 @@ private slots:
      */
     void stopServer(const QString &aProfileName);
 
+    void onNetworkStateChanged(bool aState);
+
 private:
 
     bool startSync(const QString &aProfileName, bool aScheduled);
