@@ -136,15 +136,31 @@ public:
      */
     void setInterval(unsigned aInterval);
 
-    /*! \brief Checks if rush hours are enabled.
+    /*! \brief Checks if normal schedule is obeyed.
      *
-     * \return Are rush hours enabled.
+     * \return Normal schedule is obeyed. Return value false corresponds to "manual" mode.
+     */
+    bool enabled() const;
+
+    /*! \brief Sets if normal schedule is to be obeyed.
+     *
+     * \param aEnabled Specify ifnormal scheduling hours enabled. If set to false, corresponds to "manual" mode.
+     */
+    void setEnabled(bool aEnabled);
+
+
+    // ============== RUSH HOUR SETTINGS ============================
+
+
+    /*! \brief Checks if rush hour schedule is to be obeyed.
+     *
+     * \return True if rush hour schedule is to be used. False, if rush hour scheduling is off (i.e. manual mode).
      */
     bool rushEnabled() const;
 
-    /*! \brief Sets if rush hours are enabled.
+    /*! \brief Sets rush hour schedule is to be obeyed.
      *
-     * \param aEnabled Are rush hours enabled.
+     * \param aEnabled If set to false, corresponds to rush hour scheduling off, i.e. "manual" sync.
      */
     void setRushEnabled(bool aEnabled);
 

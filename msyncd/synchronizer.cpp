@@ -649,7 +649,7 @@ bool Synchronizer::removeProfile(QString aProfileId)
             }
         }
 
-        if (profile->syncType() == SyncProfile::SYNC_SCHEDULED){
+        if (profile->syncType() == SyncProfile::SYNC_SCHEDULED) {
             iSyncScheduler->removeProfile(aProfileId);
         }
 

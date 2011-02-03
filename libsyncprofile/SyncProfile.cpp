@@ -236,7 +236,8 @@ void SyncProfile::addResults(const SyncResults &aResults)
 
 SyncProfile::SyncType SyncProfile::syncType() const
 {
-    return boolKey(KEY_SYNC_SCHEDULED) ? SYNC_SCHEDULED : SYNC_MANUAL;
+    // Sync schedule is enabled for peak or manual -> it is scheduled type.
+    return (d_ptr->iSchedule.enabled() || d_ptr->iSchedule.rushEnabled()) ? SYNC_SCHEDULED : SYNC_MANUAL;;
 }
 
 void SyncProfile::setSyncType(SyncType aType)

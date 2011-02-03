@@ -32,7 +32,7 @@ using namespace Buteo;
 static const QString DAY_SEPARATOR = ",";
 
 SyncSchedulePrivate::SyncSchedulePrivate()
-:   iInterval(0), iRushInterval(0), iRushEnabled(false)
+:   iInterval(0), iEnabled(false), iRushInterval(0), iRushEnabled(false)
 {
 }
 
@@ -41,6 +41,7 @@ SyncSchedulePrivate::SyncSchedulePrivate(const SyncSchedulePrivate &aSource)
     iTime(aSource.iTime),
     iScheduleConfiguredTime(aSource.iScheduleConfiguredTime),
     iInterval(aSource.iInterval),
+    iEnabled(aSource.iEnabled),
     iRushDays(aSource.iRushDays),
     iRushBegin(aSource.iRushBegin),
     iRushEnd(aSource.iRushEnd),
@@ -64,6 +65,7 @@ SyncSchedule::SyncSchedule(const QDomElement &aRoot)
 {
     d_ptr->iTime = QTime::fromString(aRoot.attribute(ATTR_TIME), Qt::ISODate);
     d_ptr->iInterval = aRoot.attribute(ATTR_INTERVAL).toUInt();
+    d_ptr->iEnabled = (aRoot.attribute(ATTR_ENABLED) == BOOLEAN_TRUE);
     d_ptr->iDays = d_ptr->parseDays(aRoot.attribute(ATTR_DAYS));
     d_ptr->iScheduleConfiguredTime = QDateTime::fromString(aRoot.attribute(ATTR_SYNC_CONFIGURE),Qt::ISODate);
 
@@ -103,6 +105,8 @@ SyncSchedule& SyncSchedule::operator=(const SyncSchedule &aRhs)
 QDomElement SyncSchedule::toXml(QDomDocument &aDoc) const
 {
     QDomElement root = aDoc.createElement(TAG_SCHEDULE);
+    root.setAttribute(ATTR_ENABLED, d_ptr->iEnabled ? BOOLEAN_TRUE :
+        BOOLEAN_FALSE);
     root.setAttribute(ATTR_TIME, d_ptr->iTime.toString(Qt::ISODate));
     root.setAttribute(ATTR_INTERVAL, QString::number(d_ptr->iInterval));
     root.setAttribute(ATTR_DAYS, d_ptr->createDays(d_ptr->iDays));
@@ -167,6 +171,16 @@ unsigned SyncSchedule::interval() const
 void SyncSchedule::setInterval(unsigned aInterval)
 {
     d_ptr->iInterval = aInterval;
+}
+
+void SyncSchedule::setEnabled(bool aEnabled)
+{
+    d_ptr->iEnabled = aEnabled;
+}
+
+bool SyncSchedule::enabled() const
+{
+    return d_ptr->iEnabled;
 }
 
 bool SyncSchedule::rushEnabled() const
