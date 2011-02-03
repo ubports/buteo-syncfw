@@ -373,7 +373,7 @@ void SyncSessionPluginRunnerTest ::stop ()
     testValue = 3;
 }
 
-void SyncSessionPluginRunnerTest :: abort()
+void SyncSessionPluginRunnerTest :: abort(Sync::SyncStatus /*aStatus*/)
 {
     // check the value after returning to the calling function
 

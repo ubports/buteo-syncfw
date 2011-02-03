@@ -92,8 +92,9 @@ public:
     bool start();
 
     /*! \brief Aborts the session. Returns when the abort request is sent.
+     *  \param - Status.
      */
-    void abort();
+    void abort(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED);
 
     /*! \brief Stops the session. Returns when the session is stopped.
      */
