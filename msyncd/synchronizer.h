@@ -323,6 +323,8 @@ private:
      */
     void restoreProfileCounter(SyncProfile* aProfile);
 
+    bool iSOCEnabled;
+
 #ifdef SYNCFW_UNIT_TESTS
     friend class SynchronizerTest;
 #endif
