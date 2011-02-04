@@ -82,7 +82,7 @@ public:
      * \return Root element of the created XML.
      */
     QDomElement toXml(QDomDocument &aDoc) const;
-	
+
 	/*! \brief Exports the sync schedule to QString.
      *
      * \return return the Schedule as xml formatted string
@@ -140,13 +140,13 @@ public:
      *
      * \return Normal schedule is obeyed. Return value false corresponds to "manual" mode.
      */
-    bool enabled() const;
+    bool scheduleEnabled() const;
 
     /*! \brief Sets if normal schedule is to be obeyed.
      *
      * \param aEnabled Specify ifnormal scheduling hours enabled. If set to false, corresponds to "manual" mode.
      */
-    void setEnabled(bool aEnabled);
+    void setScheduleEnabled(bool aEnabled);
 
 
     // ============== RUSH HOUR SETTINGS ============================
