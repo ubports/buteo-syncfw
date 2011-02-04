@@ -51,6 +51,8 @@ public:
 
 using namespace Buteo;
 
+const quint32 DEFAULT_SOC_AFTER_TIME(5*60);
+
 SyncProfilePrivate::SyncProfilePrivate()
 :   iLog(0),
     mSyncRetryCount(0)
@@ -454,6 +456,28 @@ SyncProfile::SyncDirection SyncProfile::syncDirection() const
     }
 
     return dir;
+}
+
+quint32 SyncProfile::syncOnChangeAfter() const
+{
+    quint32 syncOnChangeAfterTime = DEFAULT_SOC_AFTER_TIME;
+
+    const Profile *service = serviceProfile();
+    if (service)
+    {
+        QString time = service->key(KEY_SOC_AFTER);
+        if(!time.isEmpty())
+        {
+            bool ok = false;
+            syncOnChangeAfterTime = time.toUInt(&ok);
+            if(false == ok)
+            {
+                syncOnChangeAfterTime = DEFAULT_SOC_AFTER_TIME;
+            }
+        }
+    }
+    LOG_DEBUG("Sync on change after time from profile :" << syncOnChangeAfterTime);
+    return syncOnChangeAfterTime;
 }
 
 void SyncProfile::setSyncDirection(SyncDirection aDirection)

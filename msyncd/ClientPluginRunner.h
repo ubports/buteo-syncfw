@@ -67,7 +67,7 @@ public:
     virtual void stop();
 
     //! @see PluginRunner::abort
-    virtual void abort();
+    virtual void abort(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED);
 
     //! @see PluginRunner::syncResults
     virtual SyncResults syncResults();

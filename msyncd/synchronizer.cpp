@@ -127,6 +127,35 @@ bool Synchronizer::initialize()
     connect(iSyncBackup, SIGNAL(startRestore()),this, SLOT(restoreStarts()));
     connect(iSyncBackup, SIGNAL(restoreDone()),this, SLOT(restoreFinished()));
 
+    //For Sync On Change
+    QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(QString)),
+                     this, SLOT(startSync(QString)),
+                     Qt::QueuedConnection);
+    // enable SOC for contacts only as of now
+    QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
+    //TODO can we do away with hard coding storage (plug-in) names, in other words do they
+    //have to be well known this way
+    QList<SyncProfile*> SOCProfiles = iProfileManager.getSOCProfilesForStorage("./contacts");
+    if(SOCProfiles.count())
+    {
+        // TODO Come up with a scheme to avoid hard-coding, this is not done just here
+        // but also for storage plug-ins in onStorageAquired
+        aSOCStorageMap["hcontacts"] = SOCProfiles;
+        QStringList aFailedStorages;
+        bool isSOCEnabled = iSyncOnChange.enable(aSOCStorageMap, &iSyncOnChangeScheduler,
+                                                 &iPluginManager, aFailedStorages);
+        if(!isSOCEnabled)
+        {
+            foreach(const QString& aStorageName, aFailedStorages)
+            {
+                LOG_CRITICAL("Sync on change couldn't be enabled for storage" << aStorageName);
+            }
+        }
+    }
+    else
+    {
+        LOG_DEBUG("No profiles interested in SOC");
+    }
     return true;
 }
 
@@ -139,6 +168,8 @@ void Synchronizer::close()
     iClosing = true;
 
     // Stop running sessions
+    iSyncOnChange.disable();
+
     QList<SyncSession*> sessions = iActiveSessions.values();
     foreach (SyncSession* session, sessions)
     {
@@ -349,6 +380,12 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
         LOG_WARNING( "Could not find client sub-profile" );
         return false;
     }
+
+    LOG_DEBUG("Disable sync on change");
+    //As sync is ongoing, disable sync on change for now, we can query later if
+    //there are changes.
+    iSyncOnChange.disable();
+
     PluginRunner *pluginRunner = new ClientPluginRunner(
             clientProfile->name(), aSession->profile(), &iPluginManager, this,
             this);
@@ -496,6 +533,10 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
     }
 
     emit syncStatus(aProfileName, aStatus, aMessage, aErrorCode);
+
+    //Re-enable sync on change
+    iSyncOnChange.disableNextSyncOnChange(aProfileName);
+    iSyncOnChange.enable(); 
 
     // Try starting new sync sessions waiting in the queue.
     while (startNextSync())
@@ -973,6 +1014,9 @@ void Synchronizer::startServer(const QString &aProfileName)
     connect(iTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)),
             pluginRunner, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)));
 
+    connect(iTransportTracker, SIGNAL(networkStateChanged(bool)),
+            this, SLOT(onNetworkStateChanged(bool)));
+
     connect(pluginRunner, SIGNAL(done()), this, SLOT(onServerDone()));
 
     connect(pluginRunner, SIGNAL(newSession(const QString &)),
@@ -1123,6 +1167,11 @@ void Synchronizer::onNewSession(const QString &aDestination)
         SyncSession *session = new SyncSession(profile, this);
         if (session != 0)
         {
+            LOG_DEBUG("Disable sync on change");
+            //As sync is ongoing, disable sync on change for now, we can query later if
+            //there are changes.
+            iSyncOnChange.disable();
+
             session->setProfileCreated(createNewProfile);
             // disable all storages
             // @todo : Can we remove hardcoding of the storageNames ???
@@ -1402,4 +1451,29 @@ void Synchronizer::restoreProfileCounter(SyncProfile* aProfile)
         }
     }
 }
+
+void Synchronizer::onNetworkStateChanged(bool aState)
+{
+    FUNCTION_CALL_TRACE;
+    if(!aState) {
+        QList<QString> profiles = iActiveSessions.keys();        
+        foreach(QString profileId, profiles)
+        {
+            //Getting profile
+            SyncProfile *profile = iProfileManager.syncProfile (profileId);
+            if ((profile) && (profile->destinationType() ==
+                            Buteo::SyncProfile::DESTINATION_TYPE_ONLINE))
+            {
+                iActiveSessions[profileId]->abort(Sync::SYNC_ERROR);
+                delete profile;
+                profile = NULL;
+            }
+            else {
+
+                LOG_DEBUG("No profile found with aProfileId"<<profileId);
+            }
+        }
+    }
+}
+
 
