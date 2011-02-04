@@ -564,6 +564,59 @@ QList<SyncProfile*> ProfileManager::getSyncProfilesByData(
     return matchingProfiles;
 }
 
+QList<SyncProfile*> ProfileManager::getSOCProfilesForStorage(
+        const QString &aStorageName)
+{
+    FUNCTION_CALL_TRACE;
+
+    QList<SearchCriteria> criteriaList;
+
+    // Require that the profile is not disabled.
+    // Profile is enabled by default. Comparing with enabled = true would
+    // not work, because the key may not exist at all, even if the profile
+    // is enabled.
+    SearchCriteria profileEnabled;
+    profileEnabled.iType = SearchCriteria::NOT_EQUAL;
+    profileEnabled.iKey = KEY_ENABLED;
+    profileEnabled.iValue = BOOLEAN_FALSE;
+    criteriaList.append(profileEnabled);
+
+    // Profile must not be hidden.
+    SearchCriteria profileVisible;
+    profileVisible.iType = SearchCriteria::NOT_EQUAL;
+    profileVisible.iKey = KEY_HIDDEN;
+    profileVisible.iValue = BOOLEAN_TRUE;
+    criteriaList.append(profileVisible);
+
+    // Online service.
+    SearchCriteria onlineService;
+    onlineService.iType = SearchCriteria::EQUAL;
+    onlineService.iSubProfileType = Profile::TYPE_SERVICE;
+    // Service profile name is left empty. Key value is matched with all
+    // found service sub-profiles, though there should be only one.
+    onlineService.iKey = KEY_DESTINATION_TYPE;
+    onlineService.iValue = VALUE_ONLINE;
+    criteriaList.append(onlineService);
+
+    // The profile should be interested
+    // in SOC
+    SearchCriteria socSupported;
+    socSupported.iSubProfileType = Profile::TYPE_SERVICE;
+    socSupported.iType = SearchCriteria::EQUAL;
+    socSupported.iKey = KEY_SOC;
+    socSupported.iValue = BOOLEAN_TRUE;
+    criteriaList.append(socSupported);
+
+    SearchCriteria storageSupported;
+    storageSupported.iSubProfileType = Profile::TYPE_STORAGE;
+    storageSupported.iType = SearchCriteria::EQUAL;
+    storageSupported.iKey = KEY_LOCAL_URI;
+    storageSupported.iValue = aStorageName;
+    criteriaList.append(storageSupported);
+
+    return getSyncProfilesByData(criteriaList);
+}
+
 QList<SyncProfile*> ProfileManager::getSyncProfilesByStorage(
         const QString &aStorageName, bool aStorageMustBeEnabled)
 {

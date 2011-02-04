@@ -87,12 +87,12 @@ public:
     virtual void stop() = 0;
 
     /*! \brief Aborts running the plug-in
-     *
+     *  \param Status error.
      * The plug-in is requested to abort. This function will return when the
      * abort request is sent, but the plug-in will continue running until
      * it has gracefully aborted.
      */
-    virtual void abort() = 0;
+    virtual void abort(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED) = 0;
 
     /*! \brief Gets the sync results from the plug-in.
      *

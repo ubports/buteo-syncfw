@@ -76,7 +76,7 @@ public slots:
     bool init();
     bool start();
     void stop();
-    void abort();
+    void abort(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED);
     bool cleanUp();
     SyncResults syncResults();
     SyncPluginBase *plugin();

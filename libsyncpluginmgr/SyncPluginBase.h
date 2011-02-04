@@ -89,7 +89,7 @@ public:
 	 * (success or error) is still expected from the aborted session before
 	 * it terminates.
 	 */
-	virtual void abortSync() { };
+    virtual void abortSync(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED) { };
 
 	/*! \brief Cleans up any sync related stuff (e.g sync anchors etc) when the
 	 * profile is deleted

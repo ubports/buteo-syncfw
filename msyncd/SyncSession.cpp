@@ -181,7 +181,7 @@ bool SyncSession::isAborted()
     return iAborted;
 }
 
-void SyncSession::abort()
+void SyncSession::abort(Sync::SyncStatus aStatus)
 {
     FUNCTION_CALL_TRACE;
 
@@ -200,7 +200,7 @@ void SyncSession::abort()
 
         if (iPluginRunner != 0)
         {
-            iPluginRunner->abort();
+            iPluginRunner->abort(aStatus);
         }
     }
 }
@@ -457,7 +457,6 @@ void SyncSession::onNetworkSessionOpened()
                     this, SLOT(onNetworkSessionOpened()));
         disconnect(iNetworkManager, SIGNAL(connectionError()),
                     this, SLOT(onNetworkSessionError()));
-        iNetworkManager->disconnectSession();
     }
 
     if (false == tryStart())

@@ -74,7 +74,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
         iTransportStates[Sync::CONNECTIVITY_INTERNET] =
             iInternet->isOnline();
         connect(iInternet, SIGNAL(valueChanged(bool)),
-            this, SLOT(onInternetStateChanged(bool)));
+            this, SLOT(onInternetStateChanged(bool)) /*, Qt::QueuedConnection*/);
         connect(iInternet, SIGNAL(sessionConnected()),
             this, SIGNAL(sessionOpened()));
         connect(iInternet, SIGNAL(sessionError()),
@@ -129,15 +129,21 @@ void TransportTracker::updateState(Sync::ConnectivityType aType,
 {
     FUNCTION_CALL_TRACE;
 
+
     bool oldState = false;
     {
         QMutexLocker locker(&iMutex);
         oldState = iTransportStates[aType];
         iTransportStates[aType] = aState;
     }
-    if (oldState != aState)
+    if(oldState != aState)
     {
-        emit connectivityStateChanged(aType, aState);
+        if (aType != Sync::CONNECTIVITY_INTERNET) {
+            emit connectivityStateChanged(aType, aState);
+        }
+        else {
+            emit networkStateChanged(aState);
+        }
     }
 }
 

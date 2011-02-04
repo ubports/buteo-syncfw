@@ -335,6 +335,15 @@ public:
      */
     void resetAttempts();
 
+    /*! \brief If a profiles is interested in SOC, this
+     * gets the the SOC after time from that profile.
+     * The time should be in seconds and a value of 0 means
+     * sync immediately afer change
+     *
+     * @return SOC after time or -1 if none is specified
+     */
+    quint32 syncOnChangeAfter() const;
+
 private:
 
     SyncProfile& operator=(const SyncProfile &aRhs);
