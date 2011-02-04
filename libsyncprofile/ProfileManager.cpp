@@ -112,7 +112,7 @@ ProfileManagerPrivate::ProfileManagerPrivate(const QString &aPrimaryPath,
 :   iPrimaryPath(aPrimaryPath),
     iSecondaryPath(aSecondaryPath)
 {
-    FUNCTION_CALL_TRACE;
+
     if (iPrimaryPath.endsWith(QDir::separator()))
     {
         iPrimaryPath.chop(1);
@@ -128,7 +128,7 @@ ProfileManagerPrivate::ProfileManagerPrivate(const QString &aPrimaryPath,
 
 Profile *ProfileManagerPrivate::load(const QString &aName, const QString &aType)
 {
-    FUNCTION_CALL_TRACE;
+
     QString profilePath = findProfileFile(aName, aType);
     QString backupProfilePath = profilePath + BACKUP_EXT;
 
@@ -156,7 +156,7 @@ Profile *ProfileManagerPrivate::load(const QString &aName, const QString &aType)
 
 SyncLog *ProfileManagerPrivate::loadLog(const QString &aProfileName)
 {
-    FUNCTION_CALL_TRACE;
+
 
     QString fileName = iPrimaryPath + QDir::separator() + Profile::TYPE_SYNC + QDir::separator() +
             LOG_DIRECTORY + QDir::separator() + aProfileName + LOG_EXT + FORMAT_EXT;
@@ -350,13 +350,12 @@ ProfileManager::~ProfileManager()
 
 Profile *ProfileManager::profile(const QString &aName, const QString &aType)
 {
-    FUNCTION_CALL_TRACE;
+
     return d_ptr->load(aName, aType);
 }
 
 SyncProfile *ProfileManager::syncProfile(const QString &aName)
 {
-    FUNCTION_CALL_TRACE;
 
     Profile *p = profile(aName, Profile::TYPE_SYNC);
     SyncProfile *syncProfile = 0;
@@ -390,7 +389,6 @@ SyncProfile *ProfileManager::syncProfile(const QString &aName)
 
 QStringList ProfileManager::profileNames(const QString &aType)
 {
-    FUNCTION_CALL_TRACE;
 
     // Search for all profile files from the primary directory
     QStringList names;
@@ -768,11 +766,11 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
 
     BtHelper btHelp(destAddress);
     QMap <QString , QVariant> mapVal = btHelp.getDeviceProperties();
-    uint classType = mapVal.value("Class").toInt();    
+    uint classType = mapVal.value("Class").toInt();
     uint pcsuiteClass = 0x100; //Major Device Class - Computer!
 
     if (classType & pcsuiteClass) {
-        LOG_INFO("Device major class is Computer"); // not required to save profile 
+        LOG_INFO("Device major class is Computer"); // not required to save profile
         saveNewProfile = false;
         SyncProfile *profile = new SyncProfile(destAddress);
         profile->setBoolKey(KEY_HIDDEN, true);
@@ -787,7 +785,7 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
     }
 
     LOG_INFO("Profile Name :" << profileDisplayName);
-    SyncProfile *tProfile = syncProfile(BT_PROFILE_TEMPLATE);        
+    SyncProfile *tProfile = syncProfile(BT_PROFILE_TEMPLATE);
     Profile *service = tProfile->serviceProfile();
     if (service != 0) {
         tProfile->setKey(KEY_DISPLAY_NAME, profileDisplayName);
@@ -818,13 +816,13 @@ void ProfileManager::enableStorages(Profile &aProfile,
         Profile *profile = aProfile.subProfile(i.key(), Profile::TYPE_STORAGE);
         if (profile)
             profile->setEnabled(i.value());
-        else 
+        else
             LOG_WARNING("No storage profile by key :" << i.key());
     }
     return ;
 }
 
-void ProfileManager::setStoragesVisible(Profile &aProfile, 
+void ProfileManager::setStoragesVisible(Profile &aProfile,
                                         QMap<QString, bool> &aStorageMap)
 {
     FUNCTION_CALL_TRACE;
@@ -834,11 +832,11 @@ void ProfileManager::setStoragesVisible(Profile &aProfile,
     while (i.hasNext()) {
         i.next();
         Profile *profile = aProfile.subProfile(i.key(), Profile::TYPE_STORAGE);
-        
+
         if (profile) {
             // For setting the "hidden" value to correspond visiblity, invert the value from map.
             profile->setBoolKey(Buteo::KEY_HIDDEN, !i.value());
-        } else { 
+        } else {
             LOG_WARNING("No storage profile by key :" << i.key());
         }
     }
@@ -896,13 +894,12 @@ bool ProfileManagerPrivate::remove(const QString &aName, const QString &aType)
     {
         LOG_DEBUG( "Profile not found from the primary path, cannot remove:" << aName );
     }
-    
+
     return success;
 }
 
 void ProfileManager::expand(Profile &aProfile)
 {
-    FUNCTION_CALL_TRACE;
 
     if (aProfile.isLoaded())
         return; // Already expanded.
