@@ -61,11 +61,14 @@ void SyncOnChange::enable()
     FUNCTION_CALL_TRACE;
     if(iStorageChangeNotifier)
     {
-        QObject::connect(iStorageChangeNotifier, SIGNAL(storageChange(QString)),
-                         this, SLOT(sync(QString)));
         QStringList aFailedStorages;
         bool enabled = iStorageChangeNotifier->startListen(aFailedStorages);
         Q_UNUSED(enabled);
+        for(QStringList::const_iterator failedStorageItr = aFailedStorages.constBegin();
+            failedStorageItr != aFailedStorages.constEnd(); ++failedStorageItr)
+        {
+            cleanup(*failedStorageItr);
+        }
         iStorageChangeNotifier->checkForChanges();
     }
 }
@@ -74,6 +77,12 @@ void SyncOnChange::disable()
 {
     FUNCTION_CALL_TRACE;
     iStorageChangeNotifier->stopListen();
+}
+
+void SyncOnChange::disableNext()
+{
+    FUNCTION_CALL_TRACE;
+    iStorageChangeNotifier->stopListen(true);
 }
 
 void SyncOnChange::cleanup(const QString& aStorageName)
@@ -118,23 +127,6 @@ void SyncOnChange::sync(QString aStorageName)
     for(QList<SyncProfile*>::iterator profileItr = profilesList.begin();
         profileItr != profilesList.end(); ++profileItr)
     {
-        if(!iSOCDisabledProfiles.contains((*profileItr)->name()))
-        {
-            LOG_DEBUG("Schedule sync on change for storage" << aStorageName
-                       << "for profile" << (*profileItr)->name());
-            iSOCScheduler->addProfile(*profileItr);
-        }
-        else
-        {
-            LOG_DEBUG("sync on change disabled for profile" << aStorageName);
-            iSOCDisabledProfiles.removeAll((*profileItr)->name());
-        }
+        iSOCScheduler->addProfile(*profileItr);
     }
-}
-
-void SyncOnChange::disableNextSyncOnChange(const QString& aProfileName)
-{
-    FUNCTION_CALL_TRACE;
-    LOG_DEBUG("Disable next SOC for profile" << aProfileName);
-    iSOCDisabledProfiles << aProfileName;
 }

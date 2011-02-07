@@ -48,6 +48,19 @@ public:
      */
     virtual void changesReceived() = 0; 
 
+    /*! \brief Enable listening to storage changes
+     */
+    virtual void enable() = 0;
+
+    /*! \brief Disable listening to storage changes
+     *
+     * @param disableAfterNextChange if set to true, then we
+     * disable listening only if the next change occurs and
+     * if enable() hasn't been called before this change is receivied.
+     * This helps to get one notification in case items are added in batches.
+     */
+    virtual void disable(bool disableAfterNextChange = false) = 0;
+
 Q_SIGNALS:
     /*! \brief emit this signal when there's a change in this
      * storage. It's upto the plug-in when and how frequently

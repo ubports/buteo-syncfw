@@ -46,8 +46,15 @@ public:
      * storage changes. Whether there was a change can
      * be determined by calling hasChanges() on the notifier plug-in
      * and startListen() can be called again
+     *
+     * @param disableAfterNextChange if set to true, we stop listening
+     * to change notifiers after they've notified about the next change.
+     * This is useful for eg to note that a change did occur during a d2d
+     * sync (during which we disable SOC), but we don't want to get notified
+     * for each batch change, the one notification lets itself be known to us
+     * when we call checkForChanges()
      */
-    void stopListen();
+    void stopListen(bool disableAfterNextChange = false);
 
     /*! Manually check and notify changes in storage
      */
@@ -67,6 +74,7 @@ Q_SIGNALS:
 
 private:
     QHash<QString,StorageChangeNotifierPlugin*> iNotifierMap;
+    PluginManager* iPluginManager;
 };
 
 }
