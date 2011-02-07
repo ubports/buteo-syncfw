@@ -344,6 +344,12 @@ public:
      */
     quint32 syncOnChangeAfter() const;
 
+    /*! \brief checks if a profile has SOC enabled
+     *
+     * @return true if SOC enabled for this profile, false otherwise
+     */
+    bool isSOCProfile() const;
+
 private:
 
     SyncProfile& operator=(const SyncProfile &aRhs);
