@@ -458,6 +458,22 @@ SyncProfile::SyncDirection SyncProfile::syncDirection() const
     return dir;
 }
 
+bool SyncProfile::isSOCProfile() const
+{
+    bool aSOCProfile = false;
+    const Profile *service = serviceProfile();
+    if (service)
+    {
+        QString enabled = service->key(KEY_SOC);
+        enabled = enabled.trimmed();
+        if("true" == enabled)
+        {
+            aSOCProfile = true;
+        }
+    }
+    return aSOCProfile;
+}
+
 quint32 SyncProfile::syncOnChangeAfter() const
 {
     quint32 syncOnChangeAfterTime = DEFAULT_SOC_AFTER_TIME;

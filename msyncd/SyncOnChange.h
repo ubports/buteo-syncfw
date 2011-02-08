@@ -55,15 +55,14 @@ public:
      */
     void enable();
 
-    /*! \brief disable sync on change
+    /*! \brief disable sync on change immediately, i.e stop listening
+     * to change notifiers
      */
     void disable();
 
-    /*! \brief disable the next (only the next one) sync on change for a profile
-     *
-     * @param aProfileName name of the profile
+    /*! \brief Note the next change, and disable SOC if that happens
      */
-    void disableNextSyncOnChange(const QString& aProfileName);
+    void disableNext();
 
 public Q_SLOTS:
     /*! initiate sync for this storage
@@ -85,7 +84,6 @@ private:
     StorageChangeNotifier* iStorageChangeNotifier;
     QHash<QString,QList<SyncProfile*> > iSOCStorageMap;
     SyncOnChangeScheduler* iSOCScheduler;
-    QStringList iSOCDisabledProfiles;
 };
 
 }
