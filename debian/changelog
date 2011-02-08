@@ -1,3 +1,10 @@
+sync-fw (0.5.7) stable; urgency=low
+
+  * sync on change - incoroporated review comments and fixed some other potential
+    issues.
+
+ -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Mon, 07 Feb 2011 15:26:56 +0530
+
 sync-fw (0.5.6) stable; urgency=low
 
   * Implemented sync on feature for the sync framework

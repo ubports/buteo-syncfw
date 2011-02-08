@@ -394,7 +394,14 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
     //there are changes.
     if(iSOCEnabled)
     {
-        iSyncOnChange.disable();
+        if(profile->isSOCProfile())
+        {
+            iSyncOnChange.disable();
+        }
+        else
+        {
+            iSyncOnChange.disableNext();
+        }
     }
 
     PluginRunner *pluginRunner = new ClientPluginRunner(
@@ -548,7 +555,6 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
     //Re-enable sync on change
     if(iSOCEnabled)
     {
-        iSyncOnChange.disableNextSyncOnChange(aProfileName);
         iSyncOnChange.enable(); 
     }
 
@@ -1186,7 +1192,7 @@ void Synchronizer::onNewSession(const QString &aDestination)
             //there are changes.
             if(iSOCEnabled)
             {
-                iSyncOnChange.disable();
+                iSyncOnChange.disableNext();
             }
 
             session->setProfileCreated(createNewProfile);
