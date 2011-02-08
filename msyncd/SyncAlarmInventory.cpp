@@ -109,8 +109,8 @@ int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
 
     // Check if alarmDate < QDateTime::currentDateTime()
     if ( QDateTime::currentDateTime().secsTo(alarmDate) < 0 ) {
-    	return 0;
     	LOG_WARNING("alarmDate < QDateTime::currentDateTime()");
+        return 0;
     }
 
     // Store the alarm 

@@ -40,7 +40,12 @@ const QString& StoragePlugin::getPluginName() const
 
 QString StoragePlugin::getProperty( const QString& aProperty ) const
 {
-    return iProperties[aProperty];
+    QString returnValue = "";
+
+    if (iProperties.contains(aProperty)) {
+        returnValue = iProperties.value(aProperty);
+    }
+    return returnValue;
 }
 
 void StoragePlugin::getProperties( QMap<QString, QString>& aProperties ) const
