@@ -70,13 +70,13 @@ StorageChangeNotifierPlugin* PluginManager::createStorageChangeNotifier( const Q
 {
     FUNCTION_CALL_TRACE;
 
-    QString libraryName = iStorageChangeNotifierMaps[aStorageName];
-
-    if( libraryName.isEmpty() )
+    if( ! iStorageChangeNotifierMaps.contains(aStorageName) )
     {
         LOG_CRITICAL( "Library for the storage change notifier" << aStorageName << "does not exist" );
         return NULL;
     }
+
+    QString libraryName = iStorageChangeNotifierMaps.value(aStorageName);
 
     void* handle = loadDll( libraryName );
 
@@ -117,7 +117,12 @@ void PluginManager::destroyStorageChangeNotifier( StorageChangeNotifierPlugin* a
 
     QString storageName = aPlugin->name();
 
-    QString path = iStorageChangeNotifierMaps[storageName];
+    if ( ! iStorageChangeNotifierMaps.contains(storageName) ) {
+        LOG_CRITICAL( "Library for the storage change notifier" << storageName << "does not exist" );
+        return;
+    }
+
+    QString path = iStorageChangeNotifierMaps.value(storageName);
 
     void* handle = getDllHandle( path );
 
@@ -145,13 +150,13 @@ StoragePlugin* PluginManager::createStorage( const QString& aPluginName )
 {
     FUNCTION_CALL_TRACE;
 
-    QString libraryName = iStorageMaps[aPluginName];
-
-    if( libraryName.isEmpty() )
+    if( ! iStorageMaps.contains(aPluginName) )
     {
         LOG_CRITICAL( "Library for the storage" << aPluginName << "does not exist" );
         return NULL;
     }
+
+    QString libraryName = iStorageMaps.value(aPluginName);
 
     void* handle = loadDll( libraryName );
 
@@ -193,7 +198,12 @@ void PluginManager::destroyStorage( StoragePlugin* aPlugin )
 
     QString pluginName = aPlugin->getPluginName();
 
-    QString path = iStorageMaps[pluginName];
+    if ( ! iStorageMaps.contains(pluginName)) {
+        LOG_CRITICAL( "Library for the storage" << pluginName << "does not exist" );
+        return;
+    }
+
+    QString path = iStorageMaps.value(pluginName);
 
     void* handle = getDllHandle( path );
 
@@ -224,14 +234,14 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
 {
 
     FUNCTION_CALL_TRACE;
-    
-    QString libraryName = iClientMaps[aPluginName];
 
-    if( libraryName.isEmpty() )
+    if( ! iClientMaps.contains(aPluginName) )
     {
         LOG_CRITICAL( "Library for the client" << aPluginName << "does not exist" );
         return NULL;
     }
+
+    QString libraryName = iClientMaps.value(aPluginName);
 
     void* handle = loadDll( libraryName );
 
@@ -271,7 +281,12 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
 
     QString pluginName = aPlugin->getPluginName();
 
-    QString path = iClientMaps[pluginName];
+    if ( ! iClientMaps.contains(pluginName) ) {
+        LOG_CRITICAL( "Library for the client plugin" << pluginName << "does not exist" );
+        return;
+    }
+
+    QString path = iClientMaps.value(pluginName);
 
     void* handle = getDllHandle( path );
 
@@ -301,13 +316,13 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
 {
     FUNCTION_CALL_TRACE;
 
-    QString libraryName = iServerMaps[aPluginName];
-
-    if( libraryName.isEmpty() )
+    if( ! iServerMaps.contains(aPluginName) )
     {
         LOG_CRITICAL( "Library for the server" << aPluginName << "does not exist" );
         return NULL;
     }
+
+    QString libraryName = iServerMaps.value(aPluginName);
 
     void* handle = loadDll( libraryName );
 
@@ -348,7 +363,12 @@ void PluginManager::destroyServer( ServerPlugin *aPlugin )
     
     QString pluginName = aPlugin->getPluginName();
 
-    QString path = iServerMaps[pluginName];
+    if ( ! iServerMaps.contains(pluginName) ) {
+        LOG_CRITICAL( "Library for the server plugin" << pluginName << "does not exist" );
+        return;
+    }
+
+    QString path = iServerMaps.value(pluginName);
 
     void* handle = getDllHandle( path );
 
