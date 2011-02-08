@@ -1,3 +1,9 @@
+sync-fw (0.5.8) stable; urgency=low
+
+  * Added functions for getting/setting normal schedule enabled to SyncSchedule
+
+ -- Lassi Vaatamoinen <ext-lassi.vaatamoinen@nokia.com>  Tue, 08 Feb 2011 16:36:41 +0200
+
 sync-fw (0.5.7) stable; urgency=low
 
   * sync on change - incoroporated review comments and fixed some other potential
