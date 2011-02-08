@@ -173,12 +173,12 @@ void SyncSchedule::setInterval(unsigned aInterval)
     d_ptr->iInterval = aInterval;
 }
 
-void SyncSchedule::setEnabled(bool aEnabled)
+void SyncSchedule::setScheduleEnabled(bool aEnabled)
 {
     d_ptr->iEnabled = aEnabled;
 }
 
-bool SyncSchedule::enabled() const
+bool SyncSchedule::scheduleEnabled() const
 {
     return d_ptr->iEnabled;
 }
