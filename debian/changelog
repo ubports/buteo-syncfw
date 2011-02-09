@@ -8,8 +8,9 @@ sync-fw (0.5.8) stable; urgency=low
 
   * Fixes: NB#226015 - contains() method used before indexing QMap
   * Added functions for getting/setting normal schedule enabled to SyncSchedule
+  * Always-on option for scheduler defined in sync profile
 
- -- Lassi Vaatamoinen <ext-lassi.vaatamoinen@nokia.com>  Tue, 08 Feb 2011 16:36:41 +0200
+ -- Mallikarjun Hunalli <mallikarjun.hunalli@nokia.com>  Wed, 09 Feb 2011 13:36:41 +0530
 
 sync-fw (0.5.7) stable; urgency=low
 
