@@ -63,6 +63,21 @@ SyncScheduler::~SyncScheduler()
     }
 }
     
+void SyncScheduler::addProfileForSyncRetry(const SyncProfile* aProfile, QDateTime aNextSyncTime)
+{
+    FUNCTION_CALL_TRACE;
+    if(aProfile && aProfile->isEnabled())
+    {
+        removeProfile(aProfile->name());
+        int alarmId = setNextAlarm(aProfile, aNextSyncTime);
+        if (alarmId > 0)
+        {
+            iSyncScheduleProfiles.insert(aProfile->name(), alarmId);
+            LOG_DEBUG("syncretries : retry scheduled for profile" << aProfile->name());
+        }
+    }
+}
+
 bool SyncScheduler::addProfile(const SyncProfile* aProfile)
 {
     FUNCTION_CALL_TRACE;
@@ -76,9 +91,8 @@ bool SyncScheduler::addProfile(const SyncProfile* aProfile)
     removeProfile(aProfile->name());
     
     if (aProfile->isEnabled() &&
-        ((aProfile->syncType() == SyncProfile::SYNC_SCHEDULED) ||
-         (aProfile->needNextAttempt()))) {
-
+        aProfile->syncType() == SyncProfile::SYNC_SCHEDULED)
+    {
         int alarmId = setNextAlarm(aProfile);
         if (alarmId > 0) {
             iSyncScheduleProfiles.insert(aProfile->name(), alarmId);
@@ -112,12 +126,20 @@ void SyncScheduler::doIPHeartbeatActions(QString aProfileName)
 }
 
 
-int SyncScheduler::setNextAlarm(const SyncProfile* aProfile)
+int SyncScheduler::setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSyncTime)
 {
     FUNCTION_CALL_TRACE;
     
     int alarmEventID = -1;
-    QDateTime nextSyncTime = aProfile->nextSyncTime();
+    QDateTime nextSyncTime;
+    if(!aNextSyncTime.isValid())
+    {
+        nextSyncTime = aProfile->nextSyncTime();
+    }
+    else
+    {
+        nextSyncTime = aNextSyncTime;
+    }
     
     if (nextSyncTime.isValid()) {
         // The existing event object can be used by just updating the alarm time
