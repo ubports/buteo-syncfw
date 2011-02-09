@@ -47,18 +47,22 @@ public:
     {
         QList<quint32> iRetryIntervals; 
         quint32 iIntervalIndex;
+
         void init()
         {
             iIntervalIndex = 0;
         }
+
         void addInterval(quint32 interval)
         {
             iRetryIntervals.append(interval);
         }
+
         quint32 retries()
         {
             return iRetryIntervals.count();
         }
+
         qint32 nextInterval()
         {
             qint32 next = -1;
@@ -69,9 +73,20 @@ public:
             }
             return next;
         }
+
         QList<quint32> intervals()
         {
             return iRetryIntervals;
+        }
+
+        SyncRetriesInfo& operator=(const SyncRetriesInfo& rhs)
+        {
+            if(this != &rhs)
+            {
+                iIntervalIndex = rhs.iIntervalIndex;
+                iRetryIntervals = rhs.iRetryIntervals;
+            }
+            return *this;
         }
     }iSyncRetriesInfo;
 };
@@ -96,6 +111,7 @@ SyncProfilePrivate::SyncProfilePrivate(const SyncProfilePrivate &aSource)
     {
         iLog = new SyncLog(*aSource.iLog);
     } // no else
+    iSyncRetriesInfo = aSource.iSyncRetriesInfo;
 }
 
 SyncProfilePrivate::~SyncProfilePrivate()
