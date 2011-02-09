@@ -4,5 +4,5 @@ if [ "$1" = "configure" ]; then
         ldconfig
 fi
 # Start the sync daemon
-start xsession/msyncd
+#start xsession/msyncd
 

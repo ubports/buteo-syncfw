@@ -1,5 +1,5 @@
 #!/bin/sh
 set -e
 # Stop the sync daemon
-stop xsession/msyncd
+#stop xsession/msyncd
 
