@@ -66,6 +66,13 @@ public:
      */
     bool addProfile(const SyncProfile* aProfile);
 
+    /* Schedule a retry for a failed sync if the profile has retries enabled
+     *
+     * @param aProfile sync profile
+     * @param aNExtSyncTime retry after this duration
+     */
+    void addProfileForSyncRetry(const SyncProfile* aProfile, QDateTime aNextSyncTime);
+
     /*! \brief Removes the profile with the given name from the scheduler.
      *
      * No new syncNow signals will be sent for the profile. Note that an
@@ -106,9 +113,10 @@ private: // functions
      * \brief Programs next alarm event to alarmd.
      * 
      * @param aProfile The profile for which the alarm is programmed
+     * @param aNextSyncTime use if provided, otherwise fetch the info from the profile
      * @return Unique alarm event ID or 0 in failure case.
      */
-    int setNextAlarm(const SyncProfile* aProfile);
+    int setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSyncTime = QDateTime());
     
     
     /**
