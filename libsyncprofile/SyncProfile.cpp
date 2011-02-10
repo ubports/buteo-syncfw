@@ -28,6 +28,7 @@
 
 namespace Buteo {
 
+
 // Private implementation class for SyncProfile.
 class SyncProfilePrivate
 {
@@ -42,9 +43,52 @@ public:
 
     SyncSchedule iSchedule;
 
-    QList<int> mSyncRetryIntervals;
+    struct SyncRetriesInfo
+    {
+        QList<quint32> iRetryIntervals; 
+        quint32 iIntervalIndex;
 
-    int mSyncRetryCount;
+        void init()
+        {
+            iIntervalIndex = 0;
+        }
+
+        void addInterval(quint32 interval)
+        {
+            iRetryIntervals.append(interval);
+        }
+
+        quint32 retries()
+        {
+            return iRetryIntervals.count();
+        }
+
+        qint32 nextInterval()
+        {
+            qint32 next = -1;
+            if(iIntervalIndex < retries())
+            {
+                next = iRetryIntervals.at(iIntervalIndex);
+                ++iIntervalIndex;
+            }
+            return next;
+        }
+
+        QList<quint32> intervals()
+        {
+            return iRetryIntervals;
+        }
+
+        SyncRetriesInfo& operator=(const SyncRetriesInfo& rhs)
+        {
+            if(this != &rhs)
+            {
+                iIntervalIndex = rhs.iIntervalIndex;
+                iRetryIntervals = rhs.iRetryIntervals;
+            }
+            return *this;
+        }
+    }iSyncRetriesInfo;
 };
 
 }
@@ -54,10 +98,9 @@ using namespace Buteo;
 const quint32 DEFAULT_SOC_AFTER_TIME(5*60);
 
 SyncProfilePrivate::SyncProfilePrivate()
-:   iLog(0),
-    mSyncRetryCount(0)
+:   iLog(0)
 {
-    mSyncRetryIntervals.append(0);
+    iSyncRetriesInfo.init();
 }
 
 SyncProfilePrivate::SyncProfilePrivate(const SyncProfilePrivate &aSource)
@@ -68,6 +111,7 @@ SyncProfilePrivate::SyncProfilePrivate(const SyncProfilePrivate &aSource)
     {
         iLog = new SyncLog(*aSource.iLog);
     } // no else
+    iSyncRetriesInfo = aSource.iSyncRetriesInfo;
 }
 
 SyncProfilePrivate::~SyncProfilePrivate()
@@ -97,10 +141,10 @@ SyncProfile::SyncProfile(const QDomElement &aRoot)
         QDomElement timeElement  = retriesElement.firstChildElement(TAG_ATTEMPT_DELAY);
         while (!timeElement.isNull()) {
             bool ok = false;
-            int parsedTime = timeElement.attribute(ATTR_VALUE, "-1").toInt(&ok);
-            if ( ok && ( parsedTime > 0 ))
+            int parsedTime = timeElement.attribute(ATTR_VALUE, "-1").toUInt(&ok);
+            if ( ok && parsedTime > 0 )
             {
-                d_ptr->mSyncRetryIntervals.append(parsedTime);
+                d_ptr->iSyncRetriesInfo.addInterval(parsedTime);
             }
             timeElement = timeElement.nextSiblingElement(TAG_ATTEMPT_DELAY);
         }
@@ -132,18 +176,22 @@ QDomElement SyncProfile::toXml(QDomDocument &aDoc, bool aLocalOnly) const
     {
         root.appendChild(schedule);
     } // no else
-    if (d_ptr->mSyncRetryIntervals.count()>1)
+    if (d_ptr->iSyncRetriesInfo.retries())
     {
         QDomElement retries = aDoc.createElement(TAG_ERROR_ATTEMPTS);
-        for ( int i = 1 ;  i < d_ptr->mSyncRetryIntervals.count(); i++)
+        for (quint32 i = 0;  i < d_ptr->iSyncRetriesInfo.retries(); ++i)
         {
             QDomElement retryInterval = aDoc.createElement(TAG_ATTEMPT_DELAY);
-            retryInterval.setAttribute(ATTR_VALUE,d_ptr->mSyncRetryIntervals.at(i));
-            retries.appendChild(retryInterval);
+            qint32 nextInt = d_ptr->iSyncRetriesInfo.nextInterval();
+            if(-1 != nextInt)
+            {
+                retryInterval.setAttribute(ATTR_VALUE, nextInt);
+                retries.appendChild(retryInterval);
+            }
         }
         root.appendChild(retries);
+        d_ptr->iSyncRetriesInfo.init();
     }
-
     return root;
 }
 
@@ -186,20 +234,10 @@ QDateTime SyncProfile::lastSyncTime() const
 QDateTime SyncProfile::nextSyncTime() const
 {
     QDateTime nextSync;
-
-    if ( ( syncType() == SYNC_SCHEDULED ) && ( d_ptr->mSyncRetryCount == 0 ) )
+    if(syncType() == SYNC_SCHEDULED)
     {
         nextSync = d_ptr->iSchedule.nextSyncTime(lastSyncTime());
     }
-    else
-    {
-        // Manual sync mode. Returned time for next sync is null.
-        if ( ( d_ptr->mSyncRetryIntervals.count() > 0 ) && ( d_ptr->mSyncRetryCount > 0 ) && ( d_ptr->mSyncRetryCount < d_ptr->mSyncRetryIntervals.count( ) ) )
-        {
-            nextSync = QDateTime::currentDateTime().addSecs(d_ptr->mSyncRetryIntervals.at(d_ptr->mSyncRetryCount) * 60);
-        }
-    }
-
     return nextSync;
 }
 
@@ -591,41 +629,12 @@ void SyncProfile::setConflictResolutionPolicy(ConflictResolutionPolicy aPolicy)
     }
 }
 
-int SyncProfile::syncRetryAttemptsCount() const
+bool SyncProfile::hasRetries() const
 {
-    return d_ptr->mSyncRetryIntervals.count();
+    return d_ptr->iSyncRetriesInfo.retries() ? true : false;
 }
 
-int SyncProfile::syncCurrentAttempt() const
+QList<quint32> SyncProfile::retryIntervals() const
 {
-    return d_ptr->mSyncRetryCount;
-}
-
-int SyncProfile::syncRetryDelay(int aRetry) const
-{
-    if ( ( aRetry >=0 ) && ( aRetry < d_ptr->mSyncRetryIntervals.count() ) )
-        return d_ptr->mSyncRetryIntervals.at(aRetry);
-    return -1;
-}
-
-void SyncProfile::setSyncRetryAttemp(int aRetry)
-{
-    d_ptr->mSyncRetryCount = aRetry;
-}
-
-bool SyncProfile::needNextAttempt() const
-{
-    //return d_ptr->mSyncRetryCount < d_ptr->mSyncRetryIntervals.count();
-    // TODO: AAB guys need to rework the patch. Not allowing next attempts now.
-    return false;
-}
-
-void SyncProfile::setNextAttempt()
-{
-    d_ptr->mSyncRetryCount++;
-}
-
-void SyncProfile::resetAttempts()
-{
-    d_ptr->mSyncRetryCount=0;
+    return d_ptr->iSyncRetriesInfo.intervals();
 }

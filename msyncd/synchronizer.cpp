@@ -112,6 +112,9 @@ bool Synchronizer::initialize()
 
     // Initialize account manager.
     iAccounts = new AccountsHelper(iProfileManager, this); // Deleted with parent.
+    connect(iAccounts, SIGNAL(enableSOC(QString)),
+            this, SLOT(enableSOCSlot(QString)),
+            Qt::QueuedConnection);
 
     connect(this, SIGNAL(storageReleased()),
             this, SLOT(onStorageReleased()), Qt::QueuedConnection);
@@ -162,6 +165,39 @@ bool Synchronizer::initialize()
         LOG_DEBUG("No profiles interested in SOC");
     }
     return true;
+}
+
+void Synchronizer::enableSOCSlot(const QString& aProfileName)
+{
+    FUNCTION_CALL_TRACE;
+    SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
+    if(!iSOCEnabled)
+    {
+        QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
+        QList<SyncProfile*> SOCProfiles;
+        SOCProfiles.append(profile);
+        aSOCStorageMap["hcontacts"] = SOCProfiles;
+        QStringList aFailedStorages;
+        bool isSOCEnabled = iSyncOnChange.enable(aSOCStorageMap, &iSyncOnChangeScheduler,
+                                                 &iPluginManager, aFailedStorages);
+        if(!isSOCEnabled)
+        {
+            LOG_CRITICAL("Sync on change couldn't be enabled for profile" << aProfileName);
+            delete profile;
+        }
+        else
+        {
+            QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(const QString&)),
+                             this, SLOT(startSync(const QString&)),
+                             Qt::QueuedConnection);
+            iSOCEnabled = true;
+            LOG_DEBUG("Sync on change enabled for profile" << aProfileName);
+        }
+    }
+    else
+    {
+        iSyncOnChange.addProfile("hcontacts", profile);
+    }
 }
 
 void Synchronizer::close()
@@ -307,13 +343,7 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         session->setProfileCreated(true);
     }
 
-    restoreProfileCounter(profile);
-    if ( profile->syncCurrentAttempt() == 0 ) {
-        session->setScheduled(aScheduled);
-    }
-    else {
-        session->setScheduled(false);
-    }
+    session->setScheduled(aScheduled);
 
     // @todo: Complete profile with data from account manager.
     //iAccounts->addAccountData(*profile);
@@ -403,6 +433,8 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
             iSyncOnChange.disableNext();
         }
     }
+
+    iProfileManager.addRetriesInfo(profile);
 
     PluginRunner *pluginRunner = new ClientPluginRunner(
             clientProfile->name(), aSession->profile(), &iPluginManager, this,
@@ -504,7 +536,7 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
                 }
                 
                 iProfileManager.updateProfile(*sessionProf);
-                sessionProf->resetAttempts();
+                iProfileManager.retriesDone(sessionProf->name());
                 break;
             }
 
@@ -512,19 +544,19 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
             case Sync::SYNC_CANCELLED:
             {
                 session->setFailureResult(SyncResults::SYNC_RESULT_CANCELLED, Buteo::SyncResults::ABORTED);
-                session->profile()->resetAttempts();
                 break;
             }
             case Sync::SYNC_ERROR:
             {
                 session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, aErrorCode);
-                restoreProfileCounter(session->profile());
-                session->profile()->setNextAttempt();
-                saveProfileCounter(session->profile());
-                if ( !session->profile()->needNextAttempt() )
+                QDateTime nextRetryInterval = iProfileManager.getNextRetryInterval(session->profile());
+                if(nextRetryInterval.isValid())
                 {
-                    session->profile()->resetAttempts();
-                    saveProfileCounter(session->profile());
+                    iSyncScheduler->addProfileForSyncRetry(session->profile(), nextRetryInterval);
+                }
+                else
+                {
+                    iProfileManager.retriesDone(session->profile()->name());
                 }
                 break;
             }
@@ -656,7 +688,7 @@ void Synchronizer::cleanupSession(SyncSession *aSession, Sync::SyncStatus aStatu
             // UI needs to know that Sync Log has been updated.
             emit resultsAvailable(profileName,aSession->results().toString());
 
-            if ( aSession->isScheduled() || aSession->profile()->needNextAttempt() )
+            if ( aSession->isScheduled() )
             {
                 reschedule(profileName);
                 emit signalProfileChanged(profileName, 1 ,QString());
@@ -1251,14 +1283,9 @@ void Synchronizer::reschedule(const QString &aProfileName)
 
     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
 
-    restoreProfileCounter(profile);
-    if (profile && ((profile->syncType() == SyncProfile::SYNC_SCHEDULED) || (profile->needNextAttempt())))
+    if(profile && profile->syncType() == SyncProfile::SYNC_SCHEDULED)
     {
         iSyncScheduler->addProfile(profile);
-    }
-    else
-    {
-        iSyncScheduler->removeProfile(aProfileName);
     }
     if(profile)
     {
@@ -1455,26 +1482,6 @@ QStringList Synchronizer::syncProfilesByType(const QString &aType)
     return iProfileManager.profileNames(aType);     
 }
 
-void Synchronizer::saveProfileCounter(const SyncProfile* aProfile)
-{
-    FUNCTION_CALL_TRACE;
-    int current = aProfile->syncCurrentAttempt();
-    iCountersStorage[aProfile->name()] = current;
-}
-
-void Synchronizer::restoreProfileCounter(SyncProfile* aProfile)
-{
-    FUNCTION_CALL_TRACE;
-    if (aProfile) {
-        if ( iCountersStorage.contains(aProfile->name()) )  {
-            aProfile->setSyncRetryAttemp(iCountersStorage.value(aProfile->name()));
-        }
-        else {
-            aProfile->setSyncRetryAttemp(0);
-        }
-    }
-}
-
 void Synchronizer::onNetworkStateChanged(bool aState)
 {
     FUNCTION_CALL_TRACE;
@@ -1498,5 +1505,3 @@ void Synchronizer::onNetworkStateChanged(bool aState)
         }
     }
 }
-
-

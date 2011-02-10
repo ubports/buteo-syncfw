@@ -88,7 +88,9 @@ public Q_SLOTS:
 	 */
     void slotAccountUpdated(Accounts::AccountId id);
 
+Q_SIGNALS:
 
+    void enableSOC(const QString& aProfileName);
 
 private:
 

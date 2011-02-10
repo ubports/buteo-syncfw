@@ -27,6 +27,7 @@
 #include "SyncProfile.h"
 #include "Profile.h"
 #include <QList>
+#include <QHash>
 
 namespace Buteo {
 
@@ -332,6 +333,26 @@ public:
      */
     bool setSyncSchedule(QString aProfileId , QString aScheduleAsXml);
 
+    /*! \brief checks if a profile has retries info and stores the same
+     *
+     * @param aProfile sync profile
+     */
+    void addRetriesInfo(const SyncProfile* aProfile);
+
+    /*! \brief gets the next retry after time for a sync profile
+     *
+     * @param aProfile sync profile
+     * @return next retry interval
+     */
+    QDateTime getNextRetryInterval(const SyncProfile* aProfile);
+
+    /*! \brief call this to indicate that retries have to stop for a certain
+     * sync for a profile - either the no. of retry attempts exhausted or one of the retries succeeded
+     *
+     * @param aProfileName name of the profile
+     */
+    void retriesDone(const QString& aProfileName);
+
 #ifdef SYNCFW_UNIT_TESTS
     friend class ProfileManagerTest;
 #endif
@@ -354,6 +375,8 @@ private:
     ProfileManager& operator=(const ProfileManager &aRhs);
     
     ProfileManagerPrivate *d_ptr;
+
+    QHash<QString, QList<quint32> > iSyncRetriesInfo;
 };
 
 }
