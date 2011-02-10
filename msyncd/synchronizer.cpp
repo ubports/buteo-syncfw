@@ -112,6 +112,9 @@ bool Synchronizer::initialize()
 
     // Initialize account manager.
     iAccounts = new AccountsHelper(iProfileManager, this); // Deleted with parent.
+    connect(iAccounts, SIGNAL(enableSOC(QString)),
+            this, SLOT(enableSOCSlot(QString)),
+            Qt::QueuedConnection);
 
     connect(this, SIGNAL(storageReleased()),
             this, SLOT(onStorageReleased()), Qt::QueuedConnection);
@@ -162,6 +165,39 @@ bool Synchronizer::initialize()
         LOG_DEBUG("No profiles interested in SOC");
     }
     return true;
+}
+
+void Synchronizer::enableSOCSlot(const QString& aProfileName)
+{
+    FUNCTION_CALL_TRACE;
+    SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
+    if(!iSOCEnabled)
+    {
+        QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
+        QList<SyncProfile*> SOCProfiles;
+        SOCProfiles.append(profile);
+        aSOCStorageMap["hcontacts"] = SOCProfiles;
+        QStringList aFailedStorages;
+        bool isSOCEnabled = iSyncOnChange.enable(aSOCStorageMap, &iSyncOnChangeScheduler,
+                                                 &iPluginManager, aFailedStorages);
+        if(!isSOCEnabled)
+        {
+            LOG_CRITICAL("Sync on change couldn't be enabled for profile" << aProfileName);
+            delete profile;
+        }
+        else
+        {
+            QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(const QString&)),
+                             this, SLOT(startSync(const QString&)),
+                             Qt::QueuedConnection);
+            iSOCEnabled = true;
+            LOG_DEBUG("Sync on change enabled for profile" << aProfileName);
+        }
+    }
+    else
+    {
+        iSyncOnChange.addProfile("hcontacts", profile);
+    }
 }
 
 void Synchronizer::close()

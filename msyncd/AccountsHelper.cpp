@@ -291,6 +291,10 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
 	setSyncSchedule (newProfile, account->id(), true);
         // Save the newly created profile
         iProfileManager.updateProfile(*newProfile);
+        if(newProfile->isSOCProfile())
+        {
+            emit enableSOC(newProfile->name());
+        }
         delete newProfile;
     }
     else if(true == profile->boolKey(KEY_USE_ACCOUNTS, false))
@@ -299,6 +303,10 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         profile->setKey(KEY_ACTIVE, BOOLEAN_FALSE);
         profile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
         iProfileManager.updateProfile(*profile);
+        if(profile->isSOCProfile())
+        {
+            emit enableSOC(profile->name());
+        }
         delete profile;
     }
 }
