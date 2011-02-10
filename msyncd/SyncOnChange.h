@@ -64,6 +64,13 @@ public:
      */
     void disableNext();
 
+    /*! \brief adds a profile to the list of profiles interested in soc for a specific storage
+     *
+     * @param aStorageName storage name
+     * @param aProfile sync profile 
+     */
+    void addProfile(const QString& aStorageName, SyncProfile* aProfile);
+
 public Q_SLOTS:
     /*! initiate sync for this storage
      */

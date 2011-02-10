@@ -218,6 +218,14 @@ private slots:
 
     void onNetworkStateChanged(bool aState);
 
+    /*! \brief call this to request the sync daemon to enable soc
+     * for a profile. The sync daemon decides as of now for which storages
+     * soc should be enabled
+     *
+     * @param aProfileName profile name
+     */
+    void enableSOCSlot(const QString& aProfileName);
+
 private:
 
     bool startSync(const QString &aProfileName, bool aScheduled);

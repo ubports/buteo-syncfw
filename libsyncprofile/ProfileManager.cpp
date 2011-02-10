@@ -1218,5 +1218,41 @@ bool ProfileManagerPrivate::profileExists(const QString &aProfileId ,const QStri
     return QFile::exists(profileFile);
 }
 
+void ProfileManager::addRetriesInfo(const SyncProfile* profile)
+{
+    FUNCTION_CALL_TRACE;
+    if(profile)
+    {
+        if(profile->hasRetries() && !iSyncRetriesInfo.contains(profile->name()))
+        {
+            LOG_DEBUG("syncretries : retries info present for profile" << profile->name());
+            iSyncRetriesInfo[profile->name()] = profile->retryIntervals();
+        }
+    }
+}
 
+QDateTime ProfileManager::getNextRetryInterval(const SyncProfile* aProfile)
+{
+    FUNCTION_CALL_TRACE;
+    QDateTime nextRetryInterval;
+    if(aProfile &&
+       iSyncRetriesInfo.contains(aProfile->name()) &&
+       !iSyncRetriesInfo[aProfile->name()].isEmpty())
+    {
+       quint32 mins = iSyncRetriesInfo[aProfile->name()].takeFirst();
+       nextRetryInterval = QDateTime::currentDateTime().addSecs(mins * 60); 
+       LOG_DEBUG("syncretries : retry for profile" << aProfile->name() << "in" << mins <<"minutes");
+       LOG_DEBUG("syncretries :" << iSyncRetriesInfo[aProfile->name()].count() <<"attempts remain");
+    }
+    return nextRetryInterval;
+}
 
+void ProfileManager::retriesDone(const QString& aProfileName)
+{
+    FUNCTION_CALL_TRACE;
+    if(iSyncRetriesInfo.contains(aProfileName))
+    {
+       iSyncRetriesInfo.remove(aProfileName);
+       LOG_DEBUG("syncretries : retry success for" << aProfileName);
+    }
+}

@@ -130,3 +130,23 @@ void SyncOnChange::sync(QString aStorageName)
         iSOCScheduler->addProfile(*profileItr);
     }
 }
+
+void SyncOnChange::addProfile(const QString& aStorageName, SyncProfile* aProfile)
+{
+    FUNCTION_CALL_TRACE;
+    bool found = false;
+    QList<SyncProfile*> profilesList = iSOCStorageMap.value(aStorageName);
+    for(QList<SyncProfile*>::iterator profileItr = profilesList.begin();
+        profileItr != profilesList.end(); ++profileItr)
+    {
+        if(*profileItr && aProfile && (*profileItr)->name() == aProfile->name())
+        {
+            found = true;
+            break;
+        }
+    }
+    if(!found)
+    {
+        iSOCStorageMap[aStorageName].append(aProfile);
+    }
+}
