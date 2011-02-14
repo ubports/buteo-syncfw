@@ -106,7 +106,9 @@ public:
         //! a Existing Profile has been modified
         PROFILE_MODIFIED,
         //! Profile has been Removed
-        PROFILE_REMOVED
+        PROFILE_REMOVED,
+        //! Profile log file Modified.
+        PROFILE_LOGS_MODIFIED
     };
 
     /*! \brief Constructor.
