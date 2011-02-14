@@ -1,3 +1,9 @@
+sync-fw (0.5.10) stable; urgency=low
+
+   * Fixes: NB#218016 - Next Synchronization time of scheduled ovi.com sync is updating with the current time.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Mon, 14 Feb 2011 17:29:00 +0530
+
 sync-fw (0.5.9) stable; urgency=low
 
   * Implemented sync retries feature 

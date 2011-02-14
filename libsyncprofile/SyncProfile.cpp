@@ -225,18 +225,25 @@ QDateTime SyncProfile::lastSyncTime() const
 
     if (d_ptr->iLog != 0 && d_ptr->iLog->lastResults() != 0)
     {        
-        return d_ptr->iLog->lastResults()->syncTime();
+        lastSync = d_ptr->iLog->lastResults()->syncTime();
     } // no else
 
+    LOG_DEBUG("lastSync:"<<lastSync);
     return lastSync;
 }
 
-QDateTime SyncProfile::nextSyncTime() const
+QDateTime SyncProfile::nextSyncTime(QDateTime aDateTime) const
 {
     QDateTime nextSync;
     if(syncType() == SYNC_SCHEDULED)
     {
-        nextSync = d_ptr->iSchedule.nextSyncTime(lastSyncTime());
+        if (aDateTime.isValid()) {
+            nextSync = d_ptr->iSchedule.nextSyncTime(aDateTime);
+        }
+        else {
+            nextSync = d_ptr->iSchedule.nextSyncTime(lastSyncTime());
+        }
+
     }
     return nextSync;
 }
@@ -253,7 +260,7 @@ const SyncResults *SyncProfile::lastResults() const
     }
 }
 
-const SyncLog *SyncProfile::log() const
+SyncLog *SyncProfile::log() const
 {
     return d_ptr->iLog;
 }

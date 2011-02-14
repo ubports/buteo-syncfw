@@ -58,8 +58,9 @@ Synchronizer::Synchronizer( QCoreApplication* aApplication )
     iServerActivator(0),
     iAccounts(0),
     iClosing(false),
-    iSyncUIInterface(NULL),
-    iSOCEnabled(false)
+    iSOCEnabled(false),
+    iSyncUIInterface(NULL)
+
 {
     FUNCTION_CALL_TRACE;
 

@@ -97,8 +97,8 @@ bool SyncScheduler::addProfile(const SyncProfile* aProfile)
         if (alarmId > 0) {
             iSyncScheduleProfiles.insert(aProfile->name(), alarmId);
             profileAdded = true;
-            LOG_DEBUG("Sync scheduled: profile =" << aProfile->name() <<
-                "time =" << aProfile->nextSyncTime());
+            //LOG_DEBUG("Sync scheduled: profile =" << aProfile->name() <<
+            //    "time =" << aProfile->nextSyncTime());
         } // no else
     } // no else
     
@@ -131,10 +131,16 @@ int SyncScheduler::setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSync
     FUNCTION_CALL_TRACE;
     
     int alarmEventID = -1;
+
+    if(aProfile == 0)
+    {
+        return alarmEventID;
+    }
+
     QDateTime nextSyncTime;
     if(!aNextSyncTime.isValid())
     {
-        nextSyncTime = aProfile->nextSyncTime();
+        nextSyncTime = aProfile->nextSyncTime(aProfile->lastSyncTime());
     }
     else
     {
