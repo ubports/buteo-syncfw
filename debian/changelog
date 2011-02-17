@@ -1,3 +1,9 @@
+sync-fw (0.5.11) stable; urgency=low
+
+   * Fixes: NB#224749 - Current time is shown in place of Next sync time when schedule synchronize is disabled and enabled it. 
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Thu, 17 Feb 2011 17:29:00 +0530
+
 sync-fw (0.5.10) stable; urgency=low
 
    * Fixes: NB#218016 - Next Synchronization time of scheduled ovi.com sync is updating with the current time.
