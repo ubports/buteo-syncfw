@@ -38,6 +38,7 @@
 #include "ProfileEngineDefs.h"
 #include "LogMacros.h"
 #include "SyncDBusConnection.h"
+#include "BtHelper.h"
 
 #include <QtDebug>
 #include <fcntl.h>
@@ -47,6 +48,9 @@ using namespace Buteo;
 
 static const QString SYNC_DBUS_OBJECT = "/synchronizer";
 static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
+
+static const QString UUID_BEGIN = "00000001-0002-0003-0004-";
+static const QString BT_PROPERTIES_NAME = "Name";
 
 // Maximum time in milliseconds to wait for a thread to stop
 static const unsigned long long MAX_THREAD_STOP_WAIT_TIME = 5000;
@@ -780,10 +784,29 @@ bool Synchronizer::updateProfile(QString aProfileAsXml)
 {
     FUNCTION_CALL_TRACE
     bool status = false;
+    QString address;
+
     if(!aProfileAsXml.isEmpty())  {
         // save the changes to persistent storage
         Profile *profile = iProfileManager.profileFromXml(aProfileAsXml);
         if(profile) {
+            // Update storage info before giving it to profileManager
+            Profile* service = 0;
+            foreach(Profile* p, profile->allSubProfiles()) {
+                if (p->type() == Profile::TYPE_SERVICE) {
+                    service = p;
+                    break;
+                }
+            }
+
+            if (service && !profile->boolKey(Buteo::KEY_STORAGE_UPDATED)) {
+                address = service->key(Buteo::KEY_BT_ADDRESS);
+                if (!address.isNull()) {
+                    updateProfileStorageInfo(profile, address);
+                    profile->setBoolKey(Buteo::KEY_STORAGE_UPDATED, true);
+                }
+            }
+
             QString profileId = iProfileManager.updateProfile(*profile);
 
             // if the profile changes are for schedule sync we need to reschedule
@@ -1506,3 +1529,17 @@ void Synchronizer::onNetworkStateChanged(bool aState)
         }
     }
 }
+
+void Synchronizer::updateProfileStorageInfo(Buteo::Profile* aProfile, const QString& aAddress)
+{
+    FUNCTION_CALL_TRACE;
+
+    BtHelper helper(aAddress);
+
+    QString uuid = UUID_BEGIN + aAddress.split(":").join("");
+    QString btName = helper.getDeviceProperties().value(BT_PROPERTIES_NAME).toString();
+
+    aProfile->setKey(Buteo::KEY_REMOTE_NAME, btName);
+    aProfile->setKey(Buteo::KEY_UUID, uuid);
+}
+

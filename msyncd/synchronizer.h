@@ -97,6 +97,8 @@ public:
     /// \see PluginCbInterface::isConnectivityAvailable
     virtual bool isConnectivityAvailable( Sync::ConnectivityType aType );
 
+    /// \see PluginCbInterface::updateProfileStorageInfo
+    virtual void updateProfileStorageInfo(Buteo::Profile* aProfile, const QString& aAddress);
 
 // From SyncDBusInterface
 // --------------------------------------------------------------------------
