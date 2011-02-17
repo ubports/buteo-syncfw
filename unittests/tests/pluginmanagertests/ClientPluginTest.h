@@ -56,6 +56,8 @@ public:
 
     virtual bool isConnectivityAvailable( Sync::ConnectivityType /*aType*/ ) { return false; }
 
+    virtual void updateProfileStorageInfo(Profile */*aProfile*/, const QString &/*aAddress*/) { return; }
+
 private slots:
 
     void testCreateDestroy();
