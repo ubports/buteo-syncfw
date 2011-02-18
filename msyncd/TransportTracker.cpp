@@ -62,8 +62,8 @@ TransportTracker::TransportTracker(QObject *aParent) :
 #endif
     // BT
     iTransportStates[Sync::CONNECTIVITY_BT] = iDeviceInfo.currentBluetoothPowerState();
-    bool status = connect(&iDeviceInfo, SIGNAL(bluetoothStateChanged(bool)), this, SLOT(onBtStateChanged(bool)));
-    LOG_DEBUG("Connect status"<<status<<"and current bluetoothPowerState"<<iDeviceInfo.currentBluetoothPowerState());
+    QObject::connect(&iDeviceInfo, SIGNAL(bluetoothStateChanged(bool)), this, SLOT(onBtStateChanged(bool)));
+    LOG_DEBUG("Current bluetooth power state"<<iDeviceInfo.currentBluetoothPowerState());
 
 
     // Internet
@@ -112,8 +112,10 @@ void TransportTracker::onBtStateChanged(bool aState)
 {
     FUNCTION_CALL_TRACE;
 
-    LOG_DEBUG("BT state changed:" << aState);
-    updateState(Sync::CONNECTIVITY_BT, aState);
+    Q_UNUSED(aState);
+    bool btPowered = iDeviceInfo.currentBluetoothPowerState();
+    LOG_DEBUG("BT power state" << btPowered);
+    updateState(Sync::CONNECTIVITY_BT, btPowered);
 }
 
 void TransportTracker::onInternetStateChanged(bool aConnected)
