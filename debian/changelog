@@ -1,3 +1,10 @@
+sync-fw (0.5.10) stable; urgency=low
+
+  * Fixes: NB#227297 - "Service not supported by other device" message
+    displayed when remote sync from X3 to device is initiated
+
+ -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Fri, 18 Feb 2011 18:14:01 +0530
+
 sync-fw (0.5.9) stable; urgency=low
 
   * Implemented sync retries feature 
