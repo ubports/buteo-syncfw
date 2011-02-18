@@ -270,7 +270,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         int numberOfIntervals = 0;
         if(0 != d_ptr->iInterval)
         {
-            int secs = reference.secsTo(now);
+            int secs = reference.secsTo(now) + 1;
             numberOfIntervals = secs/(d_ptr->iInterval * 60);
             if(secs % (d_ptr->iInterval * 60))
             {
@@ -343,6 +343,14 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
             nextSync = nextSyncRush;
         } // no else
     } // no else
+
+    //For safer side checking nextSyncTime should not be behind currentDateTime.
+    if ( QDateTime::currentDateTime().secsTo(nextSync) < 0 ) {
+        //If it is the case making it to currentTime.
+        LOG_WARNING("Something went wrong in nextSyncTime calculation resetting to current time");
+        nextSync = QDateTime::currentDateTime();
+    }
+
 
     LOG_DEBUG("nextSync" << nextSync.toString());
 

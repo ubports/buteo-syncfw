@@ -150,7 +150,7 @@ public:
      * \return Next sync time. Null object if the sync type is manual or the
      *  time could not be determined for some other reason.
      */
-    virtual QDateTime nextSyncTime() const;
+    virtual QDateTime nextSyncTime(QDateTime aDateTime = QDateTime::currentDateTime()) const;
 
     /*! \brief Gets the results of the last sync from the sync log.
      *
@@ -162,7 +162,7 @@ public:
      *
      * \return The sync log. NULL if no log is set.
      */
-    const SyncLog *log() const;
+    SyncLog *log() const;
 
     /*! \brief Sets the synchronization log for this profile.
      *
