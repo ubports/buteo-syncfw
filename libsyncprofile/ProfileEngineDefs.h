@@ -90,6 +90,9 @@ const QString KEY_SOC("sync_on_change");
 const QString KEY_SOC_AFTER("sync_on_change_after");
 const QString KEY_LOCAL_URI("Local URI");
 const QString KEY_ALWAYS_ON_ENABLED("always_on_enabled");
+const QString KEY_REMOTE_NAME("remote_name");
+const QString KEY_UUID("uuid");
+const QString KEY_STORAGE_UPDATED("storage_updated");
 
 const QString BOOLEAN_TRUE("true");
 const QString BOOLEAN_FALSE("false");

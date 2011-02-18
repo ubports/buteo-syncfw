@@ -1034,20 +1034,20 @@ bool ProfileManager::saveSyncResults(QString aProfileName,
     FUNCTION_CALL_TRACE;
     bool success = false;
 
-    SyncLog *log = d_ptr->loadLog(aProfileName);
-    if (!log)
-    {
-        // No log yet, create new.
-        log = new SyncLog(aProfileName);
-    } // no else
+    SyncProfile *profile = syncProfile(aProfileName);
+    if (profile) {
+        SyncLog *log = profile->log();
+        if (log)
+        {
+            log->addResults(aResults);
+            success = saveLog(*log);
+            //Emitting signal
+            emit signalProfileChanged(aProfileName,ProfileManager::PROFILE_LOGS_MODIFIED,profile->toString());
+        }
 
-    if (log)
-    {
-        log->addResults(aResults);
-        success = saveLog(*log);
-        delete log;
-        log = 0;
-    } // no else
+        delete profile;
+        profile = 0;
+    }
 
     return success;
 }

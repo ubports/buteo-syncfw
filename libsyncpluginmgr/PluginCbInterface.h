@@ -30,6 +30,7 @@
 namespace Buteo {
 
 class StoragePlugin;
+class Profile;
              
 /*! \brief Interface which client and server plugins can use to communicate with
  *         synchronization daemon
@@ -87,6 +88,12 @@ public:
      */
     virtual bool isConnectivityAvailable( Sync::ConnectivityType aType ) = 0;
 
+    /*! \brief Updates profile with additional info for storages
+     *
+     * \param aProfile Profile to be updated.
+     * \param aAddress Bt address for the connection
+     */
+    virtual void updateProfileStorageInfo(Profile* aProfile, const QString& aAddress) = 0;
 
 };
 

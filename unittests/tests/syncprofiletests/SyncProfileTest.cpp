@@ -179,7 +179,7 @@ void SyncProfileTest::testNextSyncTime()
 {
     // No next sync time in manual mode.
     SyncProfile p(NAME);
-    QVERIFY(p.nextSyncTime().isNull());
+    QVERIFY(p.nextSyncTime(QDateTime::currentDateTime()).isNull());
 
     // Scheduled sync.
     p.setSyncType(SyncProfile::SYNC_SCHEDULED);
@@ -194,7 +194,7 @@ void SyncProfileTest::testNextSyncTime()
         Qt::Friday << Qt::Saturday << Qt::Sunday;
     s.setDays(days);
     p.setSyncSchedule(s);
-    QDateTime nextSync = p.nextSyncTime();
+    QDateTime nextSync = p.nextSyncTime(p.lastSyncTime());
     QCOMPARE(nextSync, lastSync.addSecs(INTERVAL * 60));
 }
 

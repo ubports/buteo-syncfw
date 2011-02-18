@@ -2,6 +2,9 @@ sync-fw (0.5.10) stable; urgency=low
 
   * Fixes: NB#227297 - "Service not supported by other device" message
     displayed when remote sync from X3 to device is initiated
+  * Fixes: NB#224749 - Current time is shown in place of Next sync time when schedule synchronize is disabled and enabled it. 
+  * Fixes: NB#178342 - New calendar is not created in device after synchronizing calendar events from N95 to device
+  * Fixes: NB#218016 - Next Synchronization time of scheduled ovi.com sync is updating with the current time.
 
  -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Fri, 18 Feb 2011 18:14:01 +0530
 
