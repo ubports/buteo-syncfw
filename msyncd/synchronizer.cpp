@@ -806,12 +806,10 @@ bool Synchronizer::updateProfile(QString aProfileAsXml)
                         QString uuid = QUuid::createUuid().toString();
                         uuid = uuid.remove(QRegExp("[{}]"));
                         profile->setKey(Buteo::KEY_UUID, uuid);
-                        LOG_DEBUG("DPK device init uuid" << uuid);
                     }
                     if(profile->key(Buteo::KEY_REMOTE_NAME).isEmpty())
                     {
                         profile->setKey(Buteo::KEY_REMOTE_NAME, profile->displayname());
-                        LOG_DEBUG("DPK device init name" << profile->displayname());
                     }
                     profile->setBoolKey(Buteo::KEY_STORAGE_UPDATED, true);
                 }
@@ -1205,7 +1203,6 @@ void Synchronizer::onNewSession(const QString &aDestination)
 
         if(aDestination.contains("USB") || classType & computerclass)
         {
-		LOG_DEBUG("DPK NOS sync");
             syncProfiles = iProfileManager.getSyncProfilesByData(
                     QString::null, QString::null, KEY_DISPLAY_NAME, PC_SYNC);
         }
@@ -1561,7 +1558,6 @@ Profile* Synchronizer::getSyncProfileByRemoteAddress(const QString& aAddress)
     {
         profiles = iProfileManager.getSyncProfilesByData(
                 QString::null, QString::null, KEY_DISPLAY_NAME, PC_SYNC);
-	LOG_DEBUG("DPK NOS profile");
     }
     else
     {
@@ -1573,11 +1569,9 @@ Profile* Synchronizer::getSyncProfileByRemoteAddress(const QString& aAddress)
         {
             profiles = iProfileManager.getSyncProfilesByData(
                     QString::null, QString::null, KEY_DISPLAY_NAME, PC_SYNC);
-	    LOG_DEBUG("DPK NOS profile");
         }
         else
         {
-	    LOG_DEBUG("DPK BT profile");
             profiles = iProfileManager.getSyncProfilesByData("",
                                           Buteo::Profile::TYPE_SERVICE,
                                           Buteo::KEY_BT_ADDRESS,
