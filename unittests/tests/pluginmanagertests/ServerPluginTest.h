@@ -55,7 +55,15 @@ public:
 
     virtual bool isConnectivityAvailable( Sync::ConnectivityType /*aType*/ ) { return false; }
 
-    virtual void updateProfileStorageInfo(Profile */*aProfile*/, const QString &/*aAddress*/) {return;}
+    virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress)
+    {
+        return 0;
+    }
+
+    virtual QString getValue(const QString& aAddress, const QString& aKey)
+    {
+        return "";
+    }
 
 private slots:
 

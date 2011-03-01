@@ -49,7 +49,6 @@ using namespace Buteo;
 static const QString SYNC_DBUS_OBJECT = "/synchronizer";
 static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
 
-static const QString UUID_BEGIN = "00000001-0002-0003-0004-";
 static const QString BT_PROPERTIES_NAME = "Name";
 
 // Maximum time in milliseconds to wait for a thread to stop
@@ -802,7 +801,18 @@ bool Synchronizer::updateProfile(QString aProfileAsXml)
             if (service && !profile->boolKey(Buteo::KEY_STORAGE_UPDATED)) {
                 address = service->key(Buteo::KEY_BT_ADDRESS);
                 if (!address.isNull()) {
-                    updateProfileStorageInfo(profile, address);
+                    if(profile->key(Buteo::KEY_UUID).isEmpty())
+                    {
+                        QString uuid = QUuid::createUuid().toString();
+                        uuid = uuid.remove(QRegExp("[{}]"));
+                        profile->setKey(Buteo::KEY_UUID, uuid);
+                        LOG_DEBUG("DPK device init uuid" << uuid);
+                    }
+                    if(profile->key(Buteo::KEY_REMOTE_NAME).isEmpty())
+                    {
+                        profile->setKey(Buteo::KEY_REMOTE_NAME, profile->displayname());
+                        LOG_DEBUG("DPK device init name" << profile->displayname());
+                    }
                     profile->setBoolKey(Buteo::KEY_STORAGE_UPDATED, true);
                 }
             }
@@ -1198,6 +1208,8 @@ void Synchronizer::onNewSession(const QString &aDestination)
             // destination a bt address
             profile = iProfileManager.createTempSyncProfile(aDestination, createNewProfile);
             LOG_DEBUG( "No sync profiles found with a matching destination address" );
+            profile->setKey(Buteo::KEY_UUID, iUUID);
+            profile->setKey(Buteo::KEY_REMOTE_NAME, iRemoteName);
         }
         else
         {
@@ -1211,7 +1223,6 @@ void Synchronizer::onNewSession(const QString &aDestination)
             syncProfiles.removeFirst();
             qDeleteAll(syncProfiles);
         }
-
     // If the profile is not hidden, UI must be informed.
 	if(!profile->isHidden())
 	{
@@ -1530,16 +1541,37 @@ void Synchronizer::onNetworkStateChanged(bool aState)
     }
 }
 
-void Synchronizer::updateProfileStorageInfo(Buteo::Profile* aProfile, const QString& aAddress)
-{
+Profile* Synchronizer::getSyncProfileByRemoteAddress(const QString& aAddress)
+{ 
     FUNCTION_CALL_TRACE;
-
-    BtHelper helper(aAddress);
-
-    QString uuid = UUID_BEGIN + aAddress.split(":").join("");
-    QString btName = helper.getDeviceProperties().value(BT_PROPERTIES_NAME).toString();
-
-    aProfile->setKey(Buteo::KEY_REMOTE_NAME, btName);
-    aProfile->setKey(Buteo::KEY_UUID, uuid);
+    Profile* profile = 0;
+    QList<SyncProfile*> profiles;
+    if(!(profiles = iProfileManager.getSyncProfilesByData("",
+                                              Buteo::Profile::TYPE_SERVICE,
+                                              Buteo::KEY_BT_ADDRESS,
+                                              aAddress)).isEmpty())
+    {
+        profile = profiles.first();
+    }
+    return profile;
 }
 
+QString Synchronizer::getValue(const QString& aAddress, const QString& aKey)
+{
+    FUNCTION_CALL_TRACE;
+    QString value;
+    if(Buteo::KEY_UUID == aKey)
+    {
+        iUUID = QUuid::createUuid().toString();
+        iUUID = iUUID.remove(QRegExp("[{}]"));
+        value = iUUID;
+    }
+
+    if(Buteo::KEY_REMOTE_NAME == aKey)
+    {
+        BtHelper btHelper(aAddress);
+        iRemoteName = btHelper.getDeviceProperties().value(BT_PROPERTIES_NAME).toString();
+        value = iRemoteName;
+    }
+    return value;
+}
