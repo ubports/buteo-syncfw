@@ -88,8 +88,20 @@ public:
      */
     virtual bool isConnectivityAvailable( Sync::ConnectivityType aType ) = 0;
 
+    /*! \brief tries to fetch a profile object based on the remote party's
+     * address (BT address for eg)
+     *
+     * @param aAddress remote party's address
+     * @return profile object - to be deleted by caller
+     */
     virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress) = 0;
 
+    /*! \brief Get a value for a property describing the remote device
+     *
+     * @param aAddress remote device's address
+     * @param aKey profile key identifying the property
+     * @return value for the property
+     */
     virtual QString getValue(const QString& aAddress, const QString& aKey) = 0;
 };
 
