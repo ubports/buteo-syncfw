@@ -758,9 +758,9 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
     saveNewProfile = true;
     if (destAddress.contains("USB")) { //USB - PCSUite no requirement to save profile
         LOG_INFO("USB connect - pc");
-        saveNewProfile = false;
-        SyncProfile *profile = new SyncProfile(destAddress);
+        SyncProfile *profile = new SyncProfile(PC_SYNC);
         profile->setBoolKey(KEY_HIDDEN, true);
+        profile->setKey(KEY_DISPLAY_NAME, PC_SYNC);
         return profile;
     }
 
@@ -771,9 +771,9 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
 
     if (classType & pcsuiteClass) {
         LOG_INFO("Device major class is Computer"); // not required to save profile
-        saveNewProfile = false;
-        SyncProfile *profile = new SyncProfile(destAddress);
+        SyncProfile *profile = new SyncProfile(PC_SYNC);
         profile->setBoolKey(KEY_HIDDEN, true);
+        profile->setKey(KEY_DISPLAY_NAME, PC_SYNC);
         return profile;
     }
 

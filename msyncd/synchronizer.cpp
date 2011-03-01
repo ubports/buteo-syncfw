@@ -1198,7 +1198,18 @@ void Synchronizer::onNewSession(const QString &aDestination)
     {
         SyncProfile *profile = 0;
         QList<SyncProfile*> syncProfiles;
-        if (!aDestination.contains("USB")) // Search profile only with BT
+        BtHelper btHelp(aDestination);
+        QMap <QString , QVariant> mapVal = btHelp.getDeviceProperties();
+        uint classType = mapVal.value("Class").toInt();
+        uint computerclass = 0x100; //Major Device Class - Computer
+
+        if(aDestination.contains("USB") || classType & computerclass)
+        {
+		LOG_DEBUG("DPK NOS sync");
+            syncProfiles = iProfileManager.getSyncProfilesByData(
+                    QString::null, QString::null, KEY_DISPLAY_NAME, PC_SYNC);
+        }
+        else
         {
             syncProfiles = iProfileManager.getSyncProfilesByData(
                     QString::null, Profile::TYPE_SERVICE, KEY_BT_ADDRESS, aDestination);
@@ -1546,10 +1557,34 @@ Profile* Synchronizer::getSyncProfileByRemoteAddress(const QString& aAddress)
     FUNCTION_CALL_TRACE;
     Profile* profile = 0;
     QList<SyncProfile*> profiles;
-    if(!(profiles = iProfileManager.getSyncProfilesByData("",
-                                              Buteo::Profile::TYPE_SERVICE,
-                                              Buteo::KEY_BT_ADDRESS,
-                                              aAddress)).isEmpty())
+    if("USB" == aAddress)
+    {
+        profiles = iProfileManager.getSyncProfilesByData(
+                QString::null, QString::null, KEY_DISPLAY_NAME, PC_SYNC);
+	LOG_DEBUG("DPK NOS profile");
+    }
+    else
+    {
+        BtHelper btHelp(aAddress);
+        QMap <QString , QVariant> mapVal = btHelp.getDeviceProperties();
+        uint classType = mapVal.value("Class").toInt();
+        uint computerclass = 0x100; //Major Device Class - Computer
+        if(classType & computerclass)
+        {
+            profiles = iProfileManager.getSyncProfilesByData(
+                    QString::null, QString::null, KEY_DISPLAY_NAME, PC_SYNC);
+	    LOG_DEBUG("DPK NOS profile");
+        }
+        else
+        {
+	    LOG_DEBUG("DPK BT profile");
+            profiles = iProfileManager.getSyncProfilesByData("",
+                                          Buteo::Profile::TYPE_SERVICE,
+                                          Buteo::KEY_BT_ADDRESS,
+                                          aAddress);
+        }
+    }
+    if(!profiles.isEmpty())
     {
         profile = profiles.first();
     }
@@ -1569,8 +1604,25 @@ QString Synchronizer::getValue(const QString& aAddress, const QString& aKey)
 
     if(Buteo::KEY_REMOTE_NAME == aKey)
     {
-        BtHelper btHelper(aAddress);
-        iRemoteName = btHelper.getDeviceProperties().value(BT_PROPERTIES_NAME).toString();
+        if("USB" == aAddress)
+        {
+            iRemoteName = PC_SYNC;
+        }
+        else
+        {
+            BtHelper btHelper(aAddress);
+            QMap <QString , QVariant> mapVal = btHelper.getDeviceProperties();
+            uint classType = mapVal.value("Class").toInt();
+            uint computerclass = 0x100; //Major Device Class - Computer
+            if(classType & computerclass)
+            {
+                iRemoteName = PC_SYNC;
+            }
+            else
+            {
+                iRemoteName = btHelper.getDeviceProperties().value(BT_PROPERTIES_NAME).toString();
+            }
+        }
         value = iRemoteName;
     }
     return value;
