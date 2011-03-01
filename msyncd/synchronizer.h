@@ -97,8 +97,10 @@ public:
     /// \see PluginCbInterface::isConnectivityAvailable
     virtual bool isConnectivityAvailable( Sync::ConnectivityType aType );
 
-    /// \see PluginCbInterface::updateProfileStorageInfo
-    virtual void updateProfileStorageInfo(Buteo::Profile* aProfile, const QString& aAddress);
+    virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress);
+
+    virtual QString getValue(const QString& aAddress, const QString& aKey);
+
 
 // From SyncDBusInterface
 // --------------------------------------------------------------------------
@@ -334,6 +336,10 @@ private:
     void restoreProfileCounter(SyncProfile* aProfile);
 
     bool iSOCEnabled;
+
+    QString iUUID;
+
+    QString iRemoteName;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class SynchronizerTest;

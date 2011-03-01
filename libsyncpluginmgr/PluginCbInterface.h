@@ -88,13 +88,9 @@ public:
      */
     virtual bool isConnectivityAvailable( Sync::ConnectivityType aType ) = 0;
 
-    /*! \brief Updates profile with additional info for storages
-     *
-     * \param aProfile Profile to be updated.
-     * \param aAddress Bt address for the connection
-     */
-    virtual void updateProfileStorageInfo(Profile* aProfile, const QString& aAddress) = 0;
+    virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress) = 0;
 
+    virtual QString getValue(const QString& aAddress, const QString& aKey) = 0;
 };
 
 }
