@@ -97,8 +97,10 @@ public:
     /// \see PluginCbInterface::isConnectivityAvailable
     virtual bool isConnectivityAvailable( Sync::ConnectivityType aType );
 
+    /// \see PluginCbInterface::getSyncProfileByRemoteAddress
     virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress);
 
+    /// \see PluginCbInterface::getValue
     virtual QString getValue(const QString& aAddress, const QString& aKey);
 
 
