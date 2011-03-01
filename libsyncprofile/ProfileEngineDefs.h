@@ -108,6 +108,7 @@ const QString VALUE_PREFER_LOCAL("prefer local");
 // Indent size for profile XML output.
 const int PROFILE_INDENT = 4;
 
+const QString PC_SYNC("PC-SYNC");
 }
 
 #endif // COMMONDEFS_H
