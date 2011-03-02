@@ -1,3 +1,10 @@
+sync-fw (0.5.13) stable; urgency=low
+
+  * Fixes: NB#232613 - Sync profile is not deleted after tapping on Yes 
+    button in confirmation dialog
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Wed, 02 Mar 2011 18:11:04 +0200
+
 sync-fw (0.5.12) stable; urgency=low
 
   * Fixes: NB#230558 - Calendar sync fails with NOS via USB

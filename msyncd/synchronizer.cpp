@@ -781,6 +781,7 @@ bool Synchronizer::cleanupProfile(const QString &aProfileId)
         delete profile;
         delete pluginRunner;
     }
+    return status;
 }
 
 bool Synchronizer::removeProfile(QString aProfileId)
