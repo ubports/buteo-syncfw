@@ -292,8 +292,17 @@ private:
     void initializeScheduler();
 
     bool isBackupRestoreInProgress ();
+
+    /*! \brief Requests for a cleanup from the plugin for the given profileId
+     *
+     * @param aProfileId Name/Id of the profile
+     * @return True or False to indicate success or failure
+     */
+    bool cleanupProfile(const QString &profileId);
     
     QMap<QString, SyncSession*> iActiveSessions;
+
+    QList<QString> iProfilesToRemove;
 
     QMap<QString, ServerPluginRunner*> iServers;
 

@@ -119,7 +119,9 @@ bool Synchronizer::initialize()
     connect(iAccounts, SIGNAL(enableSOC(QString)),
             this, SLOT(enableSOCSlot(QString)),
             Qt::QueuedConnection);
-
+    connect(iAccounts, SIGNAL(removeProfile(QString)),
+            this, SLOT(removeProfile(QString)),
+            Qt::QueuedConnection);
     connect(this, SIGNAL(storageReleased()),
             this, SLOT(onStorageReleased()), Qt::QueuedConnection);
 
@@ -572,6 +574,11 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
 
             iActiveSessions.remove(aProfileName);
             cleanupSession(session, aStatus);
+            if(iProfilesToRemove.contains(aProfileName))
+            {
+                cleanupProfile(aProfileName);
+                iProfilesToRemove.removeAll(aProfileName);
+            }
             if (session->isAborted() && (iActiveSessions.size() == 0) && isBackupRestoreInProgress()) {
                 stopServers();
                 iSyncBackup->sendReply(0);
@@ -723,14 +730,12 @@ void Synchronizer::abortSync(QString aProfileName)
     }
 }
 
-
-
-bool Synchronizer::removeProfile(QString aProfileId)
+bool Synchronizer::cleanupProfile(const QString &aProfileId)
 {
-    FUNCTION_CALL_TRACE
-    bool status = false;
+    FUNCTION_CALL_TRACE;
     // We assume this call is made on a Sync Profile
     SyncProfile *profile = iProfileManager.syncProfile (aProfileId);
+    bool status = false;
 
     if(!aProfileId.isEmpty() && profile)  {
 
@@ -775,6 +780,26 @@ bool Synchronizer::removeProfile(QString aProfileId)
         }
         delete profile;
         delete pluginRunner;
+    }
+}
+
+bool Synchronizer::removeProfile(QString aProfileId)
+{
+    FUNCTION_CALL_TRACE;
+    bool status = true;
+
+    // Check if a sync session is ongoing for this profile.
+    if(iActiveSessions.contains(aProfileId))
+    {
+        // If yes, abort that sync session first
+        LOG_DEBUG("Sync still ongoing for profile" << aProfileId);
+        LOG_DEBUG("Aborting sync for profile" << aProfileId);
+        abortSync(aProfileId);
+        iProfilesToRemove.append(aProfileId);
+    }
+    else
+    {
+        status = cleanupProfile(aProfileId);
     }
     return status;
 }

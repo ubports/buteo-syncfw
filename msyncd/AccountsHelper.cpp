@@ -89,9 +89,7 @@ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
     foreach(SyncProfile *profile, syncProfiles)
     {
         LOG_DEBUG("Removing profile" << profile->name());
-        // Delete the profile
-        iProfileManager.removeProfile(profile->name());
-
+        emit removeProfile(profile->name());
         delete profile;
     }
 }
