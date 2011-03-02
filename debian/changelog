@@ -1,3 +1,9 @@
+sync-fw (0.5.12) stable; urgency=low
+
+  * Fixes: NB#230558 - Calendar sync fails with NOS via USB
+
+ -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Wed, 02 Mar 2011 09:47:04 +0530
+
 sync-fw (0.5.11) stable; urgency=low
 
   * Fixes: NB#227297 - "Service not supported by other device" message
