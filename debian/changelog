@@ -1,6 +1,8 @@
 sync-fw (0.5.12) stable; urgency=low
 
   * Fixes: NB#230558 - Calendar sync fails with NOS via USB
+  * Fixes: NB#222418 - Fast sync is done instead of slow sync when ovi.com
+    sync is initiated after deleting account.
 
  -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Wed, 02 Mar 2011 09:47:04 +0530
 

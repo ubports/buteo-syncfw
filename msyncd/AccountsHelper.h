@@ -91,6 +91,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 
     void enableSOC(const QString& aProfileName);
+    void removeProfile(QString profileId);
 
 private:
 
