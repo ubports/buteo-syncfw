@@ -190,7 +190,7 @@ SyncLog *ProfileManagerPrivate::loadLog(const QString &aProfileName)
 bool ProfileManagerPrivate::matchProfile(const Profile &aProfile,
         const ProfileManager::SearchCriteria &aCriteria)
 {
-    FUNCTION_CALL_TRACE;
+    //FUNCTION_CALL_TRACE;
     bool matched = false;
 
     const Profile *testProfile = &aProfile;
@@ -1077,7 +1077,7 @@ bool ProfileManager::setSyncSchedule(QString aProfileId , QString aScheduleAsXml
 
 bool ProfileManagerPrivate::parseFile(const QString &aPath, QDomDocument &aDoc)
 {
-    FUNCTION_CALL_TRACE;
+    //FUNCTION_CALL_TRACE;
 
     bool parsingOk = false;
 
@@ -1111,7 +1111,7 @@ bool ProfileManagerPrivate::parseFile(const QString &aPath, QDomDocument &aDoc)
 
 QDomDocument ProfileManagerPrivate::constructProfileDocument(const Profile &aProfile)
 {
-    FUNCTION_CALL_TRACE;
+    //FUNCTION_CALL_TRACE;
 
     QDomDocument doc;
     QDomElement root = aProfile.toXml(doc);
@@ -1136,7 +1136,7 @@ QDomDocument ProfileManagerPrivate::constructProfileDocument(const Profile &aPro
 bool ProfileManagerPrivate::writeProfileFile(const QString &aProfilePath,
         const QDomDocument &aDoc)
 {
-    FUNCTION_CALL_TRACE;
+    //FUNCTION_CALL_TRACE;
 
     QFile file(aProfilePath);
     bool profileWritten = false;
@@ -1160,7 +1160,7 @@ bool ProfileManagerPrivate::writeProfileFile(const QString &aProfilePath,
 void ProfileManagerPrivate::restoreBackupIfFound(const QString &aProfilePath,
         const QString &aBackupPath)
 {
-    FUNCTION_CALL_TRACE;
+    //FUNCTION_CALL_TRACE;
 
     if (QFile::exists(aBackupPath))
     {

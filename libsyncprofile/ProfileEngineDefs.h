@@ -109,6 +109,9 @@ const QString VALUE_PREFER_LOCAL("prefer local");
 const int PROFILE_INDENT = 4;
 
 const QString PC_SYNC("PC-SYNC");
+
+//For account online_template
+const QString SYNC_ONLINE_TEMPLATE("online_template");
 }
 
 #endif // COMMONDEFS_H

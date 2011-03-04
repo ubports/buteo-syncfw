@@ -364,7 +364,8 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
     }
 
-    else if( aScheduled && (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) )
+    else if( aScheduled && ( (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
+                             (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow) ))
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
@@ -647,7 +648,8 @@ bool Synchronizer::startNextSync()
 
     QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
 
-    if (session->isScheduled() && (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal))
+    if (session->isScheduled() && ((batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
+                                     (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow)) )
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         iSyncQueue.dequeue();
