@@ -152,6 +152,10 @@ void SyncSchedule::setScheduleConfiguredTime(const QDateTime &aDateTime)
     d_ptr->iScheduleConfiguredTime = aDateTime;
 }
 
+QDateTime SyncSchedule::scheduleConfiguredTime()
+{
+    return d_ptr->iScheduleConfiguredTime;
+}
 
 QTime SyncSchedule::time() const
 {
@@ -236,7 +240,8 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
     QDateTime now = QDateTime::currentDateTime();
 
 
-    LOG_DEBUG("aPrevSync" << aPrevSync.toString() << "Last Configured Time " << scheduleConfiguredTime.toString());
+    LOG_DEBUG("aPrevSync" << aPrevSync.toString() << "Last Configured Time " << scheduleConfiguredTime.toString()
+              <<"CurrentDateTime"<<now);
 
     if (d_ptr->iTime.isValid() && !d_ptr->iDays.isEmpty())
     {
@@ -262,9 +267,10 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         // Figure out the number of intervals passed
         QDateTime reference;
         reference = (aPrevSync.isValid()) ? aPrevSync : scheduleConfiguredTime;
-        if(reference > now)
+        if(reference > now || !reference.isValid())
         {
             // If the clock was rolled back...
+            LOG_DEBUG("Setting reference to now");
             reference = now;
         }
         int numberOfIntervals = 0;
@@ -276,6 +282,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
             {
                 numberOfIntervals++;
             }
+            LOG_DEBUG("numberOfInterval:"<<numberOfIntervals<<"interval time"<<d_ptr->iInterval);
         }
         nextSync = reference.addSecs(numberOfIntervals * d_ptr->iInterval * 60);
     }
@@ -300,6 +307,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
                     // Use current time if the previous sync time is too old, or
                     // the clock has been rolled back
                     nextSyncRush = now.addSecs(d_ptr->iRushInterval * 60);
+                    LOG_DEBUG("nextsyncRush based on aPrevSync"<<nextSyncRush);
                 }
             }
             else

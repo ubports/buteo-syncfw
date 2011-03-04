@@ -261,22 +261,26 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
     Profile *serviceProfile = iProfileManager.profile(service->name(), Profile::TYPE_SERVICE);
     if (!serviceProfile) {
     	LOG_DEBUG ("!!!! Service not supported !!!!");
-	return;
+        return;
     }
     
     QString profileName ;
     if (!service->name().isEmpty()) {
-	    QStringList keys;
-	    keys << QString::number(account->id()) << service->name();
-	    serviceProfile->setName(keys);
-            profileName = serviceProfile->name();
+        QStringList keys;
+        keys << QString::number(account->id()) << service->name();
+        serviceProfile->setName(keys);
+        profileName = serviceProfile->name();
     }
     delete serviceProfile;
    
     SyncProfile *profile = iProfileManager.syncProfile(profileName);
+
+    LOG_DEBUG("profileName:"<<profileName);
     
     if(0 == profile)
     {
+        LOG_DEBUG("New profile creating with clone of base profile");
+
         // Create a new sync profile with username
         SyncProfile *newProfile = baseProfile->clone();
         newProfile->setName(profileName);
@@ -286,7 +290,21 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         // Set profile as enabled
         newProfile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
         newProfile->setKey(KEY_ACTIVE, BOOLEAN_TRUE);
-	setSyncSchedule (newProfile, account->id(), true);
+        setSyncSchedule (newProfile, account->id(), true);
+
+        //Creating new profile. Check if online_template exist
+        //If it read scheduled sync setting as Account set those setting
+        // in template initally.
+        SyncProfile *templateProfile = iProfileManager.syncProfile(SYNC_ONLINE_TEMPLATE);
+        if (templateProfile) {
+            //Read schedule setting.
+            SyncSchedule schedule = templateProfile->syncSchedule();
+            if (!schedule.scheduleConfiguredTime().isNull()) {
+                newProfile->setSyncSchedule(schedule);
+            }
+            delete templateProfile;
+        }
+
         // Save the newly created profile
         iProfileManager.updateProfile(*newProfile);
         if(newProfile->isSOCProfile())
@@ -297,8 +315,9 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
     }
     else if(true == profile->boolKey(KEY_USE_ACCOUNTS, false))
     {
+        LOG_DEBUG("Profile already exist enable it");
         // Set profile as enabled
-        profile->setKey(KEY_ACTIVE, BOOLEAN_FALSE);
+        profile->setKey(KEY_ACTIVE, BOOLEAN_TRUE);
         profile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
         iProfileManager.updateProfile(*profile);
         if(profile->isSOCProfile())

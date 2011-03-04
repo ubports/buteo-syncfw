@@ -144,6 +144,7 @@ int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
             currentAlarm = newAlarm;
             QDateTime now = QDateTime::currentDateTime();
             int iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
+            LOG_DEBUG("currentAlarm"<<currentAlarm<<"alarmTime"<<alarmTime<<"iTimerInterval"<<iTimerInterval);
             triggerCount = TRIGGER_COUNT;
             iTimer->setInterval( iTimerInterval );
             iTimer->start();

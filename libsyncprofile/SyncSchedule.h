@@ -117,11 +117,17 @@ public:
     void setTime(const QTime &aTime);
 
 
-    /*! \brief Sets the next time for sync.
+    /*! \brief Sets scheduled config time.
     *
     * \param QDateTime Sync time.
     */
     void setScheduleConfiguredTime(const QDateTime &aDateTime);
+
+    /*! \brief To get the scheduled config time.
+    *
+    *   \return QDateTime Sync time.
+    */
+    QDateTime scheduleConfiguredTime();
 
     /*! \brief Gets sync interval in minutes.
      *
