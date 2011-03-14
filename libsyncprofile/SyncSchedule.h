@@ -76,6 +76,12 @@ public:
      */
     SyncSchedule& operator=(const SyncSchedule &aRhs);
 
+    /*! \brief Equal to operator.
+     *
+     * \param aRhs Source
+     */
+    bool operator==(const SyncSchedule &aRhs);
+    
     /*! \brief Exports the sync schedule to XML.
      *
      * \param aDoc Parent document for the created XML elements.
