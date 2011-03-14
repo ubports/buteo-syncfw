@@ -102,6 +102,29 @@ SyncSchedule& SyncSchedule::operator=(const SyncSchedule &aRhs)
     return *this;
 }
 
+bool SyncSchedule::operator==(const SyncSchedule &aRhs)
+{
+    if (&aRhs == this)
+	return true;    
+    LOG_CRITICAL("Schedule logic !!check");
+    if (d_ptr->iRushDays != aRhs.d_ptr->iRushDays)
+        return false;	    
+    else if (d_ptr->iRushBegin != aRhs.d_ptr->iRushBegin)
+        return false;	    
+    else if (d_ptr->iRushEnd != aRhs.d_ptr->iRushEnd)
+        return false;	    
+    else if (d_ptr->iRushInterval != aRhs.d_ptr->iRushInterval)    
+        return false;	    
+    else if (d_ptr->iInterval  != aRhs.d_ptr->iInterval)
+        return false;	    
+    else if (d_ptr->iEnabled  != aRhs.d_ptr->iEnabled)
+        return false;	    
+    else if (d_ptr->iRushEnabled  != aRhs.d_ptr->iRushEnabled) 
+        return false;	    
+
+    return true;
+}
+
 QDomElement SyncSchedule::toXml(QDomDocument &aDoc) const
 {
     QDomElement root = aDoc.createElement(TAG_SCHEDULE);
