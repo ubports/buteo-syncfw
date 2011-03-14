@@ -106,7 +106,6 @@ bool SyncSchedule::operator==(const SyncSchedule &aRhs)
 {
     if (&aRhs == this)
 	return true;    
-    LOG_CRITICAL("Schedule logic !!check");
     if (d_ptr->iRushDays != aRhs.d_ptr->iRushDays)
         return false;	    
     else if (d_ptr->iRushBegin != aRhs.d_ptr->iRushBegin)
