@@ -37,6 +37,8 @@ class SyncScheduleTest;
 typedef QSet<int> DaySet;
 
 const QString SYNC_SCHEDULE_ENABLED_KEY_BOOL("schedule_enabled");
+const QString SYNC_SCHEDULE_PEAK_ENABLED_KEY_BOOL("schedule_peak_enabled");
+const QString SYNC_SCHEDULE_OFFPEAK_ENABLED_KEY_BOOL("schedule_offpeak_enabled");
 const QString SYNC_SCHEDULE_PEAK_DAYS_KEY_INT ("schedule_peak_days");
 const QString SYNC_SCHEDULE_PEAK_START_TIME_KEY_INT ("schedule_peak_start_time");
 const QString SYNC_SCHEDULE_PEAK_END_TIME_KEY_INT ("schedule_peak_end_time");
