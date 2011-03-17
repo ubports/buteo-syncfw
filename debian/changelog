@@ -1,6 +1,7 @@
 sync-fw (0.5.16) stable; urgency=low
 
   * Added defines for off peak and peak enable/disable.
+  * Changes in AccountsHelper.
 
  -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Thu, 17 Mar 2011 16:18:04 +0200
 
