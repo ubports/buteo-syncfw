@@ -1,3 +1,9 @@
+sync-fw (0.5.17) stable; urgency=low
+
+  * Fixed some meory leaks.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Mon, 21 Mar 2011 14:45:00 +0530
+
 sync-fw (0.5.16) stable; urgency=low
 
   * Added defines for off peak and peak enable/disable.

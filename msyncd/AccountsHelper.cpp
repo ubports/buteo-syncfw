@@ -201,8 +201,6 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
 
         syncSchedule.setInterval (account->valueAsInt (Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT));
         LOG_DEBUG ("Sync Interval :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT));
-        syncSchedule.setScheduleEnabled (syncSchedule.interval() != 0);
-            
 
         syncSchedule.setRushEnabled(account->valueAsBool(Buteo::SYNC_SCHEDULE_PEAK_ENABLED_KEY_BOOL));
         LOG_DEBUG ("Sync PEAK :" << account->valueAsBool(Buteo::SYNC_SCHEDULE_PEAK_ENABLED_KEY_BOOL));
@@ -212,7 +210,6 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
         
         syncSchedule.setRushInterval (account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT));
         LOG_DEBUG ("Sync Rush Interval :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT));
-        syncSchedule.setRushEnabled (syncSchedule.rushInterval() != 0);
 
         int map = account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_DAYS_KEY_INT);
         LOG_DEBUG ("Sync Days :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_DAYS_KEY_INT));
