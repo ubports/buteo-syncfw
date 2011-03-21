@@ -73,6 +73,9 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
                )
             {
                 addAccountIfNotExists(newAccount, service, syncProfile);
+            }
+            if(0 != syncProfile)
+            {
                 delete syncProfile;
                 syncProfile = 0;
             }
@@ -144,7 +147,7 @@ void AccountsHelper::slotAccountEnabled(Accounts::AccountId id)
             // Now disable all remaining profiles
             foreach(SyncProfile *profile, profiles)
             {
-                profile->setKey(KEY_ACTIVE, BOOLEAN_FALSE);
+                profile->setKey(KEY_ENABLED, BOOLEAN_FALSE);
                 iProfileManager.updateProfile(*profile);
                 delete profile;
             }
@@ -198,15 +201,18 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
 
         syncSchedule.setInterval (account->valueAsInt (Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT));
         LOG_DEBUG ("Sync Interval :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT));
+        syncSchedule.setScheduleEnabled (syncSchedule.interval() != 0);
+            
 
-	syncSchedule.setRushEnabled(account->valueAsBool(Buteo::SYNC_SCHEDULE_PEAK_ENABLED_KEY_BOOL));
+        syncSchedule.setRushEnabled(account->valueAsBool(Buteo::SYNC_SCHEDULE_PEAK_ENABLED_KEY_BOOL));
         LOG_DEBUG ("Sync PEAK :" << account->valueAsBool(Buteo::SYNC_SCHEDULE_PEAK_ENABLED_KEY_BOOL));
         
-	syncSchedule.setScheduleEnabled(account->valueAsBool(Buteo::SYNC_SCHEDULE_OFFPEAK_ENABLED_KEY_BOOL));
+        syncSchedule.setScheduleEnabled(account->valueAsBool(Buteo::SYNC_SCHEDULE_OFFPEAK_ENABLED_KEY_BOOL));
         LOG_DEBUG ("Sync OFFPEAK :" << account->valueAsBool(Buteo::SYNC_SCHEDULE_OFFPEAK_ENABLED_KEY_BOOL));
         
-	syncSchedule.setRushInterval (account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT));
+        syncSchedule.setRushInterval (account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT));
         LOG_DEBUG ("Sync Rush Interval :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT));
+        syncSchedule.setRushEnabled (syncSchedule.rushInterval() != 0);
 
         int map = account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_DAYS_KEY_INT);
         LOG_DEBUG ("Sync Days :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_DAYS_KEY_INT));
@@ -239,6 +245,7 @@ void AccountsHelper::slotAccountUpdated(Accounts::AccountId id)
         if (syncProfile) {
             setSyncSchedule(syncProfile, id);
             iProfileManager.updateProfile(*syncProfile);
+            emit scheduleUpdated(syncProfile->name());
             delete syncProfile;
         }
     }
@@ -293,24 +300,12 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
         // Set profile as enabled
         newProfile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
-        newProfile->setKey(KEY_ACTIVE, BOOLEAN_TRUE);
+        newProfile->setKey(KEY_ENABLED, BOOLEAN_TRUE);
         setSyncSchedule (newProfile, account->id(), true);
-
-        //Creating new profile. Check if online_template exist
-        //If it read scheduled sync setting as Account set those setting
-        // in template initally.
-        SyncProfile *templateProfile = iProfileManager.syncProfile(SYNC_ONLINE_TEMPLATE);
-        if (templateProfile) {
-            //Read schedule setting.
-            SyncSchedule schedule = templateProfile->syncSchedule();
-            if (!schedule.scheduleConfiguredTime().isNull()) {
-                newProfile->setSyncSchedule(schedule);
-            }
-            delete templateProfile;
-        }
 
         // Save the newly created profile
         iProfileManager.updateProfile(*newProfile);
+        emit scheduleUpdated(newProfile->name());
         if(newProfile->isSOCProfile())
         {
             emit enableSOC(newProfile->name());
@@ -321,13 +316,17 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
     {
         LOG_DEBUG("Profile already exist enable it");
         // Set profile as enabled
-        profile->setKey(KEY_ACTIVE, BOOLEAN_TRUE);
+        profile->setKey(KEY_ENABLED, BOOLEAN_TRUE);
         profile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
         iProfileManager.updateProfile(*profile);
+        emit scheduleUpdated(profile->name());
         if(profile->isSOCProfile())
         {
             emit enableSOC(profile->name());
         }
+    }
+    if(0 != profile)
+    {
         delete profile;
     }
 }
