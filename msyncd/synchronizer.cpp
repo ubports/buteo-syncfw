@@ -119,6 +119,9 @@ bool Synchronizer::initialize()
     connect(iAccounts, SIGNAL(enableSOC(QString)),
             this, SLOT(enableSOCSlot(QString)),
             Qt::QueuedConnection);
+    connect(iAccounts, SIGNAL(scheduleUpdated(QString)),
+            this, SLOT(reschedule(QString)),
+            Qt::QueuedConnection);
     connect(iAccounts, SIGNAL(removeProfile(QString)),
             this, SLOT(removeProfile(QString)),
             Qt::QueuedConnection);

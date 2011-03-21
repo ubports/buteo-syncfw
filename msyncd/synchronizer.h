@@ -232,6 +232,12 @@ private slots:
      */
     void enableSOCSlot(const QString& aProfileName);
 
+    /*! \brief Adds a profile to sync scheduler
+     *
+     * @param aProfileName Name of the profile to schedule.
+     */
+    void reschedule(const QString &aProfileName);
+
 private:
 
     bool startSync(const QString &aProfileName, bool aScheduled);
@@ -280,12 +286,6 @@ private:
      */
      void backupRestoreFinished();
     
-    /*! \brief Adds a profile to sync scheduler
-     *
-     * @param aProfileName Name of the profile to schedule.
-     */
-    void reschedule(const QString &aProfileName);
-
     /*! \brief Initializes sync scheduler
      *
      */
