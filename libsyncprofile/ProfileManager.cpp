@@ -755,7 +755,6 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
 {
     FUNCTION_CALL_TRACE;
 
-    saveNewProfile = true;
     if (destAddress.contains("USB")) { //USB - PCSUite no requirement to save profile
         LOG_INFO("USB connect - pc");
         SyncProfile *profile = new SyncProfile(PC_SYNC);
@@ -777,6 +776,7 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
         return profile;
     }
 
+    saveNewProfile = true;
     QString profileDisplayName = mapVal.value("Name").toString();
     if (profileDisplayName.isEmpty()) {
         //Todo : What to show if name is empty !!
