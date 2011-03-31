@@ -26,6 +26,8 @@
 #include "Profile.h"
 #include "ProfileEngineDefs.h"
 
+static const QString ACCOUNTS_GLOBAL_SERVICE("global");
+
 using namespace Buteo;
 
 AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent)
@@ -37,8 +39,6 @@ AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent
                      this, SLOT(slotAccountCreated(Accounts::AccountId)));
     QObject::connect(iAccountManager, SIGNAL(accountRemoved(Accounts::AccountId)),
                      this, SLOT(slotAccountRemoved(Accounts::AccountId)));
-    QObject::connect(iAccountManager, SIGNAL(enabledEvent(Accounts::AccountId)),
-                     this, SLOT(slotAccountEnabled(Accounts::AccountId)));
     QObject::connect(iAccountManager, SIGNAL(accountUpdated(Accounts::AccountId)),
                      this, SLOT(slotAccountUpdated(Accounts::AccountId)));
 
@@ -97,60 +97,35 @@ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
     }
 }
 
-void AccountsHelper::slotAccountEnabled(Accounts::AccountId id)
+void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool enabled)
 {
     FUNCTION_CALL_TRACE;
-    Accounts::Account *account = iAccountManager->account(id);
-    if(0 != account)
+    // Get the sender account
+    Accounts::Account *changedAccount = qobject_cast<Accounts::Account*>(this->sender());
+    if(0 != changedAccount)
     {
-        // Get all enabled services for this account
-        Accounts::ServiceList serviceList = account->enabledServices();
-        // Get all profiles for this account id
-        QList<SyncProfile*> profiles = getProfilesByAccountId(id);
-        // Check if profiles are already configured for the account
-        if(false == account->enabled())
+        LOG_DEBUG("Received account enabled changed signal" << serviceName << enabled << changedAccount->displayName());
+        if(serviceName == ACCOUNTS_GLOBAL_SERVICE)
         {
+            // Entire account disabled/enabled
+            QList<SyncProfile*> profiles = getProfilesByAccountId(changedAccount->id());
             foreach(SyncProfile *profile, profiles)
             {
-                profile->setKey(KEY_HIDDEN, BOOLEAN_TRUE);
+                LOG_DEBUG("Changing profile enabled" << profile->name() << enabled);
+                profile->setEnabled(enabled);
+                if(enabled)
+                {
+                    emit scheduleUpdated(profile->name());
+                }
                 iProfileManager.updateProfile(*profile);
                 delete profile;
             }
         }
         else
         {
-            foreach(Accounts::Service *service, serviceList)
-            {
-                SyncProfile *syncProfile = iProfileManager.syncProfile(service->name());
-                if(0 != syncProfile)
-                {
-                    addAccountIfNotExists(account, service, syncProfile);
-                    delete syncProfile;
-                    syncProfile = 0;
-                }
-                for(QList<SyncProfile*>::Iterator i = profiles.begin(); i != profiles.end(); )
-                {
-                    // If the service name is still enabled, remove the sync profile
-                    // from the list
-                    if((*i)->name().startsWith(service->name()))
-                    {
-                        delete *i;
-                        i = profiles.erase(i);
-                    }
-                    else
-                    {
-                        ++i;
-                    }
-                }
-            }
-
-            // Now disable all remaining profiles
-            foreach(SyncProfile *profile, profiles)
-            {
-                profile->setKey(KEY_ENABLED, BOOLEAN_FALSE);
-                iProfileManager.updateProfile(*profile);
-                delete profile;
-            }
+            // A service in the account is enabled/disabled
+            // [TODO:] This does not work right now. No signal is emitted from
+            // accounts when a service is enabled/disabled
         }
     }
 }
@@ -296,8 +271,7 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         // Add the account ID to the profile
         newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
         // Set profile as enabled
-        newProfile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
-        newProfile->setKey(KEY_ENABLED, BOOLEAN_TRUE);
+        newProfile->setEnabled(true);
         setSyncSchedule (newProfile, account->id(), true);
 
         // Save the newly created profile
@@ -313,8 +287,7 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
     {
         LOG_DEBUG("Profile already exist enable it");
         // Set profile as enabled
-        profile->setKey(KEY_ENABLED, BOOLEAN_TRUE);
-        profile->setKey(KEY_HIDDEN, BOOLEAN_FALSE);
+        profile->setEnabled(true);
         iProfileManager.updateProfile(*profile);
         emit scheduleUpdated(profile->name());
         if(profile->isSOCProfile())
@@ -347,4 +320,8 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
     // Register callback for account name changed
     QObject::connect(account, SIGNAL(displayNameChanged(const QString&)),
                      this, SLOT(slotAccountNameChanged(const QString&)));
+    // Callback for account enabled/disabled
+    QObject::connect(account, SIGNAL(enabledChanged(const QString&, bool)),
+                     this, SLOT(slotAccountEnabledChanged(const QString&, bool)));
 }
+
