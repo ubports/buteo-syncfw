@@ -332,6 +332,15 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error" , Buteo::SyncResults::INTERNAL_ERROR);
         return false;
     }
+    else if(false == profile->isEnabled())
+    {
+        LOG_WARNING("Profile is disabled, not stating sync");
+        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
+        iProfileManager.saveSyncResults(aProfileName, syncResults);
+        emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error" , Buteo::SyncResults::INTERNAL_ERROR);
+        delete profile;
+        return false;
+    }
 
     SyncSession *session = new SyncSession(profile, this);
     if (session == 0)
@@ -1361,12 +1370,13 @@ void Synchronizer::reschedule(const QString &aProfileName)
 
     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
 
-    if(profile && profile->syncType() == SyncProfile::SYNC_SCHEDULED)
+    if(profile && profile->syncType() == SyncProfile::SYNC_SCHEDULED && profile->isEnabled())
     {
         iSyncScheduler->addProfile(profile);
     }
     if(profile)
     {
+        LOG_DEBUG("Reschdule profile" << aProfileName << profile->syncType() << profile->isEnabled());
         delete profile;
         profile = NULL;
     }

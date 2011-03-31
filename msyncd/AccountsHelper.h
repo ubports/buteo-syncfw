@@ -70,11 +70,13 @@ public Q_SLOTS:
 	 */
     void slotAccountRemoved(Accounts::AccountId id);
 
-	/*! \brief slot for Accounts::Manager accountEnabled signal
+	/*! \brief slot for Accounts::Account enabledChanged signal
 	 *
-	 * \param id of the accounts
+	 * \param serviceName The service that was enabled/disabled. Empty if the
+     * entire account is enabled/disabled
+     * \param enabled Boolean indicating enabled (true) or disabled (false)
 	 */
-    void slotAccountEnabled(Accounts::AccountId id);
+    void slotAccountEnabledChanged(const QString &serviceName, bool enabled);
 
 	/*! \brief slot for Accounts::Manager displayNameChanged signal
 	 * *
