@@ -55,6 +55,14 @@ public:
      *
      */
     virtual ~AccountsHelper();
+    
+    /*! \brief Returns sync profiles that correspond to a given account ID
+     *
+     * \param id - The account ID.
+     * \return A list of sync profiles. The caller should delete the profiles
+     * after use.
+     */
+    QList<SyncProfile*> getProfilesByAccountId(Accounts::AccountId id);
 
 public Q_SLOTS:
 
@@ -98,7 +106,6 @@ Q_SIGNALS:
 
 private:
 
-    QList<SyncProfile*> getProfilesByAccountId(Accounts::AccountId);
 
     void addAccountIfNotExists(const Accounts::Account *account,
                                const Accounts::Service *service,

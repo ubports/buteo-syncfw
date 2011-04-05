@@ -113,8 +113,11 @@ loglevel.files = bin/set_sync_log_level
 loglevel.path = /etc/sync/
 meego.files = bin/msyncd.desktop
 meego.path = /etc/xdg/autostart/
+syncwidget.path = /etc/syncwidget/
+syncwidget.files = com.meego.msyncd
 INSTALLS += target \
-    loglevel
+    loglevel \
+    syncwidget
 
 # clean
 QMAKE_CLEAN += $(TARGET)

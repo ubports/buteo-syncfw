@@ -181,6 +181,20 @@ public slots:
     //! Called to get the current backup/restore state
     virtual bool getBackUpRestoreState();
 
+    void start(int aAccountId);
+    
+    /*! \brief Stops sync for all profiles matching the given account ID.
+     *
+     * \param aAccountId The account ID.
+     */
+    void stop(int aAccountId);
+    
+    /*! \brief Returns the list of account IDs for which sync is ongoing
+     *
+     * \return The list of account IDs currectly syncing.
+     */
+    QList<int> status();
+
 signals:
 
 	//! emitted by releaseStorages call
@@ -238,6 +252,15 @@ private slots:
      */
     void reschedule(const QString &aProfileName);
 
+    /*! \brief Handles the sync status signal
+     *
+     * @param aProfileName Name of the profile
+     * @param aStatus Status of the sync
+     * @param aMessage Status message as a string
+     * @param aMoreDetails In case of failure, contains detailed reason
+     */
+    void slotSyncStatus(QString aProfileName, int aStatus,
+                        QString aMessage, int aMoreDetails);
 private:
 
     bool startSync(const QString &aProfileName, bool aScheduled);

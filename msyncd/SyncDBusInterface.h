@@ -26,6 +26,7 @@
 #include <QtDBus>
 #include <QObject>
 #include <QString>
+#include <QList>
 
 namespace Buteo {
 
@@ -139,6 +140,18 @@ signals:
      * \param aResultsAsXml results as an xml object
      */
     void resultsAvailable(QString aProfileName , QString aResultsAsXml);
+
+    /*! \brief Notifies sync status change for a set of account Ids
+     *
+     * This signal is sent when the status of a sync for a particular
+     * account ID changes state (so typically it is always sent with a single
+     * account ID in the list). Upon receiving this signal, the client is
+     * expected to call the status method to check whether sync is
+     * running/stopped for this account ID
+     *
+     * \param aAccountIds A list of account IDs that changed state
+     */
+    void statusChanged(QList<int> aAccountIds);
  
 public slots:
 
@@ -292,6 +305,24 @@ public slots:
      * \return The sync profile ids as string list.
      */
     virtual QStringList syncProfilesByType(const QString &aType) = 0;
+
+    /*! \brief Starts sync for all profiles matching the given account ID.
+     *
+     * \param aAccountId The account ID.
+     */
+    virtual Q_NOREPLY void start(int aAccountId) = 0;
+    
+    /*! \brief Stops sync for all profiles matching the given account ID.
+     *
+     * \param aAccountId The account ID.
+     */
+    virtual Q_NOREPLY void stop(int aAccountId) = 0;
+    
+    /*! \brief Returns the list of account IDs for which sync is ongoing
+     *
+     * \return The list of account IDs currectly syncing.
+     */
+    virtual QList<int> status() = 0;
 };
 
 }

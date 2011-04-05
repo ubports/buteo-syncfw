@@ -103,6 +103,10 @@ bool Synchronizer::initialize()
         LOG_DEBUG("Registered to D-Bus");
     } // else ok
 
+    connect(this, SIGNAL(syncStatus(QString, int, QString, int)),
+            this, SLOT(slotSyncStatus(QString, int, QString, int)),
+            Qt::QueuedConnection);
+
     connect(&iProfileManager,SIGNAL(signalProfileChanged(QString,int,QString)),
             this ,SIGNAL(signalProfileChanged(QString,int,QString)));
 
@@ -739,6 +743,13 @@ void Synchronizer::abortSync(QString aProfileName)
     else
     {
         LOG_WARNING( "No sync in progress with the given profile" );
+        // Check if sync was queued, in which case, remove it from the queue
+        SyncSession *queuedSession = iSyncQueue.dequeue(aProfileName);
+        if(queuedSession)
+        {
+            LOG_DEBUG("Removed queued sync" << aProfileName);
+            delete queuedSession;
+        }
         SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_CANCELLED, Buteo::SyncResults::ABORTED);
         iProfileManager.saveSyncResults(aProfileName, syncResults);
         emit syncStatus(aProfileName, Sync::SYNC_CANCELLED, "", Buteo::SyncResults::ABORTED);
@@ -1382,6 +1393,41 @@ void Synchronizer::reschedule(const QString &aProfileName)
     }
 }
 
+void Synchronizer::slotSyncStatus(QString aProfileName, int aStatus, QString /*aMessage*/, int /*aMoreDetails*/)
+{
+    FUNCTION_CALL_TRACE;
+    SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+    if(profile)
+    {
+        QString accountId = profile->key(KEY_ACCOUNT_ID);
+        if(!accountId.isNull())
+        {
+            switch(aStatus)
+            {
+                case Sync::SYNC_QUEUED:
+                case Sync::SYNC_STARTED:
+                case Sync::SYNC_ERROR:
+                case Sync::SYNC_DONE:
+                case Sync::SYNC_ABORTED:
+                case Sync::SYNC_CANCELLED:
+                case Sync::SYNC_NOTPOSSIBLE:
+                    {
+                        QList<int> ids;
+                        ids.append(accountId.toInt());
+                        LOG_DEBUG("Sync status changed for account" << accountId);
+                        emit statusChanged(ids);
+                    }
+                    break;
+                case Sync::SYNC_STOPPING:
+                case Sync::SYNC_PROGRESS:
+                default:
+                    break;
+            }
+        }
+        delete profile;
+    }
+}
+
 bool Synchronizer::isBackupRestoreInProgress ()
 {
     FUNCTION_CALL_TRACE;
@@ -1464,6 +1510,64 @@ bool Synchronizer::getBackUpRestoreState()
 {
     LOG_DEBUG ("Synchronizer::getBackUpRestoreState");
     return iSyncBackup->getBackUpRestoreState();
+}
+
+void Synchronizer::start(int aAccountId)
+{
+   FUNCTION_CALL_TRACE;
+   LOG_DEBUG("Start sync requested for account" << aAccountId);
+   QList<SyncProfile*> profileList = iAccounts->getProfilesByAccountId(aAccountId);
+   foreach(SyncProfile *profile, profileList)
+   {
+       startSync(profile->name());
+       delete profile;
+   }
+}
+
+void Synchronizer::stop(int aAccountId)
+{
+   FUNCTION_CALL_TRACE;
+   LOG_DEBUG("Stop sync requested for account" << aAccountId);
+   QList<SyncProfile*> profileList = iAccounts->getProfilesByAccountId(aAccountId);
+   foreach(SyncProfile *profile, profileList)
+   {
+       abortSync(profile->name());
+       delete profile;
+   }
+}
+
+QList<int> Synchronizer::status()
+{
+    QList<int> syncingAccountsList;
+    // Check active sessions
+    QList<SyncSession*> activeSessions = iActiveSessions.values();
+    foreach(SyncSession *session, activeSessions)
+    {
+        if(session->profile())
+        {
+            SyncProfile *profile = session->profile();
+            QString accountId = profile->key(KEY_ACCOUNT_ID);
+            if(!accountId.isNull())
+            {
+                syncingAccountsList.append(accountId.toInt());
+            }
+        }
+    }
+    // Check queued syncs
+    const QList<SyncSession*> queuedSessions = iSyncQueue.getQueuedSyncSessions();
+    foreach(const SyncSession *session, queuedSessions)
+    {
+        if(session->profile())
+        {
+            SyncProfile *profile = session->profile();
+            QString accountId = profile->key(KEY_ACCOUNT_ID);
+            if(!accountId.isNull())
+            {
+                syncingAccountsList.append(accountId.toInt());
+            }
+        }
+    }
+    return syncingAccountsList;
 }
 
 QString Synchronizer::getLastSyncResult(const QString &aProfileId)

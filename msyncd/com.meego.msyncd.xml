@@ -1,4 +1,4 @@
--<!--
+<!--
 /*
  * This file is part of buteo-syncfw package
  *
@@ -21,7 +21,7 @@
  * 02110-1301 USA
  *
  */
---->
+-->
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
   <interface name="com.meego.msyncd">
@@ -54,6 +54,10 @@
     <signal name="resultsAvailable">
       <arg name="aProfileName" type="s" direction="out"/>
       <arg name="aResultsAsXml" type="s" direction="out"/>
+    </signal>
+    <signal name="statusChanged">
+      <arg name="aAccountIds" type="ai" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QList&lt;int&gt;"/>
     </signal>
     <method name="startSync">
       <arg type="b" direction="out"/>
@@ -96,24 +100,36 @@
       <arg name="aSyncResults" type="s" direction="in"/>
     </method>
     <method name="getLastSyncResult">
-      <arg name="aResultAsXml" type="s" direction="out"/>
+      <arg type="s" direction="out"/>
       <arg name="aProfileId" type="s" direction="in"/>
     </method>
     <method name="allVisibleSyncProfiles">
-      <arg name="aProfileAsXml" type="as" direction="out"/>
+      <arg type="as" direction="out"/>
     </method>
     <method name="syncProfile">
-      <arg name="aProfileAsXml" type="s" direction="out"/>
+      <arg type="s" direction="out"/>
       <arg name="aProfileId" type="s" direction="in"/>
     </method>
     <method name="syncProfilesByKey">
-      <arg name="aProfileAsXml" type="as" direction="out"/>
+      <arg type="as" direction="out"/>
       <arg name="aKey" type="s" direction="in"/>
       <arg name="aValue" type="s" direction="in"/>
     </method>
     <method name="syncProfilesByType">
-      <arg name="aProfileIds" type="as" direction="out"/>
+      <arg type="as" direction="out"/>
       <arg name="aType" type="s" direction="in"/>
+    </method>
+    <method name="start">
+      <arg name="aAccountId" type="i" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="stop">
+      <arg name="aAccountId" type="i" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="status">
+      <arg type="ai" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QList&lt;int&gt;"/>
     </method>
   </interface>
 </node>
