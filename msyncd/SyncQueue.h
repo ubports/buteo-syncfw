@@ -43,6 +43,12 @@ public:
      */
     void enqueue(SyncSession *aSession);
 
+    /*! \brief Removes the sync session corresponding to the profile name and returns it.
+     *
+     * \return The removed item. NULL if the queue was empty.
+     */
+    SyncSession *dequeue(const QString &aProfileName);
+
     /*! \brief Removes the first item from the queue and returns it.
      *
      * \return The removed item. NULL if the queue was empty.
@@ -66,6 +72,13 @@ public:
      * \return Is the profile in the queue.
      */
     bool contains(const QString &aProfileName) const;
+
+    /*! \brief Returns as a const reference, the list of all SyncSessions
+     * currently queued.
+     *
+     * \return Is the profile in the queue.
+     */
+    const QList<SyncSession*>& getQueuedSyncSessions() const;
 
 private:
 

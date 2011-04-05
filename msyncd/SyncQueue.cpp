@@ -49,6 +49,23 @@ SyncSession *SyncQueue::dequeue()
     return p;
 }
 
+SyncSession* SyncQueue::dequeue(const QString &aProfileName)
+{
+    FUNCTION_CALL_TRACE;
+    SyncSession *ret = 0;
+    QQueue<SyncSession*>::iterator i;
+    for (i = iItems.begin(); i != iItems.end(); ++i)
+    {
+        if ((*i)->profileName() == aProfileName)
+        {
+            ret = *i;
+            iItems.erase(i);
+            break;
+        }
+    }
+    return ret;
+}
+
 SyncSession *SyncQueue::head()
 {
     FUNCTION_CALL_TRACE;
@@ -111,3 +128,10 @@ void SyncQueue::sort()
 
     // @todo: Sort queued profiles using some criteria.
 }
+
+const QList<SyncSession*>& SyncQueue::getQueuedSyncSessions() const
+{
+    FUNCTION_CALL_TRACE;
+    return iItems;
+}
+
