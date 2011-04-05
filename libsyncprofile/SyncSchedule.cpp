@@ -289,11 +289,16 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         // Figure out the number of intervals passed
         QDateTime reference;
         reference = (aPrevSync.isValid()) ? aPrevSync : scheduleConfiguredTime;
-        if(reference > now || !reference.isValid())
+        if(reference > now)
         {
             // If the clock was rolled back...
             LOG_DEBUG("Setting reference to now");
             reference = now;
+        }
+        else if (!reference.isValid()) {
+           //It means configuring first time account. Need to sync now only.
+           LOG_DEBUG("Reference is not valid returning current date time");
+           return QDateTime::currentDateTime();
         }
         int numberOfIntervals = 0;
         if(0 != d_ptr->iInterval)
