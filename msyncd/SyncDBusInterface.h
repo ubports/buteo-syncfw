@@ -144,14 +144,14 @@ signals:
     /*! \brief Notifies sync status change for a set of account Ids
      *
      * This signal is sent when the status of a sync for a particular
-     * account ID changes state (so typically it is always sent with a single
-     * account ID in the list). Upon receiving this signal, the client is
+     * account ID changes state Upon receiving this signal, the client is
      * expected to call the status method to check whether sync is
      * running/stopped for this account ID
      *
-     * \param aAccountIds A list of account IDs that changed state
+     * \param aAccountId The account IDs that changed state
+     * \param aNewStatus The new status of sync for this account
      */
-    void statusChanged(QList<int> aAccountIds);
+    void statusChanged(int aAccountId, int aNewStatus);
  
 public slots:
 
@@ -322,7 +322,15 @@ public slots:
      *
      * \return The list of account IDs currectly syncing.
      */
-    virtual QList<int> status() = 0;
+    virtual QList<int> syncingAccounts() = 0;
+
+    /*! \brief Returns the status of the sync for the given account Id
+     *
+     * \param aAccountId The account ID.
+     * \return The status of sync: 0 = Sync is running,
+     * 1 = Last sync succeeded, 2 = last sync failed
+     */
+    virtual int status(int aAccountId) = 0;
 };
 
 }

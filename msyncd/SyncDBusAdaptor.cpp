@@ -146,11 +146,11 @@ bool SyncDBusAdaptor::startSync(const QString &aProfileId)
     return out0;
 }
 
-QList<int> SyncDBusAdaptor::status()
+int SyncDBusAdaptor::status(int aAccountId)
 {
     // handle method call com.meego.msyncd.status
-    QList<int> out0;
-    QMetaObject::invokeMethod(parent(), "status", Q_RETURN_ARG(QList<int>, out0));
+    int out0;
+    QMetaObject::invokeMethod(parent(), "status", Q_RETURN_ARG(int, out0), Q_ARG(int, aAccountId));
     return out0;
 }
 
@@ -181,6 +181,14 @@ QStringList SyncDBusAdaptor::syncProfilesByType(const QString &aType)
     // handle method call com.meego.msyncd.syncProfilesByType
     QStringList out0;
     QMetaObject::invokeMethod(parent(), "syncProfilesByType", Q_RETURN_ARG(QStringList, out0), Q_ARG(QString, aType));
+    return out0;
+}
+
+QList<int> SyncDBusAdaptor::syncingAccounts()
+{
+    // handle method call com.meego.msyncd.syncingAccounts
+    QList<int> out0;
+    QMetaObject::invokeMethod(parent(), "syncingAccounts", Q_RETURN_ARG(QList<int>, out0));
     return out0;
 }
 

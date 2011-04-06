@@ -32,8 +32,8 @@
  * before re-generating it.
  */
 
-#ifndef SYNCDBUSADAPTOR_H_1301985158
-#define SYNCDBUSADAPTOR_H_1301985158
+#ifndef SYNCDBUSADAPTOR_H_1302085830
+#define SYNCDBUSADAPTOR_H_1302085830
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -80,8 +80,8 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"s\" name=\"aResultsAsXml\"/>\n"
 "    </signal>\n"
 "    <signal name=\"statusChanged\">\n"
-"      <arg direction=\"out\" type=\"ai\" name=\"aAccountIds\"/>\n"
-"      <annotation value=\"QList&lt;int>\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg direction=\"out\" type=\"i\" name=\"aAccountId\"/>\n"
+"      <arg direction=\"out\" type=\"i\" name=\"aNewStatus\"/>\n"
 "    </signal>\n"
 "    <method name=\"startSync\">\n"
 "      <arg direction=\"out\" type=\"b\"/>\n"
@@ -151,9 +151,13 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"in\" type=\"i\" name=\"aAccountId\"/>\n"
 "      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
 "    </method>\n"
-"    <method name=\"status\">\n"
+"    <method name=\"syncingAccounts\">\n"
 "      <arg direction=\"out\" type=\"ai\"/>\n"
 "      <annotation value=\"QList&lt;int>\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+"    </method>\n"
+"    <method name=\"status\">\n"
+"      <arg direction=\"out\" type=\"i\"/>\n"
+"      <arg direction=\"in\" type=\"i\" name=\"aAccountId\"/>\n"
 "    </method>\n"
 "  </interface>\n"
         "")
@@ -175,11 +179,12 @@ public Q_SLOTS: // METHODS
     bool setSyncSchedule(const QString &aProfileId, const QString &aScheduleAsXml);
     Q_NOREPLY void start(int aAccountId);
     bool startSync(const QString &aProfileId);
-    QList<int> status();
+    int status(int aAccountId);
     Q_NOREPLY void stop(int aAccountId);
     QString syncProfile(const QString &aProfileId);
     QStringList syncProfilesByKey(const QString &aKey, const QString &aValue);
     QStringList syncProfilesByType(const QString &aType);
+    QList<int> syncingAccounts();
     bool updateProfile(const QString &aProfileAsXml);
 Q_SIGNALS: // SIGNALS
     void backupDone();
@@ -188,7 +193,7 @@ Q_SIGNALS: // SIGNALS
     void restoreInProgress();
     void resultsAvailable(const QString &aProfileName, const QString &aResultsAsXml);
     void signalProfileChanged(const QString &aProfileName, int aChangeType, const QString &aProfileAsXml);
-    void statusChanged(const QList<int> &aAccountIds);
+    void statusChanged(int aAccountId, int aNewStatus);
     void syncStatus(const QString &aProfileName, int aStatus, const QString &aMessage, int aMoreDetails);
     void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType, int aCommittedItems);
 };

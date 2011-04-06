@@ -1412,10 +1412,8 @@ void Synchronizer::slotSyncStatus(QString aProfileName, int aStatus, QString /*a
                 case Sync::SYNC_CANCELLED:
                 case Sync::SYNC_NOTPOSSIBLE:
                     {
-                        QList<int> ids;
-                        ids.append(accountId.toInt());
                         LOG_DEBUG("Sync status changed for account" << accountId);
-                        emit statusChanged(ids);
+                        emit statusChanged(accountId.toInt(), status(accountId.toInt()));
                     }
                     break;
                 case Sync::SYNC_STOPPING:
@@ -1536,8 +1534,40 @@ void Synchronizer::stop(int aAccountId)
    }
 }
 
-QList<int> Synchronizer::status()
+int Synchronizer::status(int aAccountId)
 {
+    FUNCTION_CALL_TRACE;
+    int status = 1; // Initialize to Done
+    QList<SyncProfile*> profileList = iAccounts->getProfilesByAccountId(aAccountId);
+    foreach(SyncProfile *profile, profileList)
+    {
+        // First check if sync is going on for any profile corresponding to this
+        // account ID
+        if(iActiveSessions.contains(profile->name()) || iSyncQueue.contains(profile->name()))
+        {
+            LOG_DEBUG("Sync running for" << aAccountId);
+            status = 0;
+            break;
+        }
+        else
+        {
+            // Check if the last sync resulted in an error for any of the
+            // profiles
+            const SyncResults *lastResults = profile->lastResults();
+            if(lastResults && SyncResults::SYNC_RESULT_FAILED == lastResults->majorCode())
+            {
+                status = 2;
+                break;
+            }
+        }
+    }
+    qDeleteAll(profileList);
+    return status;
+}
+
+QList<int> Synchronizer::syncingAccounts()
+{
+    FUNCTION_CALL_TRACE;
     QList<int> syncingAccountsList;
     // Check active sessions
     QList<SyncSession*> activeSessions = iActiveSessions.values();
