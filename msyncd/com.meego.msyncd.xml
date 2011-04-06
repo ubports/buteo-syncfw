@@ -56,8 +56,8 @@
       <arg name="aResultsAsXml" type="s" direction="out"/>
     </signal>
     <signal name="statusChanged">
-      <arg name="aAccountIds" type="ai" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QList&lt;int&gt;"/>
+      <arg name="aAccountId" type="i" direction="out"/>
+      <arg name="aNewStatus" type="i" direction="out"/>
     </signal>
     <method name="startSync">
       <arg type="b" direction="out"/>
@@ -127,9 +127,13 @@
       <arg name="aAccountId" type="i" direction="in"/>
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
     </method>
-    <method name="status">
+    <method name="syncingAccounts">
       <arg type="ai" direction="out"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QList&lt;int&gt;"/>
+    </method>
+    <method name="status">
+      <arg type="i" direction="out"/>
+      <arg name="aAccountId" type="i" direction="in"/>
     </method>
   </interface>
 </node>

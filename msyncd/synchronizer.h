@@ -193,7 +193,15 @@ public slots:
      *
      * \return The list of account IDs currectly syncing.
      */
-    QList<int> status();
+    QList<int> syncingAccounts();
+
+    /*! \brief Returns the status of the sync for the given account Id
+     *
+     * \param aAccountId The account ID.
+     * \return The status of sync: 0 = Sync is running,
+     * 1 = Last sync succeeded, 2 = last sync failed
+     */
+    int status(int aAccountId);
 
 signals:
 
