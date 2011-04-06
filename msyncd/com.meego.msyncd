@@ -1,1 +1,6 @@
-/synchronizer
+<?xml version="1.0"?>
+<dbus>
+<service>com.meego.msyncd</service>
+<interface>com.meego.msyncd</interface>
+<path>/synchronizer</path>
+</dbus>
