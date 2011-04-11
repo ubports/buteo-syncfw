@@ -150,8 +150,15 @@ signals:
      *
      * \param aAccountId The account IDs that changed state
      * \param aNewStatus The new status of sync for this account
+     * \param aFailedReason This is an out parameter. In case the last sync has
+     * failed, this will contain the code indicating the failure reason (TODO:
+     * Define error codes). In case the last sync has not failed, this must be
+     * ignored
+     * \param aPrevSyncTime This is an out parameter. The previous sync time.
+     * Invalid time is returned if there was no last sync.
+     * \param aNextSyncTime This is an out parameter. The next sync time.
      */
-    void statusChanged(int aAccountId, int aNewStatus);
+    void statusChanged(int aAccountId, int aNewStatus, int aFailedReason, QDateTime aPrevSyncTime, QDateTime aNextSyncTime);
  
 public slots:
 
@@ -327,10 +334,17 @@ public slots:
     /*! \brief Returns the status of the sync for the given account Id
      *
      * \param aAccountId The account ID.
+     * \param aFailedReason This is an out parameter. In case the last sync has
+     * failed, this will contain the code indicating the failure reason (TODO:
+     * Define error codes). In case the last sync has not failed, this must be
+     * ignored
+     * \param aPrevSyncTime This is an out parameter. The previous sync time.
+     * Invalid time is returned if there was no last sync.
+     * \param aNextSyncTime This is an out parameter. The next sync time.
      * \return The status of sync: 0 = Sync is running,
      * 1 = Last sync succeeded, 2 = last sync failed
      */
-    virtual int status(int aAccountId) = 0;
+    virtual int status(int aAccountId, int &aFailedReason, QDateTime &aPrevSyncTime, QDateTime &aNextSyncTime) = 0;
 };
 
 }
