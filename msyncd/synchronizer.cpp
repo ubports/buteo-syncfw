@@ -1413,8 +1413,8 @@ void Synchronizer::slotSyncStatus(QString aProfileName, int aStatus, QString /*a
                 case Sync::SYNC_NOTPOSSIBLE:
                     {
                         LOG_DEBUG("Sync status changed for account" << accountId);
-                        QDateTime aPrevSyncTime;
-                        QDateTime aNextSyncTime;
+                        qint64 aPrevSyncTime;
+                        qint64 aNextSyncTime;
                         int aFailedReason;
                         int aNewStatus = status(accountId.toInt(), aFailedReason, aPrevSyncTime, aNextSyncTime);
                         emit statusChanged(accountId.toInt(), aNewStatus, aFailedReason, aPrevSyncTime, aNextSyncTime);
@@ -1538,12 +1538,12 @@ void Synchronizer::stop(int aAccountId)
    }
 }
 
-int Synchronizer::status(int aAccountId, int &aFailedReason, QDateTime &aPrevSyncTime, QDateTime &aNextSyncTime)
+int Synchronizer::status(int aAccountId, int &aFailedReason, qint64 &aPrevSyncTime, qint64 &aNextSyncTime)
 {
     FUNCTION_CALL_TRACE;
     int status = 1; // Initialize to Done
-    aPrevSyncTime = QDateTime(); // Initialize to invalid
-    aNextSyncTime = QDateTime();
+    QDateTime prevSyncTime; // Initialize to invalid
+    QDateTime nextSyncTime;
     QList<SyncProfile*> profileList = iAccounts->getProfilesByAccountId(aAccountId);
     foreach(SyncProfile *profile, profileList)
     {
@@ -1575,23 +1575,25 @@ int Synchronizer::status(int aAccountId, int &aFailedReason, QDateTime &aPrevSyn
         // Need to return the next and last sync times
         foreach(SyncProfile *profile, profileList)
         {
-            if(!aPrevSyncTime.isValid())
+            if(!prevSyncTime.isValid())
             {
-                aPrevSyncTime = profile->lastSyncTime();
+                prevSyncTime = profile->lastSyncTime();
             }
             else
             {
-                (aPrevSyncTime > profile->lastSyncTime()) ? aPrevSyncTime : profile->lastSyncTime();
+                (prevSyncTime > profile->lastSyncTime()) ? prevSyncTime : profile->lastSyncTime();
             }
         }
-        if(aPrevSyncTime.isValid())
+        if(prevSyncTime.isValid())
         {
             // Doesn't really matter which profile we do this for, as all of
             // them have the same schedule
             SyncProfile *profile = profileList.first();
-            aNextSyncTime = profile->nextSyncTime(aPrevSyncTime);
+            nextSyncTime = profile->nextSyncTime(prevSyncTime);
         }
     }
+    aPrevSyncTime = prevSyncTime.toMSecsSinceEpoch();
+    aNextSyncTime = nextSyncTime.toMSecsSinceEpoch();
     qDeleteAll(profileList);
     return status;
 }
