@@ -1,3 +1,9 @@
+sync-fw (0.5.21) stable; urgency=low
+
+  * Added additional parameters to status and statusChanged methods.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Thu, 11 Apr 2011 13:07:00 +0530
+
 sync-fw (0.5.20) stable; urgency=low
 
   * Fixes: NB#241541 - Ovi.com sync is not initiated immediately after configuring the account.
