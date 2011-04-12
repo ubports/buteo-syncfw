@@ -158,7 +158,7 @@ signals:
      * Invalid time is returned if there was no last sync.
      * \param aNextSyncTime This is an out parameter. The next sync time.
      */
-    void statusChanged(int aAccountId, int aNewStatus, int aFailedReason, QDateTime aPrevSyncTime, QDateTime aNextSyncTime);
+    void statusChanged(int aAccountId, int aNewStatus, int aFailedReason, qint64 aPrevSyncTime, qint64 aNextSyncTime);
  
 public slots:
 
@@ -344,7 +344,7 @@ public slots:
      * \return The status of sync: 0 = Sync is running,
      * 1 = Last sync succeeded, 2 = last sync failed
      */
-    virtual int status(int aAccountId, int &aFailedReason, QDateTime &aPrevSyncTime, QDateTime &aNextSyncTime) = 0;
+    virtual int status(int aAccountId, int &aFailedReason, qint64 &aPrevSyncTime, qint64 &aNextSyncTime) = 0;
 };
 
 }

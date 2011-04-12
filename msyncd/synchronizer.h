@@ -208,7 +208,7 @@ public slots:
      * \return The status of sync: 0 = Sync is running,
      * 1 = Last sync succeeded, 2 = last sync failed
      */
-    int status(int aAccountId, int &aFailedReason, QDateTime &aPrevSyncTime, QDateTime &aNextSyncTime);
+    int status(int aAccountId, int &aFailedReason, qint64 &aPrevSyncTime, qint64 &aNextSyncTime);
 
 signals:
 

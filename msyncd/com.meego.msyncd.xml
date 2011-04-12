@@ -2,7 +2,7 @@
 /*
  * This file is part of buteo-syncfw package
  *
- * Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -21,7 +21,7 @@
  * 02110-1301 USA
  *
  */
- -->
+-->
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
   <interface name="com.meego.msyncd">
@@ -59,10 +59,8 @@
       <arg name="aAccountId" type="i" direction="out"/>
       <arg name="aNewStatus" type="i" direction="out"/>
       <arg name="aFailedReason" type="i" direction="out"/>
-      <arg name="aPrevSyncTime" type="((iii)(iiii)i)" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In3" value="QDateTime"/>
-      <arg name="aNextSyncTime" type="((iii)(iiii)i)" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QDateTime"/>
+      <arg name="aPrevSyncTime" type="x" direction="out"/>
+      <arg name="aNextSyncTime" type="x" direction="out"/>
     </signal>
     <method name="startSync">
       <arg type="b" direction="out"/>
@@ -140,10 +138,8 @@
       <arg type="i" direction="out"/>
       <arg name="aAccountId" type="i" direction="in"/>
       <arg name="aFailedReason" type="i" direction="out"/>
-      <arg name="aPrevSyncTime" type="((iii)(iiii)i)" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out2" value="QDateTime"/>
-      <arg name="aNextSyncTime" type="((iii)(iiii)i)" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out3" value="QDateTime"/>
+      <arg name="aPrevSyncTime" type="x" direction="out"/>
+      <arg name="aNextSyncTime" type="x" direction="out"/>
     </method>
   </interface>
 </node>
