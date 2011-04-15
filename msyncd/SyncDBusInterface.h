@@ -158,7 +158,7 @@ signals:
      * Invalid time is returned if there was no last sync.
      * \param aNextSyncTime This is an out parameter. The next sync time.
      */
-    void statusChanged(int aAccountId, int aNewStatus, int aFailedReason, qint64 aPrevSyncTime, qint64 aNextSyncTime);
+    void statusChanged(unsigned int aAccountId, int aNewStatus, int aFailedReason, qlonglong aPrevSyncTime, qlonglong aNextSyncTime);
  
 public slots:
 
@@ -317,19 +317,19 @@ public slots:
      *
      * \param aAccountId The account ID.
      */
-    virtual Q_NOREPLY void start(int aAccountId) = 0;
+    virtual Q_NOREPLY void start(unsigned int aAccountId) = 0;
     
     /*! \brief Stops sync for all profiles matching the given account ID.
      *
      * \param aAccountId The account ID.
      */
-    virtual Q_NOREPLY void stop(int aAccountId) = 0;
+    virtual Q_NOREPLY void stop(unsigned int aAccountId) = 0;
     
     /*! \brief Returns the list of account IDs for which sync is ongoing
      *
      * \return The list of account IDs currectly syncing.
      */
-    virtual QList<int> syncingAccounts() = 0;
+    virtual QList<unsigned int> syncingAccounts() = 0;
 
     /*! \brief Returns the status of the sync for the given account Id
      *
@@ -344,7 +344,7 @@ public slots:
      * \return The status of sync: 0 = Sync is running,
      * 1 = Last sync succeeded, 2 = last sync failed
      */
-    virtual int status(int aAccountId, int &aFailedReason, qint64 &aPrevSyncTime, qint64 &aNextSyncTime) = 0;
+    virtual int status(unsigned int aAccountId, int &aFailedReason, qlonglong &aPrevSyncTime, qlonglong &aNextSyncTime) = 0;
 };
 
 }

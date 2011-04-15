@@ -1413,11 +1413,11 @@ void Synchronizer::slotSyncStatus(QString aProfileName, int aStatus, QString /*a
                 case Sync::SYNC_NOTPOSSIBLE:
                     {
                         LOG_DEBUG("Sync status changed for account" << accountId);
-                        qint64 aPrevSyncTime;
-                        qint64 aNextSyncTime;
+                        qlonglong aPrevSyncTime;
+                        qlonglong aNextSyncTime;
                         int aFailedReason;
-                        int aNewStatus = status(accountId.toInt(), aFailedReason, aPrevSyncTime, aNextSyncTime);
-                        emit statusChanged(accountId.toInt(), aNewStatus, aFailedReason, aPrevSyncTime, aNextSyncTime);
+                        int aNewStatus = status(accountId.toUInt(), aFailedReason, aPrevSyncTime, aNextSyncTime);
+                        emit statusChanged(accountId.toUInt(), aNewStatus, aFailedReason, aPrevSyncTime, aNextSyncTime);
                     }
                     break;
                 case Sync::SYNC_STOPPING:
@@ -1514,7 +1514,7 @@ bool Synchronizer::getBackUpRestoreState()
     return iSyncBackup->getBackUpRestoreState();
 }
 
-void Synchronizer::start(int aAccountId)
+void Synchronizer::start(unsigned int aAccountId)
 {
    FUNCTION_CALL_TRACE;
    LOG_DEBUG("Start sync requested for account" << aAccountId);
@@ -1526,7 +1526,7 @@ void Synchronizer::start(int aAccountId)
    }
 }
 
-void Synchronizer::stop(int aAccountId)
+void Synchronizer::stop(unsigned int aAccountId)
 {
    FUNCTION_CALL_TRACE;
    LOG_DEBUG("Stop sync requested for account" << aAccountId);
@@ -1538,7 +1538,7 @@ void Synchronizer::stop(int aAccountId)
    }
 }
 
-int Synchronizer::status(int aAccountId, int &aFailedReason, qint64 &aPrevSyncTime, qint64 &aNextSyncTime)
+int Synchronizer::status(unsigned int aAccountId, int &aFailedReason, qlonglong &aPrevSyncTime, qlonglong &aNextSyncTime)
 {
     FUNCTION_CALL_TRACE;
     int status = 1; // Initialize to Done
@@ -1598,10 +1598,10 @@ int Synchronizer::status(int aAccountId, int &aFailedReason, qint64 &aPrevSyncTi
     return status;
 }
 
-QList<int> Synchronizer::syncingAccounts()
+QList<unsigned int> Synchronizer::syncingAccounts()
 {
     FUNCTION_CALL_TRACE;
-    QList<int> syncingAccountsList;
+    QList<unsigned int> syncingAccountsList;
     // Check active sessions
     QList<SyncSession*> activeSessions = iActiveSessions.values();
     foreach(SyncSession *session, activeSessions)
@@ -1612,7 +1612,7 @@ QList<int> Synchronizer::syncingAccounts()
             QString accountId = profile->key(KEY_ACCOUNT_ID);
             if(!accountId.isNull())
             {
-                syncingAccountsList.append(accountId.toInt());
+                syncingAccountsList.append(accountId.toUInt());
             }
         }
     }
@@ -1626,7 +1626,7 @@ QList<int> Synchronizer::syncingAccounts()
             QString accountId = profile->key(KEY_ACCOUNT_ID);
             if(!accountId.isNull())
             {
-                syncingAccountsList.append(accountId.toInt());
+                syncingAccountsList.append(accountId.toUInt());
             }
         }
     }
