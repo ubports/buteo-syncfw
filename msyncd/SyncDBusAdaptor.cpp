@@ -135,10 +135,10 @@ bool SyncDBusAdaptor::setSyncSchedule(const QString &aProfileId, const QString &
     return out0;
 }
 
-void SyncDBusAdaptor::start(int aAccountId)
+void SyncDBusAdaptor::start(unsigned int aAccountId)
 {
     // handle method call com.meego.msyncd.start
-    QMetaObject::invokeMethod(parent(), "start", Q_ARG(int, aAccountId));
+    QMetaObject::invokeMethod(parent(), "start", Q_ARG(unsigned int, aAccountId));
 }
 
 bool SyncDBusAdaptor::startSync(const QString &aProfileId)
@@ -149,16 +149,16 @@ bool SyncDBusAdaptor::startSync(const QString &aProfileId)
     return out0;
 }
 
-int SyncDBusAdaptor::status(int aAccountId, int &aFailedReason, qlonglong &aPrevSyncTime, qlonglong &aNextSyncTime)
+int SyncDBusAdaptor::status(unsigned int aAccountId, int &aFailedReason, qlonglong &aPrevSyncTime, qlonglong &aNextSyncTime)
 {
     // handle method call com.meego.msyncd.status
     return static_cast<Synchronizer *>(parent())->status(aAccountId, aFailedReason, aPrevSyncTime, aNextSyncTime);
 }
 
-void SyncDBusAdaptor::stop(int aAccountId)
+void SyncDBusAdaptor::stop(unsigned int aAccountId)
 {
     // handle method call com.meego.msyncd.stop
-    QMetaObject::invokeMethod(parent(), "stop", Q_ARG(int, aAccountId));
+    QMetaObject::invokeMethod(parent(), "stop", Q_ARG(unsigned int, aAccountId));
 }
 
 QString SyncDBusAdaptor::syncProfile(const QString &aProfileId)
@@ -185,11 +185,11 @@ QStringList SyncDBusAdaptor::syncProfilesByType(const QString &aType)
     return out0;
 }
 
-QList<int> SyncDBusAdaptor::syncingAccounts()
+QList<unsigned int> SyncDBusAdaptor::syncingAccounts()
 {
     // handle method call com.meego.msyncd.syncingAccounts
-    QList<int> out0;
-    QMetaObject::invokeMethod(parent(), "syncingAccounts", Q_RETURN_ARG(QList<int>, out0));
+    QList<unsigned int> out0;
+    QMetaObject::invokeMethod(parent(), "syncingAccounts", Q_RETURN_ARG(QList<unsigned int>, out0));
     return out0;
 }
 

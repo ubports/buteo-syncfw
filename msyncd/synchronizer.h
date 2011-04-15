@@ -181,19 +181,19 @@ public slots:
     //! Called to get the current backup/restore state
     virtual bool getBackUpRestoreState();
 
-    void start(int aAccountId);
+    void start(unsigned int aAccountId);
     
     /*! \brief Stops sync for all profiles matching the given account ID.
      *
      * \param aAccountId The account ID.
      */
-    void stop(int aAccountId);
+    void stop(unsigned int aAccountId);
     
     /*! \brief Returns the list of account IDs for which sync is ongoing
      *
      * \return The list of account IDs currectly syncing.
      */
-    QList<int> syncingAccounts();
+    QList<unsigned int> syncingAccounts();
 
     /*! \brief Returns the status of the sync for the given account Id
      *
@@ -208,7 +208,7 @@ public slots:
      * \return The status of sync: 0 = Sync is running,
      * 1 = Last sync succeeded, 2 = last sync failed
      */
-    int status(int aAccountId, int &aFailedReason, qint64 &aPrevSyncTime, qint64 &aNextSyncTime);
+    int status(unsigned int aAccountId, int &aFailedReason, qlonglong &aPrevSyncTime, qlonglong &aNextSyncTime);
 
 signals:
 

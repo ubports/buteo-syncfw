@@ -123,20 +123,20 @@
       <arg name="aType" type="s" direction="in"/>
     </method>
     <method name="start">
-      <arg name="aAccountId" type="i" direction="in"/>
+      <arg name="aAccountId" type="u" direction="in"/>
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
     </method>
     <method name="stop">
-      <arg name="aAccountId" type="i" direction="in"/>
+      <arg name="aAccountId" type="u" direction="in"/>
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
     </method>
     <method name="syncingAccounts">
-      <arg type="ai" direction="out"/>
+      <arg type="au" direction="out"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QList&lt;int&gt;"/>
     </method>
     <method name="status">
       <arg type="i" direction="out"/>
-      <arg name="aAccountId" type="i" direction="in"/>
+      <arg name="aAccountId" type="u" direction="in"/>
       <arg name="aFailedReason" type="i" direction="out"/>
       <arg name="aPrevSyncTime" type="x" direction="out"/>
       <arg name="aNextSyncTime" type="x" direction="out"/>
