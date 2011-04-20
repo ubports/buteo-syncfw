@@ -116,6 +116,8 @@ bool Synchronizer::initialize()
     {
         iServerActivator = new ServerActivator(iProfileManager,
                 *iTransportTracker, this);
+        connect(iTransportTracker, SIGNAL(networkStateChanged(bool)),
+                this, SLOT(onNetworkStateChanged(bool)));
     }
 
     // Initialize account manager.
@@ -1150,8 +1152,6 @@ void Synchronizer::startServer(const QString &aProfileName)
     connect(iTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)),
             pluginRunner, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)));
 
-    connect(iTransportTracker, SIGNAL(networkStateChanged(bool)),
-            this, SLOT(onNetworkStateChanged(bool)));
 
     connect(pluginRunner, SIGNAL(done()), this, SLOT(onServerDone()));
 
