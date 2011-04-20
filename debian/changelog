@@ -1,3 +1,10 @@
+sync-fw (0.5.24) stable; urgency=low
+
+  * Fixes: NB#248172 - Sync is not aborted when connection is cut during the
+    sync.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Wed, 20 Apr 2011 13:55:00 +0530
+
 sync-fw (0.5.23) stable; urgency=low
 
   * Changed datetime parameters in status and statusChanged methods to qlonglong.
