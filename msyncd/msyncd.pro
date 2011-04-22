@@ -39,13 +39,6 @@ LIBS += -L../libsyncpluginmgr \
     -lsyncprofile \
     -lsynccommon \
     -laccounts-qt \
-# libqttracker has a bug (158705) that causes a crash when tracker is used from
-# a library (storage plug-in in our case), which is then unloaded after use. To
-# prevent that crash we need to link with libqttracker here also, so that the
-# library will not be unloaded when storage plug-in is unloaded. The bug has been
-# marked as WONTFIX. However, as another workaround for NB #160965, we do not
-# unload libraries anymore, so the linkage to libqttracker can be removed now.
-#   -lqttracker \
     -liphb 
 
 

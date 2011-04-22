@@ -1,3 +1,9 @@
+sync-fw (0.5.25) stable; urgency=low
+
+  * Remove build and compile time dependency on libqttracker.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Fri, 22 Apr 2011 19:41:00 +0530
+
 sync-fw (0.5.24) stable; urgency=low
 
   * Fixes: NB#248172 - Sync is not aborted when connection is cut during the

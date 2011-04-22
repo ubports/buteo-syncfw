@@ -13,7 +13,7 @@ CONFIG += qdbus \
 MOBILITY += systeminfo
 
 PKGCONFIG += dbus-1
-LIBS += -liphb -lqttracker -lsignon-qt
+LIBS += -liphb -lsignon-qt
 
 SOURCES += ServerThread.cpp \
     ServerThreadTest.cpp \
