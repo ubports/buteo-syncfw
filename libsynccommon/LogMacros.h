@@ -40,14 +40,11 @@
 #define QDEBUG(...)
 #endif
 
-// This macro is defined in both debug and release builds.
-#define LOG_MSG_L_ALWAYS(level, msg) (QDebug((QtMsgType)(level)) << __FILE__ << __LINE__ << ":" << msg)
-
 //! Macros for writing log messages. Use these.
 //! Messages with level below warning are enabled only in debug builds.
-#define LOG_FATAL(msg) LOG_MSG_L_ALWAYS(QtFatalMsg, msg)
-#define LOG_CRITICAL(msg) LOG_MSG_L_ALWAYS(QtCriticalMsg, msg)
-#define LOG_WARNING(msg) LOG_MSG_L_ALWAYS(QtWarningMsg, msg)
+#define LOG_FATAL(msg) LOG_MSG_L(QtFatalMsg, msg)
+#define LOG_CRITICAL(msg) LOG_MSG_L(QtCriticalMsg, msg)
+#define LOG_WARNING(msg) LOG_MSG_L(QtWarningMsg, msg)
 #define LOG_PROTOCOL(msg) LOG_MSG_L(QtDebugMsg, msg)
 #define LOG_INFO(msg) LOG_MSG_L(QtDebugMsg, msg)
 #define LOG_DEBUG(msg) LOG_MSG_L(QtDebugMsg, msg)
