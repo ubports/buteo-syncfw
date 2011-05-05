@@ -1,3 +1,9 @@
+sync-fw (0.5.26) stable; urgency=low
+
+  * Fixes: NB#249287 - Disable sync logging or use syslog
+
+ -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Thu, 05 May 2011 13:05:51 +0530
+
 sync-fw (0.5.25) stable; urgency=low
 
   * Remove build and compile time dependency on libqttracker.

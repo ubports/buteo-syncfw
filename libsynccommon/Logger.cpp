@@ -73,7 +73,7 @@ void Logger::deleteInstance()
 }
 
 Logger::Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize)
-:   iEnabledLevels(NUM_LEVELS, true),
+:   iEnabledLevels(NUM_LEVELS),
     iIndentLevel(0),
     iIndentSize(aIndentSize),
     iFileStream(0),
@@ -124,10 +124,10 @@ Logger::~Logger()
 
 bool  Logger::setLogLevel(int aLevel)
 {
-	bool retVal = false;
+    bool retVal = false;
     if ((aLevel > 0)  && (aLevel <= NUM_LEVELS))
     {
-		disable(iEnabledLevels);
+	disable(iEnabledLevels);
         QBitArray iLevels(NUM_LEVELS, false);
         for(int i = aLevel; i > 0; i--)
         {
@@ -189,14 +189,33 @@ void Logger::write(int aLevel, const char *aMsg)
     QMutexLocker lock(&iMutex);
 
     // Verify that the log message can and should be written.
-    if (aLevel < QtDebugMsg || aLevel > QtFatalMsg || !iEnabledLevels.testBit(aLevel))
+    if (aLevel < QtDebugMsg || aLevel > QtFatalMsg )
+    {
         return;
+    }
 
     // We don't make use of format specifiers in our logs, but syslog (vprintf) might interpret any % as part of
     // a format specifier and might fail (crash) when it doesn't find values corresponding to the format, prevent that.
     QString sysLogMsg = QString::fromLocal8Bit(aMsg);
     sysLogMsg = sysLogMsg.remove("%");
-    syslog (syslogLevel[aLevel], sysLogMsg.toLocal8Bit().data());
+
+    if(!iEnabledLevels.count(true))
+    {
+        if(aLevel >= QtCriticalMsg)
+        {
+            syslog(LOG_CRIT, sysLogMsg.toLocal8Bit().data());
+        }
+        return;
+    }
+
+    // Verify that the log message can and should be written.
+    if (!iEnabledLevels.testBit(aLevel))
+    {
+        return;
+    }
+
+    syslog(syslogLevel[aLevel], sysLogMsg.toLocal8Bit().data());
+
     if (iFileStream != 0)
     {
         *iFileStream << QString(iIndentLevel, ' ') << levelTexts[aLevel] <<
