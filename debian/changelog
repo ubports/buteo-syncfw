@@ -1,3 +1,9 @@
+sync-fw (0.5.27) stable; urgency=low
+
+  * Bump up version number.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Fri, 06 May 2011 15:34:00 +0530
+
 sync-fw (0.5.26) stable; urgency=low
 
   * Fixes: NB#238013 - reduce amount of logging and logging impact in sync-fw
