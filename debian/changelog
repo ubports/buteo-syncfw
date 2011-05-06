@@ -1,6 +1,8 @@
 sync-fw (0.5.27) stable; urgency=low
 
   * Bump up version number.
+  * Fixes: NB#238013 - reduce amount of logging and logging impact in sync-fw
+  * Fixes: NB#249287 - Disable sync logging or use syslog
 
  -- Santosh Puranik <santosh.puranik@nokia.com>  Fri, 06 May 2011 15:34:00 +0530
 
