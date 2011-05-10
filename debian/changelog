@@ -1,3 +1,9 @@
+sync-fw (0.5.28) stable; urgency=low
+
+  * Fixes: NB#254037 - msyncd crashes sometimes while taking backup
+
+ -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Tue, 10 May 2011 16:00:14 +0530
+
 sync-fw (0.5.27) stable; urgency=low
 
   * Bump up version number.

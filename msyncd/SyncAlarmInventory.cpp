@@ -37,6 +37,7 @@ const int TRIGGER_COUNT = 2;
 
 SyncAlarmInventory::SyncAlarmInventory():
         currentAlarm(0),
+        iTimer(0),
         triggerCount(TRIGGER_COUNT)
 {
   // empty.explicitly call init
