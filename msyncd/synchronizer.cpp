@@ -490,7 +490,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
     {
         // Get the DBUS interface for sync-UI.
         LOG_DEBUG( "sync-ui dbus interface is getting called" );
-        if (aSession->isScheduled()) {
+        if (aSession->isScheduled() && !profile->isHidden()) {
             if (iSyncUIInterface == NULL) {
                 LOG_DEBUG( "iSyncUIInterface is Null" );
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
