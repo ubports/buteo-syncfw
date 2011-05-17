@@ -1,3 +1,9 @@
+sync-fw (0.5.30) stable; urgency=low
+
+  * Fixes: NB#254647 - msyncd is missing capabilities.
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Tue, 17 May 2011 10:47:42 +0530
+
 sync-fw (0.5.29) stable; urgency=low
 
   * Fixes: NB#255385 - Hidden profiles (like accuweather) wakes up sync-ui
