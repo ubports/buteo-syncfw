@@ -1179,7 +1179,10 @@ void Synchronizer::stopServer( const QString& aProfileName )
     if (iServers.contains(aProfileName))
     {
         ServerPluginRunner *pluginRunner = iServers[aProfileName];
-        pluginRunner->stop();
+        if( pluginRunner )
+        {
+            pluginRunner->stop();
+        }
         LOG_DEBUG("Deleting server");
         if (!iClosing)
         {

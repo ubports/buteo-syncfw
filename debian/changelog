@@ -1,3 +1,9 @@
+sync-fw (0.5.31) stable; urgency=low
+
+  * Fixes: NB#257726 - COREWEB: /usr/bin/msyncd - Buteo::Synchronizer::stopServers 
+
+ -- Amit <amit.5.aggarwal@nokia.com>  Fri, 20 May 2011 10:47:42 +0530
+
 sync-fw (0.5.30) stable; urgency=low
 
   * Fixes: NB#254647 - msyncd is missing capabilities.
