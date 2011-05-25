@@ -92,6 +92,7 @@ const QString KEY_LOCAL_URI("Local URI");
 const QString KEY_ALWAYS_ON_ENABLED("always_on_enabled");
 const QString KEY_REMOTE_NAME("remote_name");
 const QString KEY_UUID("uuid");
+const QString KEY_NOTES_UUID("notes_uuid");
 const QString KEY_STORAGE_UPDATED("storage_updated");
 
 const QString BOOLEAN_TRUE("true");
