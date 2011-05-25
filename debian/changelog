@@ -1,3 +1,9 @@
+sync-fw (0.5.32) stable; urgency=low
+
+  * Fixes:  Notes created in device not synchronized to other devices
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Wed, 25 May 2011 10:47:42 +0530
+
 sync-fw (0.5.31) stable; urgency=low
 
   * Fixes: NB#257726 - COREWEB: /usr/bin/msyncd - Buteo::Synchronizer::stopServers 
