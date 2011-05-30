@@ -130,6 +130,8 @@ public:
      */
     QBitArray getLogLevelArray();
 
+    bool enabled(){return iEnabled;}
+
 private:
     Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize);
 
@@ -151,6 +153,7 @@ private:
 
     QMutex      iMutex;
 
+    bool        iEnabled;
 };
 
 }
