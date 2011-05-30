@@ -1,3 +1,9 @@
+sync-fw (0.5.33) stable; urgency=low
+
+  * Fixes: NB#238013 - reduce amount of logging and logging impact in sync-fw
+
+ -- Deepak Kodihalli <deepak.kodihalli@nokia.com>  Mon, 30 May 2011 11:49:51 +0530
+
 sync-fw (0.5.32) stable; urgency=low
 
   * Fixes:  Notes created in device not synchronized to other devices
