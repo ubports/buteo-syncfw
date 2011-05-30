@@ -55,15 +55,7 @@ void Logger::createInstance(const QString &aLogFileName, bool aUseStdOut,
                             int aIndentSize)
 {
     deleteInstance();
-#ifndef QT_NO_DEBUG
-	sInstance = new Logger(aLogFileName, aUseStdOut, aIndentSize);
-#else
-    if (QFile::exists(aLogFileName)){
-	    sInstance = new Logger(aLogFileName, aUseStdOut, aIndentSize);
-    } else {
-	    sInstance = new Logger(QString(), aUseStdOut, aIndentSize);
-    }
-#endif
+    sInstance = new Logger(aLogFileName, aUseStdOut, aIndentSize);
 }
 
 void Logger::deleteInstance()
@@ -78,7 +70,8 @@ Logger::Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize)
     iIndentSize(aIndentSize),
     iFileStream(0),
     iStdOutStream(0),
-    iStdErrStream(0)
+    iStdErrStream(0),
+    iEnabled(false)
 {
     if (aUseStdOut)
     {
@@ -148,12 +141,14 @@ void Logger::enable(const QBitArray &aLevels)
 {
     QMutexLocker lock(&iMutex);
     iEnabledLevels |= aLevels;
+    iEnabled = true;
 }
 
 void Logger::disable(const QBitArray &aLevels)
 {
     QMutexLocker lock(&iMutex);
     iEnabledLevels &= ~(aLevels);
+    iEnabled = false;
 }
 
 void Logger::push()

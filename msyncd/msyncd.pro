@@ -6,7 +6,6 @@ QT += xml \
     network
 QT -= gui
 CONFIG += qdbus \
-    debug \
     link_pkgconfig \
     create_pc \
     create_prl \

@@ -16,7 +16,7 @@ INCLUDEPATH += . \
 
 QMAKE_LFLAGS += -ldl
 
-CONFIG += dll debug create_pc create_prl
+CONFIG += dll create_pc create_prl
 
 QT+=sql
 QT -= gui

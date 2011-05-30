@@ -28,17 +28,11 @@
 #include <QString>
 #include <QTime>
 #include <QDebug>
+#include "Logger.h"
 
 //! Helper macro for writing log messages. Avoid using directly.
-#ifndef QT_NO_DEBUG
-#define LOG_MSG_L(level, msg) (QDebug((QtMsgType)(level)) << __FILE__ << __LINE__ << ":" << msg)
-#define LOG_MSG_L_PLAIN(level, msg) (QDebug((QtMsgType)(level)) << msg)
-#define QDEBUG(...) qDebug(__VA_ARGS__)
-#else
-#define LOG_MSG_L(level, msg)
-#define LOG_MSG_L_PLAIN(level, msg)
-#define QDEBUG(...)
-#endif
+#define LOG_MSG_L(level, msg) if(Buteo::Logger::instance()->enabled())(QDebug((QtMsgType)(level)) << __FILE__ << __LINE__ << ":" << msg)
+#define LOG_MSG_L_PLAIN(level, msg) if(Buteo::Logger::instance()->enabled())(QDebug((QtMsgType)(level)) << msg)
 
 //! Macros for writing log messages. Use these.
 //! Messages with level below warning are enabled only in debug builds.

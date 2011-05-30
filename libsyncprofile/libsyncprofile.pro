@@ -12,7 +12,6 @@ INCLUDEPATH += . \
 QT += xml dbus
 QT -= gui
 CONFIG += dll \
-    debug \
     create_pc \
     create_prl
 
