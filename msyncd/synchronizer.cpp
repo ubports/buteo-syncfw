@@ -26,6 +26,7 @@
 #include "ClientPluginRunner.h"
 #include "ServerPluginRunner.h"
 #include "AccountsHelper.h"
+#include "NetworkManager.h"
 #include "TransportTracker.h"
 #include "ServerActivator.h"
 
@@ -55,7 +56,8 @@ static const QString BT_PROPERTIES_NAME = "Name";
 static const unsigned long long MAX_THREAD_STOP_WAIT_TIME = 5000;
 
 Synchronizer::Synchronizer( QCoreApplication* aApplication )
-:   iSyncScheduler(0),
+:   iNetworkManager(0),
+    iSyncScheduler(0),
     iSyncBackup(0),    
     iTransportTracker(0),
     iServerActivator(0),
@@ -109,6 +111,9 @@ bool Synchronizer::initialize()
 
     connect(&iProfileManager,SIGNAL(signalProfileChanged(QString,int,QString)),
             this ,SIGNAL(signalProfileChanged(QString,int,QString)));
+
+    iNetworkManager = new NetworkManager(this);
+    Q_ASSERT(iNetworkManager);
 
     iTransportTracker = new TransportTracker(this);
 
@@ -274,9 +279,56 @@ bool Synchronizer::startSync(QString aProfileName)
 bool Synchronizer::startScheduledSync(QString aProfileName)
 {
     FUNCTION_CALL_TRACE;
+    // All scheduled syncs are online syncs
+    // Add this to the waiting online syncs and it will be started when we
+    // receive a session connection status from the NetworkManager
+    bool sessionConnected = !iWaitingOnlineSyncs.isEmpty();
+    if(!iWaitingOnlineSyncs.contains(aProfileName))
+    {
+        iWaitingOnlineSyncs.append(aProfileName);
+    }
+    if(!sessionConnected)
+    {
+        QObject::connect(iNetworkManager, SIGNAL(connectionSuccess()), this,
+                    SLOT(slotNetworkSessionOpened()), Qt::QueuedConnection);
+        QObject::connect(iNetworkManager, SIGNAL(connectionError()), this,
+                    SLOT(slotNetworkSessionError()), Qt::QueuedConnection);
+        // Request for a network session
+        iNetworkManager->connectSession(true);
+    }
+    return true;
+}
 
-    // Scheduled sync.
-    return startSync(aProfileName, true);
+void Synchronizer::slotNetworkSessionOpened()
+{
+    FUNCTION_CALL_TRACE;
+    QObject::disconnect(iNetworkManager, SIGNAL(connectionSuccess()), this,
+                SLOT(slotNetworkSessionOpened()));
+    QObject::disconnect(iNetworkManager, SIGNAL(connectionError()), this,
+                SLOT(slotNetworkSessionError()));
+    foreach(QString profileName, iWaitingOnlineSyncs)
+    {
+        startSync(profileName, true);
+    }
+    iWaitingOnlineSyncs.clear();
+}
+
+void Synchronizer::slotNetworkSessionError()
+{
+    FUNCTION_CALL_TRACE;
+    QObject::disconnect(iNetworkManager, SIGNAL(connectionSuccess()), this,
+                SLOT(slotNetworkSessionOpened()));
+    QObject::disconnect(iNetworkManager, SIGNAL(connectionError()), this,
+                SLOT(slotNetworkSessionError()));
+    // Cancel all open sessions
+    foreach(QString profileName, iWaitingOnlineSyncs)
+    {
+        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, SyncResults::CONNECTION_ERROR);
+        iProfileManager.saveSyncResults(profileName, syncResults);
+        reschedule(profileName);
+    }
+    iWaitingOnlineSyncs.clear();
+    iNetworkManager->disconnectSession();
 }
 
 bool Synchronizer::setSyncSchedule(QString aProfileId , QString aScheduleAsXml)
@@ -289,7 +341,7 @@ bool Synchronizer::setSyncSchedule(QString aProfileId , QString aScheduleAsXml)
     return status;
 }
 
-bool Synchronizer:: saveSyncResults(QString aProfileId, QString aSyncResults)
+bool Synchronizer::saveSyncResults(QString aProfileId, QString aSyncResults)
 {
     QDomDocument doc;
     bool status = false;
@@ -592,6 +644,12 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
             }
 
             iActiveSessions.remove(aProfileName);
+            if(session->isScheduled())
+            {
+                // Calling this multiple times has no effect, even if the
+                // session was not actually opened
+                iNetworkManager->disconnectSession();
+            }
             cleanupSession(session, aStatus);
             if(iProfilesToRemove.contains(aProfileName))
             {

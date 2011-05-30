@@ -129,7 +129,7 @@ bool SyncSession::start()
     // If this is an online session, then we need to ensure that the network
     // session is opened before starting our plugin runner
     
-    if(iProfile->destinationType() == SyncProfile::DESTINATION_TYPE_ONLINE)
+    if((iProfile->destinationType() == SyncProfile::DESTINATION_TYPE_ONLINE) && !iScheduled)
     {
         iNetworkManager = new NetworkManager(this);
         Q_ASSERT(iNetworkManager);

@@ -75,10 +75,6 @@ TransportTracker::TransportTracker(QObject *aParent) :
             iInternet->isOnline();
         connect(iInternet, SIGNAL(valueChanged(bool)),
             this, SLOT(onInternetStateChanged(bool)) /*, Qt::QueuedConnection*/);
-        connect(iInternet, SIGNAL(sessionConnected()),
-            this, SIGNAL(sessionOpened()));
-        connect(iInternet, SIGNAL(sessionError()),
-            this, SIGNAL(sessionError()));
     }
     else
     {
