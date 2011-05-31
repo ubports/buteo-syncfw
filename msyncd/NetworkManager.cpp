@@ -39,8 +39,8 @@ NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
     FUNCTION_CALL_TRACE;
     m_networkConfigManager = new QNetworkConfigurationManager();
     Q_ASSERT(m_networkConfigManager);
-    Q_ASSERT(connect(m_networkConfigManager, SIGNAL(onlineStateChanged(bool)),
-                SLOT(slotOnlineStateChanged(bool))));
+    connect(m_networkConfigManager, SIGNAL(onlineStateChanged(bool)),
+                SLOT(slotOnlineStateChanged(bool)));
     m_isOnline = m_networkConfigManager->isOnline();
     LOG_DEBUG("Online status::" << m_isOnline);
 }
@@ -90,13 +90,13 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
         
         Q_ASSERT(m_networkSession);
         
-        Q_ASSERT(connect(m_networkSession, SIGNAL(error(QNetworkSession::SessionError)),
-                SLOT(slotSessionError(QNetworkSession::SessionError))));
-        Q_ASSERT(connect(m_networkSession, SIGNAL(stateChanged(QNetworkSession::State)),
-                SLOT(slotSessionState(QNetworkSession::State))));
+        connect(m_networkSession, SIGNAL(error(QNetworkSession::SessionError)),
+                SLOT(slotSessionError(QNetworkSession::SessionError)));
+        connect(m_networkSession, SIGNAL(stateChanged(QNetworkSession::State)),
+                SLOT(slotSessionState(QNetworkSession::State)));
         /*
-        Q_ASSERT(connect(m_networkSession, SIGNAL(opened()),
-                SLOT(slotSessionOpened())));
+        connect(m_networkSession, SIGNAL(opened()),
+                SLOT(slotSessionOpened()));
                 */
     }
     m_networkSession->setSessionProperty("ConnectInBackground", connectInBackground);

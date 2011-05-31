@@ -133,10 +133,10 @@ bool SyncSession::start()
     {
         iNetworkManager = new NetworkManager(this);
         Q_ASSERT(iNetworkManager);
-        Q_ASSERT(connect(iNetworkManager, SIGNAL(connectionSuccess()),
-                    SLOT(onNetworkSessionOpened()), Qt::QueuedConnection));
-        Q_ASSERT(connect(iNetworkManager, SIGNAL(connectionError()),
-                    SLOT(onNetworkSessionError()), Qt::QueuedConnection));
+        connect(iNetworkManager, SIGNAL(connectionSuccess()),
+                    SLOT(onNetworkSessionOpened()), Qt::QueuedConnection);
+        connect(iNetworkManager, SIGNAL(connectionError()),
+                    SLOT(onNetworkSessionError()), Qt::QueuedConnection);
         // Return true here and wait for the session open status
         iNetworkManager->connectSession(iScheduled);
         rv = true;
