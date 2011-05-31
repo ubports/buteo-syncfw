@@ -1,6 +1,9 @@
 sync-fw (0.5.34) stable; urgency=low
 
-  * Removing Q_ASSERT from connect
+  * Fixes: NB#261533 - Removing Q_ASSERT from connect
+  * Fixes: NB#261555 - Removing Q_ASSERT from connect
+  * Fixes: NB#257713 - msynd wakes up every ten minutes even when not
+    connected to internet.
 
  -- Amit <amit.5.aggarwal@nokia.com>  Tue, 31 May 2011 11:49:51 +0530
 
