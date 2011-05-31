@@ -31,9 +31,7 @@
 
 const QString ALARM_CONNECTION_NAME( "alarms" );
 
-// Use this to calculate the number of times a iTimer has to be triggered.
-// For now, we just divide the next trigger time by 2 and use that value
-const int TRIGGER_COUNT = 2;
+const int TRIGGER_COUNT = 1;
 
 SyncAlarmInventory::SyncAlarmInventory():
         currentAlarm(0),

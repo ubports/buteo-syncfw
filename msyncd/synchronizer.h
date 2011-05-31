@@ -50,6 +50,7 @@ namespace Buteo {
 
 class PluginManager;
 class ServerPluginRunner;
+class NetworkManager;
 class TransportTracker;
 class ServerActivator;
 class AccountsHelper;
@@ -239,6 +240,10 @@ private slots:
 
     void onNewSession(const QString &aDestination);
 
+    void slotNetworkSessionOpened();
+
+    void slotNetworkSessionError();
+
     /*! \brief Starts a server plug-in
      *
      * @param aProfileName Server profile name
@@ -343,6 +348,10 @@ private:
     QList<QString> iProfilesToRemove;
 
     QMap<QString, ServerPluginRunner*> iServers;
+
+    QList<QString> iWaitingOnlineSyncs;
+
+    NetworkManager *iNetworkManager;
 
     QMap<QString, int> iCountersStorage;
 
