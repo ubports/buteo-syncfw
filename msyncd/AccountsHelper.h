@@ -98,6 +98,7 @@ public Q_SLOTS:
 	 */
     void slotAccountUpdated(Accounts::AccountId id);
 
+    void slotSchedulerSettingsChanged(const char *aKey);
 Q_SIGNALS:
 
     void enableSOC(const QString& aProfileName);
@@ -121,6 +122,7 @@ private:
     ProfileManager &iProfileManager;
 
     QList<Accounts::Account*> iAccountList;
+    QMap <Accounts::Watch*, Accounts::AccountId> iAcctWatchMap;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class AccountsHelperTest;
