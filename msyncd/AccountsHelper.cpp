@@ -47,6 +47,7 @@ AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent
 
 AccountsHelper::~AccountsHelper()
 {
+    iAcctWatchMap.clear();
     delete iAccountManager;
     iAccountManager = 0;
     // There is no need to delete the accounts objects as they get deleted by
@@ -94,6 +95,15 @@ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
         LOG_DEBUG("Removing profile" << profile->name());
         emit removeProfile(profile->name());
         delete profile;
+    }
+    // remove corresponding watch from the Map
+    QMap<Accounts::Watch*, Accounts::AccountId>::iterator i = iAcctWatchMap.begin();
+    while (i != iAcctWatchMap.end()) {
+        if (i.value() == id) {
+            i = iAcctWatchMap.erase(i);
+            break;	    
+	} else
+            ++i;
     }
 }
 
@@ -312,6 +322,26 @@ void AccountsHelper::registerAccountListeners()
     }
 }
 
+void AccountsHelper::slotSchedulerSettingsChanged(const char *aKey)
+{
+    FUNCTION_CALL_TRACE;
+    LOG_DEBUG("Key Changed" << QString(aKey));    
+    Accounts::Watch *watch = qobject_cast<Accounts::Watch*>(this->sender());
+    if(watch && iAcctWatchMap.contains(watch)) {
+	Accounts::AccountId id = iAcctWatchMap.value(watch);   
+        QList<SyncProfile*> syncProfiles = getProfilesByAccountId(id);
+        foreach(SyncProfile *syncProfile, syncProfiles)
+        {
+            if (syncProfile) {
+                setSyncSchedule(syncProfile, id);
+                iProfileManager.updateProfile(*syncProfile);
+                emit scheduleUpdated(syncProfile->name());
+                delete syncProfile;
+            }
+        }
+    }
+}
+
 void AccountsHelper::registerAccountListener(Accounts::AccountId id)
 {
     FUNCTION_CALL_TRACE;
@@ -323,5 +353,15 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
     // Callback for account enabled/disabled
     QObject::connect(account, SIGNAL(enabledChanged(const QString&, bool)),
                      this, SLOT(slotAccountEnabledChanged(const QString&, bool)));
+     
+    account->selectService();
+    account->beginGroup("scheduler");
+    LOG_DEBUG("Watching Group :" << account->group());
+    Accounts::Watch *watch = account->watchKey();
+    if(!watch){
+        LOG_DEBUG("Failed to add watch for acct with id:" << id);
+	return;
+    }
+    iAcctWatchMap[watch] = id;
+    QObject::connect(watch, SIGNAL(notify(const char *)), this, SLOT(slotSchedulerSettingsChanged(const char *)));
 }
-

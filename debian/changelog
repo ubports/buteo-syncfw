@@ -1,3 +1,9 @@
+sync-fw (0.5.35) stable; urgency=low
+
+  * Fixes: Changes in AccountsHelper and in SyncSchedule. 
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Wed, 01 Jun 2011 11:47:42 +0330
+
 sync-fw (0.5.34) stable; urgency=low
 
   * Fixes: NB#261533 - Removing Q_ASSERT from connect
