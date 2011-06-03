@@ -31,7 +31,7 @@ static const QString ACCOUNTS_GLOBAL_SERVICE("global");
 using namespace Buteo;
 
 AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent)
-:   QObject(aParent), iProfileManager(aProfileManager)
+    :   QObject(aParent), iProfileManager(aProfileManager)
 {
     iAccountManager = new Accounts::Manager(this);
     // Connect to signal for account creation, deletion, and modification
@@ -70,8 +70,8 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
             SyncProfile *syncProfile = iProfileManager.syncProfile(service->name());
             LOG_DEBUG("Found profile::" << service->name());
             if(0 != syncProfile &&
-               (true == syncProfile->boolKey(KEY_USE_ACCOUNTS, false))
-               )
+                    (true == syncProfile->boolKey(KEY_USE_ACCOUNTS, false))
+                    )
             {
                 addAccountIfNotExists(newAccount, service, syncProfile);
             }
@@ -101,8 +101,8 @@ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
     while (i != iAcctWatchMap.end()) {
         if (i.value() == id) {
             i = iAcctWatchMap.erase(i);
-            break;	    
-	} else
+            break;
+        } else
             ++i;
     }
 }
@@ -154,7 +154,7 @@ void AccountsHelper::slotAccountNameChanged(const QString &newName)
         {
             QString profileName = syncProfile->name();
             newProfileName = profileName.mid(0, profileName.lastIndexOf('-')) +
-                             "-" + newName;
+                    "-" + newName;
             LOG_INFO("Renaming profile" << profileName << "to" << newProfileName);
             iProfileManager.rename(profileName, newName);
             delete syncProfile;
@@ -184,17 +184,23 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
         syncProfile->setSyncType (syncType);
         LOG_DEBUG ("Sync Type :" << syncType );
 
-        syncSchedule.setInterval (account->valueAsInt (Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT));
-        LOG_DEBUG ("Sync Interval :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT));
-
         syncSchedule.setRushEnabled(account->valueAsBool(Buteo::SYNC_SCHEDULE_PEAK_ENABLED_KEY_BOOL));
         LOG_DEBUG ("Sync PEAK :" << account->valueAsBool(Buteo::SYNC_SCHEDULE_PEAK_ENABLED_KEY_BOOL));
-        
+
         syncSchedule.setScheduleEnabled(account->valueAsBool(Buteo::SYNC_SCHEDULE_OFFPEAK_ENABLED_KEY_BOOL));
         LOG_DEBUG ("Sync OFFPEAK :" << account->valueAsBool(Buteo::SYNC_SCHEDULE_OFFPEAK_ENABLED_KEY_BOOL));
-        
-        syncSchedule.setRushInterval (account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT));
-        LOG_DEBUG ("Sync Rush Interval :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT));
+
+        int scheduleInterval = 60;
+        if(syncSchedule.scheduleEnabled())
+            scheduleInterval = account->valueAsInt(Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT);
+        syncSchedule.setInterval(scheduleInterval);
+        LOG_DEBUG ("Sync Interval :" << scheduleInterval);
+
+        scheduleInterval = 60;
+        if(syncSchedule.rushEnabled())
+            scheduleInterval = account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT);
+        syncSchedule.setRushInterval(scheduleInterval);
+        LOG_DEBUG ("Sync Rush Interval :" << scheduleInterval);
 
         int map = account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_DAYS_KEY_INT);
         LOG_DEBUG ("Sync Days :" << account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_DAYS_KEY_INT));
@@ -203,7 +209,7 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
         int lastDay = Qt::Sunday;
         while (lastDay > 0) {
             int val = 0;
-            val |= (1 << lastDay);
+            val |= (1 << (lastDay - 1));
             days.insert(lastDay);
             if ((val & map)) {
                 rdays.insert(lastDay);
@@ -253,10 +259,10 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
 
     Profile *serviceProfile = iProfileManager.profile(service->name(), Profile::TYPE_SERVICE);
     if (!serviceProfile) {
-    	LOG_DEBUG ("!!!! Service not supported !!!!");
+        LOG_DEBUG ("!!!! Service not supported !!!!");
         return;
     }
-    
+
     QString profileName ;
     if (!service->name().isEmpty()) {
         QStringList keys;
@@ -265,11 +271,11 @@ void AccountsHelper::addAccountIfNotExists(const Accounts::Account *account,
         profileName = serviceProfile->name();
     }
     delete serviceProfile;
-   
+
     SyncProfile *profile = iProfileManager.syncProfile(profileName);
 
     LOG_DEBUG("profileName:"<<profileName);
-    
+
     if(0 == profile)
     {
         LOG_DEBUG("New profile creating with clone of base profile");
@@ -325,10 +331,10 @@ void AccountsHelper::registerAccountListeners()
 void AccountsHelper::slotSchedulerSettingsChanged(const char *aKey)
 {
     FUNCTION_CALL_TRACE;
-    LOG_DEBUG("Key Changed" << QString(aKey));    
+    LOG_DEBUG("Key Changed" << QString(aKey));
     Accounts::Watch *watch = qobject_cast<Accounts::Watch*>(this->sender());
     if(watch && iAcctWatchMap.contains(watch)) {
-	Accounts::AccountId id = iAcctWatchMap.value(watch);   
+        Accounts::AccountId id = iAcctWatchMap.value(watch);
         QList<SyncProfile*> syncProfiles = getProfilesByAccountId(id);
         foreach(SyncProfile *syncProfile, syncProfiles)
         {
@@ -353,14 +359,14 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
     // Callback for account enabled/disabled
     QObject::connect(account, SIGNAL(enabledChanged(const QString&, bool)),
                      this, SLOT(slotAccountEnabledChanged(const QString&, bool)));
-     
+
     account->selectService();
     account->beginGroup("scheduler");
     LOG_DEBUG("Watching Group :" << account->group());
     Accounts::Watch *watch = account->watchKey();
     if(!watch){
         LOG_DEBUG("Failed to add watch for acct with id:" << id);
-	return;
+        return;
     }
     iAcctWatchMap[watch] = id;
     QObject::connect(watch, SIGNAL(notify(const char *)), this, SLOT(slotSchedulerSettingsChanged(const char *)));
