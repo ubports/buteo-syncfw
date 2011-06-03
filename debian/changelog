@@ -1,3 +1,9 @@
+sync-fw (0.5.36) stable; urgency=low
+
+  * Fixes: Schedule settings changes for accounts integration. 
+
+ -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Fri, 03 Jun 2011 11:47:42 +0330
+
 sync-fw (0.5.35) stable; urgency=low
 
   * Fixes: Changes in AccountsHelper and in SyncSchedule. 
