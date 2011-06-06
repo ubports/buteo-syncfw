@@ -226,6 +226,7 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
 
 void AccountsHelper::slotAccountUpdated(Accounts::AccountId id)
 {
+#if 0 // Not required for scheduler settings; they will be handled by slotSchedulerSettingsChanged
     FUNCTION_CALL_TRACE;
     QList<SyncProfile*> syncProfiles = getProfilesByAccountId(id);
     foreach(SyncProfile *syncProfile, syncProfiles)
@@ -237,6 +238,7 @@ void AccountsHelper::slotAccountUpdated(Accounts::AccountId id)
             delete syncProfile;
         }
     }
+#endif    
 }
 
 QList<SyncProfile*> AccountsHelper::getProfilesByAccountId(Accounts::AccountId id)
