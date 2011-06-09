@@ -142,7 +142,11 @@ int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
             // This is a new alarm. Set the iTimer for the alarm
             currentAlarm = newAlarm;
             QDateTime now = QDateTime::currentDateTime();
-            int iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
+            int iTimerInterval = 0;
+            if(now < alarmTime)
+            {
+                iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
+            }
             LOG_DEBUG("currentAlarm"<<currentAlarm<<"alarmTime"<<alarmTime<<"iTimerInterval"<<iTimerInterval);
             triggerCount = TRIGGER_COUNT;
             iTimer->setInterval( iTimerInterval );
@@ -205,7 +209,11 @@ void SyncAlarmInventory::timerTriggered()
 
                 // Set the iTimer for the alarm
                 QDateTime now = QDateTime::currentDateTime();
-                int iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
+                int iTimerInterval = 0;
+                if(now < alarmTime)
+                {
+                    iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
+                }
                 triggerCount = TRIGGER_COUNT;
                 LOG_DEBUG("Starting timer with interval::" << iTimerInterval);
                 iTimer->setInterval( iTimerInterval );

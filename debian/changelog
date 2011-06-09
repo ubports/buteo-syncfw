@@ -1,3 +1,10 @@
+sync-fw (0.5.37) stable; urgency=low
+
+  * Fixes: NB#264165 - Ovi.com sync doesn't start after account is configured
+    thru accounts application.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Thu, 09 Jun 2011 17:07:00 +0330
+
 sync-fw (0.5.36) stable; urgency=low
 
   * Fixes: Schedule settings changes for accounts integration. 
