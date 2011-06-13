@@ -1,3 +1,10 @@
+sync-fw (0.5.38) stable; urgency=low
+
+  * Fixes: NB#264754 - Incorrect next Schedule time is displayed in CalDAV
+    Schedule setting during the Peak off days.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Mon, 13 Jun 2011 17:07:00 +0330
+
 sync-fw (0.5.37) stable; urgency=low
 
   * Fixes: NB#264165 - Ovi.com sync doesn't start after account is configured

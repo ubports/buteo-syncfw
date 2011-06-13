@@ -278,7 +278,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         } // no else
         d_ptr->adjustDate(nextSync, d_ptr->iDays);
     }
-    else if (d_ptr->iInterval > 0)
+    else if (d_ptr->iInterval > 0 && d_ptr->iEnabled)
     {
         // Sync time is defined in terms of interval (for ex. every 15 minutes)
     	LOG_DEBUG("Sync interval defined as" << d_ptr->iInterval);
