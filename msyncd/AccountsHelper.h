@@ -108,8 +108,8 @@ Q_SIGNALS:
 private:
 
 
-    void addAccountIfNotExists(const Accounts::Account *account,
-                               const Accounts::Service *service,
+    void addAccountIfNotExists(Accounts::Account *account,
+                               Accounts::Service *service,
                                const SyncProfile *baseProfile);
 
     void setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew = false);
