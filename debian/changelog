@@ -1,3 +1,10 @@
+sync-fw (0.5.39) stable; urgency=low
+
+  * Fixes: NB#265693 - Ovi contacts cannot be synced to device on enabling
+    contacts data for an existing ovi account.
+
+ -- Santosh Puranik <santosh.puranik@nokia.com>  Wed, 15 Jun 2011 10:55:00 +0530
+
 sync-fw (0.5.38) stable; urgency=low
 
   * Fixes: NB#264754 - Incorrect next Schedule time is displayed in CalDAV
