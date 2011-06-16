@@ -278,7 +278,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         } // no else
         d_ptr->adjustDate(nextSync, d_ptr->iDays);
     }
-    else if (d_ptr->iInterval > 0 && d_ptr->iEnabled)
+    else if (d_ptr->iInterval > 0)
     {
         // Sync time is defined in terms of interval (for ex. every 15 minutes)
     	LOG_DEBUG("Sync interval defined as" << d_ptr->iInterval);
@@ -301,7 +301,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
            return QDateTime::currentDateTime();
         }
         int numberOfIntervals = 0;
-        if(0 != d_ptr->iInterval)
+        if(0 != d_ptr->iInterval && d_ptr->iEnabled)
         {
             int secs = reference.secsTo(now) + 1;
             numberOfIntervals = secs/(d_ptr->iInterval * 60);
@@ -311,7 +311,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
             }
             LOG_DEBUG("numberOfInterval:"<<numberOfIntervals<<"interval time"<<d_ptr->iInterval);
         }
-        nextSync = reference.addSecs(numberOfIntervals * d_ptr->iInterval * 60);
+        nextSync = d_ptr->iEnabled ? reference.addSecs(numberOfIntervals * d_ptr->iInterval * 60) : QDateTime();
     }
 
     LOG_DEBUG("next non rush hour sync is at:: " << nextSync);
