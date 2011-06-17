@@ -29,7 +29,6 @@
 
 using namespace Buteo;
 
-const int MAX_IP_HEARTBEAT_WAIT_TIME = 120;
 
 SyncScheduler::SyncScheduler(QObject *aParent)
 :   QObject(aParent)
@@ -176,7 +175,7 @@ void SyncScheduler::doAlarmActions(int aAlarmEventID)
     
     if (!syncProfileName.isEmpty()) {
         iSyncScheduleProfiles.remove(syncProfileName);
-        if(iIPHeartBeatMan->setHeartBeat(syncProfileName,0,MAX_IP_HEARTBEAT_WAIT_TIME) == true) {
+        if(iIPHeartBeatMan->setHeartBeat(syncProfileName,0, IPHB_GS_WAIT_5_MINS) == true) {
             //Do nothing, sync will be triggered on getting heart beat
         } else {
             emit syncNow(syncProfileName);

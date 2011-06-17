@@ -1,6 +1,8 @@
 sync-fw (0.5.40) stable; urgency=low
 
   * Fixes: NB#266496 - Ovi.com sync doesn't start after account is configured thru accounts application
+  * Fixes: Partial 266350 msyncd creating huge amounts of dbus connections
+  * Fixes: NB#266278 Non-optimized use of system heartbeat results to frequent wakeups
 
  -- Duggirala Karthik <karthik.2.duggirala@nokia.com>  Thu, 16 Jun 2011 15:33:00 +3030
 
