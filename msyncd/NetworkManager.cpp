@@ -86,7 +86,7 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
     else if(!m_networkSession)
     {
         QNetworkConfiguration netConfig = m_networkConfigManager->defaultConfiguration();
-        m_networkSession = new QNetworkSession(netConfig);
+ 	m_networkSession = new QNetworkSession(netConfig);
         
         Q_ASSERT(m_networkSession);
         
@@ -100,7 +100,10 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
                 */
     }
     m_networkSession->setSessionProperty("ConnectInBackground", connectInBackground);
-    m_networkSession->open();
+    if(!m_networkSession->isOpen())
+        m_networkSession->open();
+    else
+	slotSessionState(m_networkSession->state());    
 }
 
 void NetworkManager::disconnectSession()
@@ -116,6 +119,8 @@ void NetworkManager::disconnectSession()
     if(m_networkSession && 0 == m_refCount)
     {
         m_networkSession->close();
+	delete m_networkSession;
+	m_networkSession = NULL;
     }
 }
 
