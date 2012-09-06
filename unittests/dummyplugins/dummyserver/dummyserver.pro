@@ -20,7 +20,7 @@ SOURCES += DummyServer.cpp
 QMAKE_CLEAN += $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2)
 QMAKE_CLEAN += $(OBJECTS_DIR)/*.gcda $(OBJECTS_DIR)/*.gcno $(OBJECTS_DIR)/*.gcov $(OBJECTS_DIR)/moc_*
 
-target.path = /usr/share/sync-fw-tests/
+target.path = /opt/tests/buteo-syncfw/
 INSTALLS += target
 
 # #####################################################################
