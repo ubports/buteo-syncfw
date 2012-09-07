@@ -62,12 +62,12 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
     {
         registerAccountListener(id);
         Accounts::ServiceList serviceList = newAccount->services();
-        foreach(Accounts::Service *service, serviceList)
+        foreach(Accounts::Service service, serviceList)
         {
             // Look for a sync profile that matches the service name
-            LOG_DEBUG("Looking for sync profile::" << service->name());
-            SyncProfile *syncProfile = iProfileManager.syncProfile(service->name());
-            LOG_DEBUG("Found profile::" << service->name());
+            LOG_DEBUG("Looking for sync profile::" << service.name());
+            SyncProfile *syncProfile = iProfileManager.syncProfile(service.name());
+            LOG_DEBUG("Found profile::" << service.name());
             if(0 != syncProfile &&
                     (true == syncProfile->boolKey(KEY_USE_ACCOUNTS, false))
                     )
@@ -130,11 +130,11 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
                     {
                         // The service pointer must not be deleted here. It is
                         // cached by the Account manager object
-                        Accounts::Service *service = iAccountManager->service(serviceProfile->name());
+                        Accounts::Service service = iAccountManager->service(serviceProfile->name());
                         changedAccount->selectService(service);
                         bool serviceEnabled = changedAccount->enabled();
-                        changedAccount->selectService(0);
-                        LOG_DEBUG("Enabled status for service ::" << service->name() << serviceEnabled);
+                        changedAccount->selectService();
+                        LOG_DEBUG("Enabled status for service ::" << service.name() << serviceEnabled);
                         if(serviceEnabled)
                         {
                             profile->setEnabled(changedAccount->enabled());
@@ -299,21 +299,21 @@ QList<SyncProfile*> AccountsHelper::getProfilesByAccountId(Accounts::AccountId i
 }
 
 void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
-                                           Accounts::Service *service,
+                                           Accounts::Service service,
                                            const SyncProfile *baseProfile)
 {
     FUNCTION_CALL_TRACE;
 
-    Profile *serviceProfile = iProfileManager.profile(service->name(), Profile::TYPE_SERVICE);
+    Profile *serviceProfile = iProfileManager.profile(service.name(), Profile::TYPE_SERVICE);
     if (!serviceProfile) {
         LOG_DEBUG ("!!!! Service not supported !!!!");
         return;
     }
 
     QString profileName ;
-    if (!service->name().isEmpty()) {
+    if (!service.name().isEmpty()) {
         QStringList keys;
-        keys << QString::number(account->id()) << service->name();
+        keys << QString::number(account->id()) << service.name();
         serviceProfile->setName(keys);
         profileName = serviceProfile->name();
     }
@@ -330,15 +330,15 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
         // Create a new sync profile with username
         SyncProfile *newProfile = baseProfile->clone();
         newProfile->setName(profileName);
-        newProfile->setKey(KEY_DISPLAY_NAME, service->name() + "-" + account->displayName());
+        newProfile->setKey(KEY_DISPLAY_NAME, service.name() + "-" + account->displayName());
         // Add the account ID to the profile
         newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
         // Check if service is enabled
         account->selectService(service);
-        LOG_DEBUG("Service:: " << service->displayName() << "enabled status::" << account->enabled());
+        LOG_DEBUG("Service:: " << service.displayName() << "enabled status::" << account->enabled());
         // Set profile as enabled
         newProfile->setEnabled(account->enabled());
-        account->selectService(0);
+        account->selectService();
         setSyncSchedule (newProfile, account->id(), true);
 
         // Save the newly created profile
