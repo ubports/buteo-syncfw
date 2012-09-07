@@ -25,8 +25,8 @@
 
 #include <QObject>
 
-#include <accounts-qt/manager.h>
-#include <accounts-qt/account.h>
+#include <Accounts/manager.h>
+#include <Accounts/account.h>
 
 namespace Buteo {
                  
