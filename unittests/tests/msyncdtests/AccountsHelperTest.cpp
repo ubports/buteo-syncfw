@@ -54,10 +54,10 @@ void AccountsHelperTest::initTestCase()
     iAccount = iManager.createAccount(OVI_PROVIDER);
     iAccount->setDisplayName(DUMMY_USER);
     iAccount->setEnabled(true);
-    Accounts::Service *service = iManager.service(SERVICE_NAME);
+    Accounts::Service service = iManager.service(SERVICE_NAME);
     iAccount->selectService(service);
     iAccount->setEnabled(true);
-    iAccount->selectService(0);
+    iAccount->selectService();
     QVERIFY(iAccount != NULL);
     iAccount->sync();
 }

@@ -109,7 +109,7 @@ private:
 
 
     void addAccountIfNotExists(Accounts::Account *account,
-                               Accounts::Service *service,
+                               Accounts::Service service,
                                const SyncProfile *baseProfile);
 
     void setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew = false);
