@@ -12,7 +12,7 @@
 
       <case name="sync-fw-all" type="Functional" description="Running Tests for Synchronization Framework" timeout="1000" subfeature="">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
-        <step expected_result="0">/usr/share/sync-fw-tests/./runstarget.sh  /usr/share/sync-fw-tests/sync-fw-tests </step>
+        <step expected_result="0">/opt/tests/buteo-syncfw/./runstarget.sh  /opt/tests/buteo-syncfw/sync-fw-tests </step>
       </case>
 
       <!-- Get optional - fetches additional result files -->

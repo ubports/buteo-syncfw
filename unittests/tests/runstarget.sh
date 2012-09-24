@@ -4,8 +4,8 @@ echo "running ${1}..."
 
 FILE=${1##*/}  
 
-cd /usr/share/sync-fw-tests
-export LD_LIBRARY_PATH=/usr/share/sync-fw-tests:$LD_LIBRARY_PATH
+cd /opt/tests/buteo-syncfw
+export LD_LIBRARY_PATH=/opt/tests/buteo-syncfw:$LD_LIBRARY_PATH
 
 ${1} -maxwarnings 0 1>/tmp/$FILE.out 2>&1
 RESULT=$?

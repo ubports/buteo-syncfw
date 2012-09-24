@@ -72,7 +72,7 @@ headers.files = Profile.h \
     ProfileField.h \
     BtHelper.h \
     ProfileEngineDefs.h
-utility.path = /usr/bin
+utility.path = /opt/tests/buteo-syncfw
 utility.files = bin/*.pl \
     bin/*.sh
 INSTALLS += target \

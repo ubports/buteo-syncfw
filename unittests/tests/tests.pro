@@ -53,31 +53,34 @@ LIBS += -lsynccommon \
     -laccounts-qt
 
 # install
-tests.files = tests.xml \
+tests.files = \
 	      runstarget.sh \
 	      sync-fw-tests.ref
 
+testdefinition.files = tests.xml
+
 testprofiles_client.files = syncprofiletests/testprofiles/user/client/*
-testprofiles_client.path = /usr/share/sync-fw-tests/syncprofiletests/testprofiles/user/client/
+testprofiles_client.path = /opt/tests/buteo-syncfw/syncprofiletests/testprofiles/user/client/
 
 testprofiles_service.files = syncprofiletests/testprofiles/user/service/*
-testprofiles_service.path = /usr/share/sync-fw-tests/syncprofiletests/testprofiles/user/service/
+testprofiles_service.path = /opt/tests/buteo-syncfw/syncprofiletests/testprofiles/user/service/
 
 testprofiles_storage.files = syncprofiletests/testprofiles/user/storage/*
-testprofiles_storage.path = /usr/share/sync-fw-tests/syncprofiletests/testprofiles/user/storage/
+testprofiles_storage.path = /opt/tests/buteo-syncfw/syncprofiletests/testprofiles/user/storage/
 
 testprofiles_sync.files = syncprofiletests/testprofiles/user/sync/*
-testprofiles_sync.path = /usr/share/sync-fw-tests/syncprofiletests/testprofiles/user/sync/
+testprofiles_sync.path = /opt/tests/buteo-syncfw/syncprofiletests/testprofiles/user/sync/
 
 testprofiles_syssync.files = syncprofiletests/testprofiles/system/sync/*
-testprofiles_syssync.path = /usr/share/sync-fw-tests/syncprofiletests/testprofiles/system/sync/
+testprofiles_syssync.path = /opt/tests/buteo-syncfw/syncprofiletests/testprofiles/system/sync/
 
 testaccount_service.files = syncprofiletests/testprofiles/testsync-ovi.service
 testaccount_service.path = /usr/share/accounts/services/
 
 	      
-tests.path = /usr/share/sync-fw-tests/
-target.path = /usr/share/sync-fw-tests/
+tests.path = /opt/tests/buteo-syncfw/
+target.path = /opt/tests/buteo-syncfw/
+testdefinition.path = /opt/tests/buteo-syncfw/test-definition/
 
 INSTALLS += tests \
     target \
@@ -86,7 +89,8 @@ INSTALLS += tests \
     testprofiles_service \
     testprofiles_storage \
     testprofiles_sync \
-    testprofiles_syssync
+    testprofiles_syssync \
+    testdefinition
 
 QT += testlib \
     core \

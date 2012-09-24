@@ -52,7 +52,7 @@ echo "hcitool is not installed. Please Install Bluez-test package and then rerun
 exit 0
 fi
 
-/usr/bin/perl /usr/bin/get_address.pl $CWD/temp_file.txt $CWD/temp_file2.txt $1
+/usr/bin/perl /opt/tests/buteo-syncfw/get_address.pl $CWD/temp_file.txt $CWD/temp_file2.txt $1
 
 if [ $? -eq 0 ]; then
   echo "Perl Script exit normal address found"
@@ -82,11 +82,11 @@ if [ $USER == "root" ];
 then 
       echo "Home Directory is  $HOME"
       echo "You are running the script as $USER .So Adding the bluetooth address to default profiles in /etc/sync/profiles/ "
-      /usr/bin/perl /usr/bin/add_address.pl $address $name root 
+      /usr/bin/perl /opt/tests/buteo-syncfw/add_address.pl $address $name root
 else 
       echo "Home Directory is $HOME "
       echo "Adding the bluetooth address to  user profiles in /home/user/.sync/profiles/"
-      /usr/bin/perl /usr/bin/add_address.pl $address $name user 
+      /usr/bin/perl /opt/tests/buteo-syncfw/add_address.pl $address $name user
       chmod -R 777 /home/user/.sync/profiles
 fi
 
