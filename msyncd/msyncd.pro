@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = 
+TARGET =
 QT += xml \
     dbus \
     sql \
@@ -18,7 +18,7 @@ QMAKE_PKGCONFIG_LIBDIR  = $$target.path
 QMAKE_PKGCONFIG_INCDIR  = $$headers.path
 pkgconfig.files = $${TARGET}.pc
 
-DEPENDPATH += . 
+DEPENDPATH += .
 INCLUDEPATH += . \
     ../ \
     ../libsynccommon \
@@ -26,7 +26,7 @@ INCLUDEPATH += . \
     ../libsyncprofile \
     /usr/include/accounts-qt \
     /usr/include/iphbd/ \
-    
+
 PKGCONFIG += dbus-1 libsignon-qt accounts-qt
 
 QMAKE_LIBDIR_QT += ../libsyncprofile/
@@ -38,7 +38,7 @@ LIBS += -L../libsyncpluginmgr \
     -lsyncprofile \
     -lsynccommon \
     -laccounts-qt \
-    -liphb 
+    -liphb
 
 
 # Input
@@ -103,13 +103,14 @@ QMAKE_CXXFLAGS = -Wall \
 target.path = /usr/bin/
 loglevel.files = bin/set_sync_log_level
 loglevel.path = /etc/sync/
-meego.files = bin/msyncd.desktop
-meego.path = /etc/xdg/autostart/
+service.files = bin/msyncd.service
+service.path = /usr/lib/systemd/user/
 syncwidget.path = /etc/syncwidget/
 syncwidget.files = com.meego.msyncd
 INSTALLS += target \
     loglevel \
-    syncwidget
+    syncwidget \
+    service
 
 # clean
 QMAKE_CLEAN += $(TARGET)
@@ -121,7 +122,7 @@ QMAKE_CLEAN += lib$${TARGET}.prl pkgconfig/*
 # #####################################################################
 coverage.CONFIG += recursive
 QMAKE_EXTRA_TARGETS += coverage
-CONFIG(debug,debug|release) { 
+CONFIG(debug,debug|release) {
     QMAKE_EXTRA_TARGETS += cov_cxxflags \
         cov_lflags
     cov_cxxflags.target = coverage
@@ -134,7 +135,7 @@ CONFIG(debug,debug|release) {
         += \
         -fprofile-arcs \
         -ftest-coverage
-    
+
     # QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
     # QMAKE_LFLAGS += -fprofile-arcs -ftest-coverage
     # -ftest-coverage
