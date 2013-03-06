@@ -1,0 +1,6 @@
+[Unit]
+Description=Sync FW daemon
+Requires=dbus.socket
+
+[Service]
+ExecStart=/usr/bin/msyncd
