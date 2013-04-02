@@ -30,6 +30,7 @@
 
 #include "ProfileFactory.h"
 #include "ProfileEngineDefs.h"
+#include "SyncCommonDefs.h"
 
 #include "LogMacros.h"
 #include "BtHelper.h"
@@ -43,7 +44,7 @@ static const QString LOG_DIRECTORY = "logs";
 static const QString BT_PROFILE_TEMPLATE("bt_template");
 
 const QString ProfileManager::DEFAULT_PRIMARY_PROFILE_PATH =
-        QDir::homePath() + "/.sync/profiles";
+        Sync::syncCacheDir();
 const QString ProfileManager::DEFAULT_SECONDARY_PROFILE_PATH =
         "/etc/sync/profiles";
 
@@ -1210,7 +1211,7 @@ QString ProfileManagerPrivate::findProfileFile(const QString &aName, const QStri
 }
 
 // this function checks to see if its a new profile or an
-// existing profile being modified under $HOME/.sync/profiles directory.
+// existing profile being modified under $Sync::syncCacheDir/profiles directory.
 bool ProfileManagerPrivate::profileExists(const QString &aProfileId ,const QString &aType)
 {
     QString profileFile = iPrimaryPath + QDir::separator() + aType + QDir::separator() + aProfileId + FORMAT_EXT;

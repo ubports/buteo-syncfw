@@ -22,6 +22,7 @@
  */
 
 #include "SyncAlarmInventory.h"
+#include "SyncCommonDefs.h"
 
 #include <QTimer>
 #include <QObject>
@@ -50,13 +51,9 @@ bool SyncAlarmInventory::init()
     iDbHandle = QSqlDatabase::addDatabase( "QSQLITE", iConnectionName );
 
     // Make sure we have the .sync directory
-    QDir homeDir = QDir::home();
-    if(!homeDir.exists(".sync"))
-    {
-        homeDir.mkdir(".sync");
-    }
-    QString path( homeDir.path() );
-    path.append( QDir::separator() ).append( ".sync");
+    QDir configDir;
+    configDir.mkdir(Sync::syncCacheDir());
+    QString path( Sync::syncCacheDir() );
     path.append( QDir::separator() ).append( "alarms.db.sqlite" );
     path = QDir::toNativeSeparators( path );
 
