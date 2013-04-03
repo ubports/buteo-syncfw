@@ -81,13 +81,13 @@ rm $CWD/temp_file.txt $CWD/temp_file2.txt
 if [ $USER == "root" ];
 then 
       echo "Home Directory is  $HOME"
-      echo "You are running the script as $USER .So Adding the bluetooth address to default profiles in /etc/sync/profiles/ "
+      echo "You are running the script as $USER .So Adding the bluetooth address to default profiles in /etc/buteo/profiles/ "
       /usr/bin/perl /opt/tests/buteo-syncfw/add_address.pl $address $name root
 else 
       echo "Home Directory is $HOME "
       echo "Adding the bluetooth address to  user profiles in /home/user/.sync/profiles/"
       /usr/bin/perl /opt/tests/buteo-syncfw/add_address.pl $address $name user
-      chmod -R 777 /home/user/.sync/profiles
+      chmod -R 777 /home/user/.cache/msyncd/profiles
 fi
 
 if [ $? -eq 0 ]; then

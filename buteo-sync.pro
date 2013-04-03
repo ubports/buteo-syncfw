@@ -2,11 +2,8 @@ include(doc/doc.pro)
 
 TEMPLATE = subdirs
 
-SUBDIRS += libsynccommon \
-           libsyncprofile \
-           libsyncpluginmgr \
+SUBDIRS += libbuteosyncfw \
            msyncd \
-           libsyncfwclient \
            unittests \
 	   doc
 

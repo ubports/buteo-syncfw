@@ -9,11 +9,11 @@ DEPENDPATH += . \
 
 INCLUDEPATH += . \
     ../.. \
-    ../../libsynccommon \
-    ../../libsyncpluginmgr \
-    ../../libsyncprofile \
+    ../../libbuteosyncfw/common \
+    ../../libbuteosyncfw/pluginmgr \
+    ../../libbuteosyncfw/profile \
     ../../msyncd \
-    ../../libsyncfwclient \
+    ../../libbuteosyncfw/clientfw \
     pluginmanagertests \
     syncprofiletests \
     msyncdtests \
@@ -39,15 +39,9 @@ CONFIG += qtestlib \
 
 # This is needed to avoid adding the /usr/lib link directory before the
 # newer version in the present directories
-QMAKE_LIBDIR_QT = ../../libsynccommon \
-    ../../libsyncprofile \
-    ../../libsyncpluginmgr \
-    ../../libsyncfwclient 
+QMAKE_LIBDIR_QT = ../../libbuteosyncfw
     
-LIBS += -lsynccommon \
-    -lsyncprofile \
-    -lsyncpluginmgr \
-    -lsyncfwclient \
+LIBS += -lbuteosyncfw \
     -ldbus-1 \
     -lgcov \
     -laccounts-qt
