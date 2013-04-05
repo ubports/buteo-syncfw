@@ -38,7 +38,7 @@ using namespace Buteo;
 const QString Profile::TYPE_CLIENT("client");
 const QString Profile::TYPE_SERVER("server");
 const QString Profile::TYPE_STORAGE("storage");
-const QString Profile::TYPE_SERVICE("service");
+//const QString Profile::TYPE_SERVICE("service");
 const QString Profile::TYPE_SYNC("sync");
 
 

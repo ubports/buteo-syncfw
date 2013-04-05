@@ -172,22 +172,22 @@ void ProfileManagerTest::testGetByData()
     profiles.clear();
 
     // Get profiles by sub-profile information, no match.
-    profiles = pm.getSyncProfilesByData("unknown", Profile::TYPE_SERVICE);
+    profiles = pm.getSyncProfilesByData("unknown", Profile::TYPE_SYNC);
     QVERIFY(profiles.isEmpty());
 
     // Get profiles by sub-profile information, key and value defined, no match.
-    profiles = pm.getSyncProfilesByData(OVI_COM, Profile::TYPE_SERVICE,
+    profiles = pm.getSyncProfilesByData(OVI_COM, Profile::TYPE_SYNC,
         "Username", "unknown");
     QVERIFY(profiles.isEmpty());
 
     // Get profiles by sub-profile information, sub-profile name not defined,
     // key and value defined, no match.
-    profiles = pm.getSyncProfilesByData("", Profile::TYPE_SERVICE,
+    profiles = pm.getSyncProfilesByData("", Profile::TYPE_SYNC,
         "Username", "unknown");
     QVERIFY(profiles.isEmpty());
 
     // Get profiles by sub-profile information, no key defined.
-    profiles = pm.getSyncProfilesByData(OVI_COM, Profile::TYPE_SERVICE);
+    profiles = pm.getSyncProfilesByData(OVI_COM, Profile::TYPE_SYNC);
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
@@ -198,7 +198,7 @@ void ProfileManagerTest::testGetByData()
     profiles.clear();
 
     // Get profiles by sub-profile information, key and value defined.
-    profiles = pm.getSyncProfilesByData(OVI_COM, Profile::TYPE_SERVICE,
+    profiles = pm.getSyncProfilesByData(OVI_COM, Profile::TYPE_SYNC,
         "Username", "your_username");
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
@@ -211,7 +211,7 @@ void ProfileManagerTest::testGetByData()
 
     // Get profiles by sub-profile information, sub-profile name not defined,
     // key and value defined.
-    profiles = pm.getSyncProfilesByData("", Profile::TYPE_SERVICE,
+    profiles = pm.getSyncProfilesByData("", Profile::TYPE_SYNC,
         "Username", "your_username");
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
@@ -280,7 +280,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // Get profiles by sub-profile information, no match.
     criteria.iType = ProfileManager::SearchCriteria::EXISTS;
     criteria.iSubProfileName = "unknown";
-    criteria.iSubProfileType = Profile::TYPE_SERVICE;
+    criteria.iSubProfileType = Profile::TYPE_SYNC;
     criteria.iKey = QString::null;
     criteria.iValue = QString::null;
     criteriaList.clear();
@@ -348,7 +348,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // Get profiles by sub-profile information, key and value defined, no match.
     criteria.iType = ProfileManager::SearchCriteria::EQUAL;
     criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SERVICE;
+    criteria.iSubProfileType = Profile::TYPE_SYNC;
     criteria.iKey = "Username";
     criteria.iValue = "unknown";
     criteriaList.clear();
@@ -360,7 +360,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // key and value defined, no match.
     criteria.iType = ProfileManager::SearchCriteria::EQUAL;
     criteria.iSubProfileName = QString::null;
-    criteria.iSubProfileType = Profile::TYPE_SERVICE;
+    criteria.iSubProfileType = Profile::TYPE_SYNC;
     criteria.iKey = "Username";
     criteria.iValue = "unknown";
     criteriaList.clear();
@@ -371,7 +371,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // Get profiles by sub-profile information, no key defined.
     criteria.iType = ProfileManager::SearchCriteria::EXISTS;
     criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SERVICE;
+    criteria.iSubProfileType = Profile::TYPE_SYNC;
     criteria.iKey = QString::null;
     criteria.iValue = QString::null;
     criteriaList.clear();
@@ -389,7 +389,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // Get profiles by sub-profile information, key and value defined.
     criteria.iType = ProfileManager::SearchCriteria::EQUAL;
     criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SERVICE;
+    criteria.iSubProfileType = Profile::TYPE_SYNC;
     criteria.iKey = "Username";
     criteria.iValue = "your_username";
     criteriaList.clear();
@@ -407,7 +407,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // Get profiles by sub-profile information, key and value defined, no match.
     criteria.iType = ProfileManager::SearchCriteria::NOT_EQUAL;
     criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SERVICE;
+    criteria.iSubProfileType = Profile::TYPE_SYNC;
     criteria.iKey = "Username";
     criteria.iValue = "your_username";
     criteriaList.clear();
@@ -418,7 +418,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // Get profiles by sub-profile information, key and value defined.
     criteria.iType = ProfileManager::SearchCriteria::NOT_EQUAL;
     criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SERVICE;
+    criteria.iSubProfileType = Profile::TYPE_SYNC;
     criteria.iKey = "Username";
     criteria.iValue = "foobar";
     criteriaList.clear();
@@ -436,7 +436,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // key and value defined.
     criteria.iType = ProfileManager::SearchCriteria::EQUAL;
     criteria.iSubProfileName = QString::null;
-    criteria.iSubProfileType = Profile::TYPE_SERVICE;
+    criteria.iSubProfileType = Profile::TYPE_SYNC;
     criteria.iKey = "Username";
     criteria.iValue = "your_username";
     criteriaList.clear();
@@ -676,7 +676,7 @@ void ProfileManagerTest::testOverrideKey()
     QScopedPointer<SyncProfile> p(static_cast<SyncProfile*>(
         pm.profile(OVI_CALENDAR, Profile::TYPE_SYNC)));
     QVERIFY(p != 0);
-    Profile *service = p->subProfile("ovi.com", Profile::TYPE_SERVICE);
+    Profile *service = p->subProfile("ovi.com", Profile::TYPE_SYNC);
     QVERIFY(service != 0);
 
     // Set username to the main profile (service section).
