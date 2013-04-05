@@ -46,7 +46,7 @@ static const QString BT_PROFILE_TEMPLATE("bt_template");
 const QString ProfileManager::DEFAULT_PRIMARY_PROFILE_PATH =
         Sync::syncCacheDir();
 const QString ProfileManager::DEFAULT_SECONDARY_PROFILE_PATH =
-        "/etc/sync/profiles";
+        "/etc/buteo/profiles";
 
 // Private implementation class for ProfileManager.
 class ProfileManagerPrivate
