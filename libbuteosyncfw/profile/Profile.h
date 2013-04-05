@@ -60,7 +60,7 @@ public:
     //! Storage type
     static const QString TYPE_STORAGE;
     //! Service type
-    static const QString TYPE_SERVICE;
+    //static const QString TYPE_SERVICE;
     //! Sync type
     static const QString TYPE_SYNC;
 	

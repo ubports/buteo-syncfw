@@ -902,6 +902,7 @@ bool Synchronizer::updateProfile(QString aProfileAsXml)
         Profile *profile = iProfileManager.profileFromXml(aProfileAsXml);
         if(profile) {
             // Update storage info before giving it to profileManager
+                /*
             Profile* service = 0;
             foreach(Profile* p, profile->allSubProfiles()) {
                 if (p->type() == Profile::TYPE_SERVICE) {
@@ -909,9 +910,10 @@ bool Synchronizer::updateProfile(QString aProfileAsXml)
                     break;
                 }
             }
+            */
 
-            if (service && !profile->boolKey(Buteo::KEY_STORAGE_UPDATED)) {
-                address = service->key(Buteo::KEY_BT_ADDRESS);
+            if (!profile->boolKey(Buteo::KEY_STORAGE_UPDATED)) {
+                address = profile->key(Buteo::KEY_BT_ADDRESS);
                 if (!address.isNull()) {
                     if(profile->key(Buteo::KEY_UUID).isEmpty())
                     {
@@ -1322,7 +1324,7 @@ void Synchronizer::onNewSession(const QString &aDestination)
         else
         {
             syncProfiles = iProfileManager.getSyncProfilesByData(
-                    QString::null, Profile::TYPE_SERVICE, KEY_BT_ADDRESS, aDestination);
+                    QString::null, Profile::TYPE_SYNC, KEY_BT_ADDRESS, aDestination);
         } // no else
         if (syncProfiles.isEmpty())
         {
@@ -1846,7 +1848,7 @@ Profile* Synchronizer::getSyncProfileByRemoteAddress(const QString& aAddress)
         else
         {
             profiles = iProfileManager.getSyncProfilesByData("",
-                                          Buteo::Profile::TYPE_SERVICE,
+                                          Buteo::Profile::TYPE_SYNC,
                                           Buteo::KEY_BT_ADDRESS,
                                           aAddress);
         }

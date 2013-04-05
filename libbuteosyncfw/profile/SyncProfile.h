@@ -213,13 +213,13 @@ public:
      *
      * \return Service profile. NULL if not found.
      */
-    const Profile *serviceProfile() const;
+    //const Profile *serviceProfile() const;
 
     /*! \brief Get the first service sub-profile.
      *
      * \return Service profile. NULL if not found.
      */
-    Profile *serviceProfile();
+    //Profile *serviceProfile();
 
     /*! \brief Get the first client sub-profile.
      *

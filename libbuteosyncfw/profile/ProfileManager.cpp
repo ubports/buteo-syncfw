@@ -590,7 +590,7 @@ QList<SyncProfile*> ProfileManager::getSOCProfilesForStorage(
     // Online service.
     SearchCriteria onlineService;
     onlineService.iType = SearchCriteria::EQUAL;
-    onlineService.iSubProfileType = Profile::TYPE_SERVICE;
+    //onlineService.iSubProfileType = Profile::TYPE_SERVICE;
     // Service profile name is left empty. Key value is matched with all
     // found service sub-profiles, though there should be only one.
     onlineService.iKey = KEY_DESTINATION_TYPE;
@@ -600,7 +600,7 @@ QList<SyncProfile*> ProfileManager::getSOCProfilesForStorage(
     // The profile should be interested
     // in SOC
     SearchCriteria socSupported;
-    socSupported.iSubProfileType = Profile::TYPE_SERVICE;
+    //socSupported.iSubProfileType = Profile::TYPE_SERVICE;
     socSupported.iType = SearchCriteria::EQUAL;
     socSupported.iKey = KEY_SOC;
     socSupported.iValue = BOOLEAN_TRUE;
@@ -643,7 +643,7 @@ QList<SyncProfile*> ProfileManager::getSyncProfilesByStorage(
     // Online service.
     SearchCriteria onlineService;
     onlineService.iType = SearchCriteria::EQUAL;
-    onlineService.iSubProfileType = Profile::TYPE_SERVICE;
+    //onlineService.iSubProfileType = Profile::TYPE_SERVICE;
     // Service profile name is left empty. Key value is matched with all
     // found service sub-profiles, though there should be only one.
     onlineService.iKey = KEY_DESTINATION_TYPE;
@@ -787,19 +787,19 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
 
     LOG_INFO("Profile Name :" << profileDisplayName);
     SyncProfile *tProfile = syncProfile(BT_PROFILE_TEMPLATE);
-    Profile *service = tProfile->serviceProfile();
-    if (service != 0) {
+    //Profile *service = tProfile->serviceProfile();
+    //if (service != 0) {
         tProfile->setKey(KEY_DISPLAY_NAME, profileDisplayName);
         QStringList keys ;
-        keys << destAddress << service->name();
+        keys << destAddress << tProfile->name();
         tProfile->setName(keys);
         tProfile->setEnabled(true);
         tProfile->setBoolKey("hidden", false);
-        service->setKey(KEY_BT_ADDRESS, destAddress);
-        service->setKey(KEY_BT_NAME, profileDisplayName);
-    } else {
-        LOG_WARNING("No service profile, unable to update properties");
-    }
+        tProfile->setKey(KEY_BT_ADDRESS, destAddress);
+        tProfile->setKey(KEY_BT_NAME, profileDisplayName);
+    //} else {
+    //   LOG_WARNING("No service profile, unable to update properties");
+    //}
 
     return tProfile;
 }
