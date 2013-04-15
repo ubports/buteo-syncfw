@@ -107,11 +107,11 @@ void SyncProfileTest::testProperties()
 
     // Destination type.
     QCOMPARE(p.destinationType(), SyncProfile::DESTINATION_TYPE_UNDEFINED);
-    Profile *service = p.serviceProfile();
-    QVERIFY(service != 0);
-    service->setKey(KEY_DESTINATION_TYPE, VALUE_ONLINE);
+    //Profile *service = p.serviceProfile();
+    //QVERIFY(service != 0);
+    p.setKey(KEY_DESTINATION_TYPE, VALUE_ONLINE);
     QCOMPARE(p.destinationType(), SyncProfile::DESTINATION_TYPE_ONLINE);
-    service->setKey(KEY_DESTINATION_TYPE, VALUE_DEVICE);
+    p.setKey(KEY_DESTINATION_TYPE, VALUE_DEVICE);
     QCOMPARE(p.destinationType(), SyncProfile::DESTINATION_TYPE_DEVICE);
 
     // Sync direction.
@@ -209,9 +209,9 @@ void SyncProfileTest::testSubProfiles()
     QVERIFY(client != 0);
     QVERIFY(client->name() == "syncml");
 
-    const Profile *service = p.serviceProfile();
-    QVERIFY(service != 0);
-    QVERIFY(service->name() == "ovi.com");
+    //const Profile *service = p.serviceProfile();
+    //QVERIFY(service != 0);
+    QVERIFY(p.name() == "ovi.com");
 
     QList<const Profile*> storages = p.storageProfiles();
     QCOMPARE(storages.size(), 2);

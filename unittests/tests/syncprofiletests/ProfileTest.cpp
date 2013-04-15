@@ -77,7 +77,7 @@ void ProfileTest::testConstruction()
     // Copy constructor.
     {
         QScopedPointer<Profile> p(loadFromXmlFile("hcalendar", Profile::TYPE_STORAGE));
-        QScopedPointer<Profile> p2(loadFromXmlFile("ovi.com", Profile::TYPE_SERVICE));
+        QScopedPointer<Profile> p2(loadFromXmlFile("ovi.com", Profile::TYPE_SYNC));
         p2->merge(*p);
         Profile p3(*p2);
 
@@ -246,7 +246,7 @@ void ProfileTest::testSubProfiles()
     QCOMPARE(subProfileNames[2], QString("hcontacts"));
 
     QCOMPARE(p->subProfileNames(Profile::TYPE_CLIENT).size(), 0);
-    QCOMPARE(p->subProfileNames(Profile::TYPE_SERVICE).size(), 1);
+    QCOMPARE(p->subProfileNames(Profile::TYPE_SYNC).size(), 1);
     QCOMPARE(p->subProfileNames(Profile::TYPE_STORAGE).size(), 2);
 
     // Sub-profile that does not exist.
@@ -272,7 +272,7 @@ void ProfileTest::testSubProfiles()
 
 void ProfileTest::testMerge()
 {
-    QScopedPointer<Profile> p(loadFromXmlFile("ovi.com", Profile::TYPE_SERVICE));
+    QScopedPointer<Profile> p(loadFromXmlFile("ovi.com", Profile::TYPE_SYNC));
     QScopedPointer<Profile> p2(loadFromXmlFile("hcalendar", Profile::TYPE_STORAGE));
 
     QVERIFY(p != 0);
@@ -327,7 +327,7 @@ void ProfileTest::testValidate()
     p->setKey("Notebook Name", "myNotebook");
 
     // Validate profile that has sub-profiles.
-    QScopedPointer<Profile> p2(loadFromXmlFile("ovi.com", Profile::TYPE_SERVICE));
+    QScopedPointer<Profile> p2(loadFromXmlFile("ovi.com", Profile::TYPE_SYNC));
     QVERIFY(p2 != 0);
     p->setEnabled(true);
     p2->merge(*p);
@@ -353,19 +353,19 @@ void ProfileTest::testXmlConversion()
         profileFileToString("hcalendar-expected", Profile::TYPE_STORAGE));
 
     // Merge storage profile to service profile.
-    QScopedPointer<Profile> p2(loadFromXmlFile("ovi.com", Profile::TYPE_SERVICE));
+    QScopedPointer<Profile> p2(loadFromXmlFile("ovi.com", Profile::TYPE_SYNC));
     QVERIFY(p2 != 0);
     p2->merge(*p);
 
     // Output local profile data only, no merged sub-profile data.
     QVERIFY(saveToXmlFile(*p2, "ovi.com-output"));
-    QCOMPARE(profileFileToString("ovi.com-output", Profile::TYPE_SERVICE),
-        profileFileToString("ovi.com-expected", Profile::TYPE_SERVICE));
+    QCOMPARE(profileFileToString("ovi.com-output", Profile::TYPE_SYNC),
+        profileFileToString("ovi.com-expected", Profile::TYPE_SYNC));
 
     // Output merged sub-profiles also.
     QVERIFY(saveToXmlFile(*p2, "ovi.com-output", false));
-    QCOMPARE(profileFileToString("ovi.com-output", Profile::TYPE_SERVICE),
-        profileFileToString("ovi.com-merged-expected", Profile::TYPE_SERVICE));
+    QCOMPARE(profileFileToString("ovi.com-output", Profile::TYPE_SYNC),
+        profileFileToString("ovi.com-merged-expected", Profile::TYPE_SYNC));
 }
 
 Profile *ProfileTest::loadFromXmlFile(const QString &aName, const QString &aType)

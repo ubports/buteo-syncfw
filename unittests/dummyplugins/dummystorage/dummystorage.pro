@@ -3,9 +3,9 @@ TARGET = hdummy-storage
 DEPENDPATH += .
 INCLUDEPATH += . \
     ../../.. \
-    ../../../libsynccommon \
-    ../../../libsyncpluginmgr \
-    ../../../libsyncprofile
+    ../../../libbuteosyncfw/common \
+    ../../../libbuteosyncfw/pluginmgr \
+    ../../../libbuteosyncfw/profile
 
 CONFIG += plugin
 QT -= gui
