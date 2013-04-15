@@ -23,10 +23,10 @@
 
 #include <QString>
 #include <QDomDocument>
-#include <libsyncprofile/ProfileManager.h>
-#include <libsyncprofile/SyncProfile.h>
-#include <libsyncprofile/SyncResults.h>
-#include <libsyncprofile/SyncSchedule.h>
+#include <ProfileManager.h>
+#include <SyncProfile.h>
+#include <SyncResults.h>
+#include <SyncSchedule.h>
 #include "SyncClientInterfacePrivate.h"
 #include "SyncClientInterface.h"
 #include "LogMacros.h"

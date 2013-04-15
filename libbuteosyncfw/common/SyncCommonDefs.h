@@ -25,8 +25,15 @@
 #define SYNCCOMMONDEFS_H
 
 #include <QMetaType>
+#include <QDir>
 
 namespace Sync {
+
+static const QString syncCacheDir()
+{
+    const QString HOME_PATH = (::getenv("XDG_CACHE_HOME") == NULL) ? QDir::homePath() + QDir::separator() + ".cache" : ::getenv("XDG_CACHE_HOME");
+    return HOME_PATH + QDir::separator() + "msyncd";
+}
 
 enum SyncStatus {
     SYNC_QUEUED = 0,

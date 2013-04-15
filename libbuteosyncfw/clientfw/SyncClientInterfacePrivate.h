@@ -26,7 +26,7 @@
 
 #include <QObject>
 #include "SyncDaemonProxy.h"
-#include <libsyncprofile/SyncProfile.h>
+#include <SyncProfile.h>
 
 namespace Buteo {
 

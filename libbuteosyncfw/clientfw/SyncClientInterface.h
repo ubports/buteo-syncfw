@@ -26,10 +26,10 @@
 
 #include <QObject>
 #include <QString>
-#include <libsyncprofile/Profile.h>
-#include <libsyncprofile/SyncProfile.h>
-#include <libsyncprofile/SyncResults.h>
-#include <libsyncprofile/SyncSchedule.h>
+#include <Profile.h>
+#include <SyncProfile.h>
+#include <SyncResults.h>
+#include <SyncSchedule.h>
 
 
 namespace Buteo {

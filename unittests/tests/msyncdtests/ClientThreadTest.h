@@ -26,7 +26,7 @@
 #include <QtTest/QtTest>
 #include <QString>
 
-#include <libsynccommon/SyncCommonDefs.h>
+#include <SyncCommonDefs.h>
 #include "ClientThread.h"
 #include "ClientPlugin.h"
 #include "SyncProfile.h"

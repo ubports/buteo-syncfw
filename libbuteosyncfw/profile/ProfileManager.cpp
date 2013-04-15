@@ -30,6 +30,7 @@
 
 #include "ProfileFactory.h"
 #include "ProfileEngineDefs.h"
+#include "SyncCommonDefs.h"
 
 #include "LogMacros.h"
 #include "BtHelper.h"
@@ -43,9 +44,9 @@ static const QString LOG_DIRECTORY = "logs";
 static const QString BT_PROFILE_TEMPLATE("bt_template");
 
 const QString ProfileManager::DEFAULT_PRIMARY_PROFILE_PATH =
-        QDir::homePath() + "/.sync/profiles";
+        Sync::syncCacheDir();
 const QString ProfileManager::DEFAULT_SECONDARY_PROFILE_PATH =
-        "/etc/sync/profiles";
+        "/etc/buteo/profiles";
 
 // Private implementation class for ProfileManager.
 class ProfileManagerPrivate
@@ -589,7 +590,7 @@ QList<SyncProfile*> ProfileManager::getSOCProfilesForStorage(
     // Online service.
     SearchCriteria onlineService;
     onlineService.iType = SearchCriteria::EQUAL;
-    onlineService.iSubProfileType = Profile::TYPE_SERVICE;
+    //onlineService.iSubProfileType = Profile::TYPE_SERVICE;
     // Service profile name is left empty. Key value is matched with all
     // found service sub-profiles, though there should be only one.
     onlineService.iKey = KEY_DESTINATION_TYPE;
@@ -599,7 +600,7 @@ QList<SyncProfile*> ProfileManager::getSOCProfilesForStorage(
     // The profile should be interested
     // in SOC
     SearchCriteria socSupported;
-    socSupported.iSubProfileType = Profile::TYPE_SERVICE;
+    //socSupported.iSubProfileType = Profile::TYPE_SERVICE;
     socSupported.iType = SearchCriteria::EQUAL;
     socSupported.iKey = KEY_SOC;
     socSupported.iValue = BOOLEAN_TRUE;
@@ -642,7 +643,7 @@ QList<SyncProfile*> ProfileManager::getSyncProfilesByStorage(
     // Online service.
     SearchCriteria onlineService;
     onlineService.iType = SearchCriteria::EQUAL;
-    onlineService.iSubProfileType = Profile::TYPE_SERVICE;
+    //onlineService.iSubProfileType = Profile::TYPE_SERVICE;
     // Service profile name is left empty. Key value is matched with all
     // found service sub-profiles, though there should be only one.
     onlineService.iKey = KEY_DESTINATION_TYPE;
@@ -786,19 +787,19 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
 
     LOG_INFO("Profile Name :" << profileDisplayName);
     SyncProfile *tProfile = syncProfile(BT_PROFILE_TEMPLATE);
-    Profile *service = tProfile->serviceProfile();
-    if (service != 0) {
+    //Profile *service = tProfile->serviceProfile();
+    //if (service != 0) {
         tProfile->setKey(KEY_DISPLAY_NAME, profileDisplayName);
         QStringList keys ;
-        keys << destAddress << service->name();
+        keys << destAddress << tProfile->name();
         tProfile->setName(keys);
         tProfile->setEnabled(true);
         tProfile->setBoolKey("hidden", false);
-        service->setKey(KEY_BT_ADDRESS, destAddress);
-        service->setKey(KEY_BT_NAME, profileDisplayName);
-    } else {
-        LOG_WARNING("No service profile, unable to update properties");
-    }
+        tProfile->setKey(KEY_BT_ADDRESS, destAddress);
+        tProfile->setKey(KEY_BT_NAME, profileDisplayName);
+    //} else {
+    //   LOG_WARNING("No service profile, unable to update properties");
+    //}
 
     return tProfile;
 }
@@ -1210,7 +1211,7 @@ QString ProfileManagerPrivate::findProfileFile(const QString &aName, const QStri
 }
 
 // this function checks to see if its a new profile or an
-// existing profile being modified under $HOME/.sync/profiles directory.
+// existing profile being modified under $Sync::syncCacheDir/profiles directory.
 bool ProfileManagerPrivate::profileExists(const QString &aProfileId ,const QString &aType)
 {
     QString profileFile = iPrimaryPath + QDir::separator() + aType + QDir::separator() + aProfileId + FORMAT_EXT;

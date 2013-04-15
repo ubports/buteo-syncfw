@@ -48,7 +48,7 @@ const QString SERVERMAP_LOCATION = "-server.so";
 const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
 
 // Default directory from which to look for plugins
-const QString DEFAULT_PLUGIN_PATH = "/usr/lib/sync/";
+const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins/";
 
 // The name of the function which is used to create a plugin
 const QString CREATE_FUNCTION = "createPlugin";

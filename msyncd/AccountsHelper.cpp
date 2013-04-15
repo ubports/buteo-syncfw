@@ -125,27 +125,27 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
                 {
                     // Set profile to enabled, only if the corresponding service
                     // is also enabled
-                    const Profile *serviceProfile = profile->serviceProfile();
-                    if(serviceProfile)
-                    {
+                    //const Profile *serviceProfile = profile->serviceProfile();
+                    //if(serviceProfile)
+                    //{
                         // The service pointer must not be deleted here. It is
                         // cached by the Account manager object
-                        Accounts::Service service = iAccountManager->service(serviceProfile->name());
+                        Accounts::Service service = iAccountManager->service(profile->name());
                         changedAccount->selectService(service);
                         bool serviceEnabled = changedAccount->enabled();
                         changedAccount->selectService();
-                        LOG_DEBUG("Enabled status for service ::" << service.name() << serviceEnabled);
+                        LOG_DEBUG("Enabled status for service ::" << profile->name() << serviceEnabled);
                         if(serviceEnabled)
                         {
                             profile->setEnabled(changedAccount->enabled());
                             iProfileManager.updateProfile(*profile);
                             emit scheduleUpdated(profile->name());
                         }
-                    }
-                    else
-                    {
-                        LOG_WARNING("Service profile is NULL for ::" << profile->name());
-                    }
+                    //}
+                    //else
+                    //{
+                        //LOG_WARNING("Service profile is NULL for ::" << profile->name());
+                    //}
                 }
                 else
                 {
@@ -163,10 +163,10 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
             foreach(SyncProfile *profile, profiles)
             {
                 // See if the service name matches
-                Profile *serviceProfile = profile->serviceProfile();
-                if(serviceProfile)
-                {
-                    if(serviceName == serviceProfile->name())
+                //Profile *serviceProfile = profile->serviceProfile();
+                //if(serviceProfile)
+                //{
+                    if(serviceName == profile->name())
                     {
                         // We can assume that the account is already enabled if
                         // we get this
@@ -174,11 +174,11 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
                         iProfileManager.updateProfile(*profile);
                         emit scheduleUpdated(profile->name());
                     }
-                }
-                else
-                {
-                    LOG_WARNING("No service profile found for ::" << profile->name());
-                }
+                //}
+                //else
+                //{
+                //    LOG_WARNING("No service profile found for ::" << profile->name());
+                //}
                 delete profile;
             }
         }
@@ -304,7 +304,7 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
 {
     FUNCTION_CALL_TRACE;
 
-    Profile *serviceProfile = iProfileManager.profile(service.name(), Profile::TYPE_SERVICE);
+    Profile *serviceProfile = iProfileManager.profile(service.name(), Profile::TYPE_SYNC);
     if (!serviceProfile) {
         LOG_DEBUG ("!!!! Service not supported !!!!");
         return;

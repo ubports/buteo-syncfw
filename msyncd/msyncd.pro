@@ -21,9 +21,9 @@ pkgconfig.files = $${TARGET}.pc
 DEPENDPATH += .
 INCLUDEPATH += . \
     ../ \
-    ../libsynccommon \
-    ../libsyncpluginmgr \
-    ../libsyncprofile \
+    ../libbuteosyncfw/pluginmgr \
+    ../libbuteosyncfw/common \
+    ../libbuteosyncfw/profile \
     /usr/include/accounts-qt \
     /usr/include/iphbd/ \
 
@@ -31,12 +31,8 @@ PKGCONFIG += dbus-1 libsignon-qt accounts-qt
 
 QMAKE_LIBDIR_QT += ../libsyncprofile/
 
-LIBS += -L../libsyncpluginmgr \
-    -L../libsyncprofile \
-    -L../libsynccommon \
-    -lsyncpluginmgr \
-    -lsyncprofile \
-    -lsynccommon \
+LIBS += -L../libbuteosyncfw \
+    -lbuteosyncfw \
     -laccounts-qt \
     -liphb
 
@@ -102,7 +98,7 @@ QMAKE_CXXFLAGS = -Wall \
 # install
 target.path = /usr/bin/
 loglevel.files = bin/set_sync_log_level
-loglevel.path = /etc/sync/
+loglevel.path = /etc/buteo/
 service.files = bin/msyncd.service
 service.path = /usr/lib/systemd/user/
 syncwidget.path = /etc/syncwidget/
