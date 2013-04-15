@@ -23,8 +23,8 @@
 #ifndef SYNCPLUGINBASE_H
 #define SYNCPLUGINBASE_H
 
-#include "libsynccommon/SyncCommonDefs.h"
-#include "libsyncprofile/SyncResults.h"
+#include "SyncCommonDefs.h"
+#include "SyncResults.h"
 #include <QString>
 #include <QMetaType>
 #include <QObject>

@@ -24,7 +24,7 @@
 #define SERVERPLUGIN_H_4399340943904399349843
 
 #include "SyncPluginBase.h"
-#include "libsyncprofile/Profile.h"
+#include "Profile.h"
 #include <QObject>
 #include <QString>
 
