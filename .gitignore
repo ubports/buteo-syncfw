@@ -2,3 +2,8 @@ Makefile
 *.so*
 *.prl
 pkgconfig/
+*.list
+*.tag
+msyncd/msyncd
+doc/html
+unittests/tests/sync-fw-tests

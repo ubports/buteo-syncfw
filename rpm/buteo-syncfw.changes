@@ -1,2 +1,45 @@
+* Tue Mar 05 2013 Bernd Wachter <bernd.wachter@jollamobile.com> - 0.6.1
+- Change from xdg autostart to providing an user session service file
+
+* Mon Sep 24 2012 Bernd Wachter <bernd.wachter@jollamobile.com> - 0.6.0
+- Update to nemo upstream, contributing to JB#2310
+
+* Thu Sep 06 2012 Bernd Wachter <bernd.wachter@jollamobile.com> - 0.5.40
+- Update to latest upstream, contributing to JB#1813
+- Move tests to /opt/tests
+- Adjust to Accounts API changes
+
+* Wed Feb 16 2011 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.4
+- Move binaries only required for testing to -tests, fixing BMC#13446
+
+* Thu Feb 10 2011 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.4
+- Add patch to fix BMC#13367 - buteo-syncfw: removing profile fails
+
+* Thu Feb 03 2011 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.4
+- Update version, implementing FEA#8027
+
+* Mon Jan 31 2011 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.2.8
+- Update version, fixing BMC#13137
+
+* Wed Jan 05 2011 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.2.2
+- Update version, fixing BMC#11995
+
+* Fri Dec 17 2010 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.2.1
+- Update version, fixing BMC#11486
+
+* Wed Nov 24 2010 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.1.25
+- Update version, required for buteo-sync-plugins fixes from BME#3888
+
+* Sun Oct 17 2010 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.1.12
+- Update to current version
+
+* Thu Sep 23 2010 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.1.8
+- Update version, fixing BMC#3860
+
+* Tue Aug 24 2010 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.5.0.21
+- Update to latest version
+- Change BuildRequires to pkgconfig
+- Package documentation
+
 * Thu Jun 24 2010 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.4.9
 - Initial RPM version
