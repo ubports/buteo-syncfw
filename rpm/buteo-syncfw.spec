@@ -11,7 +11,6 @@ BuildRequires: pkgconfig(QtCore)
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(contextsubscriber-1.0)
 BuildRequires: pkgconfig(accounts-qt)
-BuildRequires: pkgconfig(qttracker)
 BuildRequires: pkgconfig(libsignon-qt)
 BuildRequires: pkgconfig(QtSystemInfo)
 BuildRequires: libiphb-devel
