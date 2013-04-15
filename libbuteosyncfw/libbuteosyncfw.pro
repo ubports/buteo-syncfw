@@ -115,7 +115,11 @@ headers.files = common/Logger.h \
            profile/SyncSchedule_p.h \
            profile/TargetResults.h
 
-INSTALLS += target headers
+utility.path = /opt/tests/buteo-syncfw
+utility.files = ../bin/*.pl \
+    ../bin/*.sh
+
+INSTALLS += target headers utility
 
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 QMAKE_PKGCONFIG_LIBDIR  = $$target.path
@@ -140,7 +144,7 @@ CONFIG(debug,debug|release){
         += \
         -fprofile-arcs \
         -ftest-coverage
-     
+
     coverage.commands = @echo \
         "Built with coverage support..."
     build_pass|!debug_and_release : coverage.depends = all
