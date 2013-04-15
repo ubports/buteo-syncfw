@@ -24,7 +24,7 @@
 #define CLIENTPLUGIN_H
 
 #include "SyncPluginBase.h"
-#include "libsyncprofile/SyncProfile.h"
+#include "SyncProfile.h"
 #include <QMetaType>
 
 namespace Buteo {
