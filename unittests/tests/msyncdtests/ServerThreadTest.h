@@ -50,6 +50,7 @@ class ServerPluginDerived: public ServerPlugin
 	bool uninit();
         void suspend();
         void resume();
+	virtual bool cleanUp();
 
 	bool iTestSignal;
 	

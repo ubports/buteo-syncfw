@@ -70,6 +70,11 @@ void DummyClient::abortSync()
 
 }
 
+bool DummyClient::cleanUp()
+{
+	return false;
+}
+
 SyncResults DummyClient::getSyncResults()
 {
     SyncResults results;

@@ -46,6 +46,8 @@ public:
 
     virtual void abortSync();
 
+    virtual bool cleanUp();
+
     virtual SyncResults getSyncResults();
 
 public slots:

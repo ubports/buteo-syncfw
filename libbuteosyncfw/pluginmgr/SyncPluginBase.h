@@ -89,7 +89,7 @@ public:
 	 * (success or error) is still expected from the aborted session before
 	 * it terminates.
 	 */
-    virtual void abortSync(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED) { };
+        virtual void abortSync(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED) { };
 
 	/*! \brief Cleans up any sync related stuff (e.g sync anchors etc) when the
 	 * profile is deleted
@@ -97,7 +97,7 @@ public:
 	 * Derived plug-in should implement this function and perform any cleanup
 	 * operations if required when the profile is deleted
 	 */
-	virtual bool cleanUp() { return false; };
+        virtual bool cleanUp() = 0;
 
 	/*! \brief Gets the results of the last completed sync session.
 	 *

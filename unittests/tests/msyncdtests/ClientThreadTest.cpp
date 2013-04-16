@@ -51,6 +51,11 @@ void ClientPluginDerived::connectivityStateChanged(Sync::ConnectivityType ,bool)
 {
 }
 
+bool ClientPluginDerived::cleanUp()
+{
+	return true;
+}
+
 //Constructor of the derived class
 ClientPluginDerived::ClientPluginDerived(const QString& aPluginName,
                   	    		 const SyncProfile& aProfile,

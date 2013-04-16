@@ -44,6 +44,7 @@ class ClientPluginDerived: public ClientPlugin
 	bool startSync();
 	bool init();
 	bool uninit();
+	virtual bool cleanUp();
 
 	bool iTestClSignal;
 
