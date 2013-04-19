@@ -49,6 +49,8 @@ public:
 
     virtual void resume();
 
+    virtual bool cleanUp();
+
 public slots:
 
     virtual void connectivityStateChanged( Sync::ConnectivityType aType,

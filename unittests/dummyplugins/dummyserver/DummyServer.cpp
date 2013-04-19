@@ -64,6 +64,10 @@ bool DummyServer::startListen()
     return true;
 }
 
+bool DummyServer::cleanUp()
+{
+    return true;
+}
 void DummyServer::stopListen()
 {
 

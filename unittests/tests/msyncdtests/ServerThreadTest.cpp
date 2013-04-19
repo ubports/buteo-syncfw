@@ -50,6 +50,11 @@ void ServerPluginDerived::resume()
 {
 }
 
+bool ServerPluginDerived::cleanUp()
+{
+	return true;
+}
+
 bool ServerPluginDerived::init()
 {
 	if (iTestSignal == true)
