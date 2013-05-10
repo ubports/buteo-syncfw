@@ -45,7 +45,7 @@ public:
 
     struct SyncRetriesInfo
     {
-        QList<quint32> iRetryIntervals; 
+        QList<quint32> iRetryIntervals;
         quint32 iIntervalIndex;
 
         void init()
@@ -199,8 +199,8 @@ void SyncProfile::setName(const QString &aName)
 {
   // sets the name in the super class Profile.
   Profile::setName(aName);
-  // Here we also must set name for the log associated to this profile, 
-  // as that is only set during log construction. Changing SyncProfile name does not 
+  // Here we also must set name for the log associated to this profile,
+  // as that is only set during log construction. Changing SyncProfile name does not
   // reflect there
   if (d_ptr->iLog)
     d_ptr->iLog->setProfileName(aName);
@@ -211,8 +211,8 @@ void SyncProfile::setName(const QStringList &aKeys)
   // sets the name in the super class Profile.
 
   Profile::setName(aKeys);
-  // Here we also must set name for the log associated to this profile, 
-  // as that is only set during log construction. Changing SyncProfile name does not 
+  // Here we also must set name for the log associated to this profile,
+  // as that is only set during log construction. Changing SyncProfile name does not
   // reflect there
   if (d_ptr->iLog)
     d_ptr->iLog->setProfileName(Profile::name());
@@ -220,16 +220,35 @@ void SyncProfile::setName(const QStringList &aKeys)
 
 
 QDateTime SyncProfile::lastSyncTime() const
-{    
+{
     QDateTime lastSync;
 
     if (d_ptr->iLog != 0 && d_ptr->iLog->lastResults() != 0)
-    {        
+    {
         lastSync = d_ptr->iLog->lastResults()->syncTime();
     } // no else
 
     LOG_DEBUG("lastSync:"<<lastSync);
     return lastSync;
+}
+
+QDateTime SyncProfile::lastSuccessfulSyncTime () const
+{
+    QDateTime lastSuccessSyncTime;
+    if (d_ptr->iLog)
+    {
+        QList<const SyncResults*> allResults = d_ptr->iLog->allResults();
+        for (int i=0; i<allResults.size (); i++)
+        {
+            if (allResults.at(i)->majorCode() == SyncResults::SYNC_RESULT_SUCCESS &&
+                allResults.at(i)->minorCode() == SyncResults::NO_ERROR)
+            {
+                lastSuccessSyncTime = allResults.at(i)->syncTime ();
+                break;
+            }
+        }
+    }
+    return lastSuccessSyncTime;
 }
 
 QDateTime SyncProfile::nextSyncTime(QDateTime aDateTime) const
@@ -326,9 +345,9 @@ QString SyncProfile::serviceName() const
 {
     QStringList serviceNameList = subProfileNames(Profile::TYPE_SERVICE);
 
-    if (serviceNameList.isEmpty()) 
-	    return QString();
-    
+    if (serviceNameList.isEmpty())
+        return QString();
+
     return serviceNameList.first();
 }
 

@@ -94,6 +94,8 @@ const QString KEY_REMOTE_NAME("remote_name");
 const QString KEY_UUID("uuid");
 const QString KEY_NOTES_UUID("notes_uuid");
 const QString KEY_STORAGE_UPDATED("storage_updated");
+const QString KEY_HTTP_PROXY_HOST("http_proxy_host");
+const QString KEY_HTTP_PROXY_PORT("http_proxy_port");
 
 const QString BOOLEAN_TRUE("true");
 const QString BOOLEAN_FALSE("false");

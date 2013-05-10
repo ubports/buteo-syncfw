@@ -32,7 +32,7 @@
 namespace Buteo {
 
 class SyncProfilePrivate;
-    
+
 /*! \brief A top level synchronization profile.
  *
  * SyncProfile is derived from Profile. It represents a top level
@@ -126,16 +126,16 @@ public:
      */
     virtual SyncProfile *clone() const;
 
-    
+
     /*! \brief Sets the name for the profile and associated log.
      */
     virtual void setName(const QString &aName);
-    
+
     /*! \brief Sets the name for the profile and associated log.
      */
     virtual void setName(const QStringList &aKeys);
-    
-    
+
+
     //! \see Profile::toXml
     virtual QDomElement toXml(QDomDocument &aDoc, bool aLocalOnly = true) const;
 
@@ -144,6 +144,13 @@ public:
      * \return Last sync time. Null object if this could not be determined.
      */
     QDateTime lastSyncTime() const;
+
+    /*! \brief Gets the time of the last successful sync session for
+     *  this profile
+     *  \return Sync time of the last successful session. Null if this
+     *  could not be determined
+     */
+    QDateTime lastSuccessfulSyncTime() const;
 
     /*! \brief Gets the next scheduled sync time.
      *
