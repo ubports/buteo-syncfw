@@ -43,7 +43,12 @@
 #include <QMap>
 #include <QString>
 #include <QDBusInterface>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QDeviceInfo>
+#include <QBatteryInfo>
+#else
 #include <QtSystemInfo/QSystemDeviceInfo>
+#endif
 
 
 namespace Buteo {
@@ -60,7 +65,7 @@ class AccountsHelper;
 /// This class manages other components and connects them to provide
 /// the fully functioning synchronization framework.
 class Synchronizer : public SyncDBusInterface, // Derived from QObject
-		     public PluginCbInterface
+                     public PluginCbInterface
 {
     Q_OBJECT
 public:
@@ -183,13 +188,13 @@ public slots:
     virtual bool getBackUpRestoreState();
 
     void start(unsigned int aAccountId);
-    
+
     /*! \brief Stops sync for all profiles matching the given account ID.
      *
      * \param aAccountId The account ID.
      */
     void stop(unsigned int aAccountId);
-    
+
     /*! \brief Returns the list of account IDs for which sync is ongoing
      *
      * \return The list of account IDs currectly syncing.
@@ -213,7 +218,7 @@ public slots:
 
 signals:
 
-	//! emitted by releaseStorages call
+        //! emitted by releaseStorages call
     void storageReleased();
 
 private slots:
@@ -233,7 +238,7 @@ private slots:
         Sync::SyncStatus aStatus, const QString &aMessage, int aErrorCode );
 
     void onStorageAccquired(const QString &aProfileName, const QString &aMimeType);
-    
+
     void onSyncProgressDetail(const QString &aProfileName,int aProgressDetail);
 
     void onServerDone();
@@ -323,12 +328,12 @@ private:
      *
      */
      void backupRestoreStarts ();
-	    
+
     /*! \brief Helper function when backup/restore is done.
      *
      */
      void backupRestoreFinished();
-    
+
     /*! \brief Initializes sync scheduler
      *
      */
@@ -342,7 +347,7 @@ private:
      * @return True or False to indicate success or failure
      */
     bool cleanupProfile(const QString &profileId);
-    
+
     QMap<QString, SyncSession*> iActiveSessions;
 
     QList<QString> iProfilesToRemove;
@@ -364,7 +369,7 @@ private:
     StorageBooker iStorageBooker;
 
     SyncScheduler *iSyncScheduler;
-    
+
     SyncBackup *iSyncBackup;
 
     TransportTracker *iTransportTracker;
@@ -373,7 +378,11 @@ private:
 
     AccountsHelper *iAccounts;
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    QBatteryInfo iDeviceInfo;
+#else
     QtMobility::QSystemDeviceInfo iDeviceInfo;
+#endif
 
     bool iClosing;
 

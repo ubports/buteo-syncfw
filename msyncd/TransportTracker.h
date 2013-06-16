@@ -28,39 +28,43 @@
 #include <QObject>
 #include <QMap>
 #include <QMutex>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QDeviceInfo>
+#else
 #include <QtSystemInfo/QSystemDeviceInfo>
+#endif
 
 namespace Buteo {
 
 class USBModedProxy;
 class NetworkManager;
 
-    
+
 /*! \brief Class for tracking transport states
  *
  * USB state is tracked with HAL, BT with Context Framework and Internet states with Buteo::NetworkManager.
  */
 class TransportTracker : public QObject
 {
-	Q_OBJECT
+        Q_OBJECT
 
 public:
 
-	/*! \brief Constructor
-	 *
-	 * @param aParent Parent object
-	 */
-	TransportTracker(QObject *aParent = 0);
+        /*! \brief Constructor
+         *
+         * @param aParent Parent object
+         */
+        TransportTracker(QObject *aParent = 0);
 
-	//! \brief Destructor
-	virtual ~TransportTracker();
+        //! \brief Destructor
+        virtual ~TransportTracker();
 
-	/*! \brief Checks the state of the given connectivity type
-	 *
-	 * @param aType Connectivity type
-	 * @return True if available, false if not
-	 */
-	bool isConnectivityAvailable(Sync::ConnectivityType aType) const;
+        /*! \brief Checks the state of the given connectivity type
+         *
+         * @param aType Connectivity type
+         * @return True if available, false if not
+         */
+        bool isConnectivityAvailable(Sync::ConnectivityType aType) const;
 
 signals:
 
@@ -69,7 +73,7 @@ signals:
      * @param aType Connectivity type whose state has changed
      * @param aState New state. True if available, false if not.
      */
-	void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
+        void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
 
     /*! \brief Signal emitted when a n/w state changes
      *
@@ -80,14 +84,14 @@ signals:
     /*! \brief Signal emitted when a network session is successfully opened
      */
     void sessionConnected();
-    
+
     /*! \brief Signal emitted when opening a network session fails
      */
     void sessionError();
 
 private slots:
 
-	void onUsbStateChanged(bool aConnected);
+        void onUsbStateChanged(bool aConnected);
 
     void onBtStateChanged(bool aState);
 
@@ -99,18 +103,22 @@ private:
 
     USBModedProxy *iUSBProxy;
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    QDeviceInfo iDeviceInfo;
+#else
     QtMobility::QSystemDeviceInfo iDeviceInfo;
+#endif
 
     NetworkManager *iInternet;
 
     mutable QMutex iMutex;
 
-	/*! \brief updates the state of the given connectivity type to input value
-	 *
-	 * @param aType Connectivity type
-	 * @param aState Connectivity State
-	 */
-	void updateState(Sync::ConnectivityType aType, bool aState);
+        /*! \brief updates the state of the given connectivity type to input value
+         *
+         * @param aType Connectivity type
+         * @param aState Connectivity State
+         */
+        void updateState(Sync::ConnectivityType aType, bool aState);
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class TransportTrackerTest;

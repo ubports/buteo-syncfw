@@ -58,7 +58,7 @@ static const unsigned long long MAX_THREAD_STOP_WAIT_TIME = 5000;
 Synchronizer::Synchronizer( QCoreApplication* aApplication )
 :   iNetworkManager(0),
     iSyncScheduler(0),
-    iSyncBackup(0),    
+    iSyncBackup(0),
     iTransportTracker(0),
     iServerActivator(0),
     iAccounts(0),
@@ -417,8 +417,11 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     // @todo: Complete profile with data from account manager.
     //iAccounts->addAccountData(*profile);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
+#else
     QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
-    //LOG_DEBUG("Battery status:"<<batteryStat);
+#endif
 
     if (!profile->isValid())
     {
@@ -426,9 +429,13 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
     }
-
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    else if( aScheduled && ( (batteryStat != QBatteryInfo::BatteryOk) &&
+                             (batteryStat != QBatteryInfo::BatteryFull) ))
+#else
     else if( aScheduled && ( (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
                              (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow) ))
+#endif
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
@@ -597,14 +604,14 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
                 //session->setFailureResult(SyncResults::SYNC_RESULT_SUCCESS, Buteo::SyncResults::NO_ERROR);
                 SyncProfile *sessionProf = session->profile();
                 iProfileManager.enableStorages(*sessionProf, storageMap);
-                
-                // If caps have not been modified, i.e. fetched from the remote device yet, set 
+
+                // If caps have not been modified, i.e. fetched from the remote device yet, set
                 // enabled storages also visible. If caps have been modified, we must not touch visibility anymore
                 if (sessionProf->boolKey(KEY_CAPS_MODIFIED) == false)
                 {
                     iProfileManager.setStoragesVisible(*sessionProf, storageMap);
                 }
-                
+
                 iProfileManager.updateProfile(*sessionProf);
                 iProfileManager.retriesDone(sessionProf->name());
                 break;
@@ -660,7 +667,7 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
                 stopServers();
                 iSyncBackup->sendReply(0);
             }
-        } 
+        }
         else {
             LOG_WARNING( "Session found in active sessions, but is NULL" );
         }
@@ -675,7 +682,7 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
     //Re-enable sync on change
     if(iSOCEnabled)
     {
-        iSyncOnChange.enable(); 
+        iSyncOnChange.enable();
     }
 
     // Try starting new sync sessions waiting in the queue.
@@ -698,7 +705,7 @@ bool Synchronizer::startNextSync()
 
     if (iSyncQueue.isEmpty() || isBackupRestoreInProgress()) {
         return false;
-    }        
+    }
 
     bool tryNext = true;
 
@@ -722,10 +729,18 @@ bool Synchronizer::startNextSync()
     QString profileName = session->profileName();
     LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName );
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    /// @todo check if QBatteryInfo is connected to something useful
+    QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
+
+    if (session->isScheduled() && ((batteryStat != QBatteryInfo::BatteryOk) &&
+                                   (batteryStat != QBatteryInfo::BatteryFull)) )
+#else
     QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
 
     if (session->isScheduled() && ((batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
-                                     (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow)) )
+                                   (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow)) )
+#endif
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         iSyncQueue.dequeue();
@@ -992,7 +1007,7 @@ void Synchronizer::onTransferProgress( const QString &aProfileName,
 
 }
 
-void Synchronizer::onStorageAccquired ( const QString &aProfileName, 
+void Synchronizer::onStorageAccquired ( const QString &aProfileName,
         const QString &aMimeType )
 {
     FUNCTION_CALL_TRACE;
@@ -1014,9 +1029,9 @@ void Synchronizer::onStorageAccquired ( const QString &aProfileName,
             #endif
             else if (aMimeType.compare(QString("text/x-vmsg"), Qt::CaseInsensitive) == 0)
                 storageMap["hsms"] = true;
-            else 
+            else
                 LOG_DEBUG( "Unsupported mime type" << aMimeType );
-            
+
             session->setStorageMap(storageMap);
         }
     }
@@ -1777,19 +1792,19 @@ QStringList Synchronizer::syncProfilesByKey(const QString &aKey, const QString &
         filter.iKey = aKey;
         filter.iValue = aValue;
         filters.append(filter);
-	QList<SyncProfile*> profiles = iProfileManager.getSyncProfilesByData(filters);
+        QList<SyncProfile*> profiles = iProfileManager.getSyncProfilesByData(filters);
 
-	if (profiles.size() > 0) {
-	    LOG_DEBUG("Found matching profiles  :" << profiles.size());	
+        if (profiles.size() > 0) {
+            LOG_DEBUG("Found matching profiles  :" << profiles.size());
             foreach (SyncProfile *profile, profiles) {
                profilesAsXml.append(profile->toString());
-	    }
+            }
             qDeleteAll(profiles);
-	} else {
+        } else {
             LOG_DEBUG("No profile found with key :" << aKey << "Value : " << aValue );
         }
     }
-    
+
     return profilesAsXml;
 }
 
@@ -1797,14 +1812,14 @@ QStringList Synchronizer::syncProfilesByType(const QString &aType)
 {
     FUNCTION_CALL_TRACE;
     LOG_DEBUG("Profile Type : "<< aType);
-    return iProfileManager.profileNames(aType);     
+    return iProfileManager.profileNames(aType);
 }
 
 void Synchronizer::onNetworkStateChanged(bool aState)
 {
     FUNCTION_CALL_TRACE;
     if(!aState) {
-        QList<QString> profiles = iActiveSessions.keys();        
+        QList<QString> profiles = iActiveSessions.keys();
         foreach(QString profileId, profiles)
         {
             //Getting profile
@@ -1825,7 +1840,7 @@ void Synchronizer::onNetworkStateChanged(bool aState)
 }
 
 Profile* Synchronizer::getSyncProfileByRemoteAddress(const QString& aAddress)
-{ 
+{
     FUNCTION_CALL_TRACE;
     Profile* profile = 0;
     QList<SyncProfile*> profiles;

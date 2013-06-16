@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET =
+TARGET = msyncd
 QT += xml \
     dbus \
     sql \
@@ -8,10 +8,7 @@ QT -= gui
 CONFIG += qdbus \
     link_pkgconfig \
     create_pc \
-    create_prl \
-    mobility
-
-MOBILITY += systeminfo
+    create_prl
 
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 QMAKE_PKGCONFIG_LIBDIR  = $$target.path
@@ -28,8 +25,12 @@ INCLUDEPATH += . \
 
 PKGCONFIG += dbus-1 libiphb
 
-equals(QT_MAJOR_VERSION, 4): PKGCONFIG += libsignon-qt accounts-qt
-equals(QT_MAJOR_VERSION, 5): PKGCONFIG += libsignon-qt5 accounts-qt5
+equals(QT_MAJOR_VERSION, 4): {
+    PKGCONFIG += libsignon-qt accounts-qt
+    CONFIG += mobility
+    MOBILITY += systeminfo
+}
+equals(QT_MAJOR_VERSION, 5): PKGCONFIG += libsignon-qt5 accounts-qt5 Qt0SystemInfo
 
 QMAKE_LIBDIR_QT += ../libsyncprofile/
 
