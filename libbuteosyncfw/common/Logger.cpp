@@ -33,9 +33,17 @@
 
 using namespace Buteo;
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+void logMessageHandler(QtMsgType aType, const QMessageLogContext&, const QString& aMsg)
+#else
 void logMessageHandler(QtMsgType aType, const char *aMsg)
+#endif
 {
-     Logger::instance()->write(aType, aMsg);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+  Logger::instance()->write(aType, qPrintable(aMsg));
+#else
+  Logger::instance()->write(aType, aMsg);
+#endif
 }
 
 const int Logger::DEFAULT_INDENT_SIZE = 4;
@@ -95,14 +103,21 @@ Logger::Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize)
     } // no else
 
     // Install our own message handler.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    qInstallMessageHandler(logMessageHandler);
+#else
     qInstallMsgHandler(logMessageHandler);
-
+#endif
 }
 
 Logger::~Logger()
 {
     // Restore default message handler.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    qInstallMessageHandler(0);
+#else
     qInstallMsgHandler(0);
+#endif
 
     delete iFileStream;
     iFileStream = 0;
@@ -120,7 +135,7 @@ bool  Logger::setLogLevel(int aLevel)
     bool retVal = false;
     if ((aLevel > 0)  && (aLevel <= NUM_LEVELS))
     {
-	disable(iEnabledLevels);
+        disable(iEnabledLevels);
         QBitArray iLevels(NUM_LEVELS, false);
         for(int i = aLevel; i > 0; i--)
         {
@@ -134,7 +149,7 @@ bool  Logger::setLogLevel(int aLevel)
 
 QBitArray Logger::getLogLevelArray()
 {
-	return iEnabledLevels;
+        return iEnabledLevels;
 }
 
 void Logger::enable(const QBitArray &aLevels)
@@ -175,10 +190,10 @@ void Logger::write(int aLevel, const char *aMsg)
     };
 
     int syslogLevel[NUM_LEVELS] = {
-	    LOG_DEBUG,
-	    LOG_WARNING,
-	    LOG_CRIT,
-	    LOG_CRIT,
+            LOG_DEBUG,
+            LOG_WARNING,
+            LOG_CRIT,
+            LOG_CRIT,
     } ;
 
     QMutexLocker lock(&iMutex);
@@ -240,5 +255,3 @@ void Logger::write(int aLevel, const char *aMsg)
         abort();
     } // no else
 }
-
-
