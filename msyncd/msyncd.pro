@@ -23,18 +23,19 @@ INCLUDEPATH += . \
     ../ \
     ../libbuteosyncfw/pluginmgr \
     ../libbuteosyncfw/common \
-    ../libbuteosyncfw/profile \
-    /usr/include/accounts-qt \
-    /usr/include/iphbd/ \
+    ../libbuteosyncfw/profile
 
-PKGCONFIG += dbus-1 libsignon-qt accounts-qt
+
+PKGCONFIG += dbus-1 libiphb
+
+equals(QT_MAJOR_VERSION, 4): PKGCONFIG += libsignon-qt accounts-qt
+equals(QT_MAJOR_VERSION, 5): PKGCONFIG += libsignon-qt5 accounts-qt5
 
 QMAKE_LIBDIR_QT += ../libsyncprofile/
 
 LIBS += -L../libbuteosyncfw \
-    -lbuteosyncfw \
-    -laccounts-qt \
-    -liphb
+    -lbuteosyncfw
+
 
 
 # Input

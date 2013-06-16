@@ -17,10 +17,9 @@ INCLUDEPATH += . \
     pluginmanagertests \
     syncprofiletests \
     msyncdtests \
-    syncfwclienttests \
-    /usr/include/accounts-qt
+    syncfwclienttests
 
-DEFINES += SYNCFW_UNIT_TESTS 
+DEFINES += SYNCFW_UNIT_TESTS
 
 SOURCES += tests.cpp \
     SyncFwTestRunner.cpp \
@@ -34,22 +33,27 @@ include(msyncdtests/msyncdtests.pro)
 include(syncfwclienttests/syncfwclienttests.pro)
 
 CONFIG += qtestlib \
+    link_pkgconfig \
     link_prl \
     qdbus
+
+PKGCONFIG += dbus-1
+
+equals(QT_MAJOR_VERSION, 4): PKGCONFIG += libsignon-qt accounts-qt
+equals(QT_MAJOR_VERSION, 5): PKGCONFIG += libsignon-qt5 accounts-qt5
 
 # This is needed to avoid adding the /usr/lib link directory before the
 # newer version in the present directories
 QMAKE_LIBDIR_QT = ../../libbuteosyncfw
-    
+
 LIBS += -lbuteosyncfw \
-    -ldbus-1 \
-    -lgcov \
-    -laccounts-qt
+    -lgcov
+
 
 # install
 tests.files = \
-	      runstarget.sh \
-	      sync-fw-tests.ref
+              runstarget.sh \
+              sync-fw-tests.ref
 
 testdefinition.files = tests.xml
 
@@ -71,7 +75,7 @@ testprofiles_syssync.path = /opt/tests/buteo-syncfw/syncprofiletests/testprofile
 testaccount_service.files = syncprofiletests/testprofiles/testsync-ovi.service
 testaccount_service.path = /usr/share/accounts/services/
 
-	      
+
 tests.path = /opt/tests/buteo-syncfw/
 target.path = /opt/tests/buteo-syncfw/
 testdefinition.path = /opt/tests/buteo-syncfw/test-definition/
@@ -103,7 +107,7 @@ QMAKE_CXXFLAGS += -Wall \
 # #####################################################################
 coverage.CONFIG += recursive
 QMAKE_EXTRA_TARGETS += coverage
-CONFIG(debug,debug|release) { 
+CONFIG(debug,debug|release) {
     QMAKE_EXTRA_TARGETS += cov_cxxflags \
         cov_lflags
     cov_cxxflags.target = coverage
