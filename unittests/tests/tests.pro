@@ -1,5 +1,12 @@
 TEMPLATE = app
 TARGET = sync-fw-tests
+
+VPATH += ../../msyncd \
+    pluginmanagertests \
+    syncprofiletests \
+    msyncdtests \
+    syncfwclienttests
+
 DEPENDPATH += . \
     pluginmanagertests \
     syncprofiletests \
@@ -39,15 +46,20 @@ CONFIG += qtestlib \
 
 PKGCONFIG += dbus-1
 
-equals(QT_MAJOR_VERSION, 4): PKGCONFIG += libsignon-qt accounts-qt
-equals(QT_MAJOR_VERSION, 5): PKGCONFIG += libsignon-qt5 accounts-qt5
+equals(QT_MAJOR_VERSION, 4): {
+    PKGCONFIG += libsignon-qt accounts-qt
+    LIBS += -lbuteosyncfw
+}
+equals(QT_MAJOR_VERSION, 5): {
+    PKGCONFIG += libsignon-qt5 accounts-qt5
+    LIBS += -lbuteosyncfw5
+}
 
 # This is needed to avoid adding the /usr/lib link directory before the
 # newer version in the present directories
 QMAKE_LIBDIR_QT = ../../libbuteosyncfw
 
-LIBS += -lbuteosyncfw \
-    -lgcov
+LIBS += -L../../libbuteosyncfw -lgcov
 
 
 # install

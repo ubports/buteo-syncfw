@@ -94,8 +94,11 @@ void TransportTrackerTest :: testStateChanged()
 
 
     // change BT state and verify
-
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    bool setBTState = false;
+#else
     bool setBTState = iTransportTracker->iDeviceInfo.currentBluetoothPowerState();
+#endif
     iTransportTracker->onBtStateChanged(setBTState);
     QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT), setBTState);
 

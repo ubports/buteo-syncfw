@@ -29,15 +29,16 @@ equals(QT_MAJOR_VERSION, 4): {
     PKGCONFIG += libsignon-qt accounts-qt
     CONFIG += mobility
     MOBILITY += systeminfo
+    LIBS += -lbuteosyncfw
 }
-equals(QT_MAJOR_VERSION, 5): PKGCONFIG += libsignon-qt5 accounts-qt5 Qt0SystemInfo
+equals(QT_MAJOR_VERSION, 5): {
+    PKGCONFIG += libsignon-qt5 accounts-qt5 Qt0SystemInfo
+    LIBS += -lbuteosyncfw5
+}
 
 QMAKE_LIBDIR_QT += ../libsyncprofile/
 
-LIBS += -L../libbuteosyncfw \
-    -lbuteosyncfw
-
-
+LIBS += -L../libbuteosyncfw
 
 # Input
 HEADERS += ServerActivator.h \
