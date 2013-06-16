@@ -61,10 +61,13 @@ TransportTracker::TransportTracker(QObject *aParent) :
     }
 #endif
     // BT
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#warning "Not listening to bluetooth power state changes on Qt5"
+#else
     iTransportStates[Sync::CONNECTIVITY_BT] = iDeviceInfo.currentBluetoothPowerState();
     QObject::connect(&iDeviceInfo, SIGNAL(bluetoothStateChanged(bool)), this, SLOT(onBtStateChanged(bool)));
     LOG_DEBUG("Current bluetooth power state"<<iDeviceInfo.currentBluetoothPowerState());
-
+#endif
 
     // Internet
     // @todo: enable when internet state is reported correctly.
@@ -109,7 +112,13 @@ void TransportTracker::onBtStateChanged(bool aState)
     FUNCTION_CALL_TRACE;
 
     Q_UNUSED(aState);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+/// @todo Qt5 version of systeminfo does not have bluetooth power state at the moment
+#warning "Qt5 ports always reports bluetooth power state as false for now"
+    bool btPowered = false;
+#else
     bool btPowered = iDeviceInfo.currentBluetoothPowerState();
+#endif
     LOG_DEBUG("BT power state" << btPowered);
     updateState(Sync::CONNECTIVITY_BT, btPowered);
 }
@@ -144,4 +153,3 @@ void TransportTracker::updateState(Sync::ConnectivityType aType,
         }
     }
 }
-
