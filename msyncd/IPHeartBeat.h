@@ -27,7 +27,7 @@
 #include <QMap>
 #include <QSocketNotifier>
 extern "C" {
-    #include "libiphb.h"
+    #include "iphbd/libiphb.h"
 }
 
 namespace Buteo {
