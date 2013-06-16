@@ -5,12 +5,16 @@ DEFINES +=  UNIT_TEST
 QT += xml \
     dbus
 CONFIG += qdbus \
-    link_pkgconfig \
-    mobility
+    link_pkgconfig
 
-MOBILITY += systeminfo
+equals(QT_MAJOR_VERSION, 4): {
+    CONFIG += mobility
+    MOBILITY += systeminfo
+}
 
 PKGCONFIG += dbus-1 libiphb
+
+equals(QT_MAJOR_VERSION, 5): PKGCONFIG += Qt0SystemInfo
 
 SOURCES += ServerThread.cpp \
     ServerThreadTest.cpp \

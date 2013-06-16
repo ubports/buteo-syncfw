@@ -1,5 +1,6 @@
 TEMPLATE = lib
-TARGET = buteosyncfw
+equals(QT_MAJOR_VERSION, 4): TARGET = buteosyncfw
+equals(QT_MAJOR_VERSION, 5): TARGET = buteosyncfw5
 DEPENDPATH += . clientfw  common  pluginmgr  profile
 INCLUDEPATH += . clientfw  common  pluginmgr  profile
 
