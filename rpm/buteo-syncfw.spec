@@ -14,6 +14,7 @@ BuildRequires: pkgconfig(accounts-qt)
 BuildRequires: pkgconfig(libsignon-qt)
 BuildRequires: pkgconfig(QtSystemInfo)
 BuildRequires: libiphb-devel
+Requires: %{name}-msyncd
 # TODO: needs a proper fix
 # Patch0: 0001-Synchronizer-removeProfile-remove-profiles-even-if-p.patch
 
@@ -23,9 +24,6 @@ BuildRequires: libiphb-devel
 %files
 %defattr(-,root,root,-)
 %config %{_sysconfdir}/buteo/*
-%config %{_libdir}/systemd/user/*.service
-%config %{_sysconfdir}/syncwidget/*
-%{_bindir}/msyncd
 %{_libdir}/*.so.*
 
 %package devel
@@ -42,6 +40,20 @@ Requires: %{name} = %{version}-%{release}
 %{_libdir}/*.so
 %{_libdir}/*.prl
 %{_libdir}/pkgconfig/*.pc
+
+%package msyncd
+Summary: Buteo sync daemon
+Group: System/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description msyncd
+%{summary}.
+
+%files msyncd
+%defattr(-,root,root,-)
+%config %{_libdir}/systemd/user/*.service
+%config %{_sysconfdir}/syncwidget/*
+%{_bindir}/msyncd
 
 %package doc
 Summary: Documentation for %{name}
