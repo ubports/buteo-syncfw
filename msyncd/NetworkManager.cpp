@@ -94,10 +94,7 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
                 SLOT(slotSessionError(QNetworkSession::SessionError)));
         connect(m_networkSession, SIGNAL(stateChanged(QNetworkSession::State)),
                 SLOT(slotSessionState(QNetworkSession::State)));
-        /*
-        connect(m_networkSession, SIGNAL(opened()),
-                SLOT(slotSessionOpened()));
-                */
+        connect(m_networkSession, SIGNAL(opened()), SIGNAL(connectionSuccess()));
     }
     m_networkSession->setSessionProperty("ConnectInBackground", connectInBackground);
     if(!m_networkSession->isOpen())
