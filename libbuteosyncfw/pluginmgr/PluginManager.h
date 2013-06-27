@@ -40,7 +40,7 @@ class Profile;
 class ClientPluginTest;
 class ServerPluginTest;
 class StoragePluginTest;
-    
+
 // Location filters of plugin maps
 const QString STORAGEMAP_LOCATION = "-storage.so";
 const QString CLIENTMAP_LOCATION = "-client.so";
@@ -48,7 +48,11 @@ const QString SERVERMAP_LOCATION = "-server.so";
 const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
 
 // Default directory from which to look for plugins
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/";
+#else
 const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins/";
+#endif
 
 // The name of the function which is used to create a plugin
 const QString CREATE_FUNCTION = "createPlugin";
