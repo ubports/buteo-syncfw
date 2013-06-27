@@ -46,6 +46,8 @@ Requires: %{name} = %{version}-%{release}
 Summary: Buteo sync daemon
 Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
+Provides: buteo-syncfw-msyncd = %{version}
+Obsoletes: buteo-syncfw-msyncd < %{version}
 
 %description msyncd
 %{summary}.

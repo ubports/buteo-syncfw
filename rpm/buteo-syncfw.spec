@@ -41,15 +41,18 @@ Requires: %{name} = %{version}-%{release}
 %{_libdir}/*.prl
 %{_libdir}/pkgconfig/*.pc
 
-%package msyncd
+# Should not be required anymore, sticks around for now
+# in case we need to test something explicitely with qt4 stack
+%package qt4-msyncd
 Summary: Buteo sync daemon
 Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
+Conflicts: buteo-syncfw-qt5-msyncd
 
-%description msyncd
+%description qt4-msyncd
 %{summary}.
 
-%files msyncd
+%files qt4-msyncd
 %defattr(-,root,root,-)
 %config %{_libdir}/systemd/user/*.service
 %config %{_sysconfdir}/syncwidget/*
