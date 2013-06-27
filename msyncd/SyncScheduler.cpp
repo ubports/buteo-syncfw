@@ -175,7 +175,8 @@ void SyncScheduler::doAlarmActions(int aAlarmEventID)
     
     if (!syncProfileName.isEmpty()) {
         iSyncScheduleProfiles.remove(syncProfileName);
-        if(iIPHeartBeatMan->setHeartBeat(syncProfileName,0, IPHB_GS_WAIT_5_MINS) == true) {
+        // Use global slots (min time == max time) for scheduling heart beats.
+        if(iIPHeartBeatMan->setHeartBeat(syncProfileName, IPHB_GS_WAIT_2_5_MINS, IPHB_GS_WAIT_2_5_MINS)) {
             //Do nothing, sync will be triggered on getting heart beat
         } else {
             emit syncNow(syncProfileName);
