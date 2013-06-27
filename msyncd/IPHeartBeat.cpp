@@ -98,7 +98,7 @@ bool IPHeartBeat::setHeartBeat(const QString& aProfName, ushort aMinWaitTime, us
 {
     FUNCTION_CALL_TRACE;
 
-    if( (aMinWaitTime >= aMaxWaitTime) || aProfName.isEmpty() )
+    if( (aMinWaitTime > aMaxWaitTime) || aProfName.isEmpty() )
         return false;
 
     LOG_DEBUG("setHeartBeat(), profile name = " << aProfName);
