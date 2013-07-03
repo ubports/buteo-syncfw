@@ -47,6 +47,8 @@ Requires: %{name} = %{version}-%{release}
 Summary: Buteo sync daemon
 Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
+Requires: systemd
+Requires: systemd-user-session-targets
 Conflicts: buteo-syncfw-qt5-msyncd
 
 %description qt4-msyncd
@@ -55,6 +57,7 @@ Conflicts: buteo-syncfw-qt5-msyncd
 %files qt4-msyncd
 %defattr(-,root,root,-)
 %config %{_libdir}/systemd/user/*.service
+%{_libdir}/systemd/user/user-session.target.wants/*.service
 %config %{_sysconfdir}/syncwidget/*
 %{_bindir}/msyncd
 
@@ -100,7 +103,20 @@ make
 make INSTALL_ROOT=%{buildroot} install
 chmod +x %{buildroot}/opt/tests/buteo-syncfw/*.pl %{buildroot}/opt/tests/buteo-syncfw/*.sh
 %fdupes %{buildroot}/opt/tests/buteo-syncfw/
+mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
+ln -s ../msyncd.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
 
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%post
+/sbin/ldconfig
+if [ "$1" -ge 1 ]; then
+    systemctl-user daemon-reload || true
+    systemctl-user restart msyncd.service || true
+fi
+
+%postun
+/sbin/ldconfig
+if [ "$1" -eq 0 ]; then
+    systemctl-user stop msyncd.service || true
+    systemctl-user daemon-reload || true
+fi
