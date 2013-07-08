@@ -4,7 +4,8 @@ SOURCEPATH += . \
 DEFINES +=  UNIT_TEST
 QT += xml \
     dbus
-CONFIG += qdbus \
+QT -= gui
+CONFIG += \
     link_pkgconfig
 
 equals(QT_MAJOR_VERSION, 4): {
@@ -14,7 +15,7 @@ equals(QT_MAJOR_VERSION, 4): {
 
 PKGCONFIG += dbus-1 libiphb
 
-equals(QT_MAJOR_VERSION, 5): PKGCONFIG += Qt0SystemInfo
+equals(QT_MAJOR_VERSION, 5): PKGCONFIG += Qt5SystemInfo
 
 SOURCES += ServerThread.cpp \
     ServerThreadTest.cpp \

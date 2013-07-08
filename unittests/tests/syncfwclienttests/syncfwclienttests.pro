@@ -1,22 +1,21 @@
 SOURCEPATH += . \
-    ../../../libsyncfwclient 
-    
+    ../../../libsyncfwclient
+
 INCLUDEPATH += ../ \
-			../../msyncd 
-			
+                        ../../msyncd
+
 
 QT += xml \
     dbus
-CONFIG += qdbus \
+QT -= gui
+CONFIG += \
     link_pkgconfig \
 
 PKGCONFIG += dbus-1
-LIBS += 
+LIBS +=
 
-SOURCES +=  SyncClientInterfaceTest.cpp 
+SOURCES +=  SyncClientInterfaceTest.cpp
 
 HEADERS +=  SyncClientInterfaceTest.h
 
-OTHER_FILES += 
-
-
+OTHER_FILES +=
