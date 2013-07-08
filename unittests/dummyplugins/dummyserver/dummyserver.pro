@@ -8,7 +8,6 @@ INCLUDEPATH += . \
     ../../../libbuteosyncfw/profile
 
 CONFIG += plugin
-
 QT -= gui
 
 #input
@@ -30,7 +29,7 @@ coverage.CONFIG += recursive
 QMAKE_EXTRA_TARGETS += coverage
 CONFIG(debug,debug|release){
     QMAKE_EXTRA_TARGETS += cov_cxxflags \
-			cov_lflags
+                        cov_lflags
 
     cov_cxxflags.target = coverage
     cov_cxxflags.depends = CXXFLAGS \
@@ -42,7 +41,7 @@ CONFIG(debug,debug|release){
     cov_lflags.depends = LFLAGS \
         += \
         -fprofile-arcs \
-	-ftest-coverage
+        -ftest-coverage
 
     coverage.commands = @echo \
         "Built with coverage support..."

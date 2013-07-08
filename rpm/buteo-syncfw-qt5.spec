@@ -15,8 +15,7 @@ BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(contextsubscriber-1.0)
 BuildRequires: pkgconfig(accounts-qt5)
 BuildRequires: pkgconfig(libsignon-qt5)
-# FIXME, seems to be a typo in packaging
-BuildRequires: pkgconfig(Qt0SystemInfo)
+BuildRequires: pkgconfig(Qt5SystemInfo)
 BuildRequires: pkgconfig(libiphb)
 
 %description

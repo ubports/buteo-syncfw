@@ -9,7 +9,6 @@ VER_MIN = 1
 VER_PAT = 0
 
 QT += sql xml dbus
-
 QT -= gui
 
 CONFIG += dll \

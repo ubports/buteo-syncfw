@@ -39,10 +39,9 @@ include(syncprofiletests/syncprofiletests.pro)
 include(msyncdtests/msyncdtests.pro)
 include(syncfwclienttests/syncfwclienttests.pro)
 
-CONFIG += qtestlib \
+CONFIG += \
     link_pkgconfig \
-    link_prl \
-    qdbus
+    link_prl
 
 PKGCONFIG += dbus-1
 
@@ -104,11 +103,14 @@ INSTALLS += tests \
 
 QT += testlib \
     core \
+    dbus \
     xml \
     dbus \
     network \
     sql
+
 QT -= gui
+
 QMAKE_CXXFLAGS += -Wall \
         -fprofile-arcs \
         -ftest-coverage \

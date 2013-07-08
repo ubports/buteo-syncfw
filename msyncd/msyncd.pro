@@ -5,7 +5,8 @@ QT += xml \
     sql \
     network
 QT -= gui
-CONFIG += qdbus \
+
+CONFIG += \
     link_pkgconfig \
     create_pc \
     create_prl
@@ -32,7 +33,7 @@ equals(QT_MAJOR_VERSION, 4): {
     LIBS += -lbuteosyncfw
 }
 equals(QT_MAJOR_VERSION, 5): {
-    PKGCONFIG += libsignon-qt5 accounts-qt5 Qt0SystemInfo
+    PKGCONFIG += libsignon-qt5 accounts-qt5 Qt5SystemInfo
     LIBS += -lbuteosyncfw5
 }
 
