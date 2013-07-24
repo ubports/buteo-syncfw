@@ -430,8 +430,9 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
     }
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    else if( aScheduled && ( (batteryStat != QBatteryInfo::BatteryOk) &&
-                             (batteryStat != QBatteryInfo::BatteryFull) ))
+    /// @todo check if QBatteryInfo is connected to something useful
+    else if( aScheduled && ( (batteryStat == QBatteryInfo::BatteryEmpty) ||
+                             (batteryStat == QBatteryInfo::BatteryLow) ))
 #else
     else if( aScheduled && ( (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
                              (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow) ))
@@ -732,9 +733,8 @@ bool Synchronizer::startNextSync()
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     /// @todo check if QBatteryInfo is connected to something useful
     QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
-
-    if (session->isScheduled() && ((batteryStat != QBatteryInfo::BatteryOk) &&
-                                   (batteryStat != QBatteryInfo::BatteryFull)) )
+    if (session->isScheduled() && ((batteryStat == QBatteryInfo::BatteryEmpty) ||
+                             (batteryStat == QBatteryInfo::BatteryLow)))
 #else
     QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
 
