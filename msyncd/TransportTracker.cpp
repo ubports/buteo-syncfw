@@ -59,6 +59,9 @@ TransportTracker::TransportTracker(QObject *aParent) :
         iTransportStates[Sync::CONNECTIVITY_USB] =
             iUSBProxy->isUSBConnected();
     }
+#else
+    // hack when not compiled with USB moded to enable USB sync there
+    iTransportStates[Sync::CONNECTIVITY_USB] = true;
 #endif
     // BT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
