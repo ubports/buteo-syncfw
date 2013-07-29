@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<profile name="$profile.name" type="sync" >
+<!--
+Definitions for the client plugin. All the client plugin definitions are
+in the form of key/value pairs. These key/value pairs are used by the buteo
+sync framework. You can also add your own key/value pairs that you can use
+in the plugin. The key/value pairs are accessible  via the 'iProfile' object,
+like:
+    QMap<QString, QString> properties = iProfile->allNonStorageKeys ();
+
+Depending on your needs, change the following default settings
+-->
+    <key name="Remote database" value="$profile.remote_url" />
+    <key name="Username" value="$profile.username" />
+    <key name="Password" value="$profile.password" />
+    <key name="destinationtype" value="online"/>
+    <key name="displayname" value="$profile.displayname"/>
+    <key name="enabled" value="$profile.enabled" />
+    <key name="use_accounts" value="false" />
+    <key name="hidden" value="true" />
+
+<!--
+The following settings are for the protocol. But these can also be set
+in $(plugin.classname).xml file
+-->
+    <profile name="$plugin.classname" type="client" >
+        <key name="Sync Transport" value="$profile.transport" />
+        <key name="Sync Direction" value="$profile.syncdirection" />
+        <key name="conflictpolicy" value="$profile.conflictpolicy" />
+    </profile>
+
+<!-- The following are the storage plugins that this plugin supports.
+If you do not use a storage plug-in, then you do not need to have the
+following definitions.
+These are just samples and you can have your own storage plugins
+-->
+    <profile name="hcontacts" type="storage" >
+        <key name="enabled" value="true" />
+        <key name="Local URI" value="./contacts" />
+        <key name="Target URI" value="contact" />
+    </profile>
+
+    <profile name="hcalendar" type="storage" >
+        <key name="enabled" value="true" />
+        <key name="Notebook Name" value="Personal"/>
+        <key name="Local URI" value="./calendar" />
+        <key name="Target URI" value="caltask" />
+        <key name="Calendar Format" value="vcalendar" />
+    </profile>
+
+</profile>

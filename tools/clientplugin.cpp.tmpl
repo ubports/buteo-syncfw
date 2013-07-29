@@ -1,0 +1,692 @@
+/*
+ * YOUR LICENSE TEXT HERE
+ */
+
+\#include "$(plugin.name).h"
+
+\#include <buteosyncfw5/PluginCbInterface.h>
+\#include <buteosyncfw5/LogMacros.h>
+
+extern "C" $(plugin.name)* createPlugin(const QString& pluginName,
+        const Buteo::SyncProfile& profile,
+        Buteo::PluginCbInterface *cbInterface)
+{
+    return new $(plugin.name)(pluginName, profile, cbInterface);
+}
+
+extern "C" void destroyPlugin($(plugin.name) *client)
+{
+    delete client;
+}
+
+$(plugin.name)::$(plugin.name)(const QString& pluginName,
+        const Buteo::SyncProfile& profile,
+        Buteo::PluginCbInterface *cbInterface) :
+    ClientPlugin(pluginName, profile, cbInterface), mAgent(0),
+            mTransport(0), mConfig(0), mCommittedItems(0)
+{
+    FUNCTION_CALL_TRACE;
+}
+
+$(plugin.name)::~$(plugin.name)()
+{
+    FUNCTION_CALL_TRACE;
+}
+
+/**
+  * \!brief Initialize the plugin for the actual sync to happen
+  * This method will be invoked by the framework
+  */
+bool
+$(plugin.name)::init()
+{
+    FUNCTION_CALL_TRACE;
+
+
+    // Fetch all the non-storage keys from the profile XML
+    // The object iProfile is from @see ClientPlugin.h and holds all
+    // the profile information related to this plugin
+    mProperties = iProfile.allNonStorageKeys();
+
+    // Initialize protocol agent, transport and the protocol configuration
+    // initConfig can also configure the plugin if necessary
+    if (initAgent() && initTransport() && initConfig())
+    {
+        return true;
+    } else
+    {
+        // Uninitialize everything that was initialized before failure.
+        // This method will unload the plugin
+        uninit();
+        return false;
+    }
+}
+
+/**
+  * \!brief Uninitializes the plugin
+  * This method will be invoked by the framework
+  */
+bool
+$(plugin.name)::uninit()
+{
+    FUNCTION_CALL_TRACE;
+
+    // Close the protocol agent
+    closeAgent();
+
+    // Close the configuration for the protocol as well as the plugin
+    closeConfig();
+
+    // Close the transport
+    closeTransport();
+
+    return true;
+}
+
+/**
+  * \!brief Start the actual sync. This method will be invoked by the
+  * framework
+  */
+bool
+$(plugin.name)::startSync()
+{
+    FUNCTION_CALL_TRACE;
+
+    // If any of the initialization fails, abort sync
+    if (mAgent == 0 || mConfig == 0 || mTransport == 0)
+    {
+        return false;
+    }
+
+    // Connects ths signal for syncFinished
+    connect(mAgent, SIGNAL(syncFinished(MyProtocol::SyncState)),
+            this, SLOT(syncFinished(MyProtocol::SyncState)));
+
+    // The following signals are optional. But it is good to have such a
+    // structure for your protocol plugin
+
+    // This signal signifies a protocol state change. Using this signal,
+    // the plugin can take an appropriate action
+    connect(mAgent, SIGNAL(stateChanged(MyProtocol::SyncState)),
+            this, SLOT(syncStateChanged(MyProtocol::SyncState)));
+
+    // This signal is mainly useful for UI updates to display whenever
+    // items are synchronized
+    connect(mAgent, SIGNAL(itemProcessed(MyProtocol::ModificationType,
+            MyProtocol::ModifiedDatabase, QString, QString,int)),
+            this, SLOT(receiveItemProcessed(MyProtocol::ModificationType,
+            MyProtocol::ModifiedDatabase, QString, QString,int)));
+
+    // This signal is required for informing that storage plugins (like contacts/
+    // calendar etc.) have been acquired for sync
+    connect(mAgent, SIGNAL(storageAccquired(QString)),
+            this, SLOT(storageAccquired(QString)));
+
+    // Set the transport over which the sync has to happen
+    mConfig->setTransport(mTransport);
+
+    // Start the actual sync
+    return mAgent->startSync(*mConfig);
+
+}
+
+/**
+  * \!brief Aborts sync. An abort can happen due to protocol errors,
+  * connection failures or by the user (via a UI)
+  */
+void
+$(plugin.name)::abortSync(Sync::SyncStatus status)
+{
+    FUNCTION_CALL_TRACE;
+    MyProtocol::SyncState state = MyProtocol::ABORTED;
+
+    if (status == Sync::SYNC_ERROR) {
+        state = MyProtocol::CONNECTION_ERROR;
+    }
+
+    if( mAgent )
+    {
+        if( !mAgent->abort(state) )
+        {
+            LOG_DEBUG( "Agent not active, aborting immediately" );
+            syncFinished(MyProtocol::ABORTED);
+
+        }
+        else
+        {
+            LOG_DEBUG( "Agent active, abort event posted" );
+        }
+    }
+    else
+    {
+        LOG_WARNING( "abortSync() called before init(), ignoring" );
+    }
+
+}
+
+/**
+  * This method is required if a profile has been deleted. The plugin
+  * has to implement the necessary cleanup (like temporary data, anchors etc.)
+  */
+bool
+$(plugin.name)::cleanUp()
+{
+    FUNCTION_CALL_TRACE;
+
+    mProperties = iProfile.allNonStorageKeys();
+    initAgent();
+    initConfig();
+
+    bool retVal = mAgent->cleanUp(mConfig);
+
+    closeAgent();
+    closeConfig();
+    return retVal;
+}
+
+/**
+  * This method can be used to take an appropriate action whenever the
+  * state changes in the protocol plugin 'MyProtocol'
+  * It is upto the protocol plugin to implement such a signal
+  */
+void
+$(plugin.name)::syncStateChanged(MyProtocol::SyncState state)
+{
+
+    FUNCTION_CALL_TRACE;
+
+    switch(state) {
+    case MyProtocol::LOCAL_INIT:
+    case MyProtocol::REMOTE_INIT: {
+        emit syncProgressDetail(getProfileName(), Sync::SYNC_PROGRESS_INITIALISING);
+        break;
+    }
+    case MyProtocol::SENDING_ITEMS: {
+        emit syncProgressDetail(getProfileName(), Sync::SYNC_PROGRESS_SENDING_ITEMS);
+        break;
+    }
+    case MyProtocol::RECEIVING_ITEMS: {
+        emit syncProgressDetail(getProfileName(), Sync::SYNC_PROGRESS_RECEIVING_ITEMS);
+        break;
+    }
+    case MyProtocol::FINALIZING: {
+        emit syncProgressDetail(getProfileName(), Sync::SYNC_PROGRESS_FINALISING);
+        break;
+    }
+    default:
+        //do nothing
+        break;
+    };
+}
+
+/**
+  * This slot can be used to manage the result when sync is finished
+  */
+void
+$(plugin.name)::syncFinished(MyProtocol::SyncState state)
+{
+
+    FUNCTION_CALL_TRACE;
+
+    switch(state)
+    {
+    // Modify the below states as per the supported states in your
+    // protocol plugin
+        case MyProtocol::INTERNAL_ERROR:
+        case MyProtocol::AUTHENTICATION_FAILURE:
+        case MyProtocol::DATABASE_FAILURE:
+        case MyProtocol::CONNECTION_ERROR:
+        case MyProtocol::INVALID_SYNCML_MESSAGE:
+        case MyProtocol::UNSUPPORTED_SYNC_TYPE:
+        case MyProtocol::UNSUPPORTED_STORAGE_TYPE:
+        {
+            generateResults( false );
+            emit error( getProfileName(), "", state);
+            break;
+        }
+        case MyProtocol::SUSPENDED:
+        case MyProtocol::ABORTED:
+        case MyProtocol::SYNC_FINISHED:
+        {
+            generateResults( true );
+            emit success( getProfileName(), QString::number(aState));
+            break;
+        }
+        case MyProtocol::NOT_PREPARED:
+        case MyProtocol::PREPARED:
+        case MyProtocol::LOCAL_INIT:
+        case MyProtocol::REMOTE_INIT:
+        case MyProtocol::SENDING_ITEMS:
+        case MyProtocol::RECEIVING_ITEMS:
+        case MyProtocol::FINALIZING:
+        case MyProtocol::SUSPENDING:
+        default:
+        {
+            // do nothing. This state should never occur. Probably fail sync
+            break;
+        }
+    }
+}
+
+/**
+  * Slot for storage acquired. If your plugin does not use a separate
+  * storage plugin, then there is no need to have this method
+  */
+void
+$(plugin.name)::storageAccquired(QString mimeType)
+{
+    FUNCTION_CALL_TRACE;
+    LOG_DEBUG(" MimeType " << mimeType);
+    emit accquiredStorage(mimeType);
+}
+
+/**
+  * Slot for item processed signal. Keep track of all the added/modified/deleted
+  * items here
+  */
+void
+$(plugin.name)::receiveItemProcessed(
+        MyProtocol::ModificationType modificationType,
+        MyProtocol::ModifiedDatabase modifiedDatabase,
+        QString localDatabase,
+        QString mimeType,
+        int committedItems)
+{
+    FUNCTION_CALL_TRACE;
+
+    LOG_DEBUG("Modification Type " << modificationType);
+    LOG_DEBUG("Modification Database " << modifiedDatabase);
+    LOG_DEBUG("Database " << localDatabase);
+    LOG_DEBUG("MimeType " << mimeType);
+
+    ++mCommittedItems;
+
+    // receivedItems is coming from SyncPluginBase.h
+    if(!receivedItems.contains(localDatabase))
+    {
+        ReceivedItemDetails details;
+        details.added = details.modified = details.deleted = details.error = 0;
+        details.mime = mimeType;
+        receivedItems[localDatabase] = details;
+    }
+
+    Sync::TransferDatabase db = Sync::LOCAL_DATABASE;
+
+    switch (modificationType) {
+    case MyProtocol::MOD_ITEM_ADDED: {
+        ++receivedItems[localDatabase].added;
+        break;
+    }
+    case MyProtocol::MOD_ITEM_MODIFIED: {
+        ++receivedItems[localDatabase].modified;
+        break;
+    }
+    case MyProtocol::MOD_ITEM_DELETED: {
+        ++receivedItems[localDatabase].deleted;
+        break;
+    }
+    case MyProtocol::MOD_ITEM_ERROR: {
+        ++receivedItems[localDatabase].error;
+        break;
+    }
+    default: {
+        Q_ASSERT(0);
+        break;
+
+    }
+    }
+
+    if (modifiedDatabase == MyProtocol::MOD_LOCAL_DATABASE) {
+        db = Sync::LOCAL_DATABASE;
+    } else {
+        db = Sync::REMOTE_DATABASE;
+    }
+
+    if( mCommittedItems == committedItems )
+    {
+        QMapIterator<QString,ReceivedItemDetails> itr(receivedItems);
+        while( itr.hasNext() )
+        {
+            itr.next();
+            if( itr.value().added )
+                emit transferProgress(getProfileName(), db, Sync::ITEM_ADDED, itr.value().mime, itr.value().added);
+            if( itr.value().modified )
+                emit transferProgress(getProfileName(), db, Sync::ITEM_MODIFIED, itr.value().mime, itr.value().modified);
+            if( itr.value().deleted )
+                emit transferProgress(getProfileName(), db, Sync::ITEM_DELETED, itr.value().mime, itr.value().deleted);
+            if( itr.value().error )
+                emit transferProgress(getProfileName(), db, Sync::ITEM_ERROR, itr.value().mime, itr.value().error);
+        }
+        mCommittedItems = 0;
+        receivedItems.clear();
+    }
+}
+
+/**
+  * Initializes protocol agent
+  */
+bool
+$(plugin.name)::initAgent()
+{
+
+    FUNCTION_CALL_TRACE;
+
+    LOG_DEBUG("Creating agent...");
+
+    mAgent = new MyProtocol::SyncAgent();
+    if (!mAgent) {
+        LOG_DEBUG("Agent creation failed");
+        return false;
+    }
+    else {
+        LOG_DEBUG("Agent created");
+        return true;
+    }
+}
+
+/**
+  * Closes protocol agent
+  */
+void
+$(plugin.name)::closeAgent()
+{
+
+    FUNCTION_CALL_TRACE;
+
+    LOG_DEBUG("Destroying agent...");
+
+    if (iAgent) {
+            delete iAgent;
+            iAgent = 0;
+    }
+}
+
+/**
+ * Initializes transport
+ */
+bool
+$(plugin.name)::initTransport()
+{
+    FUNCTION_CALL_TRACE;
+
+    LOG_DEBUG("Initiating transport...");
+
+    bool success = false;
+    // Initialize your transport (could be any like HTTP, Obex, TCP, ...)
+    // mTransport = new MyTransport ();
+
+    return success;
+}
+
+/**
+  * Closes transport
+  */
+void
+$(plugin.name)::closeTransport()
+{
+
+    FUNCTION_CALL_TRACE;
+
+    LOG_DEBUG("Closing transport...");
+
+    delete mTransport;
+    mTransport = NULL;
+
+    LOG_DEBUG("Transport closed");
+
+}
+
+/**
+  * Initializes config. This configuration can be for both plugin
+  * as well as for the protocol
+  */
+bool
+$(plugin.name)::initConfig()
+{
+
+    FUNCTION_CALL_TRACE;
+
+    // The following initialization is a sample, but could vary depending
+    // on your specific plugin and protocol
+    LOG_DEBUG("Initiating config...");
+
+    // Get the storage names (only if you are using storage plugins)
+    QStringList storageNames = iProfile.subProfileNames(
+            Buteo::Profile::TYPE_STORAGE);
+
+    if (storageNames.isEmpty()) {
+        LOG_CRITICAL("No storages defined for profile, nothing to sync");
+        return false;
+    }
+
+    // Initialize the storages
+    if (!iStorageProvider.init(&iProfile, this, iCbInterface, false)) {
+        LOG_CRITICAL("Could not initialize storage provider");
+        return false;
+    }
+
+    mConfig = new MyProtocol::SyncAgentConfig;
+
+    // ** Read configuration
+
+    // Two configuration files are being read: first the Meego default config file,
+    // and then possible external config file, which can be used to add additional
+    // configuration, or replace some of the configuration of Meego default config.
+
+    // ** Set up storage provider
+    mConfig->setStorageProvider(&mStorageProvider);
+
+
+    // ** Set up sync parameters
+    QString transportType = mProperties[PROF_SYNC_TRANSPORT];
+
+    QString remoteDeviceName;
+
+    if (transportType == HTTP_TRANSPORT) {
+        // Do HTTP transport initialization
+    } else if (transportType == OBEX_TRANSPORT) {
+        //Do OBEX transport initialization
+    }
+
+    QString versionProp = iProperties[PROF_SYNC_PROTOCOL];
+
+    MyProtocol::SyncInitiator initiator = MyProtocol::INIT_CLIENT;
+
+    // Resolve the sync direction, "1-way", "2-way", "1-way from client", "1-way from server"
+    // Sync direction comes from profile XML
+    MyProtocol::SyncDirection direction = resolveSyncDirection(initiator);
+
+    MyProtocol::SyncMode syncMode(direction, initiator);
+
+    // ** Set up auth parameters
+
+    // You can fetch the username and password from ASSO
+    MyProtocol::AuthType type = MyProtocol::AUTH_NONE;
+    QString username;
+    QString password;
+
+    // Read the credentials from asso and if they are not found there,
+    // read the credentials from profile XML (only for testing)
+    if (transportType == HTTP_TRANSPORT) {
+        type = MyProtocol::AUTH_BASIC;
+        username = mProperties[PROF_USERID];
+        password = mProperties[PROF_PASSWD];
+    } else if (transportType == OBEX_TRANSPORT) {
+        type = MyProtocol::AUTH_NONE;
+    }
+
+    mConfig->setAuthParams(type, username, password);
+
+    // ** Set up other parameters
+    // Conflict resolution policy comes from profile XML
+    // Possible resolution policies: client wins, server wins
+    MyProtocol::ConflictResolutionPolicy policy =
+            resolveConflictResolutionPolicy(initiator);
+    mConfig->setAgentProperty(MyProtocol::CONFLICTRESOLUTIONPOLICYPROP,
+            QString::number(policy));
+
+    return true;
+}
+
+void
+$(plugin.name)::closeConfig()
+{
+
+    FUNCTION_CALL_TRACE;
+
+    LOG_DEBUG("Closing config...");
+
+    delete mConfig;
+    mConfig = NULL;
+
+    if (!mStorageProvider.uninit()) {
+        LOG_CRITICAL("Could not uninitialize storage provider");
+    }
+
+    LOG_DEBUG("Config closed");
+}
+
+/**
+  * Returns the sync results
+  */
+Buteo::SyncResults
+$(plugin.name)::getSyncResults() const
+{
+    FUNCTION_CALL_TRACE;
+
+    return mResults;
+}
+
+/**
+  * Signal from the protocol engine about connectivity state changes
+  */
+void
+$(plugin.name)::connectivityStateChanged(Sync::ConnectivityType aType,
+        bool aState)
+{
+    FUNCTION_CALL_TRACE;
+
+    LOG_DEBUG("Received connectivity change event:" << aType << " changed to "
+            << aState);
+}
+
+/**
+  * Method to set the sync direction
+  * This method logic need not be changed and should work as is
+  */
+MyProtocol::SyncDirection
+$(plugin.name)::resolveSyncDirection(const MyProtocol::SyncInitiator& initiator)
+{
+    FUNCTION_CALL_TRACE;
+
+    Buteo::SyncProfile::SyncDirection directionFromProfile =
+            iProfile.syncDirection();
+
+    MyProtocol::SyncDirection direction = MyProtocol::DIRECTION_TWO_WAY;
+
+    if (initiator == MyProtocol::INIT_CLIENT) {
+
+        if (directionFromProfile
+                == Buteo::SyncProfile::SYNC_DIRECTION_FROM_REMOTE) {
+            direction = MyProtocol::DIRECTION_FROM_SERVER;
+        } else if (directionFromProfile
+                == Buteo::SyncProfile::SYNC_DIRECTION_TO_REMOTE) {
+            direction = MyProtocol::DIRECTION_FROM_CLIENT;
+        }
+    } else if (initiator == MyProtocol::INIT_SERVER) {
+        if (directionFromProfile
+                == Buteo::SyncProfile::SYNC_DIRECTION_FROM_REMOTE) {
+            direction = MyProtocol::DIRECTION_FROM_CLIENT;
+        } else if (directionFromProfile
+                == Buteo::SyncProfile::SYNC_DIRECTION_TO_REMOTE) {
+            direction = MyProtocol::DIRECTION_FROM_SERVER;
+        }
+    }
+
+    return direction;
+}
+
+/**
+  * Method to set the conflict resolution policy.
+  * This method logic need not be changed and can be used as is
+  */
+MyProtocol::ConflictResolutionPolicy
+$(plugin.name)::resolveConflictResolutionPolicy (const MyProtocol::SyncInitiator& initiator)
+{
+    FUNCTION_CALL_TRACE;
+
+    Buteo::SyncProfile::ConflictResolutionPolicy crPolicyFromProfile =
+            iProfile.conflictResolutionPolicy();
+
+    /* In case if we have to resolve conflict the choice will be based on the user selection when
+     * creating a sync profile , if to prefer local changes or remote changes.
+     */
+    MyProtocol::ConflictResolutionPolicy crPolicy =
+            MyProtocol::PREFER_LOCAL_CHANGES;
+
+    switch (crPolicyFromProfile) {
+    case Buteo::SyncProfile::CR_POLICY_PREFER_LOCAL_CHANGES: {
+        LOG_DEBUG("Buteo::SyncProfile::CR_POLICY_PREFER_LOCAL_CHANGES");
+        crPolicy = MyProtocol::PREFER_LOCAL_CHANGES;
+        break;
+    }
+
+    case Buteo::SyncProfile::CR_POLICY_PREFER_REMOTE_CHANGES: {
+        LOG_DEBUG("Buteo::SyncProfile::CR_POLICY_PREFER_REMOTE_CHANGES");
+        crPolicy = MyProtocol::PREFER_REMOTE_CHANGES;
+        break;
+    }
+
+    default: {
+        break;
+    }
+    }
+
+    return crPolicy;
+}
+
+/**
+  * Method to generate the results once the sync is finished
+  * This method logic need not be changed and can be used as is
+  */
+void
+$(plugin.name)::generateResults (bool successful)
+{
+    FUNCTION_CALL_TRACE;
+
+    mResults.setMajorCode( successful ? Buteo::SyncResults::SYNC_RESULT_SUCCESS : Buteo::SyncResults::SYNC_RESULT_FAILED );
+
+    mResults.setTargetId(mAgent->getResults().getRemoteDeviceId());
+    const QMap<QString, MyProtocol::DatabaseResults>* dbResults = mAgent->getResults().getDatabaseResults();
+
+    if (dbResults->isEmpty())
+    {
+        LOG_DEBUG("No items transferred");
+    }
+    else
+    {
+        QMapIterator<QString, MyProtocol::DatabaseResults> i( *dbResults );
+        while ( i.hasNext() )
+        {
+            i.next();
+            const MyProtocol::DatabaseResults& r = i.value();
+            Buteo::TargetResults targetResults(
+                    i.key(), // Target name
+                    Buteo::ItemCounts( r.iLocalItemsAdded,
+                                       r.iLocalItemsDeleted,
+                                       r.iLocalItemsModified ),
+                    Buteo::ItemCounts( r.iRemoteItemsAdded,
+                                       r.iRemoteItemsDeleted,
+                                       r.iRemoteItemsModified ));
+            mResults.addTargetResults( targetResults );
+
+            LOG_DEBUG("Items for" << targetResults.targetName() << ":");
+            LOG_DEBUG("LA:" << targetResults.localItems().added <<
+                      "LD:" << targetResults.localItems().deleted <<
+                      "LM:" << targetResults.localItems().modified <<
+                      "RA:" << targetResults.remoteItems().added <<
+                      "RD:" << targetResults.remoteItems().deleted <<
+                      "RM:" << targetResults.remoteItems().modified);
+        }
+    }
+}
