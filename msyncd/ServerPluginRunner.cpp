@@ -117,7 +117,9 @@ bool ServerPluginRunner::init()
     connect(iThread, SIGNAL(initError(const QString &, const QString &, int)),
         this, SLOT(onError(const QString &, const QString &, int)));
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     connect(iThread, SIGNAL(terminated()), this, SLOT(onThreadExit()));
+#endif
 
     connect(iThread, SIGNAL(finished()), this, SLOT(onThreadExit()));
 
