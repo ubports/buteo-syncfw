@@ -47,7 +47,9 @@ enum SyncStatus {
     SYNC_NOTPOSSIBLE,
     SYNC_AUTHENTICATION_FAILURE,
     SYNC_DATABASE_FAILURE,
-    SYNC_CONNECTION_ERROR
+    SYNC_CONNECTION_ERROR,
+    SYNC_SERVER_FAILURE,
+    SYNC_BAD_REQUEST
 };
 
 // UI needs to display a detailed Progress for the Current ongoing sync
