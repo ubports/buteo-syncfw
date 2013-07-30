@@ -21,7 +21,7 @@
 
 from Cheetah.Template import Template
 
-import sys, ConfigParser, argparse
+import sys, ConfigParser, argparse, os, shutil
 
 def main():
     usage = "usage: %prog [options] arg"
@@ -42,6 +42,10 @@ def main():
     # Validate the config file
     validator = ConfigValidator (cf)
     validator.validate ()
+    
+    tg = TemplateGenerator (cf, "test")
+    tg.createDirStructure()
+    tg.generateClasses()
 
 '''
     Class to validate the configuration input
@@ -87,16 +91,74 @@ class ConfigValidator:
            for key in missing_fields:
                print key
            sys.exit (3)
-               
+
+# End validator class
+
+'''
+Class to generate the template
+'''
+class TemplateGenerator:
+    def __init__ (self, configParser, targetDir):
+        self.targetDir = targetDir
+        self.configParser = configParser
+        
+        self.type = ''
+        if self.configParser.has_section ('clientconfig'):
+            self.type = 'clientconfig'
+            self.classtemplate_h = 'clientplugin.h.tmpl'
+            self.classtemplate_cpp = 'clientplugin.cpp.tmpl'
+        elif self.configParser.has_section ('serverconfig'):
+            self.type = 'serverconfig'
+            self.classtemplate_h = 'serverplugin.h.tmpl'
+            self.classtemplate_cpp = 'serverplugin.cpp.tmpl'
+        elif self.configParser.has_section ('storageconfig'):
+            self.type = 'storageconfig'
+            self.classtemplate_h = 'storageplugin.h.tmpl'
+            self.classtemplate_cpp = 'storageplugin.cpp.tmpl'
+
+    def createDirStructure (self):
+        try:
+            if not os.path.exists(self.targetDir):
+                os.makedirs(self.targetDir + "/" + "xml")
+        except OSError as exception:
+            if exception.errorno != errno.EEXIST:
+                raise
+        
+    def cleanup (self):
+        inp = 'yn'
+        count = 1
+        while inp.lower() == 'y' or inp.lower() == 'n' or count < 4:
+            inp = raw_input("Really delete '" + self.targetDir + "' (y/n)?")
+            if inp.lower() == 'y':
+                shutil.rmtree(self.targetDir, False)
+                return
+            elif inp.lower() == 'n':
+                return
+            count = count + 1
+
+    def generateClasses (self):
+        classname = self.configParser.get (self.type, 'classname')
+
+        # Generate .h
+        header = open (self.targetDir + "/" + classname + ".h", "w")
+        print >> header, Template (file = self.classtemplate_h, searchList = [{'plugin':dict(self.configParser.items(self.type))}])
+        header.close()
+        
+        # Generate .cpp
+        cpp = open (self.targetDir + "/" + classname + ".cpp", "w")
+        print >> cpp, Template (file = self.classtemplate_cpp, searchList = [{'plugin':dict(self.configParser.items(self.type))}])
+        cpp.close()
+        
+
+# End TemplateGenerator class
 
 if __name__ == "__main__":
     main()
 
+
 #print Template (file = 'clientprofile.xml.tmpl', searchList = [{'profile':dict(cf.items('profile'))}])
 #print Template (file = 'mypluginprofile.xml.tmpl', searchList = [{'plugin':dict(cf.items('clientplugin')), 'profile':dict(cf.items('profile'))}])
 '''
-print Template (file = 'clientplugin.h.tmpl', searchList = [{'plugin':clientplugin}])
-print Template (file = 'clientplugin.cpp.tmpl', searchList = [{'plugin':clientplugin}])
 print Template (file = 'mypluginprofile.xml.tmpl', searchList = [{'plugin':clientplugin}, {'profile':clientprofile}])
 print Template (file = 'sample.tmpl', searchList = [{'plugin':clientplugin}, {'profile':clientprofile}])
 '''
