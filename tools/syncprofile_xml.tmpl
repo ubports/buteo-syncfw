@@ -2,7 +2,7 @@
 
 <profile name="$profile.name" type="sync" >
 <!--
-Definitions for the client plugin. All the client plugin definitions are
+Definitions for the client plugin profile. All the client plugin definitions are
 in the form of key/value pairs. These key/value pairs are used by the buteo
 sync framework. You can also add your own key/value pairs that you can use
 in the plugin. The key/value pairs are accessible  via the 'iProfile' object,
@@ -11,20 +11,30 @@ like:
 
 Depending on your needs, change the following default settings
 -->
+#if $getVar('$profile.remote_url', '') != ''
     <key name="Remote database" value="$profile.remote_url" />
+#end if
+#if $getVar('$profile.username','') != ''
     <key name="Username" value="$profile.username" />
+#end if
+#if $getVar('$profile.password','') != ''
     <key name="Password" value="$profile.password" />
+#end if
     <key name="destinationtype" value="online"/>
     <key name="displayname" value="$profile.displayname"/>
     <key name="enabled" value="$profile.enabled" />
+#if $getVar('$profile.use_accounts','') != ''
     <key name="use_accounts" value="false" />
+#end if
+#if $getVar('$profile.hidden','') != ''
     <key name="hidden" value="true" />
+#end if
 
 <!--
 The following settings are for the protocol. But these can also be set
-in $(plugin.classname).xml file
+in $(profile.classname).xml file
 -->
-    <profile name="$plugin.classname" type="client" >
+    <profile name="$profile.agent_name" type="client" >
         <key name="Sync Transport" value="$profile.transport" />
         <key name="Sync Direction" value="$profile.syncdirection" />
         <key name="conflictpolicy" value="$profile.conflictpolicy" />
