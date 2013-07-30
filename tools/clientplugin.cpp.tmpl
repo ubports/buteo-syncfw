@@ -2,24 +2,24 @@
  * YOUR LICENSE TEXT HERE
  */
 
-\#include "$(plugin.name).h"
+\#include "$(plugin.classname).h"
 
 \#include <buteosyncfw5/PluginCbInterface.h>
 \#include <buteosyncfw5/LogMacros.h>
 
-extern "C" $(plugin.name)* createPlugin(const QString& pluginName,
+extern "C" $(plugin.classname)* createPlugin(const QString& pluginName,
         const Buteo::SyncProfile& profile,
         Buteo::PluginCbInterface *cbInterface)
 {
-    return new $(plugin.name)(pluginName, profile, cbInterface);
+    return new $(plugin.classname)(pluginName, profile, cbInterface);
 }
 
-extern "C" void destroyPlugin($(plugin.name) *client)
+extern "C" void destroyPlugin($(plugin.classname) *client)
 {
     delete client;
 }
 
-$(plugin.name)::$(plugin.name)(const QString& pluginName,
+$(plugin.classname)::$(plugin.classname)(const QString& pluginName,
         const Buteo::SyncProfile& profile,
         Buteo::PluginCbInterface *cbInterface) :
     ClientPlugin(pluginName, profile, cbInterface), mAgent(0),
@@ -28,7 +28,7 @@ $(plugin.name)::$(plugin.name)(const QString& pluginName,
     FUNCTION_CALL_TRACE;
 }
 
-$(plugin.name)::~$(plugin.name)()
+$(plugin.classname)::~$(plugin.classname)()
 {
     FUNCTION_CALL_TRACE;
 }
@@ -38,7 +38,7 @@ $(plugin.name)::~$(plugin.name)()
   * This method will be invoked by the framework
   */
 bool
-$(plugin.name)::init()
+$(plugin.classname)::init()
 {
     FUNCTION_CALL_TRACE;
 
@@ -67,7 +67,7 @@ $(plugin.name)::init()
   * This method will be invoked by the framework
   */
 bool
-$(plugin.name)::uninit()
+$(plugin.classname)::uninit()
 {
     FUNCTION_CALL_TRACE;
 
@@ -88,7 +88,7 @@ $(plugin.name)::uninit()
   * framework
   */
 bool
-$(plugin.name)::startSync()
+$(plugin.classname)::startSync()
 {
     FUNCTION_CALL_TRACE;
 
@@ -135,7 +135,7 @@ $(plugin.name)::startSync()
   * connection failures or by the user (via a UI)
   */
 void
-$(plugin.name)::abortSync(Sync::SyncStatus status)
+$(plugin.classname)::abortSync(Sync::SyncStatus status)
 {
     FUNCTION_CALL_TRACE;
     MyProtocol::SyncState state = MyProtocol::ABORTED;
@@ -169,7 +169,7 @@ $(plugin.name)::abortSync(Sync::SyncStatus status)
   * has to implement the necessary cleanup (like temporary data, anchors etc.)
   */
 bool
-$(plugin.name)::cleanUp()
+$(plugin.classname)::cleanUp()
 {
     FUNCTION_CALL_TRACE;
 
@@ -190,7 +190,7 @@ $(plugin.name)::cleanUp()
   * It is upto the protocol plugin to implement such a signal
   */
 void
-$(plugin.name)::syncStateChanged(MyProtocol::SyncState state)
+$(plugin.classname)::syncStateChanged(MyProtocol::SyncState state)
 {
 
     FUNCTION_CALL_TRACE;
@@ -223,7 +223,7 @@ $(plugin.name)::syncStateChanged(MyProtocol::SyncState state)
   * This slot can be used to manage the result when sync is finished
   */
 void
-$(plugin.name)::syncFinished(MyProtocol::SyncState state)
+$(plugin.classname)::syncFinished(MyProtocol::SyncState state)
 {
 
     FUNCTION_CALL_TRACE;
@@ -273,7 +273,7 @@ $(plugin.name)::syncFinished(MyProtocol::SyncState state)
   * storage plugin, then there is no need to have this method
   */
 void
-$(plugin.name)::storageAccquired(QString mimeType)
+$(plugin.classname)::storageAccquired(QString mimeType)
 {
     FUNCTION_CALL_TRACE;
     LOG_DEBUG(" MimeType " << mimeType);
@@ -285,7 +285,7 @@ $(plugin.name)::storageAccquired(QString mimeType)
   * items here
   */
 void
-$(plugin.name)::receiveItemProcessed(
+$(plugin.classname)::receiveItemProcessed(
         MyProtocol::ModificationType modificationType,
         MyProtocol::ModifiedDatabase modifiedDatabase,
         QString localDatabase,
@@ -366,7 +366,7 @@ $(plugin.name)::receiveItemProcessed(
   * Initializes protocol agent
   */
 bool
-$(plugin.name)::initAgent()
+$(plugin.classname)::initAgent()
 {
 
     FUNCTION_CALL_TRACE;
@@ -388,7 +388,7 @@ $(plugin.name)::initAgent()
   * Closes protocol agent
   */
 void
-$(plugin.name)::closeAgent()
+$(plugin.classname)::closeAgent()
 {
 
     FUNCTION_CALL_TRACE;
@@ -405,7 +405,7 @@ $(plugin.name)::closeAgent()
  * Initializes transport
  */
 bool
-$(plugin.name)::initTransport()
+$(plugin.classname)::initTransport()
 {
     FUNCTION_CALL_TRACE;
 
@@ -422,7 +422,7 @@ $(plugin.name)::initTransport()
   * Closes transport
   */
 void
-$(plugin.name)::closeTransport()
+$(plugin.classname)::closeTransport()
 {
 
     FUNCTION_CALL_TRACE;
@@ -441,7 +441,7 @@ $(plugin.name)::closeTransport()
   * as well as for the protocol
   */
 bool
-$(plugin.name)::initConfig()
+$(plugin.classname)::initConfig()
 {
 
     FUNCTION_CALL_TRACE;
@@ -529,7 +529,7 @@ $(plugin.name)::initConfig()
 }
 
 void
-$(plugin.name)::closeConfig()
+$(plugin.classname)::closeConfig()
 {
 
     FUNCTION_CALL_TRACE;
@@ -550,7 +550,7 @@ $(plugin.name)::closeConfig()
   * Returns the sync results
   */
 Buteo::SyncResults
-$(plugin.name)::getSyncResults() const
+$(plugin.classname)::getSyncResults() const
 {
     FUNCTION_CALL_TRACE;
 
@@ -561,7 +561,7 @@ $(plugin.name)::getSyncResults() const
   * Signal from the protocol engine about connectivity state changes
   */
 void
-$(plugin.name)::connectivityStateChanged(Sync::ConnectivityType aType,
+$(plugin.classname)::connectivityStateChanged(Sync::ConnectivityType aType,
         bool aState)
 {
     FUNCTION_CALL_TRACE;
@@ -575,7 +575,7 @@ $(plugin.name)::connectivityStateChanged(Sync::ConnectivityType aType,
   * This method logic need not be changed and should work as is
   */
 MyProtocol::SyncDirection
-$(plugin.name)::resolveSyncDirection(const MyProtocol::SyncInitiator& initiator)
+$(plugin.classname)::resolveSyncDirection(const MyProtocol::SyncInitiator& initiator)
 {
     FUNCTION_CALL_TRACE;
 
@@ -611,7 +611,7 @@ $(plugin.name)::resolveSyncDirection(const MyProtocol::SyncInitiator& initiator)
   * This method logic need not be changed and can be used as is
   */
 MyProtocol::ConflictResolutionPolicy
-$(plugin.name)::resolveConflictResolutionPolicy (const MyProtocol::SyncInitiator& initiator)
+$(plugin.classname)::resolveConflictResolutionPolicy (const MyProtocol::SyncInitiator& initiator)
 {
     FUNCTION_CALL_TRACE;
 
@@ -650,7 +650,7 @@ $(plugin.name)::resolveConflictResolutionPolicy (const MyProtocol::SyncInitiator
   * This method logic need not be changed and can be used as is
   */
 void
-$(plugin.name)::generateResults (bool successful)
+$(plugin.classname)::generateResults (bool successful)
 {
     FUNCTION_CALL_TRACE;
 

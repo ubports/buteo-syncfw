@@ -3,8 +3,8 @@
  *
  */
 
-\#ifndef $(plugin.name)_H
-\#define $(plugin.name)_H
+\#ifndef $(plugin.classname)_H
+\#define $(plugin.classname)_H
 
 // Include this header if you are using storage plugins
 \#include "SyncMLStorageProvider.h"
@@ -14,7 +14,7 @@
 /*! \brief Implementation for client plugin
  *
  */
-class $plugin.name : public Buteo::ClientPlugin
+class $plugin.classname : public Buteo::ClientPlugin
 {
     Q_OBJECT;
 public:
@@ -25,7 +25,7 @@ public:
      * @param aProfile Sync profile
      * @param aCbInterface Pointer to the callback interface
      */
-    $plugin.name ( const QString& pluginName,
+    $plugin.classname ( const QString& pluginName,
                   const Buteo::SyncProfile& profile,
                   Buteo::PluginCbInterface *cbInterface );
 
@@ -33,7 +33,7 @@ public:
      *
      * Call uninit before destroying the object.
      */
-    virtual ~$(plugin.name)();
+    virtual ~$(plugin.classname)();
 
     //! @see SyncPluginBase::init
     virtual bool init();
@@ -137,21 +137,21 @@ private:
 
 };
 
-/*! \brief Creates $plugin.name client plugin
+/*! \brief Creates $plugin.classname client plugin
  *
  * @param aPluginName Name of this client plugin
  * @param aProfile Profile to use
  * @param aCbInterface Pointer to the callback interface
  * @return Client plugin on success, otherwise NULL
  */
-extern "C" $(plugin.name)* createPlugin (const QString& pluginName,
+extern "C" $(plugin.classname)* createPlugin (const QString& pluginName,
                                          const Buteo::SyncProfile& profile,
                                          Buteo::PluginCbInterface *cbInterface );
 
-/*! \brief Destroys $plugin.name client plugin
+/*! \brief Destroys $plugin.classname client plugin
  *
- * @param aServer $plugin.name client plugin instance to destroy
+ * @param aServer $plugin.classname client plugin instance to destroy
  */
-extern "C" void destroyPlugin( $plugin.name *client );
+extern "C" void destroyPlugin( $plugin.classname *client );
 
-\#endif  //  $plugin.name
+\#endif  //  $plugin.classname
