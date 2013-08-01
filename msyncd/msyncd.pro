@@ -157,3 +157,10 @@ linux-g++-maemo {
   message("Meego specific install")
   INSTALLS += meego
 }
+
+usb-moded {
+  message("Building with usb-moded")
+  DEFINES += __USBMODED__
+  HEADERS += USBModedProxy.h
+  SOURCES += USBModedProxy.cpp
+}
