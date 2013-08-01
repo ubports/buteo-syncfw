@@ -37,7 +37,7 @@
 using namespace Buteo;
 static const QString USB_MODE_SERVICE("com.meego.usb_moded");
 static const QString USB_MODE_OBJECT("/com/meego/usb_moded");
-static const QString MODE_OVI_SUITE("ovi_suite");
+static const QString SYNC_MODE_NAME("ovi_suite");
 
 /*
  * Implementation of interface class USBModedProxy
@@ -61,8 +61,8 @@ void USBModedProxy::slotModeChanged(const QString &mode)
 {
     FUNCTION_CALL_TRACE;
     bool isConnected = false;
-    
-    if(MODE_OVI_SUITE == mode)
+
+    if(SYNC_MODE_NAME == mode)
     {
         isConnected = true;
     }
@@ -83,11 +83,10 @@ bool USBModedProxy::isUSBConnected()
     else
     {
         LOG_INFO("USB connected in mode::" << reply.value());
-        if(MODE_OVI_SUITE == reply.value())
+        if(SYNC_MODE_NAME == reply.value())
         {
             isConnected = true;
         }
     }
     return isConnected;
 }
-
