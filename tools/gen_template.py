@@ -188,7 +188,7 @@ class TemplateGenerator:
     def generateStorageProfiles (self):
         sl = dict()
         sl['profile'] = self.configObj['config']
-        sl['props'] = self.configObj['properties']
+        sl['props'] = self.configObj['config']['properties']
 
         storage_file = open (self.targetDir + "/xml/storage/" + self.configObj['config']['name'] + ".xml", "w")
         print >> storage_file, Template (file = "storageprofile_xml.tmpl", searchList = [sl])
