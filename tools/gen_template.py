@@ -64,6 +64,10 @@ class ConfigValidator:
         if configObj.has_key ('config') == False:
             print "Error: Invalid config file. 'config' section not available"
             sys.exit (3)
+        
+        if configObj.get('config').has_key('type') == False:
+            print "Error: Invalid config file. 'type' of the plugin not provided. Possible values: 'client/server/storage'"
+            sys.exit (3)
 
         if configObj['config']['type'] == 'client':
             self.mandatory_fields = self.mandatory_client_config_keys
@@ -87,7 +91,18 @@ class ConfigValidator:
         if len(missing_fields) != 0:
            print "Missing mandatory fields:" + str(missing_fields)
            sys.exit (3)
+        
+        # Validate specific server profile properties
+        self.validateServerProfile(self.configObj['config'])
 
+    def validateServerProfile (self, properties):
+        # For now, possible 'transport' key/values are checked 
+        possible_transports = ['usb', 'bt', 'ip']
+        given_transport = properties['transport']
+        if possible_transports.__contains__(given_transport) == None:
+                print "Wrong value for transport. Possible values: usb/bt/ip"
+                sys.exit(3)
+        
 # End validator class
 
 '''
@@ -195,21 +210,35 @@ class TemplateGenerator:
         storage_file.close()
 
     def generateSyncAgentProfile (self, profileXmlName):
-        agentprops = self.configObj['config']['agent']['props']
+        sl = dict()
+        sl['name'] = profileXmlName
+        sl['props'] = self.configObj['config']['agent']['props']
+
         agent_file = open (self.targetDir + "/xml/client/" + profileXmlName + ".xml", "w")
-        print >> agent_file, Template (file = "syncagentprofile_xml.tmpl", searchList = [{'name':profileXmlName}, {'props':agentprops}])
+        print >> agent_file, Template (file = "syncagentprofile_xml.tmpl", searchList = [sl])
         agent_file.close()
         
     def generateServerProfile (self, profileXmlName):
-        print "TBD"
+        sl = dict()
+        sl['profile'] = self.configObj['config']
+        if self.configObj.get('config').has_key('storages'):
+            sl['storages'] = self.configObj['config']['storages']
+        if self.configObj.get('config').has_key('ext-config'):
+            sl['extprops'] = self.configObj['config'['ext-config']
+        
+        server_profile = open (self.targetDir + "/xml/server/" + profileXmlName + ".xml", "w")
+        print >> server_profile, Template (file = self.profile, searchList = [sl])
+        server_profile.close()
         
     def generateSyncProfile (self, profileXmlName):
         sl = dict()
         sl['profile'] = self.configObj['config']
-        sl['storages'] = self.configObj['config']['storages']
+        if self.configObj.get('config').has_key('storages'):
+            sl['storages'] = self.configObj['config']['storages']
         sl['agentname'] = self.configObj['config']['agent']['name']
         sl['agentprops'] = self.configObj['config']['agent']['props']
-        sl['extprops'] = self.configObj['config']['ext-config']
+        if self.configObj.get('config').has_key('ext-config'):
+            sl['extprops'] = self.configObj['config']['ext-config']
         
         sync_profile_file = open (self.targetDir + "/xml/sync/" + profileXmlName + ".xml", "w")
         print >> sync_profile_file, Template (file = self.profile, searchList = [sl])
@@ -217,9 +246,9 @@ class TemplateGenerator:
         
     def generateProfiles (self):
         profile_name = self.configObj['config']['name']
-        agent_name = self.configObj['config']['agent']['name']
 
         if self.configObj['config']['type'] == 'client':
+            agent_name = self.configObj['config']['agent']['name']
             self.generateSyncProfile(profile_name)
             self.generateSyncAgentProfile(agent_name)
         elif self.configObj['config']['type'] == 'server':
