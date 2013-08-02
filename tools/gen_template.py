@@ -93,7 +93,8 @@ class ConfigValidator:
            sys.exit (3)
         
         # Validate specific server profile properties
-        self.validateServerProfile(self.configObj['config'])
+        if self.configObj['config']['type'] == 'server':
+            self.validateServerProfile(self.configObj['config'])
 
     def validateServerProfile (self, properties):
         # For now, possible 'transport' key/values are checked 
@@ -161,15 +162,14 @@ class TemplateGenerator:
         try:
             os.makedirs(dir + "/" + "xml")
             
-            if self.hasStorages() == True:
-                os.makedirs(dir + "/xml/storage")
-
             if self.configObj['config']['type'] == 'client':
                 os.makedirs(dir + "/xml/client")
                 # Create the sync directory
                 os.makedirs(dir + "/xml/sync")
             elif self.configObj['config']['type'] == 'server':
                 os.makedirs(dir + "/xml/server")
+            if self.configObj['config']['type'] == 'storage':
+                os.makedirs(dir + "/xml/storage")
                 
         except OSError as exception:
             if exception.errno != errno.EEXIST:
@@ -200,12 +200,13 @@ class TemplateGenerator:
         print >> cpp, Template (file = self.classtemplate_cpp, searchList = [{'plugin':self.configObj.get('config')}])
         cpp.close()
 
-    def generateStorageProfiles (self):
+    def generateStorageProfiles (self, profileXmlName):
         sl = dict()
         sl['profile'] = self.configObj['config']
-        sl['props'] = self.configObj['config']['properties']
+        if self.configObj.get('config').has_key('ext-config'):
+            sl['extprops'] = self.configObj['config']['ext-config']
 
-        storage_file = open (self.targetDir + "/xml/storage/" + self.configObj['config']['name'] + ".xml", "w")
+        storage_file = open (self.targetDir + "/xml/storage/" + profileXmlName + ".xml", "w")
         print >> storage_file, Template (file = "storageprofile_xml.tmpl", searchList = [sl])
         storage_file.close()
 
@@ -224,7 +225,7 @@ class TemplateGenerator:
         if self.configObj.get('config').has_key('storages'):
             sl['storages'] = self.configObj['config']['storages']
         if self.configObj.get('config').has_key('ext-config'):
-            sl['extprops'] = self.configObj['config'['ext-config']
+            sl['extprops'] = self.configObj['config']['ext-config']
         
         server_profile = open (self.targetDir + "/xml/server/" + profileXmlName + ".xml", "w")
         print >> server_profile, Template (file = self.profile, searchList = [sl])
@@ -254,7 +255,7 @@ class TemplateGenerator:
         elif self.configObj['config']['type'] == 'server':
             self.generateServerProfile(profile_name)
         elif self.configObj['config']['type'] == 'storage':
-            self.generateStorageProfiles()
+            self.generateStorageProfiles(profile_name)
 
         self.generateProjectFile()
 
