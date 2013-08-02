@@ -49,6 +49,7 @@ def main():
     tg.createDirStructure()
     tg.generateClasses()
     tg.generateProfiles()
+    tg.generateProjectFile()
 
 '''
     Class to validate the configuration input
@@ -260,8 +261,15 @@ class TemplateGenerator:
         self.generateProjectFile()
 
     def generateProjectFile (self):
-        print "TBD"
+        sl = dict()
+        sl['projectname'] = self.targetDir + "-" + self.configObj['config']['type']
+        sl['profile'] = {'type':self.configObj['config']['type'], }
+        sl['classname'] = self.configObj['config']['classname']
         
+        project_file = open (self.targetDir + "/" + self.targetDir + ".pro", "w")
+        print >> project_file, Template (file = "myproj_pro.tmpl", searchList = [sl])
+        project_file.close()
+
 # End TemplateGenerator class
 
 if __name__ == "__main__":
