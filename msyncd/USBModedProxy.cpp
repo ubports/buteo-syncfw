@@ -37,7 +37,7 @@
 using namespace Buteo;
 static const QString USB_MODE_SERVICE("com.meego.usb_moded");
 static const QString USB_MODE_OBJECT("/com/meego/usb_moded");
-static const QString SYNC_MODE_NAME("ovi_suite");
+static const QString SYNC_MODE_NAME("pc_suite");
 
 /*
  * Implementation of interface class USBModedProxy
