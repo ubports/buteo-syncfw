@@ -2,7 +2,8 @@
 
 <profile name="$profile.name" type="storage" >
     <key name="enabled" value="$profile.enabled" />
-    #for $key, $value in $props.items()
+    <key name="mimetype" value="$profile.mimetype" />
+    #for $key, $value in $extprops.items()
     <key name="$key" value="$value" />
     #end for
 </profile>
