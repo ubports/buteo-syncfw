@@ -1,11 +1,11 @@
 TEMPLATE = lib
-TARGET = $(profile.name)-client
+TARGET = $(projectname)
 DEPENDPATH += .
 INCLUDEPATH += . 
 
 CONFIG += link_pkgconfig plugin
 
-PKGCONFIG = buteosyncfw5 Qt5SystemInfo
+PKGCONFIG = buteosyncfw5
 target.path = /usr/lib/buteo-plugins-qt5
 
 QT += dbus sql network
@@ -15,38 +15,41 @@ VER_MAJ = 1
 VER_MIN = 0
 VER_PAT = 0
 
-#input
-HEADERS += $(plugin.classname).h
+\#input
+HEADERS += $(classname).h
 
-SOURCES += $(plugin.classname).cpp
+SOURCES += $(classname).cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \
     -Wno-cast-align \
     -O2 -finline-functions
 
-#clean
-QMAKE_CLEAN += $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2)
-QMAKE_CLEAN += $(OBJECTS_DIR)/*.gcda $(OBJECTS_DIR)/*.gcno $(OBJECTS_DIR)/*.gcov $(OBJECTS_DIR)/moc_*
-#QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
-#QMAKE_LFLAGS += -fprofile-arcs -ftest-coverage
+\#clean
+QMAKE_CLEAN += \$(TARGET) \$(TARGET0) \$(TARGET1) \$(TARGET2)
+QMAKE_CLEAN += \$(OBJECTS_DIR)/*.gcda \$(OBJECTS_DIR)/*.gcno \$(OBJECTS_DIR)/*.gcov \$(OBJECTS_DIR)/moc_*
 
+\#install
 
+$(profile.type).path = /etc/buteo/profiles/$(profile.type)
+$(profile.type).files = xml/$(profile.type)/*
 
-#install
-
-client.path = /etc/buteo/profiles/client
-client.files = xml/syncml.xml
-
-####To Remove Later After Accounts Integration
-
+#if $getVar('$profile.type', '') == 'client'
 sync.path = /etc/buteo/profiles/sync
 sync.files = xml/sync/*
+#end if
 
-#service.path = /etc/buteo/profiles/service
-#service.files = xml/service/*
-
+#if $getVar('$profile.type', '') == 'storage'
 storage.path = /etc/buteo/profiles/storage
 storage.files = xml/storage/*
+#end if
 
-INSTALLS += target client sync service storage
+INSTALLS += target $(profile.type)
+
+#if $getVar('$profile.type', '') == 'client'
+INSTALLS += sync
+#end if
+
+#if $getVar('$profile.type', '') == 'storage'
+INSTALLS += storage
+#end if
