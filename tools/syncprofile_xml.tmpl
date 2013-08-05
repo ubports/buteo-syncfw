@@ -34,10 +34,10 @@ Depending on your needs, change the following default settings
 The following settings are for the protocol. But these can also be set
 in $(profile.classname).xml file
 -->
-    <profile name="$profile.agent_name" type="client" >
-        <key name="Sync Transport" value="$profile.transport" />
-        <key name="Sync Direction" value="$profile.syncdirection" />
-        <key name="conflictpolicy" value="$profile.conflictpolicy" />
+    <profile name="$agentname" type="client" >
+        #for $key, $value in $agentprops.items()
+        <key name="$key" value="$value" />
+        #end for
     </profile>
 
 <!-- The following are the storage plugins that this plugin supports.
@@ -45,18 +45,21 @@ If you do not use a storage plug-in, then you do not need to have the
 following definitions.
 These are just samples and you can have your own storage plugins
 -->
-    <profile name="hcontacts" type="storage" >
-        <key name="enabled" value="true" />
-        <key name="Local URI" value="./contacts" />
-        <key name="Target URI" value="contact" />
+    #for $storagename, $props in $storages.items()
+    <profile name="$storagename" type="storage" >
+        #for $key, $value in $props.items()
+        <key name="$key" value="$value" />
+        #end for
     </profile>
+    #end for
+    
+<!-- Add any extra key/value pairs that your plugin might need. These
+properties are not used by the framework and only your plugin can make
+use of them. These key/values should not conflict with the ones that 
+the framework uses -->
 
-    <profile name="hcalendar" type="storage" >
-        <key name="enabled" value="true" />
-        <key name="Notebook Name" value="Personal"/>
-        <key name="Local URI" value="./calendar" />
-        <key name="Target URI" value="caltask" />
-        <key name="Calendar Format" value="vcalendar" />
-    </profile>
+    #for $key, $value in $extprops.items()
+    <key name="$key" value="$value" />
+    #end for
 
 </profile>

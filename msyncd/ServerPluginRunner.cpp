@@ -105,7 +105,7 @@ bool ServerPluginRunner::init()
 
     connect(iPlugin, SIGNAL(success(const QString &, const QString &)),
         this, SLOT(onSuccess(const QString &, const QString &)));
-    
+
     connect(iPlugin, SIGNAL(accquiredStorage(const QString &)),
         this, SLOT(onStorageAccquired(const QString &)));
 
@@ -279,8 +279,13 @@ void ServerPluginRunner::onSessionDone()
 
     // Remove reference to the server plug-in. This may result in stopping
     // the server plug-in, if it doesn't need to be active any more.
+
+#if 0
+    // SyncML Server plugin should not die after one single session
+    // Don't think removing the server reference is useful
     if (iServerActivator != 0)
     {
         iServerActivator->removeRef(plugin()->getProfileName());
     }
+#endif
 }
