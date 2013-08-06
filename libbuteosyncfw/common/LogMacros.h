@@ -28,6 +28,7 @@
 #include <QString>
 #include <QTime>
 #include <QDebug>
+#include <QDateTime>
 #include "Logger.h"
 
 //! Helper macro for writing log messages. Avoid using directly.
@@ -52,7 +53,7 @@
 #define FUNCTION_CALL_TRACE Buteo::LogTimer timerDebugVariable(QString(__PRETTY_FUNCTION__));
 
 namespace Buteo {
-    
+
 /*!
  * \brief Helper class for timing function execution time.
  */

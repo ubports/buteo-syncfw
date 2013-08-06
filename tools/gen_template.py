@@ -1,3 +1,4 @@
+#!/usr/bin/python
 '''
 *
 * Copyright (C) 2013 Jolla Ltd. and/or its subsidiary(-ies).
@@ -29,14 +30,13 @@ def main():
     usage = "usage: %prog [options] arg"
 
     parser = argparse.ArgumentParser (description='Generates Buteo sync plugin template code', usage=sys.argv[0] + ' [options] arg')
-    parser.add_argument('-c', '--config')
-    parser.add_argument('-d', '--dir')
+    parser.add_argument('-c', '--config', help="Config file to generate the source templates", required=True)
+    parser.add_argument('-d', '--outdir', help="Target output directory. Should be writable")
     args = parser.parse_args()
-    if not args.config:
-        print parser.usage
-        sys.exit(2)
-
     options = vars (args)
+    if options['config'] == None or options['outdir'] == None:
+        print parser.print_help()
+        sys.exit(2)
 
     # Read the configuration file provided from cmdline
     co = ConfigObj (options['config'])
@@ -45,7 +45,7 @@ def main():
     validator = ConfigValidator (co)
     validator.validate ()
 
-    tg = TemplateGenerator (co, options['dir'])
+    tg = TemplateGenerator (co, options['outdir'])
     tg.createDirStructure()
     tg.generateClasses()
     tg.generateProfiles()
@@ -65,7 +65,7 @@ class ConfigValidator:
         if configObj.has_key ('config') == False:
             print "Error: Invalid config file. 'config' section not available"
             sys.exit (3)
-        
+
         if configObj.get('config').has_key('type') == False:
             print "Error: Invalid config file. 'type' of the plugin not provided. Possible values: 'client/server/storage'"
             sys.exit (3)
@@ -92,19 +92,19 @@ class ConfigValidator:
         if len(missing_fields) != 0:
            print "Missing mandatory fields:" + str(missing_fields)
            sys.exit (3)
-        
+
         # Validate specific server profile properties
         if self.configObj['config']['type'] == 'server':
             self.validateServerProfile(self.configObj['config'])
 
     def validateServerProfile (self, properties):
-        # For now, possible 'transport' key/values are checked 
+        # For now, possible 'transport' key/values are checked
         possible_transports = ['usb', 'bt', 'ip']
         given_transport = properties['transport']
         if possible_transports.__contains__(given_transport) == None:
                 print "Wrong value for transport. Possible values: usb/bt/ip"
                 sys.exit(3)
-        
+
 # End validator class
 
 '''
@@ -114,20 +114,23 @@ class TemplateGenerator:
     def __init__ (self, configObj, targetDir):
         self.targetDir = targetDir
         self.configObj = configObj
+        TEMPLATE_DIR = 'templates/'
 
         if self.configObj['config']['type'] == 'client':
-            self.classtemplate_h = 'clientplugin_h.tmpl'
-            self.classtemplate_cpp = 'clientplugin_cpp.tmpl'
-            self.profile = 'syncprofile_xml.tmpl'
-            self.agent_profile = 'syncagentprofile_xml.tmpl'
+            self.classtemplate_h = TEMPLATE_DIR + 'clientplugin_h.tmpl'
+            self.classtemplate_cpp = TEMPLATE_DIR + 'clientplugin_cpp.tmpl'
+            self.profile = TEMPLATE_DIR + 'syncprofile_xml.tmpl'
+            self.agent_profile = TEMPLATE_DIR + 'syncagentprofile_xml.tmpl'
         elif self.configObj['config']['type'] == 'server':
-            self.classtemplate_h = 'serverplugin_h.tmpl'
-            self.classtemplate_cpp = 'serverplugin_cpp.tmpl'
-            self.profile = 'serverprofile_xml.tmpl'
+            self.classtemplate_h = TEMPLATE_DIR + 'serverplugin_h.tmpl'
+            self.classtemplate_cpp = TEMPLATE_DIR + 'serverplugin_cpp.tmpl'
+            self.profile = TEMPLATE_DIR + 'serverprofile_xml.tmpl'
         elif self.configObj['config']['type'] == 'storage':
-            self.classtemplate_h = 'storageplugin_h.tmpl'
-            self.classtemplate_cpp = 'storageplugin_cpp.tmpl'
-            self.profile = 'storageprofile_xml.tmpl'
+            self.classtemplate_h = TEMPLATE_DIR + 'storageplugin_h.tmpl'
+            self.classtemplate_cpp = TEMPLATE_DIR + 'storageplugin_cpp.tmpl'
+            self.profile = TEMPLATE_DIR + 'storageprofile_xml.tmpl'
+
+        self.projectfile = TEMPLATE_DIR + 'myproj_pro.tmpl'
 
     def hasStorages (self):
         if self.configObj.has_key ('storages') and (len(self.configObj['storages']) > 0):
@@ -158,11 +161,11 @@ class TemplateGenerator:
                     continue
             else:
                 dirExistsFlag = False
-        
+
         self.targetDir = dir
         try:
             os.makedirs(dir + "/" + "xml")
-            
+
             if self.configObj['config']['type'] == 'client':
                 os.makedirs(dir + "/xml/client")
                 # Create the sync directory
@@ -171,7 +174,7 @@ class TemplateGenerator:
                 os.makedirs(dir + "/xml/server")
             if self.configObj['config']['type'] == 'storage':
                 os.makedirs(dir + "/xml/storage")
-                
+
         except OSError as exception:
             if exception.errno != errno.EEXIST:
                 raise
@@ -208,7 +211,7 @@ class TemplateGenerator:
             sl['extprops'] = self.configObj['config']['ext-config']
 
         storage_file = open (self.targetDir + "/xml/storage/" + profileXmlName + ".xml", "w")
-        print >> storage_file, Template (file = "storageprofile_xml.tmpl", searchList = [sl])
+        print >> storage_file, Template (file = self.profile, searchList = [sl])
         storage_file.close()
 
     def generateSyncAgentProfile (self, profileXmlName):
@@ -217,9 +220,9 @@ class TemplateGenerator:
         sl['props'] = self.configObj['config']['agent']['props']
 
         agent_file = open (self.targetDir + "/xml/client/" + profileXmlName + ".xml", "w")
-        print >> agent_file, Template (file = "syncagentprofile_xml.tmpl", searchList = [sl])
+        print >> agent_file, Template (file = self.agent_profile, searchList = [sl])
         agent_file.close()
-        
+
     def generateServerProfile (self, profileXmlName):
         sl = dict()
         sl['profile'] = self.configObj['config']
@@ -227,11 +230,11 @@ class TemplateGenerator:
             sl['storages'] = self.configObj['config']['storages']
         if self.configObj.get('config').has_key('ext-config'):
             sl['extprops'] = self.configObj['config']['ext-config']
-        
+
         server_profile = open (self.targetDir + "/xml/server/" + profileXmlName + ".xml", "w")
         print >> server_profile, Template (file = self.profile, searchList = [sl])
         server_profile.close()
-        
+
     def generateSyncProfile (self, profileXmlName):
         sl = dict()
         sl['profile'] = self.configObj['config']
@@ -241,11 +244,11 @@ class TemplateGenerator:
         sl['agentprops'] = self.configObj['config']['agent']['props']
         if self.configObj.get('config').has_key('ext-config'):
             sl['extprops'] = self.configObj['config']['ext-config']
-        
+
         sync_profile_file = open (self.targetDir + "/xml/sync/" + profileXmlName + ".xml", "w")
         print >> sync_profile_file, Template (file = self.profile, searchList = [sl])
         sync_profile_file.close()
-        
+
     def generateProfiles (self):
         profile_name = self.configObj['config']['name']
 
@@ -265,13 +268,14 @@ class TemplateGenerator:
         sl['projectname'] = self.targetDir + "-" + self.configObj['config']['type']
         sl['profile'] = {'type':self.configObj['config']['type'], }
         sl['classname'] = self.configObj['config']['classname']
-        
+
         project_file = open (self.targetDir + "/" + self.targetDir + ".pro", "w")
-        print >> project_file, Template (file = "myproj_pro.tmpl", searchList = [sl])
+        print >> project_file, Template (file = self.projectfile, searchList = [sl])
         project_file.close()
 
 # End TemplateGenerator class
 
+# Main function
 if __name__ == "__main__":
     main()
 
