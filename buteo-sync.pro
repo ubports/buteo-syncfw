@@ -5,7 +5,8 @@ TEMPLATE = subdirs
 SUBDIRS += libbuteosyncfw \
            msyncd \
            unittests \
-	   doc
+	   doc \
+	   tools
 
 QT += testlib
 

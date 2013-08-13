@@ -1,4 +1,4 @@
-TEMPLATE=lib
+TEMPLATE=subdirs
 
 OTHER_FILES += \
     clientplugin.h.tmpl \
