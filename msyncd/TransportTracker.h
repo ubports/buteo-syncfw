@@ -28,9 +28,8 @@
 #include <QObject>
 #include <QMap>
 #include <QMutex>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <QDeviceInfo>
-#else
+#include <QDBusVariant>
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #include <QtSystemInfo/QSystemDeviceInfo>
 #endif
 
@@ -93,7 +92,11 @@ private slots:
 
         void onUsbStateChanged(bool aConnected);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     void onBtStateChanged(bool aState);
+#else
+    void onBtStateChanged(QString aKey, QDBusVariant aValue);
+#endif
 
     void onInternetStateChanged(bool aConnected);
 
@@ -103,9 +106,7 @@ private:
 
     USBModedProxy *iUSBProxy;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    QDeviceInfo iDeviceInfo;
-#else
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QtMobility::QSystemDeviceInfo iDeviceInfo;
 #endif
 
@@ -124,6 +125,8 @@ private:
     friend class TransportTrackerTest;
     friend class SynchronizerTest;
 #endif
+    
+    bool btConnectivityStatus();
 
 };
 
