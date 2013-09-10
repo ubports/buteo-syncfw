@@ -1,10 +1,10 @@
 [Unit]
 Description=Sync FW daemon
-Requires=dbus.socket
-After=pre-user-session.target
+Requires=dbus.socket booster-qt5.service
+After=pre-user-session.target booster-qt5.service
 
 [Service]
-ExecStart=/usr/bin/msyncd
+ExecStart=/usr/bin/invoker -s --type=qt5 /usr/bin/msyncd
 Restart=always
 
 [Install]
