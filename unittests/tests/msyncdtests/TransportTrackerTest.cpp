@@ -26,6 +26,7 @@
 #include <SyncCommonDefs.h>
 #include <QtTest/QtTest>
 #include <QSignalSpy>
+#include <QDBusVariant>
 #include "SyncFwTestLoader.h"
 
 using namespace Buteo;
@@ -96,10 +97,12 @@ void TransportTrackerTest :: testStateChanged()
     // change BT state and verify
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     bool setBTState = false;
+    QDBusVariant v(QVariant(true));
+    iTransportTracker->onBtStateChanged("Powered", v);
 #else
     bool setBTState = iTransportTracker->iDeviceInfo.currentBluetoothPowerState();
-#endif
     iTransportTracker->onBtStateChanged(setBTState);
+#endif
     QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT), setBTState);
 
 
