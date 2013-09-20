@@ -96,6 +96,7 @@ const QString KEY_NOTES_UUID("notes_uuid");
 const QString KEY_STORAGE_UPDATED("storage_updated");
 const QString KEY_HTTP_PROXY_HOST("http_proxy_host");
 const QString KEY_HTTP_PROXY_PORT("http_proxy_port");
+const QString KEY_PROFILE_ID("profile_id");
 
 const QString BOOLEAN_TRUE("true");
 const QString BOOLEAN_FALSE("false");
