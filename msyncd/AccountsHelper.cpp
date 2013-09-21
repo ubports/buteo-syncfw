@@ -337,12 +337,16 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
         account->selectService(service);
         LOG_DEBUG("Service:: " << service.displayName() << "enabled status::" << account->enabled());
         // Set profile as enabled
-        newProfile->setEnabled(account->enabled());
+        newProfile->setEnabled(true);
         account->selectService();
         setSyncSchedule (newProfile, account->id(), true);
 
         // Save the newly created profile
         iProfileManager.updateProfile(*newProfile);
+
+        account->setValue(KEY_PROFILE_ID, newProfile->name());
+        account->sync();
+
         emit scheduleUpdated(newProfile->name());
         if(newProfile->isSOCProfile())
         {
