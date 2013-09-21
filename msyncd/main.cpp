@@ -64,7 +64,7 @@ void setLogLevelFromFile()
     }
 }
 
-int main( int argc, char* argv[] )
+Q_DECL_EXPORT int main( int argc, char* argv[] )
 {
     // remove this later on if not needed in harmattan,
     // this IS needed for fremantle
