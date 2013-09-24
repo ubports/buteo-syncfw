@@ -4,7 +4,9 @@ Requires=dbus.socket booster-qt5.service
 After=pre-user-session.target booster-qt5.service
 
 [Service]
-ExecStart=/usr/bin/invoker -s --type=qt5 /usr/bin/msyncd
+# -G (--global-syms) so that msyncd's plugins can find symbols in msyncd and
+#     in the libraries msyncd is linked to.
+ExecStart=/usr/bin/invoker -G -s --type=qt5 /usr/bin/msyncd
 Restart=always
 
 [Install]
