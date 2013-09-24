@@ -15,6 +15,6 @@ echo "$RESULT is return value of executing ${1}" >> /tmp/$FILE.out
 grep "Totals:" /tmp/$FILE.out >/tmp/$FILE.cmp
 
 # Exit with the same code as the test binary
-#exit $RESULT
+exit $RESULT
 # Exit always with zero until problems in CI environment are resolved
-exit 0
+#exit 0
