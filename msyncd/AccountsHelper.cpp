@@ -345,7 +345,7 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
         iProfileManager.updateProfile(*newProfile);
 
         account->setValue(KEY_PROFILE_ID, newProfile->name());
-        account->sync();
+        account->syncAndBlock();
 
         emit scheduleUpdated(newProfile->name());
         if(newProfile->isSOCProfile())
