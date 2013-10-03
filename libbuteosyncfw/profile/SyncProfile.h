@@ -99,6 +99,22 @@ public:
         CR_POLICY_UNDEFINED
     };
 
+    //! Current status enum
+    enum CurrentSyncStatus
+    {
+        //! NOT_SYNCED - no sync has been done for the profile yet
+        SYNC_NEVER_HAPPENED,
+
+        //! SYNC_SUCCESS - the last sync has been successful
+        SYNC_SUCCESS,
+
+        //! SYNC_FAILED - the last sync has failed
+        SYNC_FAILED,
+
+        //! SYNC_CANCELLED - the last sync has been cancelled
+        SYNC_CANCLLED
+    };
+
     /*! \brief Constructs an empty SyncProfile with the given name.
      *
      * \param aName Name of the profile to create.
@@ -317,6 +333,15 @@ public:
 
     bool hasRetries() const;
     QList<quint32> retryIntervals() const;
+
+    /*! \brief Gives the current status of the sync as an enum value
+     *  If the current status of ongoing syncs is required, check the 
+     * d-bus API "runningSyncs" which returns the list of currently running
+     * sync sessions. The current sync sessions cannot be part of a profiel,
+     *
+     * @return CurrentSyncStatus
+     */
+    CurrentSyncStatus currentSyncStatus() const;
 
 private:
 
