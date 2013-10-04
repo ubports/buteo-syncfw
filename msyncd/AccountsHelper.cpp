@@ -134,6 +134,7 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
                         changedAccount->selectService(service);
                         bool serviceEnabled = changedAccount->enabled();
                         changedAccount->selectService();
+                        addSetting(changedAccount->id(), KEY_PROFILE_ID, QVariant(profile->name()));
                         LOG_DEBUG("Enabled status for service ::" << profile->name() << serviceEnabled);
                         if(serviceEnabled)
                         {
@@ -334,18 +335,13 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
         // Add the account ID to the profile
         newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
         // Check if service is enabled
-        account->selectService(service);
         LOG_DEBUG("Service:: " << service.displayName() << "enabled status::" << account->enabled());
         // Set profile as enabled
-        newProfile->setEnabled(true);
-        account->selectService();
+        newProfile->setEnabled(account->enabled());
         setSyncSchedule (newProfile, account->id(), true);
 
         // Save the newly created profile
         iProfileManager.updateProfile(*newProfile);
-
-        account->setValue(KEY_PROFILE_ID, newProfile->name());
-        account->syncAndBlock();
 
         emit scheduleUpdated(newProfile->name());
         if(newProfile->isSOCProfile())
@@ -369,6 +365,21 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
     if(0 != profile)
     {
         delete profile;
+    }
+}
+
+void AccountsHelper::addSetting(Accounts::AccountId id, QString key, QVariant value) {
+    FUNCTION_CALL_TRACE;
+
+    LOG_DEBUG("Account Id " << id << "   Key = " << key << "  Value = " << value);
+    Accounts::Account* account = iAccountManager->account(id);
+    if (account != NULL) {
+        account->setValue(key, value);
+        bool success = account->syncAndBlock();
+        if (!success) {
+            LOG_WARNING("Could not save settings to Account : Reason = " << iAccountManager->lastError().message());
+        }
+        delete account;
     }
 }
 
