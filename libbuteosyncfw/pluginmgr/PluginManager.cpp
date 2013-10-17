@@ -50,6 +50,9 @@ PluginManager::PluginManager( const QString &aPluginPath )
     loadPluginMaps( STORAGEMAP_LOCATION, iStorageMaps );
     loadPluginMaps( CLIENTMAP_LOCATION, iClientMaps );
     loadPluginMaps( SERVERMAP_LOCATION, iServerMaps );
+
+    loadPluginMaps( OOP_CLIENT_SUFFIX, iOopClientMaps);
+    loadPluginMaps( OOP_SERVER_SUFFIX, iOoPServerMaps);
 }
 
 PluginManager::~PluginManager()
@@ -235,41 +238,47 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
 
     FUNCTION_CALL_TRACE;
 
-    if( ! iClientMaps.contains(aPluginName) )
+    if( ! iClientMaps.contains(aPluginName) ||
+        ! iOopClientMaps.contains(aPluginName))
     {
         LOG_CRITICAL( "Library for the client" << aPluginName << "does not exist" );
         return NULL;
     }
 
-    QString libraryName = iClientMaps.value(aPluginName);
-
-    void* handle = loadDll( libraryName );
-
-    if( !handle ) {
-        return NULL;
-    }
-
-    FUNC_CREATE_CLIENT clientPointer = (FUNC_CREATE_CLIENT)dlsym( handle,
-                                        CREATE_FUNCTION.toStdString().c_str() );
-
-    if( dlerror() )
+    if ( iClientMaps.contains(aPluginName) )
     {
-        LOG_CRITICAL( "Library" << libraryName << "does not have a create function" );
-        unloadDll( libraryName );
-        return NULL;
-    }
+        QString libraryName = iClientMaps.value(aPluginName);
 
-    ClientPlugin* plugin = (*clientPointer)( aPluginName, aProfile, aCbInterface );
+        void* handle = loadDll( libraryName );
 
-    if( plugin ) {
-        return plugin;
-    }
-    else {
-        LOG_CRITICAL( "Could not create plugin instance" );
-        unloadDll( libraryName );
-        return NULL;
-    }
+        if( !handle ) {
+            return NULL;
+        }
 
+        FUNC_CREATE_CLIENT clientPointer = (FUNC_CREATE_CLIENT)dlsym( handle,
+                                            CREATE_FUNCTION.toStdString().c_str() );
+
+        if( dlerror() )
+        {
+            LOG_CRITICAL( "Library" << libraryName << "does not have a create function" );
+            unloadDll( libraryName );
+            return NULL;
+        }
+
+        ClientPlugin* plugin = (*clientPointer)( aPluginName, aProfile, aCbInterface );
+
+        if( plugin ) {
+            return plugin;
+        }
+        else {
+            LOG_CRITICAL( "Could not create plugin instance" );
+            unloadDll( libraryName );
+            return NULL;
+        }
+    } else if ( iOopClientMaps.contains(aPluginName) )
+    {
+        // Start the out of process plugin
+    }
 }
 
 void PluginManager::destroyClient( ClientPlugin *aPlugin )
@@ -281,33 +290,39 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
 
     QString pluginName = aPlugin->getPluginName();
 
-    if ( ! iClientMaps.contains(pluginName) ) {
+    if ( ! iClientMaps.contains(pluginName) ||
+         ! iOopClientMaps.contains(pluginName)) {
         LOG_CRITICAL( "Library for the client plugin" << pluginName << "does not exist" );
         return;
     }
 
-    QString path = iClientMaps.value(pluginName);
+    if ( iClientMaps.contains(pluginName) )
+    {
+        QString path = iClientMaps.value(pluginName);
 
-    void* handle = getDllHandle( path );
+        void* handle = getDllHandle( path );
 
-    if( !handle ) {
-        LOG_CRITICAL( "Could not find library for client plugin" << pluginName );
-        return;
+        if( !handle ) {
+            LOG_CRITICAL( "Could not find library for client plugin" << pluginName );
+            return;
+        }
+
+        FUNC_DESTROY_CLIENT clientDestroyer = (FUNC_DESTROY_CLIENT)dlsym(
+                                               handle,
+                                               DESTROY_FUNCTION.toStdString().c_str() );
+
+        if (dlerror()) {
+            unloadDll( path );
+            LOG_CRITICAL( "Library" << path << "does not have a destroy function" );
+        }
+        else {
+            (*clientDestroyer)(aPlugin);
+            unloadDll( path );
+        }
+    } else if ( iOopClientMaps.contains(pluginName) )
+    {
+        // Stop the OOP process
     }
-
-    FUNC_DESTROY_CLIENT clientDestroyer = (FUNC_DESTROY_CLIENT)dlsym(
-                                           handle,
-                                           DESTROY_FUNCTION.toStdString().c_str() );
-
-    if (dlerror()) {
-        unloadDll( path );
-        LOG_CRITICAL( "Library" << path << "does not have a destroy function" );
-    }
-    else {
-        (*clientDestroyer)(aPlugin);
-        unloadDll( path );
-    }
-
 }
 
 ServerPlugin* PluginManager::createServer( const QString& aPluginName,
@@ -316,42 +331,49 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
 {
     FUNCTION_CALL_TRACE;
 
-    if( ! iServerMaps.contains(aPluginName) )
+    if( ! iServerMaps.contains(aPluginName) ||
+        ! iOoPServerMaps.contains(aPluginName) )
     {
         LOG_CRITICAL( "Library for the server" << aPluginName << "does not exist" );
         return NULL;
     }
 
-    QString libraryName = iServerMaps.value(aPluginName);
-
-    void* handle = loadDll( libraryName );
-
-    if( !handle ) {
-        LOG_CRITICAL("Loading library failed");
-        return NULL;
-    }
-
-    FUNC_CREATE_SERVER serverPointer = (FUNC_CREATE_SERVER)dlsym( handle,
-                                        CREATE_FUNCTION.toStdString().c_str());
-
-    if( dlerror() )
+    if ( iServerMaps.contains(aPluginName) )
     {
-        LOG_CRITICAL( "Library" << libraryName << "does not have a create function" );
-        unloadDll( libraryName );
-        return NULL;
-    }
+        // Load the plugin library
+        QString libraryName = iServerMaps.value(aPluginName);
 
-    ServerPlugin* plugin = (*serverPointer)( aPluginName, aProfile, aCbInterface );
+        void* handle = loadDll( libraryName );
 
-    if( plugin ) {
-        return plugin;
-    }
-    else {
-        LOG_CRITICAL( "Could not create plugin instance" );
-        unloadDll( libraryName );
-        return NULL;
-    }
+        if( !handle ) {
+            LOG_CRITICAL("Loading library failed");
+            return NULL;
+        }
 
+        FUNC_CREATE_SERVER serverPointer = (FUNC_CREATE_SERVER)dlsym( handle,
+                                            CREATE_FUNCTION.toStdString().c_str());
+
+        if( dlerror() )
+        {
+            LOG_CRITICAL( "Library" << libraryName << "does not have a create function" );
+            unloadDll( libraryName );
+            return NULL;
+        }
+
+        ServerPlugin* plugin = (*serverPointer)( aPluginName, aProfile, aCbInterface );
+
+        if( plugin ) {
+            return plugin;
+        }
+        else {
+            LOG_CRITICAL( "Could not create plugin instance" );
+            unloadDll( libraryName );
+            return NULL;
+        }
+    } else if ( iOoPServerMaps.contains(aPluginName) )
+    {
+        // Start the Oop process plugin
+    }
 }
 
 void PluginManager::destroyServer( ServerPlugin *aPlugin )
@@ -363,31 +385,39 @@ void PluginManager::destroyServer( ServerPlugin *aPlugin )
     
     QString pluginName = aPlugin->getPluginName();
 
-    if ( ! iServerMaps.contains(pluginName) ) {
+    if ( ! iServerMaps.contains(pluginName) ||
+         ! iOoPServerMaps.contains(pluginName) ) {
         LOG_CRITICAL( "Library for the server plugin" << pluginName << "does not exist" );
         return;
     }
 
-    QString path = iServerMaps.value(pluginName);
+    if ( iServerMaps.contains(pluginName) )
+    {
+        // Unload the server plugin library
+        QString path = iServerMaps.value(pluginName);
 
-    void* handle = getDllHandle( path );
+        void* handle = getDllHandle( path );
 
-    if( !handle ) {
-        LOG_CRITICAL( "Could not find library for server plugin" << pluginName );
-        return;
-    }
+        if( !handle ) {
+            LOG_CRITICAL( "Could not find library for server plugin" << pluginName );
+            return;
+        }
 
-    FUNC_DESTROY_SERVER serverDestroyer = (FUNC_DESTROY_SERVER)dlsym(
-                                           handle,
-                                           DESTROY_FUNCTION.toStdString().c_str());
+        FUNC_DESTROY_SERVER serverDestroyer = (FUNC_DESTROY_SERVER)dlsym(
+                                               handle,
+                                               DESTROY_FUNCTION.toStdString().c_str());
 
-    if (dlerror()) {
-        unloadDll( path );
-        LOG_CRITICAL( "Library" << path << "does not have a destroy function" );
-    }
-    else {
-        (*serverDestroyer)(aPlugin);
-        unloadDll( path );
+        if (dlerror()) {
+            unloadDll( path );
+            LOG_CRITICAL( "Library" << path << "does not have a destroy function" );
+        }
+        else {
+            (*serverDestroyer)(aPlugin);
+            unloadDll( path );
+        }
+    } else if ( iOoPServerMaps.contains(pluginName) )
+    {
+        // Stop the OOP server process
     }
 }
 

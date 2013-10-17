@@ -47,6 +47,11 @@ const QString CLIENTMAP_LOCATION = "-client.so";
 const QString SERVERMAP_LOCATION = "-server.so";
 const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
 
+// OOP plugins binary name suffix
+const QString OOP_CLIENT_SUFFIX = "-client";
+const QString OOP_SERVER_SUFFIX = "-server";
+const QString DEFAULT_OOP_PATH = "/usr/lib/buteo-plugins-qt5/oopp";
+
 // Default directory from which to look for plugins
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/";
@@ -181,6 +186,9 @@ private:
     QMap<QString, QString>  iStorageMaps;
     QMap<QString, QString>  iClientMaps;
     QMap<QString, QString>  iServerMaps;
+
+    QMap<QString, QString>  iOopClientMaps;
+    QMap<QString, QString>  iOoPServerMaps;
 
     QList<DllInfo>          iLoadedDlls;
 
