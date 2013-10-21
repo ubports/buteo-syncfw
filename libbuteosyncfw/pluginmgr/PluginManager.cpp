@@ -24,6 +24,7 @@
 #include "PluginManager.h"
 
 #include <QDir>
+#include <QProcess>
 
 #include <dlfcn.h>
 
@@ -37,7 +38,7 @@
 using namespace Buteo;
 
 PluginManager::PluginManager( const QString &aPluginPath )
- : iPluginPath( aPluginPath )
+ : iPluginPath( aPluginPath ), iProcess(0)
 {
     FUNCTION_CALL_TRACE;
     
@@ -278,6 +279,18 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
     } else if ( iOopClientMaps.contains(aPluginName) )
     {
         // Start the out of process plugin
+        QString exePath = iOopClientMaps.value( aPluginName );
+
+        bool procStarted = startOOPPlugin( exePath );
+
+        if( procStarted == false ) {
+            LOG_CRITICAL( "Could not start process" );
+            stopOOPPlugin (aPluginName);
+            return NULL;
+        }
+
+        // Create the client plugin interface to talk to the process
+        
     }
 }
 
@@ -543,4 +556,123 @@ KLUDGE: Due to NB #169065, crashes are seen in QMetaType if we unload DLLs. Henc
 
     iDllLock.unlock();
 
+}
+
+bool PluginManager::startOOPPlugin( const QString &aPath )
+{
+    FUNCTION_CALL_TRACE;
+    bool started = false;
+    iDllLock.lockForWrite();
+
+    LOG_DEBUG( "Searching for oop plugin " << aPath);
+    
+    for( int i = 0; i < iLoadedDlls.count(); ++i )
+    {
+        if ( iLoadedDlls[i].iPath == aPath )
+        {
+            iProcess = (QProcess*)iLoadedDlls[i].iHandle;
+            ++iLoadedDlls[i].iRefCount;
+        }
+    }
+
+    // If process is not running, then start it
+    if( !iProcess )
+    {
+        iProcBinaryPath = aPath;
+        iProcess = new QProcess();
+        LOG_DEBUG( "Starting process " << aPath );
+        
+        /*
+        QObject::connect( iProcess, SIGNAL(started()),
+                          this, SLOT(onProcessStarted()) );
+        QObject::connect( iProcess, SIGNAL(error(QProcess::ProcessError)),
+                          this, SLOT(onProcessError(QProcess::ProcessError)) );
+        QObject::connect( iProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
+                          this, SLOT(onProcessFinished(int,QProcess::ExitStatus)) );
+        */
+
+        iProcess->startDetached( aPath );
+        bool state = iProcess->waitForStarted();
+        if (state == true)
+        {
+            DllInfo info;
+    	    info.iPath = iProcBinaryPath;
+    	    info.iHandle = (void*)iProcess;
+    	    info.iRefCount = 1;
+
+    	    iLoadedDlls.append( info );
+            started = true;
+
+        } else {
+            LOG_CRITICAL( "Unable to start process plugin " << aPath <<
+                          ". Error " << iProcess->error());
+        }
+    }
+
+    iDllLock.unlock();
+    return started;
+}
+
+void PluginManager::stopOOPPlugin( const QString &aPath )
+{
+    FUNCTION_CALL_TRACE;
+
+    iDllLock.lockForWrite();
+
+    for( int i = 0; i < iLoadedDlls.count(); ++i )
+    {
+        if( iLoadedDlls[i].iPath == aPath ) {
+            // Stop the process using the handle
+            QProcess *proc = (QProcess*)iLoadedDlls[i].iHandle; 
+            proc->terminate();
+            if (proc->waitForFinished() == false)
+                proc->kill();
+            break;
+        }
+    }
+
+    iDllLock.unlock();
+}
+
+void PluginManager::onProcessStarted()
+{
+    FUNCTION_CALL_TRACE;
+
+    DllInfo info;
+    info.iPath = iProcBinaryPath;
+    info.iHandle = iProcess;
+    info.iRefCount = 1;
+
+    iLoadedDlls.append( info );
+}
+
+void PluginManager::onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus )
+{
+    FUNCTION_CALL_TRACE;
+
+    iDllLock.lockForWrite();
+
+#if 0
+    QProcess *proc = (QProcess*)QObject::sender();
+    if ( proc )
+    {
+        for( int i=0; i < iLoadedDlls.count(); ++i ) {
+            if( iLoadedDlls[i].iPath == proc->program()) {
+                --iLoadedDlls[i].iRefCount;
+                if( iLoadedDlls[i].iRefCount == 0 ) {
+                    proc->terminate();
+                    iLoadedDlls.removeAt( i );
+                }
+                break;
+            }
+        }
+    }
+#endif
+}
+
+void PluginManager::onProcessError( QProcess::ProcessError procError )
+{
+    FUNCTION_CALL_TRACE;
+
+    LOG_CRITICAL( "Unable to start process ");
 }
