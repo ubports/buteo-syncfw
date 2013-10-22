@@ -28,7 +28,6 @@
 
 #include "SyncFwTestLoader.h"
 #include "ProfileEngineDefs.h"
-#include "Logger.h"
 
 using namespace Buteo;
 
@@ -36,12 +35,10 @@ static const QString PROFILE_DIR = "syncprofiletests/testprofiles/user";
 
 void ProfileTest::initTestCase()
 {
-    //Logger::createInstance();
 }
 
 void ProfileTest::cleanupTestCase()
 {
-    //Logger::deleteInstance();
 }
 
 void ProfileTest::testConstruction()
