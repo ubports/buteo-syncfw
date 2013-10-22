@@ -24,7 +24,6 @@
 #include "ClientPluginRunnerTest.h"
 #include "PluginManager.h"
 #include "synchronizer.h"
-#include "Logger.h"
 #include "ClientThread.h"
 
 using namespace Buteo;
@@ -39,7 +38,6 @@ void ClientPluginRunnerTest::initTestCase()
 	iPluginCbIf =  new Synchronizer(NULL);
 	iClientPrunner = new ClientPluginRunner(PLUGIN,iSprofile, iPluginMgr,
 						iPluginCbIf, NULL);
-	//Logger::createInstance();
 }
 void ClientPluginRunnerTest::cleanupTestCase()
 {
@@ -56,7 +54,6 @@ void ClientPluginRunnerTest::cleanupTestCase()
 	iPluginMgr = 0;
 	iPluginCbIf = 0;
 	iClientPrunner = 0;
-	//Logger::deleteInstance();
 }
 void ClientPluginRunnerTest::testCpluginRunnerConstructor()
 {

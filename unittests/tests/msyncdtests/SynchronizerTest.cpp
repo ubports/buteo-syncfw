@@ -22,7 +22,6 @@
  */
 #include "SyncFwTestLoader.h"
 #include "SynchronizerTest.h"
-#include "Logger.h"
 #include "TransportTracker.h"
 #include "ServerActivator.h"
 #include "ServerPluginRunner.h"
@@ -37,8 +36,6 @@ void SynchronizerTest::initTestCase()
 	iProfileQ = new SyncProfile("Profile1");
 	iSyncSession = new SyncSession(iProfile, NULL);
 	iSyncSessionQ = new SyncSession(iProfileQ, NULL);
-	
-    //Logger::createInstance();
 }
 void SynchronizerTest::cleanupTestCase()
 {
@@ -57,7 +54,6 @@ void SynchronizerTest::cleanupTestCase()
 	iSync = 0;
 	iSyncSession = 0;
 	iSyncSessionQ = 0;
-    //Logger::deleteInstance();
 }
 void SynchronizerTest::testSyncConstructor()
 {

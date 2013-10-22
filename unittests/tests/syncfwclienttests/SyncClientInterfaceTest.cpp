@@ -23,7 +23,6 @@
 #include "SyncFwTestLoader.h"
 #include "SyncClientInterfaceTest.h"
 #include "synchronizer.h"
-#include "Logger.h"
 #include "Profile.h"
 #include "SyncSchedule.h"
 #include "SyncProfile.h"

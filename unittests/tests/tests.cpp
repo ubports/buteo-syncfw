@@ -24,7 +24,6 @@
 #include <QCoreApplication>
 #include <QtTest>
 #include "SyncFwTestRunner.h"
-#include "Logger.h"
 
 int main(int argc, char* argv[])
 {

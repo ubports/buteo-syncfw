@@ -24,7 +24,6 @@
 #include "SyncFwTestLoader.h"
 #include "ServerThreadTest.h"
 #include "PluginManager.h"
-#include "Logger.h"
 
 using namespace Buteo;
 
@@ -88,8 +87,6 @@ void ServerThreadTest::initTestCase()
 	iServerThread = new ServerThread();
 	iPluginDerived = new ServerPluginDerived(PGNAME, *iProfile, NULL);
 	iThreadTestSp = iPluginDerived;
-	
-	//Logger::createInstance();
 }
 void ServerThreadTest::cleanupTestCase()
 {
@@ -104,8 +101,6 @@ void ServerThreadTest::cleanupTestCase()
 	iPluginDerived = 0;
 	iServerThread = 0;
 	iThreadTestSp = 0;
-
-	//Logger::deleteInstance();
 }
 void ServerThreadTest::testServerThreadConstructor()
 {

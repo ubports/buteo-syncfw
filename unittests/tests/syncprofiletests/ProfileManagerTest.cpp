@@ -27,7 +27,6 @@
 #include "StorageProfile.h"
 #include "SyncResults.h"
 
-#include <Logger.h>
 #include <QScopedPointer>
 #include <QFile>
 
@@ -44,13 +43,11 @@ static const QString SYSTEMPROFILE_DIR = "syncprofiletests/testprofiles/system";
 
 void ProfileManagerTest::initTestCase()
 {
-    //Logger::createInstance();
 }
 
 
 void ProfileManagerTest::cleanupTestCase()
 {
-    //Logger::deleteInstance();
 }
 
 

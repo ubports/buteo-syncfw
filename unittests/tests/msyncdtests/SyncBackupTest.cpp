@@ -22,7 +22,6 @@
  */
 #include "SyncFwTestLoader.h"
 #include "SyncBackupTest.h"
-#include "Logger.h"
 
 #include <QDBusMessage>
 

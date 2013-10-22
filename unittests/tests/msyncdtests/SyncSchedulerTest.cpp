@@ -25,7 +25,6 @@
 #include "SyncProfile.h"
 #include <ctime>
 #include "SyncFwTestLoader.h"
-#include "Logger.h"
 
 using namespace Buteo;
 
