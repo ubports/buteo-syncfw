@@ -48,7 +48,9 @@ HEADERS += common/Logger.h \
            profile/SyncResults.h \
            profile/SyncSchedule.h \
            profile/SyncSchedule_p.h \
-           profile/TargetResults.h
+           profile/TargetResults.h \
+    pluginmgr/OOPClientPlugin.h \
+    pluginmgr/OOPServerPlugin.h
 SOURCES += common/Logger.cpp \
            common/SyncDBusConnection.cpp \
            clientfw/SyncClientInterface.cpp \
@@ -74,7 +76,9 @@ SOURCES += common/Logger.cpp \
            profile/SyncProfile.cpp \
            profile/SyncResults.cpp \
            profile/SyncSchedule.cpp \
-           profile/TargetResults.cpp
+           profile/TargetResults.cpp \
+    pluginmgr/OOPClientPlugin.cpp \
+    pluginmgr/OOPServerPlugin.cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \
