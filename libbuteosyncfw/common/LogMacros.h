@@ -37,20 +37,29 @@
 
 //! Macros for writing log messages. Use these.
 //! Messages with level below warning are enabled only in debug builds.
-#define LOG_FATAL(msg) LOG_MSG_L(QtFatalMsg, msg)
-#define LOG_CRITICAL(msg) LOG_MSG_L(QtCriticalMsg, msg)
-#define LOG_WARNING(msg) LOG_MSG_L(QtWarningMsg, msg)
-#define LOG_PROTOCOL(msg) LOG_MSG_L(QtDebugMsg, msg)
-#define LOG_INFO(msg) LOG_MSG_L(QtDebugMsg, msg)
-#define LOG_DEBUG(msg) LOG_MSG_L(QtDebugMsg, msg)
-#define LOG_TRACE(msg) LOG_MSG_L(QtDebugMsg, msg)
-#define LOG_TRACE_PLAIN(msg) LOG_MSG_L_PLAIN(QtDebugMsg, msg)
+#define LOG_FATAL(msg) qFatal(msg)
+#define LOG_CRITICAL(msg) qCritical() << msg
+#define LOG_WARNING(msg) qWarning() << msg
 
-/*!
- * Creates a trace message to log when the function is entered and exited.
- * Logs also to time spent in the function.
- */
-#define FUNCTION_CALL_TRACE Buteo::LogTimer timerDebugVariable(QString(__PRETTY_FUNCTION__));
+#if defined(BUTEO_ENABLE_DEBUG)
+# define LOG_PROTOCOL(msg) qDebug() << msg
+# define LOG_INFO(msg) qDebug() << msg
+# define LOG_DEBUG(msg) qDebug() << msg
+# define LOG_TRACE(msg) qDebug() << msg
+# define LOG_TRACE_PLAIN(msg) qDebug() << msg
+ /*!
+  * Creates a trace message to log when the function is entered and exited.
+  * Logs also to time spent in the function.
+  */
+# define FUNCTION_CALL_TRACE Buteo::LogTimer timerDebugVariable(QString(__PRETTY_FUNCTION__));
+#else
+# define LOG_PROTOCOL(msg) if (false) qDebug() << msg
+# define LOG_INFO(msg) if (false) qDebug() << msg
+# define LOG_DEBUG(msg) if (false) qDebug() << msg
+# define LOG_TRACE(msg) if (false) qDebug() << msg
+# define LOG_TRACE_PLAIN(msg) if (false) qDebug() << msg
+# define FUNCTION_CALL_TRACE
+#endif
 
 namespace Buteo {
 
