@@ -77,7 +77,10 @@ Q_DECL_EXPORT int main( int argc, char* argv[] )
     QDBusConnection::sessionBus();
     QDBusConnection::systemBus();
 
-    setLogLevelFromFile();
+    // This could be enabled to log the output to file
+    // Disabling the output to file for now. To get the output, run msyncd from
+    // cmd-line
+    //setLogLevelFromFile();
 
     LOG_DEBUG("Starting Log At :"  << QDateTime::currentDateTime()  );
 
