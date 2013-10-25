@@ -2,6 +2,7 @@
 <node>
   <interface name="com.buteo.msyncd.baseplugin">
 
+    <!-- BEGIN: Common plugin methods -->
     <signal name="transferProgress">
       <arg name="aProfileName" type="s" direction="out"/>
       <arg name="aTransferDatabase" type="i" direction="out"/>
@@ -59,6 +60,35 @@
       <arg name="aType" type="i" direction="in"/>
       <arg name="aState" type="i" direction="in"/>
     </method>
+    <!-- END: Common plugin methods -->
+
+    <!-- BEGIN: Client plugin methods -->
+    <method name="startSync">
+    </method>
+
+    <method name="profile">
+      <arg type="s" direction="out"/> <!-- We will pass the SyncResults as an XML string and use constructor and toXml to perform serialization/deserialization -->
+    </method>
+    <!-- END: Client plugin methods -->
+
+    <!-- BEGIN: Server plugin methods -->
+    <signal name="newSession">
+      <arg name="aDestination" type="s" direction="out"/>
+    </signal>
+
+    <method name="startListen">
+      <arg type="b" direction="out"/>
+    </method>
+
+    <method name="stopListen">
+    </method>
+
+    <method name="suspend">
+    </method>
+
+    <method name="resume">
+    </method>
+    <!-- END: Server plugin methods -->
 
   </interface>
 </node>
