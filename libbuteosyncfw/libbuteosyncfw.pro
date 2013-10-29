@@ -32,7 +32,6 @@ HEADERS += common/Logger.h \
            pluginmgr/StorageItem.h \
            pluginmgr/StoragePlugin.h \
            pluginmgr/SyncPluginBase.h \
-           pluginmgr/BasePluginDBusAdaptor.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
@@ -49,9 +48,7 @@ HEADERS += common/Logger.h \
            profile/TargetResults.h \
            pluginmgr/OOPClientPlugin.h \
            pluginmgr/OOPServerPlugin.h \
-           pluginmgr/PluginServiceObj.h \
-           pluginmgr/ButeoPluginIf.h \
-           pluginmgr/ButeoPluginIfAdaptor.h
+           pluginmgr/ButeoPluginIf.h
 SOURCES += common/Logger.cpp \
            common/SyncDBusConnection.cpp \
            clientfw/SyncClientInterface.cpp \
@@ -77,10 +74,7 @@ SOURCES += common/Logger.cpp \
            profile/TargetResults.cpp \
            pluginmgr/OOPClientPlugin.cpp \
            pluginmgr/OOPServerPlugin.cpp \
-           pluginmgr/PluginServiceObj.cpp \
-           pluginmgr/ButeoPluginIf.cpp \
-           pluginmgr/ButeoPluginIfAdaptor.cpp \
-    pluginmgr/plugin_main.cpp
+           pluginmgr/ButeoPluginIf.cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \
@@ -99,6 +93,12 @@ target.path = /usr/lib/
 equals(QT_MAJOR_VERSION, 4): headers.path = /usr/include/buteosyncfw
 equals(QT_MAJOR_VERSION, 5): headers.path = /usr/include/buteosyncfw5
 
+sources.path = /usr/include/buteosyncfw5/
+
+sources.files = pluginmgr/plugin_main.cpp \
+                pluginmgr/PluginServiceObj.cpp \
+                pluginmgr/ButeoPluginIfAdaptor.cpp
+
 headers.files = common/Logger.h \
            common/LogMacros.h \
            common/SyncCommonDefs.h \
@@ -115,9 +115,8 @@ headers.files = common/Logger.h \
            pluginmgr/StorageItem.h \
            pluginmgr/StoragePlugin.h \
            pluginmgr/SyncPluginBase.h \
-	   pluginmgr/PluginServiceObj.h \
-	   pluginmgr/ButeoPluginIfAdaptor.h \
-	   pluginmgr/ButeoPluginIf.h \
+           pluginmgr/PluginServiceObj.h \
+           pluginmgr/ButeoPluginIfAdaptor.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
@@ -137,7 +136,7 @@ utility.path = /opt/tests/buteo-syncfw
 utility.files = ../bin/*.pl \
     ../bin/*.sh
 
-INSTALLS += target headers utility
+INSTALLS += target headers utility sources
 
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 QMAKE_PKGCONFIG_LIBDIR  = $$target.path

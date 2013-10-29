@@ -20,16 +20,61 @@
 * 02110-1301 USA
 */
 #include <QCoreApplication>
+#include <QDBusConnection>
 #include "PluginServiceObj.h"
 #include "ButeoPluginIfAdaptor.h"
 #include "LogMacros.h"
+
+#define DBUS_SERVICE_NAME_PREFIX "com.buteo.msyncd.plugin."
+#define DBUS_SERVICE_OBJ_PATH "/"
 
 int main( int argc, char** argv )
 {
     QCoreApplication app( argc, argv );
 
+    // We obtain the plugin name and the profile name from cmdline
+    // One way to pass the arguments is via cmdline, the other way is
+    // to use the method setPluginParams() dbus method. But setting
+    // cmdline arguments is probably cleaner
+    if( argv[1] == NULL ||
+        argv[2] == NULL )
+    {
+        LOG_FATAL( "Plugin name and profile name are not obtained from cmdline" );
+        app.exit( 1 );
+    }
+    QString pluginName = QString( argv[1] );
+    QString profileName = QString( argv[2] );
+
 #ifndef CLASSNAME
     LOG_FATAL( "CLASSNAME value not defined in project file" );
     app.exit( 2 );
 #endif
+
+    PluginServiceObj *serviceObj = new PluginServiceObj( pluginName, profileName );
+    if( !serviceObj ) {
+        LOG_FATAL( "Unable to create the service adaptor object" );
+        app.exit( 3 );
+    }
+
+    new ButeoPluginIfAdaptor( serviceObj );
+
+    // Create a session bus
+    QDBusConnection connection = QDBusConnection::sessionBus();
+    if( connection.registerService( DBUS_SERVICE_NAME_PREFIX + pluginName) == true ) {
+        if( connection.registerObject(DBUS_SERVICE_OBJ_PATH, serviceObj) == true ) {
+            LOG_DEBUG( "Plugin " << pluginName << " with profile "
+                       << profileName << " registered at dbus "
+                       << DBUS_SERVICE_NAME_PREFIX + pluginName
+                       << " and path " << DBUS_SERVICE_OBJ_PATH );
+        } else {
+            LOG_FATAL( "Unable to register service at path " << DBUS_SERVICE_OBJ_PATH );
+            app.exit( 4 );
+        }
+    } else {
+        LOG_FATAL( "Unable to register service at " << DBUS_SERVICE_NAME_PREFIX + pluginName );
+        app.exit( 4 );
+    }
+
+    // TODO: Should any unix signals be handled?
+    return app.exec();
 }
