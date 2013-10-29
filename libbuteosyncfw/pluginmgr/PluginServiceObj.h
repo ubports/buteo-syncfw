@@ -29,7 +29,9 @@ class PluginServiceObj : public QObject
 {
     Q_OBJECT
 public:
-    explicit PluginServiceObj(QObject *parent = 0);
+    explicit PluginServiceObj(const QString aProfileName,
+                              const QString aPluginName,
+                              QObject *parent = 0);
     virtual ~PluginServiceObj();
 
 public: // PROPERTIES
@@ -56,6 +58,9 @@ Q_SIGNALS: // SIGNALS
     void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
     void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType, int aCommittedItems);
     
+private:
+    QString    iProfile;
+    QString    iPluginName;
 };
 
 #endif // PLUGINSERVICEOBJ_H
