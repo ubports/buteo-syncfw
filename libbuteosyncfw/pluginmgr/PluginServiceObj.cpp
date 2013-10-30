@@ -42,7 +42,6 @@ PluginServiceObj::PluginServiceObj( QString aProfileName, QString aPluginName, Q
 
     // Create the plugin (client or server)
     iPlugin = new CLASSNAME( iPluginName, *iProfile, NULL );
-
 }
 
 PluginServiceObj::~PluginServiceObj()

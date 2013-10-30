@@ -187,7 +187,9 @@ private:
 
     void unloadDll( const QString& aPath );
 
-    bool startOOPPlugin( const QString& aPath );
+    bool startOOPPlugin( const QString& aPath,
+                         const QString& aPluginName,
+                         const QString& aProfileName );
 
     void stopOOPPlugin( const QString& aPath );
 
