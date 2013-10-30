@@ -54,8 +54,8 @@ PluginManager::PluginManager( const QString &aPluginPath )
     loadPluginMaps( CLIENTMAP_LOCATION, iClientMaps );
     loadPluginMaps( SERVERMAP_LOCATION, iServerMaps );
 
-    loadPluginMaps( OOP_CLIENT_SUFFIX, iOopClientMaps);
-    loadPluginMaps( OOP_SERVER_SUFFIX, iOoPServerMaps);
+    loadOOPPluginMaps( OOP_CLIENT_SUFFIX, iOopClientMaps );
+    loadOOPPluginMaps( OOP_SERVER_SUFFIX, iOoPServerMaps );
 }
 
 PluginManager::~PluginManager()
@@ -238,12 +238,10 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
                                            const SyncProfile& aProfile,
                                            PluginCbInterface *aCbInterface)
 {
-
     FUNCTION_CALL_TRACE;
 
-    if( ! iClientMaps.contains(aPluginName) ||
-        ! iOopClientMaps.contains(aPluginName))
-    {
+    if( ! iClientMaps.contains(aPluginName) &&
+        ! iOopClientMaps.contains(aPluginName)) {
         LOG_CRITICAL( "Library for the client" << aPluginName << "does not exist" );
         return NULL;
     }
@@ -488,12 +486,39 @@ void PluginManager::loadPluginMaps( const QString aFilter, QMap<QString, QString
 
         // Remove lib
         file.remove(0, 3);
+
         aTargetMap[file] = iPluginPath + (*listIterator);
         ++listIterator;
     }
 
 }
 
+void PluginManager::loadOOPPluginMaps( const QString aFilter, QMap<QString, QString> &aTargetMap )
+{
+    FUNCTION_CALL_TRACE;
+
+    QDir pluginDirectory( iPluginPath + "/oopp" );
+
+    QStringList entries = pluginDirectory.entryList( QDir::Files );
+
+    QStringList::const_iterator listIterator = entries.constBegin();
+    while (listIterator != entries.constEnd())
+    {
+        QString file = (*listIterator);
+
+        if (!file.endsWith(aFilter))
+        {
+            ++listIterator;
+            continue;
+        }
+        // Remove filter from end
+        file.chop( aFilter.length() );
+
+        aTargetMap[file] = iPluginPath + (*listIterator);
+        ++listIterator;
+    }
+
+}
 void* PluginManager::loadDll( const QString& aPath )
 {
     

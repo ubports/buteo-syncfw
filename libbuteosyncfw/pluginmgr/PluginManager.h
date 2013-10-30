@@ -51,11 +51,11 @@ const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
 // OOP plugins binary name suffix
 const QString OOP_CLIENT_SUFFIX = "-client";
 const QString OOP_SERVER_SUFFIX = "-server";
-const QString DEFAULT_OOP_PATH = "/usr/lib/buteo-plugins-qt5/oopp";
 
 // Default directory from which to look for plugins
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/";
+const QString DEFAULT_OOP_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/oopp";
 #else
 const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins/";
 #endif
@@ -180,6 +180,8 @@ private:
 
 
     void loadPluginMaps( const QString aFilter, QMap<QString, QString>& aTargetMap );
+
+    void loadOOPPluginMaps( const QString aFilter, QMap<QString, QString>& aTargetMap );
 
     void* loadDll( const QString& aPath );
 
