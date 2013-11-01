@@ -40,7 +40,7 @@
 using namespace Buteo;
 
 PluginManager::PluginManager( const QString &aPluginPath )
- : iPluginPath( aPluginPath ), iProcess(0)
+ : iPluginPath( aPluginPath )
 {
     FUNCTION_CALL_TRACE;
     
@@ -311,7 +311,7 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
 
     QString pluginName = aPlugin->getPluginName();
 
-    if ( ! iClientMaps.contains(pluginName) ||
+    if ( ! iClientMaps.contains(pluginName) &&
          ! iOopClientMaps.contains(pluginName)) {
         LOG_CRITICAL( "Library for the client plugin" << pluginName << "does not exist" );
         return;
@@ -354,7 +354,7 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
 {
     FUNCTION_CALL_TRACE;
 
-    if( ! iServerMaps.contains(aPluginName) ||
+    if( ! iServerMaps.contains(aPluginName) &&
         ! iOoPServerMaps.contains(aPluginName) )
     {
         LOG_CRITICAL( "Library for the server" << aPluginName << "does not exist" );
@@ -425,7 +425,7 @@ void PluginManager::destroyServer( ServerPlugin *aPlugin )
     
     QString pluginName = aPlugin->getPluginName();
 
-    if ( ! iServerMaps.contains(pluginName) ||
+    if ( ! iServerMaps.contains(pluginName) &&
          ! iOoPServerMaps.contains(pluginName) ) {
         LOG_CRITICAL( "Library for the server plugin" << pluginName << "does not exist" );
         return;
@@ -497,7 +497,7 @@ void PluginManager::loadOOPPluginMaps( const QString aFilter, QMap<QString, QStr
 {
     FUNCTION_CALL_TRACE;
 
-    QDir pluginDirectory( iPluginPath + "/oopp" );
+    QDir pluginDirectory( iPluginPath + QDir::separator() + "oopp" + QDir::separator());
 
     QStringList entries = pluginDirectory.entryList( QDir::Files );
 
@@ -514,7 +514,9 @@ void PluginManager::loadOOPPluginMaps( const QString aFilter, QMap<QString, QStr
         // Remove filter from end
         file.chop( aFilter.length() );
 
-        aTargetMap[file] = iPluginPath + (*listIterator);
+        aTargetMap[file] = iPluginPath +
+                           QDir::separator() + "oopp" + QDir::separator() +
+                           (*listIterator);
         ++listIterator;
     }
 
@@ -623,41 +625,35 @@ bool PluginManager::startOOPPlugin( const QString &aPath,
     iDllLock.lockForWrite();
 
     LOG_DEBUG( "Searching for oop plugin " << aPath);
-    
+    QProcess *process = NULL;
+ 
     for( int i = 0; i < iLoadedDlls.count(); ++i )
     {
         if ( iLoadedDlls[i].iPath == aPath )
         {
-            iProcess = (QProcess*)iLoadedDlls[i].iHandle;
+            process = (QProcess*)iLoadedDlls[i].iHandle;
             ++iLoadedDlls[i].iRefCount;
         }
     }
 
     // If process is not running, then start it
-    if( !iProcess )
+    if( !process )
     {
-        iProcBinaryPath = aPath;
-        iProcess = new QProcess();
         QStringList args;
         args << aPluginName << aProfileName;
         LOG_DEBUG( "Starting process " << aPath );
         
-        /*
-        QObject::connect( iProcess, SIGNAL(started()),
-                          this, SLOT(onProcessStarted()) );
-        QObject::connect( iProcess, SIGNAL(error(QProcess::ProcessError)),
-                          this, SLOT(onProcessError(QProcess::ProcessError)) );
-        QObject::connect( iProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
-                          this, SLOT(onProcessFinished(int,QProcess::ExitStatus)) );
-        */
-
-        iProcess->startDetached( aPath, args );
-        bool state = iProcess->waitForStarted();
-        if (state == true)
+        process = new QProcess();
+        process->start( aPath, args );
+        // This check is a workaround for the bug https://codereview.qt-project.org/#change,62897
+        if( process->state() == QProcess::Starting ) {
+            started = process->waitForStarted();
+        }
+        if (started == true)
         {
             DllInfo info;
-    	    info.iPath = iProcBinaryPath;
-    	    info.iHandle = (void*)iProcess;
+    	    info.iPath = aPath;
+    	    info.iHandle = (void*)process;
     	    info.iRefCount = 1;
 
     	    iLoadedDlls.append( info );
@@ -665,7 +661,7 @@ bool PluginManager::startOOPPlugin( const QString &aPath,
 
         } else {
             LOG_CRITICAL( "Unable to start process plugin " << aPath <<
-                          ". Error " << iProcess->error());
+                          ". Error " << process->error());
         }
     }
 
@@ -683,56 +679,13 @@ void PluginManager::stopOOPPlugin( const QString &aPath )
     {
         if( iLoadedDlls[i].iPath == aPath ) {
             // Stop the process using the handle
-            QProcess *proc = (QProcess*)iLoadedDlls[i].iHandle; 
-            proc->terminate();
-            if (proc->waitForFinished() == false)
-                proc->kill();
+            QProcess *process = (QProcess*)iLoadedDlls[i].iHandle; 
+            process->terminate();
+            if (process->waitForFinished() == false)
+                process->kill();
             break;
         }
     }
 
     iDllLock.unlock();
-}
-
-void PluginManager::onProcessStarted()
-{
-    FUNCTION_CALL_TRACE;
-
-    DllInfo info;
-    info.iPath = iProcBinaryPath;
-    info.iHandle = iProcess;
-    info.iRefCount = 1;
-
-    iLoadedDlls.append( info );
-}
-
-void PluginManager::onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus )
-{
-    FUNCTION_CALL_TRACE;
-
-    iDllLock.lockForWrite();
-
-#if 0
-    QProcess *proc = (QProcess*)QObject::sender();
-    if ( proc )
-    {
-        for( int i=0; i < iLoadedDlls.count(); ++i ) {
-            if( iLoadedDlls[i].iPath == proc->program()) {
-                --iLoadedDlls[i].iRefCount;
-                if( iLoadedDlls[i].iRefCount == 0 ) {
-                    proc->terminate();
-                    iLoadedDlls.removeAt( i );
-                }
-                break;
-            }
-        }
-    }
-#endif
-}
-
-void PluginManager::onProcessError( QProcess::ProcessError procError )
-{
-    FUNCTION_CALL_TRACE;
-
-    LOG_CRITICAL( "Unable to start process ");
 }

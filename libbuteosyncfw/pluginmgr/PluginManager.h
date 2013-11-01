@@ -209,8 +209,6 @@ private:
 
     QReadWriteLock          iDllLock;
 
-    QProcess                *iProcess;
-
     QString                 iProcBinaryPath;
 
 #ifdef SYNCFW_UNIT_TESTS
