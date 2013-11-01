@@ -56,7 +56,7 @@ int main( int argc, char** argv )
 
     // Create a session bus
     QDBusConnection connection = QDBusConnection::sessionBus();
-    if( connection.registerService( DBUS_SERVICE_NAME_PREFIX + pluginName) == true ) {
+    if( connection.registerService( DBUS_SERVICE_NAME_PREFIX + profileName) == true ) {
         if( connection.registerObject(DBUS_SERVICE_OBJ_PATH, serviceObj) == true ) {
             LOG_DEBUG( "Plugin " << pluginName << " with profile "
                        << profileName << " registered at dbus "

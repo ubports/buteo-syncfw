@@ -24,6 +24,8 @@
 
 #include <ClientPlugin.h>
 
+#include "ButeoPluginIf.h"
+
 namespace Buteo {
 
 class OOPClientPlugin : public ClientPlugin
@@ -52,6 +54,8 @@ public slots:
     virtual void connectivityStateChanged(Sync::ConnectivityType aType,
                                           bool aState);
 
+private:
+    ButeoPluginIf     *iOopClientIface;
 };
 
 }
