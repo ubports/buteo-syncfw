@@ -44,9 +44,11 @@
     </method>
 
     <method name="init">
+      <arg type="b" direction="out"/>
     </method>
 
     <method name="uninit">
+      <arg type="b" direction="out"/>
     </method>
 
     <method name="abortSync">
@@ -54,6 +56,7 @@
     </method>
 
     <method name="cleanUp">
+      <arg type="b" direction="out"/>
     </method>
 
     <method name="getSyncResults"> <!-- We will pass the SyncResults as an XML string and use constructor and toXml to perform serialization/deserialization -->

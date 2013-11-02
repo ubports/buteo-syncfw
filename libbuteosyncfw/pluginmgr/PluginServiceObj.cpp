@@ -68,11 +68,25 @@ void PluginServiceObj::setPluginParams(const QString &aPluginName,
     }
 }
 
+bool PluginServiceObj::init()
+{
+    return true;
+}
+
+bool PluginServiceObj::uninit()
+{
+    return true;
+}
+
+void PluginServiceObj::startSync()
+{
+}
+
 void PluginServiceObj::abortSync(uchar aStatus)
 {
 }
 
-void PluginServiceObj::cleanUp()
+bool PluginServiceObj::cleanUp()
 {
 }
 
@@ -92,10 +106,6 @@ QString PluginServiceObj::getSyncResults()
 {
 }
 
-void PluginServiceObj::init()
-{
-}
-
 QString PluginServiceObj::profile()
 {
 }
@@ -108,19 +118,11 @@ bool PluginServiceObj::startListen()
 {
 }
 
-void PluginServiceObj::startSync()
-{
-}
-
 void PluginServiceObj::stopListen()
 {
 }
 
 void PluginServiceObj::suspend()
-{
-}
-
-void PluginServiceObj::uninit()
 {
 }
 
