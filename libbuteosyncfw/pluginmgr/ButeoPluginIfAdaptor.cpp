@@ -47,10 +47,10 @@ bool ButeoPluginIfAdaptor::cleanUp()
     return out0;
 }
 
-void ButeoPluginIfAdaptor::connectivityStateChanged(int aType, int aState)
+void ButeoPluginIfAdaptor::connectivityStateChanged(int aType, bool aState)
 {
     // handle method call com.buteo.msyncd.baseplugin.connectivityStateChanged
-    QMetaObject::invokeMethod(parent(), "connectivityStateChanged", Q_ARG(int, aType), Q_ARG(int, aState));
+    QMetaObject::invokeMethod(parent(), "connectivityStateChanged", Q_ARG(int, aType), Q_ARG(bool, aState));
 }
 
 QString ButeoPluginIfAdaptor::getPluginName()
@@ -113,10 +113,12 @@ bool ButeoPluginIfAdaptor::startListen()
     return out0;
 }
 
-void ButeoPluginIfAdaptor::startSync()
+bool ButeoPluginIfAdaptor::startSync()
 {
     // handle method call com.buteo.msyncd.baseplugin.startSync
-    QMetaObject::invokeMethod(parent(), "startSync");
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "startSync", Q_RETURN_ARG(bool, out0));
+    return out0;
 }
 
 void ButeoPluginIfAdaptor::stopListen()

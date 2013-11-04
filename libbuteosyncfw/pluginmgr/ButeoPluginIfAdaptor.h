@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef BUTEOPLUGINIFADAPTOR_H_1383360577
-#define BUTEOPLUGINIFADAPTOR_H_1383360577
+#ifndef BUTEOPLUGINIFADAPTOR_H_1383575815
+#define BUTEOPLUGINIFADAPTOR_H_1383575815
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -82,9 +82,11 @@ class ButeoPluginIfAdaptor: public QDBusAbstractAdaptor
 "    </method>\n"
 "    <method name=\"connectivityStateChanged\">\n"
 "      <arg direction=\"in\" type=\"i\" name=\"aType\"/>\n"
-"      <arg direction=\"in\" type=\"i\" name=\"aState\"/>\n"
+"      <arg direction=\"in\" type=\"b\" name=\"aState\"/>\n"
 "    </method>\n"
-"    <method name=\"startSync\"/>\n"
+"    <method name=\"startSync\">\n"
+"      <arg direction=\"out\" type=\"b\"/>\n"
+"    </method>\n"
 "    <method name=\"profile\">\n"
 "      <arg direction=\"out\" type=\"s\"/>\n"
 "    </method>\n"
@@ -107,7 +109,7 @@ public: // PROPERTIES
 public Q_SLOTS: // METHODS
     void abortSync(uchar aStatus);
     bool cleanUp();
-    void connectivityStateChanged(int aType, int aState);
+    void connectivityStateChanged(int aType, bool aState);
     QString getPluginName();
     QString getProfileName();
     QString getSyncResults();
@@ -116,7 +118,7 @@ public Q_SLOTS: // METHODS
     void resume();
     void setPluginParams(const QString &aPluginName, const QString &aProfile);
     bool startListen();
-    void startSync();
+    bool startSync();
     void stopListen();
     void suspend();
     bool uninit();

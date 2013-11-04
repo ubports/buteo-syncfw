@@ -8,8 +8,8 @@
  * Do not edit! All changes made to it will be lost.
  */
 
-#ifndef BUTEOPLUGINIF_H_1383360535
-#define BUTEOPLUGINIF_H_1383360535
+#ifndef BUTEOPLUGINIF_H_1383575809
+#define BUTEOPLUGINIF_H_1383575809
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
@@ -49,7 +49,7 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QLatin1String("cleanUp"), argumentList);
     }
 
-    inline QDBusPendingReply<> connectivityStateChanged(int aType, int aState)
+    inline QDBusPendingReply<> connectivityStateChanged(int aType, bool aState)
     {
         QList<QVariant> argumentList;
         argumentList << QVariant::fromValue(aType) << QVariant::fromValue(aState);
@@ -105,7 +105,7 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QLatin1String("startListen"), argumentList);
     }
 
-    inline QDBusPendingReply<> startSync()
+    inline QDBusPendingReply<bool> startSync()
     {
         QList<QVariant> argumentList;
         return asyncCallWithArgumentList(QLatin1String("startSync"), argumentList);

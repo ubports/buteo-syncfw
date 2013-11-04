@@ -47,7 +47,7 @@ int main( int argc, char** argv )
     LOG_FATAL( "CLASSNAME value not defined in project file" );
 #endif
 
-    PluginServiceObj *serviceObj = new PluginServiceObj( pluginName, profileName );
+    PluginServiceObj *serviceObj = new PluginServiceObj( profileName, pluginName );
     if( !serviceObj ) {
         LOG_FATAL( "Unable to create the service adaptor object" );
     }
@@ -56,11 +56,11 @@ int main( int argc, char** argv )
 
     // Create a session bus
     QDBusConnection connection = QDBusConnection::sessionBus();
-    if( connection.registerService( DBUS_SERVICE_NAME_PREFIX + profileName) == true ) {
+    if( connection.registerService( DBUS_SERVICE_NAME_PREFIX + profileName ) == true ) {
         if( connection.registerObject(DBUS_SERVICE_OBJ_PATH, serviceObj) == true ) {
             LOG_DEBUG( "Plugin " << pluginName << " with profile "
                        << profileName << " registered at dbus "
-                       << DBUS_SERVICE_NAME_PREFIX + pluginName
+                       << DBUS_SERVICE_NAME_PREFIX + profileName
                        << " and path " << DBUS_SERVICE_OBJ_PATH );
         } else {
             LOG_FATAL( "Unable to register dbus service" );

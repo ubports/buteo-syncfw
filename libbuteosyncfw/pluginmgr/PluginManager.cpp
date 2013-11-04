@@ -644,8 +644,11 @@ bool PluginManager::startOOPPlugin( const QString &aPath,
         LOG_DEBUG( "Starting process " << aPath );
         
         process = new QProcess();
+        process->setProcessChannelMode( QProcess::ForwardedChannels );
         process->start( aPath, args );
+
         // This check is a workaround for the bug https://codereview.qt-project.org/#change,62897
+        QThread::msleep(200);         // The process state does not seem be in a proper state immediately
         if( process->state() == QProcess::Starting ) {
             started = process->waitForStarted();
         }
