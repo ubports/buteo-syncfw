@@ -21,7 +21,6 @@
 */
 #include "PluginServiceObj.h"
 #include <SyncResults.h>
-#include <SyncProfile.h>
 #include <ProfileManager.h>
 #include <LogMacros.h>
 #include <SyncCommonDefs.h>
@@ -34,7 +33,7 @@ PluginServiceObj::PluginServiceObj(QObject *parent) :
 }
 
 PluginServiceObj::PluginServiceObj( QString aProfileName, QString aPluginName, QObject *parent) :
-    QObject(parent), iProfile(0), iPlugin(0)
+    QObject(parent), iProfile(0), iPluginName(aPluginName), iPlugin(0)
 {
     ProfileManager pm;
     SyncProfile *syncProfile = pm.syncProfile( aProfileName );
@@ -43,7 +42,7 @@ PluginServiceObj::PluginServiceObj( QString aProfileName, QString aPluginName, Q
     }
 
     // Create the plugin (client or server)
-    iPlugin = new CLASSNAME( iPluginName, *iProfile, NULL );
+    iPlugin = new CLASSNAME( iPluginName, *iProfile, &iPluginCb );
 }
 
 PluginServiceObj::~PluginServiceObj()

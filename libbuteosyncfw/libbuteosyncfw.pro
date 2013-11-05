@@ -99,7 +99,8 @@ sources.path = /usr/include/buteosyncfw5/
 
 sources.files = pluginmgr/plugin_main.cpp \
                 pluginmgr/PluginServiceObj.cpp \
-                pluginmgr/ButeoPluginIfAdaptor.cpp
+                pluginmgr/ButeoPluginIfAdaptor.cpp \
+                pluginmgr/PluginCbImpl.cpp
 
 headers.files = common/Logger.h \
            common/LogMacros.h \
@@ -119,6 +120,7 @@ headers.files = common/Logger.h \
            pluginmgr/SyncPluginBase.h \
            pluginmgr/PluginServiceObj.h \
            pluginmgr/ButeoPluginIfAdaptor.h \
+           pluginmgr/PluginCbImpl.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
