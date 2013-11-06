@@ -27,9 +27,6 @@ using namespace Buteo;
 
 #include "LogMacros.h"
 
-#define DBUS_SERVICE_NAME_PREFIX "com.buteo.msyncd.plugin."
-#define DBUS_SERVICE_OBJ_PATH "/"
-
 OOPClientPlugin::OOPClientPlugin( const QString& aPluginName,
                                   const SyncProfile& aProfile,
                                   PluginCbInterface* aCbInterface) : 
@@ -38,40 +35,40 @@ OOPClientPlugin::OOPClientPlugin( const QString& aPluginName,
     FUNCTION_CALL_TRACE;
 
     // Initialise dbus for client
-    iOopClientIface = new ButeoPluginIf( DBUS_SERVICE_NAME_PREFIX + aProfile.name(),
+    iOopPluginIface = new ButeoPluginIf( DBUS_SERVICE_NAME_PREFIX + aProfile.name(),
                                          DBUS_SERVICE_OBJ_PATH,
                                          QDBusConnection::sessionBus()
                                        );
 
     // Chain the signals received over dbus
-    connect(iOopClientIface, SIGNAL(transferProgress(const QString &, int, int, const QString &, int)),
+    connect(iOopPluginIface, SIGNAL(transferProgress(const QString &, int, int, const QString &, int)),
         this, SIGNAL(transferProgress(const QString &, int, int, const QString &, int)));
 
-    connect(iOopClientIface, SIGNAL(error(const QString &, const QString &, int)),
+    connect(iOopPluginIface, SIGNAL(error(const QString &, const QString &, int)),
         this, SIGNAL(error(const QString &, const QString &, int)));
 
-    connect(iOopClientIface, SIGNAL(success(const QString &, const QString &)),
+    connect(iOopPluginIface, SIGNAL(success(const QString &, const QString &)),
         this, SIGNAL(success(const QString &, const QString &)));
 
-    connect(iOopClientIface, SIGNAL(accquiredStorage(const QString &)),
+    connect(iOopPluginIface, SIGNAL(accquiredStorage(const QString &)),
         this, SIGNAL(accquiredStorage(const QString &)));
 
-    connect(iOopClientIface,SIGNAL(syncProgressDetail(const QString &,int)),
+    connect(iOopPluginIface,SIGNAL(syncProgressDetail(const QString &,int)),
     		this ,SIGNAL(syncProgressDetail(const QString &,int)));
 }
 
 OOPClientPlugin::~OOPClientPlugin()
 {
-    if( iOopClientIface ) {
-        delete iOopClientIface;
-        iOopClientIface = 0;
+    if( iOopPluginIface ) {
+        delete iOopPluginIface;
+        iOopPluginIface = 0;
     }
 }
 
 bool OOPClientPlugin::init()
 {
     FUNCTION_CALL_TRACE;
-    QDBusReply<bool> reply = iOopClientIface->init();
+    QDBusReply<bool> reply = iOopPluginIface->init();
     if( !reply.isValid() ) {
         LOG_WARNING( "Invalid reply for init from plugin" );
         return false;
@@ -84,7 +81,7 @@ bool OOPClientPlugin::uninit()
 {
     FUNCTION_CALL_TRACE;
 
-    QDBusReply<bool> reply = iOopClientIface->uninit();
+    QDBusReply<bool> reply = iOopPluginIface->uninit();
     if( !reply.isValid() ) {
         LOG_WARNING( "Invalid reply for uninit from plugin" );
         return false;
@@ -97,7 +94,7 @@ bool OOPClientPlugin::startSync()
 {
     FUNCTION_CALL_TRACE;
 
-    QDBusReply<bool> reply = iOopClientIface->startSync();
+    QDBusReply<bool> reply = iOopPluginIface->startSync();
     if( !reply.isValid() ) {
         LOG_WARNING( "Invalid reply for startSync from plugin" );
         return false;
@@ -110,14 +107,14 @@ void OOPClientPlugin::abortSync( Sync::SyncStatus aStatus )
 {
     FUNCTION_CALL_TRACE;
 
-    iOopClientIface->abortSync( (uchar)aStatus );
+    iOopPluginIface->abortSync( (uchar)aStatus );
 }
 
 bool OOPClientPlugin::cleanUp()
 {
     FUNCTION_CALL_TRACE;
 
-    QDBusReply<bool> reply = iOopClientIface->cleanUp();
+    QDBusReply<bool> reply = iOopPluginIface->cleanUp();
     if( !reply.isValid() ) {
         LOG_WARNING( "Invalid reply for cleanUp from plugin" );
         return false;
@@ -133,7 +130,7 @@ SyncResults OOPClientPlugin::getSyncResults() const
     SyncResults errorSyncResult( QDateTime(),
                             SyncResults::SYNC_RESULT_INVALID,
                             SyncResults::SYNC_RESULT_INVALID );
-    QDBusReply<QString> reply = iOopClientIface->getSyncResults();
+    QDBusReply<QString> reply = iOopPluginIface->getSyncResults();
     if( !reply.isValid() ) {
         LOG_WARNING( "Invalid reply for getSyncResults from plugin" );
         return errorSyncResult;
@@ -155,5 +152,5 @@ void OOPClientPlugin::connectivityStateChanged( Sync::ConnectivityType aType,
 {
     FUNCTION_CALL_TRACE;
 
-    iOopClientIface->connectivityStateChanged( aType, aState );
+    iOopPluginIface->connectivityStateChanged( aType, aState );
 }

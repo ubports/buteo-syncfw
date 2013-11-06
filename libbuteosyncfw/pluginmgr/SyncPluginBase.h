@@ -25,12 +25,15 @@
 
 #include "SyncCommonDefs.h"
 #include "SyncResults.h"
+#include "ButeoPluginIf.h"
+
 #include <QString>
 #include <QMetaType>
 #include <QObject>
 #include <QMap>
 
-
+#define DBUS_SERVICE_NAME_PREFIX "com.buteo.msyncd.plugin."
+#define DBUS_SERVICE_OBJ_PATH "/"
 
 namespace Buteo {
 
@@ -179,6 +182,7 @@ protected:
 
         QMap<QString, ReceivedItemDetails> receivedItems;
 
+        ButeoPluginIf     *iOopPluginIface;
 private:
 
 	QString iPluginName;
