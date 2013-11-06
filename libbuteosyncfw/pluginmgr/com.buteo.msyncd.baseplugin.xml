@@ -31,18 +31,6 @@
       <arg name="aProgressDetail" type="i" direction="out"/>
     </signal>
 
-    <method name="setPluginParams">
-      <arg name="aPluginName" type="s" direction="in" />
-      <arg name="aProfile" type="s" direction="in" />
-    </method>
-    <method name="getPluginName">
-      <arg type="s" direction="out"/>
-    </method>
-
-    <method name="getProfileName">
-      <arg type="s" direction="out"/>
-    </method>
-
     <method name="init">
       <arg type="b" direction="out"/>
     </method>
@@ -74,9 +62,6 @@
       <arg type="b" direction="out"/>
     </method>
 
-    <method name="profile">
-      <arg type="s" direction="out"/> <!-- We will pass the SyncResults as an XML string and use constructor and toXml to perform serialization/deserialization -->
-    </method>
     <!-- END: Client plugin methods -->
 
     <!-- BEGIN: Server plugin methods -->

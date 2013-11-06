@@ -53,22 +53,6 @@ void ButeoPluginIfAdaptor::connectivityStateChanged(int aType, bool aState)
     QMetaObject::invokeMethod(parent(), "connectivityStateChanged", Q_ARG(int, aType), Q_ARG(bool, aState));
 }
 
-QString ButeoPluginIfAdaptor::getPluginName()
-{
-    // handle method call com.buteo.msyncd.baseplugin.getPluginName
-    QString out0;
-    QMetaObject::invokeMethod(parent(), "getPluginName", Q_RETURN_ARG(QString, out0));
-    return out0;
-}
-
-QString ButeoPluginIfAdaptor::getProfileName()
-{
-    // handle method call com.buteo.msyncd.baseplugin.getProfileName
-    QString out0;
-    QMetaObject::invokeMethod(parent(), "getProfileName", Q_RETURN_ARG(QString, out0));
-    return out0;
-}
-
 QString ButeoPluginIfAdaptor::getSyncResults()
 {
     // handle method call com.buteo.msyncd.baseplugin.getSyncResults
@@ -85,24 +69,10 @@ bool ButeoPluginIfAdaptor::init()
     return out0;
 }
 
-QString ButeoPluginIfAdaptor::profile()
-{
-    // handle method call com.buteo.msyncd.baseplugin.profile
-    QString out0;
-    QMetaObject::invokeMethod(parent(), "profile", Q_RETURN_ARG(QString, out0));
-    return out0;
-}
-
 void ButeoPluginIfAdaptor::resume()
 {
     // handle method call com.buteo.msyncd.baseplugin.resume
     QMetaObject::invokeMethod(parent(), "resume");
-}
-
-void ButeoPluginIfAdaptor::setPluginParams(const QString &aPluginName, const QString &aProfile)
-{
-    // handle method call com.buteo.msyncd.baseplugin.setPluginParams
-    QMetaObject::invokeMethod(parent(), "setPluginParams", Q_ARG(QString, aPluginName), Q_ARG(QString, aProfile));
 }
 
 bool ButeoPluginIfAdaptor::startListen()
