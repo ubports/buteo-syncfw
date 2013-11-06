@@ -107,7 +107,9 @@ void OOPClientPlugin::abortSync( Sync::SyncStatus aStatus )
 {
     FUNCTION_CALL_TRACE;
 
-    iOopPluginIface->abortSync( (uchar)aStatus );
+    QDBusReply<void> reply = iOopPluginIface->abortSync( (uchar)aStatus );
+    if( !reply.isValid() )
+        LOG_WARNING( "Invalid reply for connectivityStateChanged from plugin" );
 }
 
 bool OOPClientPlugin::cleanUp()
@@ -152,5 +154,7 @@ void OOPClientPlugin::connectivityStateChanged( Sync::ConnectivityType aType,
 {
     FUNCTION_CALL_TRACE;
 
-    iOopPluginIface->connectivityStateChanged( aType, aState );
+    QDBusReply<void> reply = iOopPluginIface->connectivityStateChanged( aType, aState );
+    if( !reply.isValid() )
+        LOG_WARNING( "Invalid reply for connectivityStateChanged from plugin" );
 }
