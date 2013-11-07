@@ -31,49 +31,125 @@ OOPServerPlugin::OOPServerPlugin( const QString& aPluginName,
     
 {
     FUNCTION_CALL_TRACE;
+
+    // Initialise dbus for client
+    iOopPluginIface = new ButeoPluginIf( DBUS_SERVICE_NAME_PREFIX + aProfile.name(),
+                                         DBUS_SERVICE_OBJ_PATH,
+                                         QDBusConnection::sessionBus()
+                                       );
+
+    // Chain the signals received over dbus
+    connect(iOopPluginIface, SIGNAL(transferProgress(const QString &, int, int, const QString &, int)),
+        this, SIGNAL(transferProgress(const QString &, int, int, const QString &, int)));
+
+    connect(iOopPluginIface, SIGNAL(error(const QString &, const QString &, int)),
+        this, SIGNAL(error(const QString &, const QString &, int)));
+
+    connect(iOopPluginIface, SIGNAL(success(const QString &, const QString &)),
+        this, SIGNAL(success(const QString &, const QString &)));
+
+    connect(iOopPluginIface, SIGNAL(accquiredStorage(const QString &)),
+        this, SIGNAL(accquiredStorage(const QString &)));
+
+    connect(iOopPluginIface, SIGNAL(newSession(const QString&)),
+            this, SIGNAL(newSession(const QString&)));
 }
 
 OOPServerPlugin::~OOPServerPlugin()
 {
     FUNCTION_CALL_TRACE;
+
+    if( iOopPluginIface ) {
+        delete iOopPluginIface;
+        iOopPluginIface = 0;
+    }
 }
 
 bool OOPServerPlugin::init()
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<bool> reply = iOopPluginIface->init();
+    if( !reply.isValid() ) {
+        LOG_WARNING( "Invalid reply for init from plugin" );
+        return false;
+    }
+
+    return reply.value();
 }
 
 bool OOPServerPlugin::uninit()
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<bool> reply = iOopPluginIface->startSync();
+    if( !reply.isValid() ) {
+        LOG_WARNING( "Invalid reply for startSync from plugin" );
+        return false;
+    }
+
+    return reply.value();
 }
 
 bool OOPServerPlugin::startListen()
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<bool> reply = iOopPluginIface->startListen();
+    if( !reply.isValid() ) {
+        LOG_WARNING( "Invalid reply for startListen from plugin" );
+        return false;
+    }
+
+    return reply.value();
 }
 
 void OOPServerPlugin::stopListen()
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<void> reply = iOopPluginIface->stopListen();
+    if( !reply.isValid() )
+        LOG_WARNING( "Invalid reply for stopListen from plugin" );
 }
 
 void OOPServerPlugin::suspend()
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<void> reply = iOopPluginIface->suspend();
+    if( !reply.isValid() )
+        LOG_WARNING( "Invalid reply for suspend from plugin" );
 }
 
 void OOPServerPlugin::resume()
 {
+    FUNCTION_CALL_TRACE;
+
+    QDBusReply<void> reply = iOopPluginIface->resume();
+    if( !reply.isValid() )
+        LOG_WARNING( "Invalid reply for resume from plugin" );
 }
 
 bool OOPServerPlugin::cleanUp()
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<bool> reply = iOopPluginIface->cleanUp();
+    if( !reply.isValid() ) {
+        LOG_WARNING( "Invalid reply for cleanUp from plugin" );
+        return false;
+    }
+
+    return reply.value();
 }
 
 void OOPServerPlugin::connectivityStateChanged( Sync::ConnectivityType aType,
                                                 bool aState )
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<void> reply = iOopPluginIface->connectivityStateChanged(aType, aState);
+    if( !reply.isValid() )
+        LOG_WARNING( "Invalid reply for connectivityStateChanged from plugin" );
 }

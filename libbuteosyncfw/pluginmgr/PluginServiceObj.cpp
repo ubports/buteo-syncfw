@@ -28,25 +28,8 @@
 using namespace Buteo;
 
 PluginServiceObj::PluginServiceObj( QString aProfileName, QString aPluginName, QObject *parent) :
-    QObject(parent), iPlugin(0)
+    QObject(parent), iPlugin(0), iProfileName(aProfileName), iPluginName(aPluginName)
 {
-    ProfileManager pm;
-    SyncProfile *syncProfile = pm.syncProfile( aProfileName );
-
-    // Create the plugin (client or server)
-    iPlugin = new CLASSNAME( aPluginName, *syncProfile, &iPluginCb );
- 
-    // Chain the signals
-    QObject::connect(iPlugin, SIGNAL(transferProgress(const QString&, int, int, const QString, int)),
-                     this, SIGNAL(transferProgress(const QString&, int, int, const QString&, int)));
-    QObject::connect(iPlugin, SIGNAL(error(const QString&, const QStrnig&, int)),
-                     this, SIGNAL(error(const QString&, const QString&, int)));
-    QObject::connect(iPlugin, SIGNAL(success(const QString&, const QString&)),
-                     this, SIGNAL(success(const QString&, const QString&)));
-    QObject::connect(iPlugin, SIGNAL(accquiredStorage(const QString&)),
-                     this, SIGNAL(accquiredStorage(const QString&)));
-    QObject::connect(iPlugin, SIGNAL(syncProgressDetail(const QString&, int)),
-                     this, SIGNAL(syncProgressDetail(const QString&, int)));
 }
 
 PluginServiceObj::~PluginServiceObj()
@@ -61,6 +44,42 @@ bool PluginServiceObj::init()
 {
     FUNCTION_CALL_TRACE;
 
+    ProfileManager pm;
+#ifdef CLIENT_PLUGIN
+    SyncProfile *syncProfile = pm.syncProfile( iProfileName );
+    if( !syncProfile ) {
+        LOG_WARNING( "Profile " << iProfileName << " does not exist" );
+        return false;
+    }
+
+    // Create the plugin (client or server)
+    iPlugin = new CLASSNAME( iPluginName, *syncProfile, &iPluginCb );
+#else
+    Profile *profile = pm.profile( iProfileName, Profile::TYPE_SERVER );
+    if( !profile ) {
+        LOG_WARNING( "Profile " << iProfileName << " does not exist" );
+        return false;
+    }
+
+    // Create the plugin (client or server)
+    iPlugin = new CLASSNAME( iPluginName, *profile, &iPluginCb );
+
+    // Server signals
+    QObject::connect(iPlugin, SIGNAL(newSession(const QString&)),
+                     this, SIGNAL(newSession(const QString&)));
+#endif
+    // Chain the signals
+    QObject::connect(iPlugin, SIGNAL(transferProgress(const QString&, int, int, const QString, int)),
+                     this, SIGNAL(transferProgress(const QString&, int, int, const QString&, int)));
+    QObject::connect(iPlugin, SIGNAL(error(const QString&, const QStrnig&, int)),
+                     this, SIGNAL(error(const QString&, const QString&, int)));
+    QObject::connect(iPlugin, SIGNAL(success(const QString&, const QString&)),
+                     this, SIGNAL(success(const QString&, const QString&)));
+    QObject::connect(iPlugin, SIGNAL(accquiredStorage(const QString&)),
+                     this, SIGNAL(accquiredStorage(const QString&)));
+    QObject::connect(iPlugin, SIGNAL(syncProgressDetail(const QString&, int)),
+                     this, SIGNAL(syncProgressDetail(const QString&, int)));
+
     return iPlugin->init();
 }
 
@@ -69,13 +88,6 @@ bool PluginServiceObj::uninit()
     FUNCTION_CALL_TRACE;
 
     return iPlugin->uninit();
-}
-
-bool PluginServiceObj::startSync()
-{
-    FUNCTION_CALL_TRACE;
-
-    return iPlugin->startSync();
 }
 
 void PluginServiceObj::abortSync(uchar aStatus)
@@ -106,7 +118,15 @@ QString PluginServiceObj::getSyncResults()
     return iPlugin->getSyncResults().toString();
 }
 
-#ifndef CLIENT_PLUGIN
+#ifdef CLIENT_PLUGIN
+bool PluginServiceObj::startSync()
+{
+    FUNCTION_CALL_TRACE;
+
+    return iPlugin->startSync();
+}
+
+#else
 void PluginServiceObj::resume()
 {
     FUNCTION_CALL_TRACE;

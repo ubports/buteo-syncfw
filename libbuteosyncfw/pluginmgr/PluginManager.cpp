@@ -397,6 +397,7 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
     {
         // Start the Oop process plugin
         QString exePath = iOoPServerMaps.value( aPluginName );
+
         bool procStarted = startOOPPlugin( exePath, aPluginName, aProfile.name() );
     
         if( procStarted == false ) {
@@ -626,7 +627,7 @@ bool PluginManager::startOOPPlugin( const QString &aPath,
 
     LOG_DEBUG( "Searching for oop plugin " << aPath);
     QProcess *process = NULL;
- 
+
     for( int i = 0; i < iLoadedDlls.count(); ++i )
     {
         if ( iLoadedDlls[i].iPath == aPath )
