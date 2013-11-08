@@ -662,6 +662,7 @@ bool PluginManager::startOOPPlugin( const QString &aPath,
 
     	    iLoadedDlls.append( info );
             started = true;
+            LOG_DEBUG( "Process " << process->program() << " started with pid " << process->pid() );
 
         } else {
             LOG_CRITICAL( "Unable to start process plugin " << aPath <<

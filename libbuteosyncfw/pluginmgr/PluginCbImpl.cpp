@@ -40,6 +40,11 @@ PluginCbImpl::PluginCbImpl()
 PluginCbImpl::~PluginCbImpl()
 {
     FUNCTION_CALL_TRACE;
+
+    if( imsyncIface ) {
+        delete imsyncIface;
+        imsyncIface = 0;
+    }
 }
 
 bool PluginCbImpl::requestStorage(const QString &aStorageName,
@@ -89,7 +94,7 @@ bool PluginCbImpl::isConnectivityAvailable( Sync::ConnectivityType aType )
 {
     FUNCTION_CALL_TRACE;
 
-    return false;
+    return iTransportTracker.isConnectivityAvailable(aType);
 }
 
 Profile* PluginCbImpl::getSyncProfileByRemoteAddress(const QString& aAddress)

@@ -17,6 +17,8 @@ PKGCONFIG += dbus-1
 
 equals(QT_MAJOR_VERSION, 5): PKGCONFIG += Qt5SystemInfo
 
+LIBS += -L../../../libbuteosyncfw -lbuteosyncfw5
+
 SOURCES += ServerThread.cpp \
     ServerThreadTest.cpp \
     StorageBookerTest.cpp \
@@ -31,7 +33,6 @@ SOURCES += ServerThread.cpp \
     PluginRunner.cpp \
     ClientThread.cpp \
     ClientThreadTest.cpp\
-    TransportTracker.cpp \
     TransportTrackerTest.cpp \
     PluginRunnerTest.cpp \
     ClientPluginRunner.cpp \
@@ -66,7 +67,6 @@ HEADERS += ServerThread.h \
     PluginRunner.h \
     ClientThread.h \
     ClientThreadTest.h\
-    TransportTracker.h \
     TransportTrackerTest.h \
     PluginRunnerTest.h \
     ClientPluginRunner.h \
