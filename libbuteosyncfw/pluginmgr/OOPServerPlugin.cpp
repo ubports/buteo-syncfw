@@ -26,7 +26,8 @@ using namespace Buteo;
 
 OOPServerPlugin::OOPServerPlugin( const QString& aPluginName,
                                   const Profile& aProfile,
-                                  PluginCbInterface* aCbInterface ) :
+                                  PluginCbInterface* aCbInterface,
+                                  QProcess& aProcess ) :
     ServerPlugin( aPluginName, aProfile, aCbInterface )
     
 {
@@ -53,6 +54,12 @@ OOPServerPlugin::OOPServerPlugin( const QString& aPluginName,
 
     connect(iOopPluginIface, SIGNAL(newSession(const QString&)),
             this, SIGNAL(newSession(const QString&)));
+
+    connect(&aProcess, SIGNAL(error(QProcess::ProcessError)),
+            this, SIGNAL(processError(QProcess::ProcessError)));
+
+    connect(&aProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
+            this, SIGNAL(processFinished(int,QProcess::ExitStatus)));
 }
 
 OOPServerPlugin::~OOPServerPlugin()

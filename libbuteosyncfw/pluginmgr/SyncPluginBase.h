@@ -155,6 +155,9 @@ signals:
 	 */
 	void syncProgressDetail( const QString &aProfileName, int aProgressDetail);
 
+    void processError( QProcess::ProcessError error );
+
+    void processFinished( int exitCode, QProcess::ExitStatus exitStatus );
 
 public slots:
 
