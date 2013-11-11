@@ -648,7 +648,9 @@ QProcess* PluginManager::startOOPPlugin( const QString &aPath,
         bool started = false;
         QStringList args;
         args << aPluginName << aProfileName;
-        LOG_DEBUG( "Starting process " << aPath );
+        LOG_DEBUG( "Starting process " << aPath <<
+                   " with plugin name " << aPluginName <<
+                   " and profile name " << aProfileName);
         
         process = new QProcess();
         process->setProcessChannelMode( QProcess::ForwardedChannels );
@@ -686,14 +688,21 @@ void PluginManager::stopOOPPlugin( const QString &aPath )
 
     iDllLock.lockForWrite();
 
-    for( int i = 0; i < iLoadedDlls.count(); ++i )
+    for( int i = 0; i < iLoadedDlls.size(); ++i )
     {
-        if( iLoadedDlls[i].iPath == aPath ) {
+        if( iLoadedDlls[i].iPath == aPath )
+        {
+            --iLoadedDlls[i].iRefCount;
+
             // Stop the process using the handle
             QProcess *process = (QProcess*)iLoadedDlls[i].iHandle; 
             process->terminate();
             if (process->waitForFinished() == false)
                 process->kill();
+
+            if( iLoadedDlls[i].iRefCount == 0 )
+                iLoadedDlls.removeAt( i );
+
             break;
         }
     }
