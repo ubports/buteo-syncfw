@@ -285,7 +285,6 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
 
         if( process == NULL ) {
             LOG_CRITICAL( "Could not start process" );
-            stopOOPPlugin (aPluginName);
             return NULL;
         }
 
@@ -405,7 +404,6 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
     
         if( process == NULL ) {
             LOG_CRITICAL( "Could not start server plugin process" );
-            stopOOPPlugin( aPluginName );
             return NULL;
         }
 
