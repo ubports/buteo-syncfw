@@ -102,6 +102,8 @@ private slots:
 
     void onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus );
 
+    void pluginTimeout();
+
 private:
 
     SyncProfile *iProfile;
