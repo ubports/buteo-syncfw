@@ -48,16 +48,25 @@ PluginCbImpl::~PluginCbImpl()
 }
 
 bool PluginCbImpl::requestStorage(const QString &aStorageName,
-        const SyncPluginBase *aCaller)
+        const SyncPluginBase */*aCaller*/)
 {
     FUNCTION_CALL_TRACE;
 
-    Q_UNUSED( aCaller );
+    bool requestResult = false;
 
-    QStringList storages;
-    storages << aStorageName;
-    QDBusReply<bool> gotStorages = imsyncIface->requestStorages(storages);
-    return gotStorages;
+    if( imsyncIface ) {
+        QStringList storages;
+    	storages << aStorageName;
+    	QDBusReply<bool> gotStorages = imsyncIface->requestStorages(storages);
+
+    	if( !gotStorages.isValid() )
+        	LOG_WARNING( "Request for storage " << aStorageName << " failed" );
+    	else
+            requestResult = gotStorages.value();
+    } else
+        LOG_WARNING( "msyncd dbus interface is NULL" );
+
+    return requestResult;
 }
 
 void PluginCbImpl::releaseStorage(const QString &aStorageName,
@@ -65,9 +74,12 @@ void PluginCbImpl::releaseStorage(const QString &aStorageName,
 {
     FUNCTION_CALL_TRACE;
 
-    QStringList storages;
-    storages << aStorageName;
-    imsyncIface->releaseStorages( storages );
+    if( imsyncIface ) {
+        QStringList storages;
+    	storages << aStorageName;
+    	imsyncIface->releaseStorages( storages );
+    } else
+        LOG_WARNING( "msyncd dbus interface is NULL" );
 }
 
 StoragePlugin* PluginCbImpl::createStorage(const QString &aPluginName)
@@ -75,7 +87,7 @@ StoragePlugin* PluginCbImpl::createStorage(const QString &aPluginName)
     FUNCTION_CALL_TRACE;
 
     StoragePlugin* plugin = NULL;
-    if (!aPluginName.isEmpty())
+    if ( !aPluginName.isEmpty() )
     {
         plugin = iPluginManager.createStorage(aPluginName);
     } // no else
