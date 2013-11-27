@@ -21,6 +21,7 @@
     <td>
       <ul>
         <li><a href="plugin-guide.html">Writing Synchronization plugins</a></li>
+        <li><a href="api-usage.html">Using Buteo framework API</a></li>
       </ul>
     </td>
   </tr>
