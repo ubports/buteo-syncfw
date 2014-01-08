@@ -95,8 +95,8 @@ Group: Development/Libraries
 
 
 %build
-qmake -qt=5 -recursive CONFIG+=usb-moded
-make
+%qmake5 -recursive CONFIG+=usb-moded
+make %{_smp_mflags}
 
 
 %install
