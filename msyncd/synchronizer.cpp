@@ -417,7 +417,9 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     // @todo: Complete profile with data from account manager.
     //iAccounts->addAccountData(*profile);
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+    QBatteryInfo::LevelStatus batteryStat = iDeviceInfo.levelStatus();
+#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
     QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
 #else
     QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
@@ -429,8 +431,10 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
     }
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    /// @todo check if QBatteryInfo is connected to something useful
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+    else if( aScheduled && ( (batteryStat == QBatteryInfo::LevelEmpty) ||
+                             (batteryStat == QBatteryInfo::LevelLow) ))
+#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
     else if( aScheduled && ( (batteryStat == QBatteryInfo::BatteryEmpty) ||
                              (batteryStat == QBatteryInfo::BatteryLow) ))
 #else
@@ -730,8 +734,11 @@ bool Synchronizer::startNextSync()
     QString profileName = session->profileName();
     LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName );
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    /// @todo check if QBatteryInfo is connected to something useful
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+    QBatteryInfo::LevelStatus batteryStat = iDeviceInfo.levelStatus();
+    if (session->isScheduled() && ((batteryStat == QBatteryInfo::LevelEmpty) ||
+                             (batteryStat == QBatteryInfo::LevelLow)))
+#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
     QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
     if (session->isScheduled() && ((batteryStat == QBatteryInfo::BatteryEmpty) ||
                              (batteryStat == QBatteryInfo::BatteryLow)))
