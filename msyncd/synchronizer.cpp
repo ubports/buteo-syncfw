@@ -683,6 +683,7 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
     }
 
     emit syncStatus(aProfileName, aStatus, aMessage, aErrorCode);
+    emit syncDone(aProfileName);
 
     //Re-enable sync on change
     if(iSOCEnabled)
@@ -1082,6 +1083,8 @@ void Synchronizer::initializeScheduler()
         iSyncScheduler = new SyncScheduler(this);
         connect(iSyncScheduler, SIGNAL(syncNow(QString)),
                 this, SLOT(startScheduledSync(QString)), Qt::QueuedConnection);
+        connect(this, SIGNAL(syncDone(QString)),
+                iSyncScheduler, SLOT(syncDone(QString)),  Qt::QueuedConnection);
         QList<SyncProfile*> profiles = iProfileManager.allSyncProfiles();
         foreach (SyncProfile *profile, profiles)
         {

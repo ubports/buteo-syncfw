@@ -21,23 +21,22 @@
  *
  */
 #include "SyncScheduler.h"
-#include "IPHeartBeat.h"
 #include "SyncProfile.h"
 #include "LogMacros.h"
+#include "BackgroundSync.h"
 #include <QtDBus/QtDBus>
-#include "IPHeartBeat.h"
+#include <keepalive/backgroundactivity.h>
 
 using namespace Buteo;
-
 
 SyncScheduler::SyncScheduler(QObject *aParent)
 :   QObject(aParent)
 {
     FUNCTION_CALL_TRACE;
-    
-    iIPHeartBeatMan = new IPHeartBeat(this);
-    
-    connect(iIPHeartBeatMan,SIGNAL(onHeartBeat(QString)),this,SLOT(doIPHeartbeatActions(QString)));
+
+    iBackgroundActivity = new BackgroundSync(this);
+
+    connect(iBackgroundActivity,SIGNAL(onBackgroundSyncRunning(QString)),this,SLOT(doBackgroundActions(QString)));
 
     // Create the alarm inventory object
     iAlarmInventory = new SyncAlarmInventory();
@@ -96,14 +95,13 @@ bool SyncScheduler::addProfile(const SyncProfile* aProfile)
         if (alarmId > 0) {
             iSyncScheduleProfiles.insert(aProfile->name(), alarmId);
             profileAdded = true;
-            //LOG_DEBUG("Sync scheduled: profile =" << aProfile->name() <<
-            //    "time =" << aProfile->nextSyncTime());
+            LOG_DEBUG("Sync scheduled: profile =" << aProfile->name() <<
+                      "time =" << aProfile->nextSyncTime());
         } // no else
     } // no else
     
     return profileAdded;
 }
-
 
 void SyncScheduler::removeProfile(const QString &aProfileName)
 {
@@ -117,13 +115,12 @@ void SyncScheduler::removeProfile(const QString &aProfileName)
     }
 }
 
-void SyncScheduler::doIPHeartbeatActions(QString aProfileName)
+void SyncScheduler::doBackgroundActions(QString aProfileName)
 {
     FUNCTION_CALL_TRACE;
-    
+
     emit syncNow(aProfileName);
 }
-
 
 int SyncScheduler::setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSyncTime)
 {
@@ -165,7 +162,6 @@ int SyncScheduler::setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSync
     return alarmEventID;
 }
 
-
 void SyncScheduler::doAlarmActions(int aAlarmEventID)
 {
     FUNCTION_CALL_TRACE;
@@ -175,16 +171,13 @@ void SyncScheduler::doAlarmActions(int aAlarmEventID)
     
     if (!syncProfileName.isEmpty()) {
         iSyncScheduleProfiles.remove(syncProfileName);
-        // Use global slots (min time == max time) for scheduling heart beats.
-        if(iIPHeartBeatMan->setHeartBeat(syncProfileName, IPHB_GS_WAIT_2_5_MINS, IPHB_GS_WAIT_2_5_MINS)) {
-            //Do nothing, sync will be triggered on getting heart beat
+        if(iBackgroundActivity->setBackgroundSync(syncProfileName)) {
         } else {
             emit syncNow(syncProfileName);
         }
     } // no else, in error cases simply ignore
     
 }
-
 
 void SyncScheduler::removeAlarmEvent(int aAlarmEventID)
 {
@@ -201,7 +194,6 @@ void SyncScheduler::removeAlarmEvent(int aAlarmEventID)
     }
 }
 
-
 void SyncScheduler::removeAllAlarms()
 {
     FUNCTION_CALL_TRACE;
@@ -209,3 +201,7 @@ void SyncScheduler::removeAllAlarms()
     iAlarmInventory->removeAllAlarms();    
 }
 
+void SyncScheduler::syncDone(const QString &aProfileName)
+{
+    iBackgroundActivity->removeBackgroundSync(aProfileName);
+}

@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QtSql>
+#include <keepalive/backgroundactivity.h>
 
 /*! \brief Class for storing alarms
  *
@@ -87,8 +88,9 @@ class SyncAlarmInventory : public QObject
         /* Method to fetch the database handle */
         QSqlDatabase*  getDbHandle();
 
-        /* Timer object to keep tracke of alarm timers */
-        QTimer*        iTimer;
+        /* BackgroundActivity object to keep track of alarm timers */
+
+        BackgroundActivity *iBackgroundActivity;
 
         /* Current alarm that is under work */
         int            currentAlarm;
