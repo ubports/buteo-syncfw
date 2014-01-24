@@ -17,6 +17,7 @@ BuildRequires: pkgconfig(libsignon-qt5)
 BuildRequires: pkgconfig(Qt5SystemInfo)
 BuildRequires: pkgconfig(libiphb)
 BuildRequires: pkgconfig(qt5-boostable)
+BuildRequires: pkgconfig(keepalive)
 Requires: mapplauncherd-qt5
 
 %description

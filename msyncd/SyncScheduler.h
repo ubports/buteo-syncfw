@@ -23,10 +23,11 @@
 #ifndef SYNCSCHEDULER_H
 #define SYNCSCHEDULER_H
 
+#include "SyncAlarmInventory.h"
+#include "BackgroundSync.h"
 #include <QObject>
 #include <QMap>
 #include <ctime>
-#include "SyncAlarmInventory.h"
 
 class QDateTime;
 
@@ -35,7 +36,7 @@ namespace Buteo {
 class SyncSession;
 class SyncSchedulerTest;
 class SyncProfile;
-class IPHeartBeat;
+class BackgroundSync;
 
 /*! \brief SyncScheduler Object to be used to set Schedule via the framework */
 class SyncScheduler : public QObject
@@ -81,7 +82,14 @@ public:
      * \param aProfileName Name of the profile to remove from the scheduler.
      */
     void removeProfile(const QString &aProfileName);
-    
+
+public slots:
+    /**
+     * \brief Performs needed actions when a scheduled sync is completed
+     *
+     * @param aProfileName Name of the profile for the completed sync
+     */
+    void syncDone(const QString &aProfileName);
     
 private slots:
     /**
@@ -93,11 +101,11 @@ private slots:
     void doAlarmActions(int aAlarmEventID);
     
     /**
-     * \brief Performs needed actions when a IP heart beat is triggered
+     * \brief Performs needed actions when a BackgroundAction is triggered
      * 
-     * @param aProfileName Name of the profile on which heart beat received
+     * @param aProfileName Name of the profile on which a BackgroundAction started
      */
-    void doIPHeartbeatActions(QString aProfileName);    
+    void doBackgroundActions(QString aProfileName);
 
 signals:
     /*! \brief Signal emitted when a sync session should be launched based on
@@ -142,9 +150,9 @@ private: // data
 
     /// Alarm factory object
     SyncAlarmInventory      *iAlarmInventory;
-    
-    /// IP Heartbeat management object
-    IPHeartBeat*            iIPHeartBeatMan;
+
+    /// BackgroundSync management object
+    BackgroundSync *iBackgroundActivity;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class SyncSchedulerTest;
