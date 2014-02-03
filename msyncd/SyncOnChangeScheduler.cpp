@@ -72,6 +72,8 @@ SyncOnChangeTimer::~SyncOnChangeTimer()
 void SyncOnChangeTimer::fire()
 {
     FUNCTION_CALL_TRACE;
+    // If this code changes in the future to be possible to call this from background
+    // processes, QTimer needs to change to BackgroundActivity.
     QTimer::singleShot(iTimeout*1000, this, SLOT(onTimeout()));
 }
 

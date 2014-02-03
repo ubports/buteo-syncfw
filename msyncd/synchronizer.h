@@ -221,6 +221,13 @@ signals:
         //! emitted by releaseStorages call
     void storageReleased();
 
+    /*! \brief emit this signal when the sync session is completed,
+     *  this is useful when the session status is not important.
+     *
+     * @param aProfileName
+     */
+    void syncDone(const QString &aProfileName);
+
 private slots:
 
     /*! \brief Handler for storage released signal.
