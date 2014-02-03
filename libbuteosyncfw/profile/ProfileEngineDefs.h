@@ -76,6 +76,7 @@ const QString KEY_HIDDEN("hidden");
 const QString KEY_PROTECTED("protected");
 const QString KEY_DESTINATION_TYPE("destinationtype");
 const QString KEY_SYNC_DIRECTION("Sync Direction");
+const QString KEY_FORCE_SLOW_SYNC("force_slow_sync");
 const QString KEY_CONFLICT_RESOLUTION_POLICY("conflictpolicy");
 const QString KEY_BT_ADDRESS("bt_address");
 const QString KEY_REMOTE_ID("remote_id");
