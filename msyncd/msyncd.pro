@@ -24,7 +24,7 @@ INCLUDEPATH += . \
     ../libbuteosyncfw/profile
 
 
-PKGCONFIG += dbus-1 libiphb
+PKGCONFIG += dbus-1 libiphb keepalive
 
 equals(QT_MAJOR_VERSION, 4): {
     PKGCONFIG += libsignon-qt accounts-qt
@@ -68,11 +68,11 @@ HEADERS += ServerActivator.h \
     ServerPluginRunner.h \
     SyncAlarmInventory.h \
     NetworkManager.h \
-    IPHeartBeat.h \
     SyncSigHandler.h \
     StorageChangeNotifier.h \
     SyncOnChange.h \
-    SyncOnChangeScheduler.h
+    SyncOnChangeScheduler.h \
+    BackgroundSync.h
 
 SOURCES += ServerActivator.cpp \
     TransportTracker.cpp \
@@ -93,11 +93,11 @@ SOURCES += ServerActivator.cpp \
     ServerPluginRunner.cpp \
     SyncAlarmInventory.cpp \
     NetworkManager.cpp \
-    IPHeartBeat.cpp \
     SyncSigHandler.cpp \
     StorageChangeNotifier.cpp \
     SyncOnChange.cpp \
-    SyncOnChangeScheduler.cpp
+    SyncOnChangeScheduler.cpp \
+    BackgroundSync.cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \
