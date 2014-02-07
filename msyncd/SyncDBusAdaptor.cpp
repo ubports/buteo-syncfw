@@ -150,7 +150,7 @@ bool SyncDBusAdaptor::startSync(const QString &aProfileId)
 int SyncDBusAdaptor::status(uint aAccountId, int &aFailedReason, qlonglong &aPrevSyncTime, qlonglong &aNextSyncTime)
 {
     // handle method call com.meego.msyncd.status
-    //return static_cast<YourObjectType *>(parent())->status(aAccountId, aFailedReason, aPrevSyncTime, aNextSyncTime);
+    return static_cast<Synchronizer *>(parent())->status(aAccountId, aFailedReason, aPrevSyncTime, aNextSyncTime);
 }
 
 void SyncDBusAdaptor::stop(uint aAccountId)

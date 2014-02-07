@@ -80,7 +80,7 @@ available
 \endcode
 - Signal to indicate that the status of the sync operation has changed. The status 
 could be that the state has changed from in progress to failed with also the failed 
-reson
+reason
 \code
 <signal name="statusChanged">
   <arg name="aAccountId" type="u" direction="out"/>

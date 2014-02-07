@@ -20,12 +20,11 @@
 * 02110-1301 USA
 */
 
-#include "OOPClientPlugin.h"
-using namespace Buteo;
-
 #include <QDomDocument>
-
+#include "OOPClientPlugin.h"
 #include "LogMacros.h"
+
+using namespace Buteo;
 
 OOPClientPlugin::OOPClientPlugin(const QString& aPluginName,
                                  const SyncProfile& aProfile,
@@ -36,7 +35,7 @@ OOPClientPlugin::OOPClientPlugin(const QString& aPluginName,
     FUNCTION_CALL_TRACE;
 
     // Initialise dbus for client
-    iOopPluginIface = new ButeoPluginIf( DBUS_SERVICE_NAME_PREFIX + aProfile.name(),
+    iOopPluginIface = new ButeoPluginIface( DBUS_SERVICE_NAME_PREFIX + aProfile.name(),
                                          DBUS_SERVICE_OBJ_PATH,
                                          QDBusConnection::sessionBus()
                                        );
