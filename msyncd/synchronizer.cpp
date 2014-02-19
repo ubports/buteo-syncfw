@@ -109,8 +109,8 @@ bool Synchronizer::initialize()
             this, SLOT(slotSyncStatus(QString, int, QString, int)),
             Qt::QueuedConnection);
 
-    connect(&iProfileManager,SIGNAL(signalProfileChanged(QString,int,QString)),
-            this ,SIGNAL(signalProfileChanged(QString,int,QString)));
+    connect(&iProfileManager ,SIGNAL(signalProfileChanged(QString,int,QString)),
+            this, SIGNAL(signalProfileChanged(QString,int,QString)));
 
     iNetworkManager = new NetworkManager(this);
     Q_ASSERT(iNetworkManager);
@@ -1083,8 +1083,6 @@ void Synchronizer::initializeScheduler()
         iSyncScheduler = new SyncScheduler(this);
         connect(iSyncScheduler, SIGNAL(syncNow(QString)),
                 this, SLOT(startScheduledSync(QString)), Qt::QueuedConnection);
-        connect(this, SIGNAL(syncDone(QString)),
-                iSyncScheduler, SLOT(syncDone(QString)),  Qt::QueuedConnection);
         QList<SyncProfile*> profiles = iProfileManager.allSyncProfiles();
         foreach (SyncProfile *profile, profiles)
         {
@@ -1472,6 +1470,10 @@ void Synchronizer::reschedule(const QString &aProfileName)
     if(profile && profile->syncType() == SyncProfile::SYNC_SCHEDULED && profile->isEnabled())
     {
         iSyncScheduler->addProfile(profile);
+    } else {
+        LOG_DEBUG("Sync got disabled for" << aProfileName);
+        iSyncScheduler->removeProfile(aProfileName);
+
     }
     if(profile)
     {
