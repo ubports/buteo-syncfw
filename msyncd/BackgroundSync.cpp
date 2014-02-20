@@ -24,10 +24,9 @@
 #include "LogMacros.h"
 #include "BackgroundSync.h"
 #include <QStringList>
-#include <QDebug>
 #include <keepalive/backgroundactivity.h>
 
-using namespace Buteo;
+const int MAX_FREQUENCY = 1080;
 
 BackgroundSync::BackgroundSync(QObject* aParent)
  :  QObject(aParent)
@@ -39,10 +38,10 @@ BackgroundSync::~BackgroundSync()
 {
     FUNCTION_CALL_TRACE;
 
-    removeAllBackgroundSync();
+    removeAll();
 }
 
-void BackgroundSync::removeAllBackgroundSync()
+void BackgroundSync::removeAll()
 {
     FUNCTION_CALL_TRACE;
 
@@ -55,16 +54,16 @@ void BackgroundSync::removeAllBackgroundSync()
     }
 
     for(int i=0; i<profNames.size(); i++) {
-        removeBackgroundSync(profNames[i]);
+        remove(profNames[i]);
     }
 }
 
-void BackgroundSync::removeBackgroundSync(const QString &aProfName)
+bool BackgroundSync::remove(const QString &aProfName)
 {
     FUNCTION_CALL_TRACE;
 
     if(iScheduledSyncs.contains(aProfName) == false)
-        return;
+        return false;
 
     BActivityStruct& tmp = iScheduledSyncs[aProfName];
 
@@ -72,27 +71,10 @@ void BackgroundSync::removeBackgroundSync(const QString &aProfName)
     delete tmp.backgroundActivity;
 
     iScheduledSyncs.remove(aProfName);
+    return true;
 }
 
-QString BackgroundSync::getProfNameFromId(const QString activityId)
-{
-    FUNCTION_CALL_TRACE;
-
-    QMapIterator<QString,BActivityStruct> iter(iScheduledSyncs);
-
-    while (iter.hasNext()) {
-        iter.next();
-        const BActivityStruct& tmp = iter.value();
-        if(tmp.id == activityId) {
-            return iter.key();
-            break;
-        }
-    }
-
-    return QString();
-}
-
-bool BackgroundSync::setBackgroundSync(const QString &aProfName)
+bool BackgroundSync::set(const QString &aProfName, int seconds)
 {
     FUNCTION_CALL_TRACE;
 
@@ -100,17 +82,43 @@ bool BackgroundSync::setBackgroundSync(const QString &aProfName)
         return false;
 
     if(iScheduledSyncs.contains(aProfName) == true) {
-        LOG_DEBUG("Profile already in waiting... No new BackgroundSync");
-        return true; //returing 'true' - no immediate sync request to be sent.
+        // Can't schedule sync for such long interval removing existent profile if it exists,
+        // new background activity will be added below
+        if ((seconds / 60 >  MAX_FREQUENCY)) {
+            remove(aProfName);
+        } else {
+
+            BActivityStruct &newAct = iScheduledSyncs[aProfName];
+            BackgroundActivity::Frequency frequency = frequencyFromSeconds(seconds);
+
+            if (newAct.frequency != frequency) {
+                newAct.frequency = frequency;
+                newAct.backgroundActivity->setWakeupFrequency(newAct.frequency);
+                newAct.backgroundActivity->wait();
+                LOG_DEBUG("BackgroundSync::set(), Rescheduling for " << aProfName << " with frequency " << seconds / 60);
+                return true;
+            } else {
+                newAct.backgroundActivity->wait();
+                LOG_DEBUG("Profile already with the same frequency... No new BackgroundSync");
+                return true; //returing 'true' - no immediate sync request to be sent.
+            }
+        }
     }
 
     BActivityStruct &newAct = iScheduledSyncs[aProfName];
     newAct.backgroundActivity = new BackgroundActivity(this);
     newAct.id = newAct.backgroundActivity->id();
     connect(newAct.backgroundActivity,SIGNAL(running()), this, SLOT(onBackgroundSyncStarted()));
-    newAct.backgroundActivity->run();
-
-    LOG_DEBUG("setBackgroundSync(), profile name = " << aProfName);
+    if (seconds / 60 >  MAX_FREQUENCY) {
+        LOG_DEBUG("BackgroundSync::set() without a frequency, profile name = " << aProfName);
+        newAct.frequency = BackgroundActivity::Range; // 0
+        newAct.backgroundActivity->wait(seconds);
+    } else {
+        newAct.frequency = frequencyFromSeconds(seconds);
+        newAct.backgroundActivity->setWakeupFrequency(newAct.frequency);
+        newAct.backgroundActivity->wait();
+        LOG_DEBUG("BackgroundSync::set(), profile name = " << aProfName << " with frequency " << seconds / 60);
+    }
     return true;
 }
 
@@ -134,7 +142,53 @@ void BackgroundSync::onBackgroundSyncCompleted(QString aProfName)
 {
     FUNCTION_CALL_TRACE;
     LOG_DEBUG("Background sync completed, removing activity, profile name = " << aProfName);
-    removeBackgroundSync(aProfName);
+    remove(aProfName);
 }
 
+QString BackgroundSync::getProfNameFromId(const QString activityId)
+{
+    FUNCTION_CALL_TRACE;
 
+    QMapIterator<QString,BActivityStruct> iter(iScheduledSyncs);
+
+    while (iter.hasNext()) {
+        iter.next();
+        const BActivityStruct& tmp = iter.value();
+        if(tmp.id == activityId) {
+            return iter.key();
+            break;
+        }
+    }
+
+    return QString();
+}
+
+BackgroundActivity::Frequency BackgroundSync::frequencyFromSeconds(int seconds) {
+
+    // Don't allow frequencies smaller than 5 mins.
+    // In rare cases is possible that seconds is 0
+    int minutes = seconds / 60;
+
+    if (minutes <= 5)
+        return BackgroundActivity::FiveMinutes;
+    else if (minutes <= 10)
+        return BackgroundActivity::TenMinutes;
+    else if (minutes <= 15)
+        return BackgroundActivity::FifteenMinutes;
+    else if (minutes <= 30)
+        return BackgroundActivity::ThirtyMinutes;
+    else if (minutes <= 60)
+        return BackgroundActivity::OneHour;
+    else if (minutes <= 2 * 60)
+        return BackgroundActivity::TwoHours;
+    else if (minutes <= 4 * 60)
+        return BackgroundActivity::FourHours;
+    else if (minutes <= 8 * 60)
+        return BackgroundActivity::EightHours;
+    else if (minutes <= 10 * 60)
+        return BackgroundActivity::TenHours;
+    else if (minutes <= 12 * 60)
+        return BackgroundActivity::TwelveHours;
+    else
+        return BackgroundActivity::MaximumFrequency; //18h
+}

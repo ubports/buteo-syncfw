@@ -13,7 +13,7 @@ equals(QT_MAJOR_VERSION, 4): {
     MOBILITY += systeminfo
 }
 
-PKGCONFIG += dbus-1 libiphb keepalive
+PKGCONFIG += dbus-1
 
 equals(QT_MAJOR_VERSION, 5): PKGCONFIG += Qt5SystemInfo
 
@@ -25,7 +25,6 @@ SOURCES += ServerThread.cpp \
     SyncQueue.cpp \
     AccountsHelperTest.cpp \
     AccountsHelper.cpp \
-    SyncSchedulerTest.cpp \
     SyncScheduler.cpp \
     SyncSession.cpp \
     SyncSessionTest.cpp \
@@ -53,8 +52,7 @@ SOURCES += ServerThread.cpp \
     SyncSigHandlerTest.cpp \
     SyncOnChange.cpp \
     SyncOnChangeScheduler.cpp \
-    StorageChangeNotifier.cpp \
-    BackgroundSync.cpp
+    StorageChangeNotifier.cpp
 
 HEADERS += ServerThread.h \
     ServerThreadTest.h \
@@ -62,7 +60,6 @@ HEADERS += ServerThread.h \
     SyncQueueTest.h \
     AccountsHelperTest.h \
     AccountsHelper.h \
-    SyncSchedulerTest.h \
     SyncScheduler.h \
     SyncSession.h \
     SyncSessionTest.h \
@@ -92,10 +89,30 @@ HEADERS += ServerThread.h \
     SyncSigHandlerTest.h \
     SyncOnChange.h \
     SyncOnChangeScheduler.h \
-    StorageChangeNotifier.h \
-    BackgroundSync.h
+    StorageChangeNotifier.h
 
-OTHER_FILES +=
+contains(DEFINES, USE_KEEPALIVE) {
+    PKGCONFIG += keepalive
+
+    HEADERS += \
+        BackgroundSync.h
+
+    SOURCES += \
+        BackgroundSync.cpp
+
+} else {
+    PKGCONFIG += libiphb
+
+    HEADERS += \
+        SyncSchedulerTest.h \
+        IPHeartBeat.h \
+        IPHeartBeatTest.h
+
+    SOURCES += \
+        SyncSchedulerTest.cpp \
+        IPHeartBeat.cpp \
+        IPHeartBeatTest.cpp
+}
 
 # for compiling on meego
 linux-g++-maemo {

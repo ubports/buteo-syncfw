@@ -1,5 +1,5 @@
 Name: buteo-syncfw-qt5
-Version: 0.6.15
+Version: 0.6.25
 Release: 1
 Summary: Synchronization backend
 Group: System/Libraries
@@ -96,7 +96,7 @@ Group: Development/Libraries
 
 
 %build
-%qmake5 -recursive CONFIG+=usb-moded
+%qmake5 -recursive CONFIG+=usb-moded DEFINES+=USE_KEEPALIVE
 make %{_smp_mflags}
 
 

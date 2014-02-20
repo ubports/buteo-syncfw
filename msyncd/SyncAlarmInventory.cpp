@@ -24,6 +24,7 @@
 #include "SyncAlarmInventory.h"
 #include "SyncCommonDefs.h"
 
+#include <QTimer>
 #include <QObject>
 #include <QSettings>
 #include <QDebug>
@@ -35,7 +36,7 @@ const int TRIGGER_COUNT = 1;
 
 SyncAlarmInventory::SyncAlarmInventory():
         currentAlarm(0),
-        iBackgroundActivity(0),
+        iTimer(0),
         triggerCount(TRIGGER_COUNT)
 {
   // empty.explicitly call init
@@ -77,14 +78,14 @@ bool SyncAlarmInventory::init()
     // Clear any old alarms that may have lingered
     removeAllAlarms();
 
-    // Create the BackgroundActivity object
-    iBackgroundActivity = new BackgroundActivity(this);
-    if(iBackgroundActivity) {
-        connect( iBackgroundActivity, SIGNAL(running()), this, SLOT(timerTriggered()) );
+    // Create the iTimer object
+    iTimer = new QTimer(this);
+    if(iTimer) {
+    	connect( iTimer, SIGNAL(timeout()), this, SLOT(timerTriggered()) );
     	currentAlarm = 0;
     	return true;
     } else {
-        LOG_WARNING("Failed to create a BackgroundActivity");
+    	LOG_WARNING("Failed to create a QTimer");
     	return false;
     }
 }
@@ -97,10 +98,10 @@ SyncAlarmInventory::~SyncAlarmInventory()
     iDbHandle = QSqlDatabase();
     QSqlDatabase::removeDatabase( iConnectionName );
     
-    if (iBackgroundActivity) {
-        iBackgroundActivity->stop();
-        delete iBackgroundActivity;
-        iBackgroundActivity = 0;
+    if (iTimer) {
+        iTimer->stop();
+        delete iTimer;
+	    iTimer = 0;
     }
 }
 
@@ -134,21 +135,25 @@ int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
             int newAlarm = selectQuery.value(0).toInt();
             QDateTime alarmTime = selectQuery.value(1).toDateTime();
 
+            // If the newAlarm != currentAlarm that is fetched from DB, stop the
+            // previous iTimer
+            if ( (currentAlarm != 0) && (newAlarm != currentAlarm) ) {
+                if ( !iTimer->isActive() )
+                    iTimer->stop();
+            }
+
             // This is a new alarm. Set the iTimer for the alarm
             currentAlarm = newAlarm;
             QDateTime now = QDateTime::currentDateTime();
-            // Min heartbeat delay needs to be > 0
-            int iTimerInterval = 5;
+            int iTimerInterval = 0;
             if(now < alarmTime)
             {
-                iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT);  // time interval in sec
+                iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
             }
             LOG_DEBUG("currentAlarm"<<currentAlarm<<"alarmTime"<<alarmTime<<"iTimerInterval"<<iTimerInterval);
             triggerCount = TRIGGER_COUNT;
-            if (!iBackgroundActivity->isStopped()) {
-                iBackgroundActivity->stop();
-            }
-            iBackgroundActivity->wait( iTimerInterval );
+            iTimer->setInterval( iTimerInterval );
+            iTimer->start();
         }
     } else {
     	LOG_WARNING("Select Query Execution Failed" );
@@ -193,6 +198,7 @@ void SyncAlarmInventory::timerTriggered()
         // Delete the alarm from DB
         if ( !deleteAlarmFromDb(currentAlarm) ) {
         }
+        iTimer->stop();
         currentAlarm = 0;
 
         // Set the new alarm iTimer
@@ -204,25 +210,19 @@ void SyncAlarmInventory::timerTriggered()
                 currentAlarm = selectQuery.value(0).toInt();
                 QDateTime alarmTime = selectQuery.value(1).toDateTime();
 
-                // Set the BackGroundActivity for the alarm
+                // Set the iTimer for the alarm
                 QDateTime now = QDateTime::currentDateTime();
-                // Min heartbeat delay needs to be > 0
-                int iTimerInterval = 5;
+                int iTimerInterval = 0;
                 if(now < alarmTime)
                 {
-                    iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT);  // time interval in seconds
+                    iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
                 }
                 triggerCount = TRIGGER_COUNT;
                 LOG_DEBUG("Starting timer with interval::" << iTimerInterval);
-                if (!iBackgroundActivity->isStopped()) {
-                    iBackgroundActivity->stop();
-                }
-                iBackgroundActivity->wait( iTimerInterval );
-                return ;
+                iTimer->setInterval( iTimerInterval );
+                iTimer->start();
             }
         }
-        // No more alarms
-        iBackgroundActivity->stop();
     }
 }
 
