@@ -23,20 +23,29 @@
 #ifndef SYNCSCHEDULER_H
 #define SYNCSCHEDULER_H
 
-#include "SyncAlarmInventory.h"
+#ifdef USE_KEEPALIVE
 #include "BackgroundSync.h"
+#else
+#include "SyncAlarmInventory.h"
+#include "IPHeartBeat.h"
+#endif
 #include <QObject>
 #include <QMap>
+#include <QDateTime>
 #include <ctime>
 
 class QDateTime;
+#ifdef USE_KEEPALIVE
+class BackgroundSync;
+#else
+class IPHeartBeat;
+#endif
 
 namespace Buteo {
     
 class SyncSession;
 class SyncSchedulerTest;
 class SyncProfile;
-class BackgroundSync;
 
 /*! \brief SyncScheduler Object to be used to set Schedule via the framework */
 class SyncScheduler : public QObject
@@ -83,15 +92,9 @@ public:
      */
     void removeProfile(const QString &aProfileName);
 
-public slots:
-    /**
-     * \brief Performs needed actions when a scheduled sync is completed
-     *
-     * @param aProfileName Name of the profile for the completed sync
-     */
-    void syncDone(const QString &aProfileName);
-    
 private slots:
+
+#ifndef USE_KEEPALIVE
     /**
      * \brief Performs needed actions when scheduled alarm is triggered
      * 
@@ -99,13 +102,14 @@ private slots:
      */
 
     void doAlarmActions(int aAlarmEventID);
+#endif
     
     /**
-     * \brief Performs needed actions when a BackgroundAction is triggered
+     * \brief Performs needed actions when a IP heart beat is triggered
      * 
-     * @param aProfileName Name of the profile on which a BackgroundAction started
+     * @param aProfileName Name of the profile on which heart beat received
      */
-    void doBackgroundActions(QString aProfileName);
+    void doIPHeartbeatActions(QString aProfileName);
 
 signals:
     /*! \brief Signal emitted when a sync session should be launched based on
@@ -131,7 +135,8 @@ private: // functions
      * \brief Creates a DBUS adaptor for the scheduler
      */
     void setupDBusAdaptor();
-    
+
+#ifndef USE_KEEPALIVE
     /**
      * \brief Removes an alarm from alarmd queue
      * @param aAlarmEventID ID of the alarm to be removed
@@ -142,17 +147,23 @@ private: // functions
      * \brief A convenience method that removes all alarms from alarmd queue
      */
     void removeAllAlarms();
+#endif
     
 private: // data
-    
+
+#ifdef USE_KEEPALIVE
+    /// BackgroundSync management object
+    BackgroundSync *iBackgroundActivity;
+#else
     /// A list of sync schedule profiles
-    QMap<QString, int> iSyncScheduleProfiles; 
+    QMap<QString, int> iSyncScheduleProfiles;
 
     /// Alarm factory object
     SyncAlarmInventory      *iAlarmInventory;
 
-    /// BackgroundSync management object
-    BackgroundSync *iBackgroundActivity;
+    /// IP Heartbeat management object
+    IPHeartBeat* iIPHeartBeatMan;
+#endif
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class SyncSchedulerTest;

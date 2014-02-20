@@ -28,7 +28,7 @@
 #include <QMap>
 #include <keepalive/backgroundactivity.h>
 
-namespace Buteo {
+class BackgroundActivity;
 
 /// \brief BackgroundSync implementation.
 ///
@@ -42,6 +42,7 @@ class BackgroundSync : public QObject
     {
         QString id;
         BackgroundActivity* backgroundActivity;
+        BackgroundActivity::Frequency frequency;
     };
 
 public:
@@ -59,20 +60,21 @@ public:
      *
      * The beat will be generated between minWaitTime and maxWaitTime seconds
      * \param aProfName Name of the profile.
+     * \param seconds Sync frequency in seconds
      * \return Success indicator.
      */
 
-    bool setBackgroundSync(const QString& aProfName);
+    bool set(const QString& aProfName, int seconds);
 
     /*! \brief Removes background sync for a profile.
      *
      * \param aProfName Name of the profile.
      */
-    void removeBackgroundSync(const QString& aProfName);
+    bool remove(const QString& aProfName);
 
     /*! \brief Removes all background syncs for all profiles.
      */
-    void removeAllBackgroundSync();
+    void removeAll();
 
 signals:
 
@@ -104,12 +106,18 @@ private:
      */
     QString getProfNameFromId(const QString activityId);
 
+    /*! \brief Returns a valid BackgroundActivity frequency
+     *
+     * \param seconds Amounth of time for the frequency
+     * \return BackgroundActivity frequency
+     */
+
+    BackgroundActivity::Frequency frequencyFromSeconds(int seconds);
+
 private:
 
     ///Map of structures waiting for background sync
     QMap<QString, BActivityStruct> iScheduledSyncs;
 };
-
-}
 
 #endif // BACKGROUNDSYNC_H

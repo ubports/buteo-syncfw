@@ -386,9 +386,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         nextSync = QDateTime::currentDateTime();
     }
 
-
     LOG_DEBUG("nextSync" << nextSync.toString());
-
     return nextSync;
 }
 
