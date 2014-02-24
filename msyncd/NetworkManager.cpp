@@ -34,7 +34,7 @@ bool NetworkManager::m_isSessionActive = false;
 
 NetworkManager::NetworkManager(QObject *parent /* = 0*/) : 
     QObject(parent), m_networkConfigManager(0), m_networkSession(0),
-    m_isOnline(false)
+    m_isOnline(false), m_errorEmitted(false)
 {
     FUNCTION_CALL_TRACE;
     m_networkConfigManager = new QNetworkConfigurationManager();
@@ -86,7 +86,8 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
     else if(!m_networkSession)
     {
         QNetworkConfiguration netConfig = m_networkConfigManager->defaultConfiguration();
- 	m_networkSession = new QNetworkSession(netConfig);
+        m_networkSession = new QNetworkSession(netConfig);
+        m_errorEmitted = false;
         
         Q_ASSERT(m_networkSession);
         
@@ -97,10 +98,16 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
         connect(m_networkSession, SIGNAL(opened()), SIGNAL(connectionSuccess()));
     }
     m_networkSession->setSessionProperty("ConnectInBackground", connectInBackground);
-    if(!m_networkSession->isOpen())
+    if(!m_networkSession->isOpen()) {
         m_networkSession->open();
-    else
-	slotSessionState(m_networkSession->state());    
+        // Fail after 10 sec if no network reply is received
+        if (!m_networkSession->waitForOpened(10000) && !m_errorEmitted) {
+            qWarning() << "No network reply received after 10 seconds, emitting session error.";
+            slotSessionError(m_networkSession->error());
+        }
+    } else {
+        slotSessionState(m_networkSession->state());
+    }
 }
 
 void NetworkManager::disconnectSession()
@@ -194,6 +201,15 @@ void NetworkManager::slotSessionError(QNetworkSession::SessionError error)
     return;
 #endif
     FUNCTION_CALL_TRACE;
+
+    // Emit network errors only once per request
+    if (m_errorEmitted) {
+        m_errorEmitted = false;
+        return;
+    } else {
+        m_errorEmitted = true;
+    }
+
     switch(error)
     {
     case QNetworkSession::UnknownSessionError:
