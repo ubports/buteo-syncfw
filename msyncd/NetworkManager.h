@@ -102,6 +102,7 @@ signals:
             static bool                     m_isSessionActive;          // Flag to indicate if a network session is active
             bool                            m_isOnline;                 // Flag to indicate if the device is online
             static int                      m_refCount;                 // Reference counter for number of open connections
+            bool                            m_errorEmitted;             // Network error emited flag
 private slots:
             void slotOnlineStateChanged(bool isOnline);
             void slotSessionState(QNetworkSession::State status);
