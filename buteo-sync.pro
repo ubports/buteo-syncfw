@@ -2,13 +2,15 @@ include(doc/doc.pro)
 
 TEMPLATE = subdirs
 
-SUBDIRS += libbuteosyncfw \
-           msyncd \
-           unittests \
-	   doc \
-	   tools
+SUBDIRS += \
+    libbuteosyncfw \
+    msyncd \
+    unittests \
+    doc \
+    tools
 
-QT += testlib
+msyncd.depends = libbuteosyncfw
+unittests.depends = libbuteosyncfw
 
 coverage.CONFIG += recursive
 
