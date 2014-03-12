@@ -1,0 +1,8 @@
+#!/bin/sh
+
+storage_dir=/home/nemo/.cache/msyncd
+mkdir -p $storage_dir
+chown privileged $storage_dir
+chgrp privileged $storage_dir
+chmod 770 $storage_dir
+
