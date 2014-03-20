@@ -1,5 +1,5 @@
 Name: buteo-syncfw-qt5
-Version: 0.6.28
+Version: 0.6.25
 Release: 1
 Summary: Synchronization backend
 Group: System/Libraries
@@ -18,10 +18,7 @@ BuildRequires: pkgconfig(Qt5SystemInfo)
 BuildRequires: pkgconfig(libiphb)
 BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: pkgconfig(keepalive)
-BuildRequires: oneshot
 Requires: mapplauncherd-qt5
-Requires: oneshot
-%{_oneshot_requires_post}
 
 %description
 %{summary}.
@@ -30,7 +27,6 @@ Requires: oneshot
 %defattr(-,root,root,-)
 %config %{_sysconfdir}/buteo/*
 %{_libdir}/*.so.*
-%{_oneshotdir}/msyncd-storage-perm
 
 %package devel
 Summary: Development files for %{name}
@@ -111,14 +107,9 @@ chmod +x %{buildroot}/opt/tests/buteo-syncfw/*.pl %{buildroot}/opt/tests/buteo-s
 mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
 ln -s ../msyncd.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
 
-mkdir -p %{buildroot}/%{_oneshotdir}
-install -D -m 755 oneshot/msyncd-storage-perm %{buildroot}/%{_oneshotdir}
 
 %post
 /sbin/ldconfig
-
-%{_bindir}/add-oneshot msyncd-storage-perm
-
 if [ "$1" -ge 1 ]; then
     systemctl-user daemon-reload || true
     systemctl-user restart msyncd.service || true
