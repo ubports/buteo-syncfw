@@ -23,6 +23,7 @@
 #include <QNetworkSession>
 #include <QNetworkConfiguration>
 #include <QNetworkConfigurationManager>
+#include <QTimer>
 
 #include "NetworkManager.h"
 #include "LogMacros.h"
@@ -32,7 +33,7 @@ using namespace Buteo;
 int NetworkManager::m_refCount = 0;
 bool NetworkManager::m_isSessionActive = false;
 
-NetworkManager::NetworkManager(QObject *parent /* = 0*/) : 
+NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
     QObject(parent), m_networkConfigManager(0), m_networkSession(0),
     m_isOnline(false), m_errorEmitted(false)
 {
@@ -88,9 +89,9 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
         QNetworkConfiguration netConfig = m_networkConfigManager->defaultConfiguration();
         m_networkSession = new QNetworkSession(netConfig);
         m_errorEmitted = false;
-        
+
         Q_ASSERT(m_networkSession);
-        
+
         connect(m_networkSession, SIGNAL(error(QNetworkSession::SessionError)),
                 SLOT(slotSessionError(QNetworkSession::SessionError)));
         connect(m_networkSession, SIGNAL(stateChanged(QNetworkSession::State)),
@@ -101,12 +102,17 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
     if(!m_networkSession->isOpen()) {
         m_networkSession->open();
         // Fail after 10 sec if no network reply is received
-        if (!m_networkSession->waitForOpened(10000) && !m_errorEmitted) {
-            qWarning() << "No network reply received after 10 seconds, emitting session error.";
-            slotSessionError(m_networkSession->error());
-        }
+        QTimer::singleShot(10000,this,SLOT(sessionConnectionTimeout()));
     } else {
         slotSessionState(m_networkSession->state());
+    }
+}
+
+void NetworkManager::sessionConnectionTimeout()
+{
+    if (!m_errorEmitted) {
+        qWarning() << "No network reply received after 10 seconds, emitting session error.";
+        slotSessionError(m_networkSession->error());
     }
 }
 
@@ -123,8 +129,8 @@ void NetworkManager::disconnectSession()
     if(m_networkSession && 0 == m_refCount)
     {
         m_networkSession->close();
-	delete m_networkSession;
-	m_networkSession = NULL;
+        delete m_networkSession;
+        m_networkSession = NULL;
     }
 }
 

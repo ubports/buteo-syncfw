@@ -47,12 +47,12 @@ namespace Buteo
              * @param parent Parent object
              */
             NetworkManager(QObject *parent = 0);
-            
+
             /*! \brief Destructor
              *
              */
             ~NetworkManager();
-            
+
             /*! \brief Returns if the device is currently online, i.e, a data
              * sessions is possible.
              *
@@ -72,7 +72,7 @@ namespace Buteo
              * without popping up the connetion dialog
              */
             void connectSession(bool connectInBackground = false);
-            
+
             /*! \brief Disconnects an open session
              *
              */
@@ -107,6 +107,7 @@ private slots:
             void slotOnlineStateChanged(bool isOnline);
             void slotSessionState(QNetworkSession::State status);
             void slotSessionError(QNetworkSession::SessionError error);
+            void sessionConnectionTimeout();
     };
 }
 
