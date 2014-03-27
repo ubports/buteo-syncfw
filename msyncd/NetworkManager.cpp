@@ -35,7 +35,8 @@ bool NetworkManager::m_isSessionActive = false;
 
 NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
     QObject(parent), m_networkConfigManager(0), m_networkSession(0),
-    m_isOnline(false), m_errorEmitted(false)
+    m_isOnline(false), m_errorEmitted(false),
+    m_sessionTimer(0)
 {
     FUNCTION_CALL_TRACE;
     m_networkConfigManager = new QNetworkConfigurationManager();
@@ -44,6 +45,10 @@ NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
                 SLOT(slotOnlineStateChanged(bool)));
     m_isOnline = m_networkConfigManager->isOnline();
     LOG_DEBUG("Online status::" << m_isOnline);
+    m_sessionTimer = new QTimer(this);
+    m_sessionTimer->setSingleShot(true);
+    m_sessionTimer->setInterval(10000);
+    connect(m_sessionTimer,SIGNAL(timeout()),this,SLOT(sessionConnectionTimeout()));
 }
 
 NetworkManager::~NetworkManager()
@@ -102,7 +107,7 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
     if(!m_networkSession->isOpen()) {
         m_networkSession->open();
         // Fail after 10 sec if no network reply is received
-        QTimer::singleShot(10000,this,SLOT(sessionConnectionTimeout()));
+        m_sessionTimer->start();
     } else {
         slotSessionState(m_networkSession->state());
     }
@@ -110,7 +115,7 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
 
 void NetworkManager::sessionConnectionTimeout()
 {
-    if (!m_errorEmitted) {
+    if (!m_errorEmitted && m_networkSession) {
         qWarning() << "No network reply received after 10 seconds, emitting session error.";
         slotSessionError(m_networkSession->error());
     }
@@ -128,6 +133,9 @@ void NetworkManager::disconnectSession()
     }
     if(m_networkSession && 0 == m_refCount)
     {
+        if (m_sessionTimer->isActive())
+            m_sessionTimer->stop();
+
         m_networkSession->close();
         delete m_networkSession;
         m_networkSession = NULL;
@@ -143,6 +151,8 @@ void NetworkManager::slotOnlineStateChanged(bool isOnline)
     LOG_DEBUG("Online status changed, is online is now::" << isOnline);
     if(m_isOnline != isOnline)
     {
+        if (m_sessionTimer->isActive())
+            m_sessionTimer->stop();
         m_isOnline = isOnline;
         emit valueChanged(m_isOnline);
     }
