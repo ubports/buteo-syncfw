@@ -25,6 +25,7 @@
 
 #include <QNetworkSession>
 
+class QTimer;
 class QNetworkConfigurationManager;
 
 namespace Buteo
@@ -103,6 +104,7 @@ signals:
             bool                            m_isOnline;                 // Flag to indicate if the device is online
             static int                      m_refCount;                 // Reference counter for number of open connections
             bool                            m_errorEmitted;             // Network error emited flag
+            QTimer                          *m_sessionTimer;
 private slots:
             void slotOnlineStateChanged(bool isOnline);
             void slotSessionState(QNetworkSession::State status);
