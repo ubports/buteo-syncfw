@@ -111,6 +111,7 @@ headers.files = common/Logger.h \
            common/SyncCommonDefs.h \
            common/SyncDBusConnection.h \
            common/TransportTracker.h \
+           common/NetworkManager.h \
            clientfw/SyncClientInterface.h \
            clientfw/SyncClientInterfacePrivate.h \
            clientfw/SyncDaemonProxy.h \

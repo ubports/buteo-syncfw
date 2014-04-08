@@ -68,7 +68,6 @@ HEADERS += ServerActivator.h \
     ClientPluginRunner.h \
     ServerPluginRunner.h \
     SyncAlarmInventory.h \
-    NetworkManager.h \
     SyncSigHandler.h \
     StorageChangeNotifier.h \
     SyncOnChange.h \
@@ -91,7 +90,6 @@ SOURCES += ServerActivator.cpp \
     ClientPluginRunner.cpp \
     ServerPluginRunner.cpp \
     SyncAlarmInventory.cpp \
-    NetworkManager.cpp \
     SyncSigHandler.cpp \
     StorageChangeNotifier.cpp \
     SyncOnChange.cpp \
