@@ -87,6 +87,8 @@ const QString KEY_USB_TRANSPORT("usb_transport");
 const QString KEY_INTERNET_TRANSPORT("internet_transport");
 const QString KEY_LOAD_WITHOUT_TRANSPORT("load_without_transport");
 const QString KEY_CAPS_MODIFIED("caps_modified");
+const QString KEY_SYNC_SINCE_DAYS_PAST("sync_since_days_past"); // sync from this many days before the current date
+const QString KEY_SYNC_ALWAYS_UP_TO_DATE("sync_always_up_to_date");
 const QString KEY_SOC("sync_on_change");
 const QString KEY_SOC_AFTER("sync_on_change_after");
 const QString KEY_LOCAL_URI("Local URI");
