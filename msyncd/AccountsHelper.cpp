@@ -206,28 +206,6 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
     }
 }
 
-void AccountsHelper::slotAccountNameChanged(const QString &newName)
-{
-    FUNCTION_CALL_TRACE;
-    // Get the sender account
-    Accounts::Account *changedAccount = qobject_cast<Accounts::Account*>(this->sender());
-    if(0 != changedAccount)
-    {
-        QString newProfileName;
-        // Rename all the sync profiles associated with this account id
-        QList<SyncProfile*> syncProfiles = getProfilesByAccountId(changedAccount->id());
-        foreach(SyncProfile *syncProfile, syncProfiles)
-        {
-            QString profileName = syncProfile->name();
-            newProfileName = profileName.mid(0, profileName.lastIndexOf('-')) +
-                    "-" + newName;
-            LOG_INFO("Renaming profile" << profileName << "to" << newProfileName);
-            iProfileManager.rename(profileName, newName);
-            delete syncProfile;
-        }
-    }
-}
-
 void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew)
 {
     FUNCTION_CALL_TRACE;
@@ -472,9 +450,6 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
     FUNCTION_CALL_TRACE;
     Accounts::Account *account = iAccountManager->account(id);
     iAccountList.append(account);
-    // Register callback for account name changed
-    QObject::connect(account, SIGNAL(displayNameChanged(const QString&)),
-                     this, SLOT(slotAccountNameChanged(const QString&)));
     // Callback for account enabled/disabled
     QObject::connect(account, SIGNAL(enabledChanged(const QString&, bool)),
                      this, SLOT(slotAccountEnabledChanged(const QString&, bool)));
