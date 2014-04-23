@@ -87,12 +87,6 @@ public Q_SLOTS:
      * \param enabled Boolean indicating enabled (true) or disabled (false)
 	 */
     void slotAccountEnabledChanged(const QString &serviceName, bool enabled);
-
-	/*! \brief slot for Accounts::Manager displayNameChanged signal
-	 * *
-	 * \param newName of the accounts
-	 */
-    void slotAccountNameChanged(const QString &newName);
     
 	/*! \brief slot for Accounts::Manager displayNameChanged signal
 	 * *
