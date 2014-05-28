@@ -24,14 +24,19 @@
 
 #include <QObject>
 #include <QString>
+#include <Profile.h>
+#include <SyncProfile.h>
+
+#include CLASSNAME_H
+
+using namespace Buteo;
 
 class PluginServiceObj : public QObject
 {
     Q_OBJECT
 public:
-    explicit PluginServiceObj(const QString aProfileName,
-                              const QString aPluginName,
-                              QObject *parent = 0);
+    explicit PluginServiceObj(QObject *parent = 0);
+    PluginServiceObj( QString aProfile, QString aPluginName, QObject *parent = 0 );
     virtual ~PluginServiceObj();
 
 public: // PROPERTIES
@@ -45,11 +50,14 @@ public Q_SLOTS: // METHODS
     void init();
     QString profile();
     void resume();
+    void setPluginParams(const QString &aPluginName, const QString &aProfileName);
     bool startListen();
     void startSync();
     void stopListen();
     void suspend();
     void uninit();
+    void exitWithSyncSuccess(QString aProfileName, QString aState);
+    void exitWithSyncFailed(QString aProfileName, QString aMessage, int aErrorCode);
 Q_SIGNALS: // SIGNALS
     void accquiredStorage(const QString &aMimeType);
     void error(const QString &aProfileName, const QString &aMessage, int aErrorCode);
@@ -57,10 +65,14 @@ Q_SIGNALS: // SIGNALS
     void success(const QString &aProfileName, const QString &aMessage);
     void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
     void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType, int aCommittedItems);
+
+    // Signal to indicate to the main() function of sync done 
+    void syncDone(const Buteo::SyncProfile::CurrentSyncStatus status);
     
 private:
-    QString    iProfile;
-    QString    iPluginName;
+    SyncProfile    *iProfile;
+    QString         iPluginName;
+    CLASSNAME      *iPlugin;
 };
 
 #endif // PLUGINSERVICEOBJ_H

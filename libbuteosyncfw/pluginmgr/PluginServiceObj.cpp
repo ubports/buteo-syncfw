@@ -22,18 +22,51 @@
 #include "PluginServiceObj.h"
 #include <SyncResults.h>
 #include <SyncProfile.h>
+#include <ProfileManager.h>
 
 using namespace Buteo;
 
-PluginServiceObj::PluginServiceObj(const QString aProfile,
-                                   const QString aPluginName,
-                                   QObject *parent) :
-    iProfile(aProfile), iPluginName(aPluginName), QObject(parent)
+PluginServiceObj::PluginServiceObj(QObject *parent) :
+    QObject(parent), iProfile(0), iPlugin(0)
 {
+}
+
+PluginServiceObj::PluginServiceObj( QString aProfileName, QString aPluginName, QObject *parent) :
+    QObject(parent), iProfile(0), iPlugin(0)
+{
+    ProfileManager pm;
+    SyncProfile *syncProfile = pm.syncProfile( aProfileName );
+    if( syncProfile ) {
+        iProfile = syncProfile;
+    }
+
+    // Create the plugin (client or server)
+    iPlugin = new CLASSNAME( iPluginName, *iProfile, NULL );
+
 }
 
 PluginServiceObj::~PluginServiceObj()
 {
+    if( iProfile ) {
+        delete iProfile;
+        iProfile = 0;
+    }
+
+    if( iPlugin ) {
+        delete iPlugin;
+        iPlugin = 0;
+    }
+}
+
+void PluginServiceObj::setPluginParams(const QString &aPluginName,
+                                       const QString &aProfileName)
+{
+    iPluginName = aPluginName;
+    ProfileManager pm;
+    SyncProfile *syncProfile = pm.syncProfile(aProfileName);
+    if( syncProfile ) {
+        iProfile = syncProfile;
+    }
 }
 
 void PluginServiceObj::abortSync(uchar aStatus)
@@ -89,5 +122,16 @@ void PluginServiceObj::suspend()
 }
 
 void PluginServiceObj::uninit()
+{
+}
+
+void PluginServiceObj::exitWithSyncSuccess( QString aProfileName,
+                                            QString aState )
+{
+}
+
+void PluginServiceObj::exitWithSyncFailed( QString aProfileName,
+                                           QString aMessage,
+                                           int aErrorCode )
 {
 }
