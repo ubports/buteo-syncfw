@@ -69,9 +69,9 @@ bool PluginServiceObj::init()
                      this, SIGNAL(newSession(const QString&)));
 #endif
     // Chain the signals
-    QObject::connect(iPlugin, SIGNAL(transferProgress(const QString&, int, int, const QString, int)),
+    QObject::connect(iPlugin, SIGNAL(transferProgress(const QString&, int, int, const QString&, int)),
                      this, SIGNAL(transferProgress(const QString&, int, int, const QString&, int)));
-    QObject::connect(iPlugin, SIGNAL(error(const QString&, const QStrnig&, int)),
+    QObject::connect(iPlugin, SIGNAL(error(const QString&, const QString&, int)),
                      this, SIGNAL(error(const QString&, const QString&, int)));
     QObject::connect(iPlugin, SIGNAL(success(const QString&, const QString&)),
                      this, SIGNAL(success(const QString&, const QString&)));
