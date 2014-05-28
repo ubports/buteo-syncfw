@@ -42,12 +42,12 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
     void abortSync(uchar aStatus);
-    void cleanUp();
+    bool cleanUp();
     void connectivityStateChanged(int aType, int aState);
     QString getPluginName();
     QString getProfileName();
     QString getSyncResults();
-    void init();
+    bool init();
     QString profile();
     void resume();
     void setPluginParams(const QString &aPluginName, const QString &aProfileName);
@@ -55,7 +55,7 @@ public Q_SLOTS: // METHODS
     void startSync();
     void stopListen();
     void suspend();
-    void uninit();
+    bool uninit();
     void exitWithSyncSuccess(QString aProfileName, QString aState);
     void exitWithSyncFailed(QString aProfileName, QString aMessage, int aErrorCode);
 Q_SIGNALS: // SIGNALS
