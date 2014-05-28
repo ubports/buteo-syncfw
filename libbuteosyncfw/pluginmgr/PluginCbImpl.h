@@ -25,6 +25,7 @@
 #include "PluginCbInterface.h"
 #include "PluginManager.h"
 #include "SyncDaemonProxy.h"
+#include "TransportTracker.h"
 
 namespace Buteo {
 
@@ -69,6 +70,7 @@ private:
 
     PluginManager   iPluginManager;
     
+    TransportTracker  iTransportTracker;
 };
 
 }

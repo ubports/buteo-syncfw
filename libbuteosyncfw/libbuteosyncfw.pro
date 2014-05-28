@@ -8,7 +8,7 @@ VER_MAJ = 0
 VER_MIN = 1
 VER_PAT = 0
 
-QT += sql xml dbus
+QT += sql xml dbus network
 QT -= gui
 
 CONFIG += dll \
@@ -22,6 +22,8 @@ HEADERS += common/Logger.h \
            common/LogMacros.h \
            common/SyncCommonDefs.h \
            common/SyncDBusConnection.h \
+           common/TransportTracker.h \
+           common/NetworkManager.h \
            clientfw/SyncClientInterface.h \
            clientfw/SyncClientInterfacePrivate.h \
            clientfw/SyncDaemonProxy.h \
@@ -53,6 +55,8 @@ HEADERS += common/Logger.h \
            pluginmgr/ButeoPluginIf.h
 SOURCES += common/Logger.cpp \
            common/SyncDBusConnection.cpp \
+           common/TransportTracker.cpp \
+           common/NetworkManager.cpp \
            clientfw/SyncClientInterface.cpp \
            clientfw/SyncClientInterfacePrivate.cpp \
            clientfw/SyncDaemonProxy.cpp \
@@ -106,6 +110,7 @@ headers.files = common/Logger.h \
            common/LogMacros.h \
            common/SyncCommonDefs.h \
            common/SyncDBusConnection.h \
+           common/TransportTracker.h \
            clientfw/SyncClientInterface.h \
            clientfw/SyncClientInterfacePrivate.h \
            clientfw/SyncDaemonProxy.h \

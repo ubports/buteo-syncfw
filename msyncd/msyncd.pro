@@ -51,7 +51,6 @@ LIBS += -L../libbuteosyncfw
 
 # Input
 HEADERS += ServerActivator.h \
-    TransportTracker.h \
     synchronizer.h \
     SyncDBusInterface.h \
     SyncBackupProxy.h \
@@ -76,7 +75,6 @@ HEADERS += ServerActivator.h \
     SyncOnChangeScheduler.h
 
 SOURCES += ServerActivator.cpp \
-    TransportTracker.cpp \
     main.cpp \
     synchronizer.cpp \
     SyncDBusAdaptor.cpp \
