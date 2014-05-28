@@ -281,16 +281,19 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
         // Start the out of process plugin
         QString exePath = iOopClientMaps.value( aPluginName );
 
-        bool procStarted = startOOPPlugin( exePath, aPluginName, aProfile.name() );
+        QProcess* process = startOOPPlugin( exePath, aPluginName, aProfile.name() );
 
-        if( procStarted == false ) {
+        if( process == NULL ) {
             LOG_CRITICAL( "Could not start process" );
             stopOOPPlugin (aPluginName);
             return NULL;
         }
 
         // Create the client plugin interface to talk to the process
-        OOPClientPlugin* plugin = new OOPClientPlugin( aPluginName, aProfile, aCbInterface );
+        OOPClientPlugin* plugin = new OOPClientPlugin( aPluginName,
+                                                       aProfile,
+                                                       aCbInterface,
+                                                       *process );
         if( plugin ) {
             return plugin;
         } else {
@@ -398,15 +401,18 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
         // Start the Oop process plugin
         QString exePath = iOoPServerMaps.value( aPluginName );
 
-        bool procStarted = startOOPPlugin( exePath, aPluginName, aProfile.name() );
+        QProcess* process = startOOPPlugin( exePath, aPluginName, aProfile.name() );
     
-        if( procStarted == false ) {
+        if( process == NULL ) {
             LOG_CRITICAL( "Could not start server plugin process" );
             stopOOPPlugin( aPluginName );
             return NULL;
         }
 
-        OOPServerPlugin* plugin = new OOPServerPlugin( aPluginName, aProfile, aCbInterface );
+        OOPServerPlugin* plugin = new OOPServerPlugin( aPluginName,
+                                                       aProfile,
+                                                       aCbInterface,
+                                                       *process );
         if( plugin ) {
             return plugin;
         } else {
@@ -617,12 +623,11 @@ KLUDGE: Due to NB #169065, crashes are seen in QMetaType if we unload DLLs. Henc
 
 }
 
-bool PluginManager::startOOPPlugin( const QString &aPath,
+QProcess* PluginManager::startOOPPlugin( const QString &aPath,
                                     const QString& aPluginName,
                                     const QString& aProfileName)
 {
     FUNCTION_CALL_TRACE;
-    bool started = false;
     iDllLock.lockForWrite();
 
     LOG_DEBUG( "Searching for oop plugin " << aPath);
@@ -640,6 +645,7 @@ bool PluginManager::startOOPPlugin( const QString &aPath,
     // If process is not running, then start it
     if( !process )
     {
+        bool started = false;
         QStringList args;
         args << aPluginName << aProfileName;
         LOG_DEBUG( "Starting process " << aPath );
@@ -661,17 +667,17 @@ bool PluginManager::startOOPPlugin( const QString &aPath,
     	    info.iRefCount = 1;
 
     	    iLoadedDlls.append( info );
-            started = true;
             LOG_DEBUG( "Process " << process->program() << " started with pid " << process->pid() );
 
         } else {
             LOG_CRITICAL( "Unable to start process plugin " << aPath <<
                           ". Error " << process->error());
+            return NULL;
         }
     }
 
     iDllLock.unlock();
-    return started;
+    return process;
 }
 
 void PluginManager::stopOOPPlugin( const QString &aPath )

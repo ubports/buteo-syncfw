@@ -23,6 +23,7 @@
 #define OOPCLIENTPLUGIN_H
 
 #include <ClientPlugin.h>
+#include <QProcess>
 
 namespace Buteo {
 
@@ -31,7 +32,8 @@ class OOPClientPlugin : public ClientPlugin
 public:
     OOPClientPlugin( const QString& aPluginName,
                      const Buteo::SyncProfile& aProfile,
-                     Buteo::PluginCbInterface* aCbInterface );
+                     Buteo::PluginCbInterface* aCbInterface,
+                     QProcess& aProcess);
 
     virtual ~OOPClientPlugin();
 

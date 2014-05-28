@@ -105,6 +105,10 @@ private slots:
     // Slot for observing thread exit
     void onThreadExit();
 
+    void onProcessError( QProcess::ProcessError error );
+
+    void onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus );
+
 private:
 
     void onSessionDone();

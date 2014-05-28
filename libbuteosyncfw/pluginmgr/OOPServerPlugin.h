@@ -23,6 +23,7 @@
 #define OOPSERVERPLUGIN_H
 
 #include <ServerPlugin.h>
+#include <QProcess>
 
 namespace Buteo {
 class OOPServerPlugin : public ServerPlugin
@@ -30,7 +31,8 @@ class OOPServerPlugin : public ServerPlugin
 public:
     OOPServerPlugin( const QString& aPluginName,
                      const Profile& aProfile,
-                     PluginCbInterface* aCbInterface );
+                     PluginCbInterface* aCbInterface,
+                     QProcess& process );
 
     virtual ~OOPServerPlugin();
 

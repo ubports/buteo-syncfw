@@ -27,9 +27,10 @@ using namespace Buteo;
 
 #include "LogMacros.h"
 
-OOPClientPlugin::OOPClientPlugin( const QString& aPluginName,
-                                  const SyncProfile& aProfile,
-                                  PluginCbInterface* aCbInterface) : 
+OOPClientPlugin::OOPClientPlugin(const QString& aPluginName,
+                                 const SyncProfile& aProfile,
+                                 PluginCbInterface* aCbInterface,
+                                 QProcess &aProcess ) : 
     ClientPlugin( aPluginName, aProfile, aCbInterface )
 {
     FUNCTION_CALL_TRACE;
@@ -55,6 +56,12 @@ OOPClientPlugin::OOPClientPlugin( const QString& aPluginName,
 
     connect(iOopPluginIface,SIGNAL(syncProgressDetail(const QString &,int)),
     		this ,SIGNAL(syncProgressDetail(const QString &,int)));
+
+    connect(&aProcess, SIGNAL(error(QProcess::ProcessError)),
+            this, SIGNAL(processError(QProcess::ProcessError)));
+
+    connect(&aProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
+            this, SIGNAL(processFinished(int,QProcess::ExitStatus)));
 }
 
 OOPClientPlugin::~OOPClientPlugin()
