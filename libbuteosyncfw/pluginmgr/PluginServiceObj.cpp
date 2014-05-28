@@ -20,9 +20,15 @@
 * 02110-1301 USA
 */
 #include "PluginServiceObj.h"
+#include <SyncResults.h>
+#include <SyncProfile.h>
 
-PluginServiceObj::PluginServiceObj(QObject *parent) :
-    QObject(parent)
+using namespace Buteo;
+
+PluginServiceObj::PluginServiceObj(const QString aProfile,
+                                   const QString aPluginName,
+                                   QObject *parent) :
+    iProfile(aProfile), iPluginName(aPluginName), QObject(parent)
 {
 }
 

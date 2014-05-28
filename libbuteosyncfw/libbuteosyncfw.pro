@@ -79,7 +79,8 @@ SOURCES += common/Logger.cpp \
            pluginmgr/OOPServerPlugin.cpp \
            pluginmgr/PluginServiceObj.cpp \
            pluginmgr/ButeoPluginIf.cpp \
-           pluginmgr/ButeoPluginIfAdaptor.cpp
+           pluginmgr/ButeoPluginIfAdaptor.cpp \
+    pluginmgr/plugin_main.cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \
