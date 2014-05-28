@@ -16,6 +16,8 @@ QMAKE_PKGCONFIG_LIBDIR  = $$target.path
 QMAKE_PKGCONFIG_INCDIR  = $$headers.path
 pkgconfig.files = $${TARGET}.pc
 
+#DEFINES += BUTEO_ENABLE_DEBUG
+
 DEPENDPATH += .
 INCLUDEPATH += . \
     ../ \

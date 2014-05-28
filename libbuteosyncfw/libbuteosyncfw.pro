@@ -15,6 +15,8 @@ CONFIG += dll \
     create_pc \
     create_prl
 
+#DEFINES += BUTEO_ENABLE_DEBUG
+
 # Input
 HEADERS += common/Logger.h \
            common/LogMacros.h \

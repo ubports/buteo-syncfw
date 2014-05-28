@@ -36,24 +36,20 @@ int main( int argc, char** argv )
     // One way to pass the arguments is via cmdline, the other way is
     // to use the method setPluginParams() dbus method. But setting
     // cmdline arguments is probably cleaner
-    if( argv[1] == NULL ||
-        argv[2] == NULL )
+    if( (argc != 3) || (argv[1] == NULL) || (argv[2] == NULL) )
     {
         LOG_FATAL( "Plugin name and profile name are not obtained from cmdline" );
-        app.exit( 1 );
     }
     QString pluginName = QString( argv[1] );
     QString profileName = QString( argv[2] );
 
 #ifndef CLASSNAME
     LOG_FATAL( "CLASSNAME value not defined in project file" );
-    app.exit( 2 );
 #endif
 
     PluginServiceObj *serviceObj = new PluginServiceObj( pluginName, profileName );
     if( !serviceObj ) {
         LOG_FATAL( "Unable to create the service adaptor object" );
-        app.exit( 3 );
     }
 
     new ButeoPluginIfAdaptor( serviceObj );
@@ -67,12 +63,10 @@ int main( int argc, char** argv )
                        << DBUS_SERVICE_NAME_PREFIX + pluginName
                        << " and path " << DBUS_SERVICE_OBJ_PATH );
         } else {
-            LOG_FATAL( "Unable to register service at path " << DBUS_SERVICE_OBJ_PATH );
-            app.exit( 4 );
+            LOG_FATAL( "Unable to register dbus service" );
         }
     } else {
-        LOG_FATAL( "Unable to register service at " << DBUS_SERVICE_NAME_PREFIX + pluginName );
-        app.exit( 4 );
+        LOG_FATAL( "Unable to register service" );
     }
 
     // TODO: Should any unix signals be handled?
