@@ -33,8 +33,6 @@ HEADERS += common/Logger.h \
            pluginmgr/StoragePlugin.h \
            pluginmgr/SyncPluginBase.h \
            pluginmgr/BasePluginDBusAdaptor.h \
-	   pluginmgr/ClientPluginDBusAdaptor.h \
-	   pluginmgr/ServerPluginDBusAdaptor.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
@@ -49,8 +47,11 @@ HEADERS += common/Logger.h \
            profile/SyncSchedule.h \
            profile/SyncSchedule_p.h \
            profile/TargetResults.h \
-    pluginmgr/OOPClientPlugin.h \
-    pluginmgr/OOPServerPlugin.h
+           pluginmgr/OOPClientPlugin.h \
+           pluginmgr/OOPServerPlugin.h \
+           pluginmgr/PluginServiceObj.h \
+           pluginmgr/ButeoPluginIf.h \
+           pluginmgr/ButeoPluginIfAdaptor.h
 SOURCES += common/Logger.cpp \
            common/SyncDBusConnection.cpp \
            clientfw/SyncClientInterface.cpp \
@@ -63,9 +64,6 @@ SOURCES += common/Logger.cpp \
            pluginmgr/StorageItem.cpp \
            pluginmgr/StoragePlugin.cpp \
            pluginmgr/SyncPluginBase.cpp \
-	   pluginmgr/BasePluginDBusAdaptor.cpp \
-	   pluginmgr/ClientPluginDBusAdaptor.cpp \
-	   pluginmgr/ServerPluginDBusAdaptor.cpp \
            profile/BtHelper.cpp \
            profile/Profile.cpp \
            profile/ProfileFactory.cpp \
@@ -77,8 +75,11 @@ SOURCES += common/Logger.cpp \
            profile/SyncResults.cpp \
            profile/SyncSchedule.cpp \
            profile/TargetResults.cpp \
-    pluginmgr/OOPClientPlugin.cpp \
-    pluginmgr/OOPServerPlugin.cpp
+           pluginmgr/OOPClientPlugin.cpp \
+           pluginmgr/OOPServerPlugin.cpp \
+           pluginmgr/PluginServiceObj.cpp \
+           pluginmgr/ButeoPluginIf.cpp \
+           pluginmgr/ButeoPluginIfAdaptor.cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \
@@ -113,6 +114,9 @@ headers.files = common/Logger.h \
            pluginmgr/StorageItem.h \
            pluginmgr/StoragePlugin.h \
            pluginmgr/SyncPluginBase.h \
+	   pluginmgr/PluginServiceObj.h \
+	   pluginmgr/ButeoPluginIfAdaptor.h \
+	   pluginmgr/ButeoPluginIf.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
