@@ -51,7 +51,7 @@ Buteo syncfw version 0.1.0 supported only dynamic link library plugins which the
 framework loads into the same process memory as msyncd. This archicture has a
 problem that if any one of the plugin misbehaves (crashes, for example), msyncd
 would also crash and there is a probability that it would not recover. To avoid
-such situations, an out of process plugin architecture was deviced and implemented.
+such situations, an out of process plugin architecture was devised and implemented.
 In this architecture, each of the plugins would be running as separate processes
 and msyncd process would interact with each of the processes to handle the sync
 life cycle and operations.
@@ -94,7 +94,7 @@ DEFINES += CLIENT_PLUGIN
 
 Also, note that your plugin should have public inheritance from Buteo::ClientPlugin 
 
-If you want your exissting plugin dll configuration to exist with the out of process plugin configuration, the good way is to add another configuration to your .pro file. The config would look like:
+If you want your existing plugin dll configuration to exist with the out of process plugin configuration, the good way is to add another configuration to your .pro file. The config would look like:
 
 \code
 PLUGIN_DLL {

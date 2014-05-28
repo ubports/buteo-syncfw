@@ -22,7 +22,7 @@
 #include <QCoreApplication>
 #include <QDBusConnection>
 #include "PluginServiceObj.h"
-#include "ButeoPluginIfAdaptor.h"
+#include "ButeoPluginIfaceAdaptor.h"
 #include "LogMacros.h"
 
 #define DBUS_SERVICE_NAME_PREFIX "com.buteo.msyncd.plugin."
@@ -52,7 +52,7 @@ int main( int argc, char** argv )
         LOG_FATAL( "Unable to create the service adaptor object" );
     }
 
-    new ButeoPluginIfAdaptor( serviceObj );
+    new ButeoPluginIfaceAdaptor( serviceObj );
 
     // Create a session bus
     QDBusConnection connection = QDBusConnection::sessionBus();

@@ -34,7 +34,7 @@ OOPServerPlugin::OOPServerPlugin( const QString& aPluginName,
     FUNCTION_CALL_TRACE;
 
     // Initialise dbus for client
-    iOopPluginIface = new ButeoPluginIf( DBUS_SERVICE_NAME_PREFIX + aProfile.name(),
+    iOopPluginIface = new ButeoPluginIface( DBUS_SERVICE_NAME_PREFIX + aProfile.name(),
                                          DBUS_SERVICE_OBJ_PATH,
                                          QDBusConnection::sessionBus()
                                        );

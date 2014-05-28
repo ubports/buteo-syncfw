@@ -52,7 +52,7 @@ HEADERS += common/Logger.h \
            profile/TargetResults.h \
            pluginmgr/OOPClientPlugin.h \
            pluginmgr/OOPServerPlugin.h \
-           pluginmgr/ButeoPluginIf.h
+           pluginmgr/ButeoPluginIface.h
 SOURCES += common/Logger.cpp \
            common/SyncDBusConnection.cpp \
            common/TransportTracker.cpp \
@@ -80,7 +80,7 @@ SOURCES += common/Logger.cpp \
            profile/TargetResults.cpp \
            pluginmgr/OOPClientPlugin.cpp \
            pluginmgr/OOPServerPlugin.cpp \
-           pluginmgr/ButeoPluginIf.cpp
+           pluginmgr/ButeoPluginIface.cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \
@@ -103,7 +103,7 @@ sources.path = /usr/include/buteosyncfw5/
 
 sources.files = pluginmgr/plugin_main.cpp \
                 pluginmgr/PluginServiceObj.cpp \
-                pluginmgr/ButeoPluginIfAdaptor.cpp \
+                pluginmgr/ButeoPluginIfaceAdaptor.cpp \
                 pluginmgr/PluginCbImpl.cpp
 
 headers.files = common/Logger.h \
@@ -124,7 +124,8 @@ headers.files = common/Logger.h \
            pluginmgr/StoragePlugin.h \
            pluginmgr/SyncPluginBase.h \
            pluginmgr/PluginServiceObj.h \
-           pluginmgr/ButeoPluginIfAdaptor.h \
+           pluginmgr/ButeoPluginIfaceAdaptor.h \
+           pluginmgr/ButeoPluginIface.h \
            pluginmgr/PluginCbImpl.h \
            profile/BtHelper.h \
            profile/Profile.h \

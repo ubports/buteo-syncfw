@@ -60,7 +60,7 @@ computers, Internet based cloud services and mobile devices. The kind of
 data like pictures (JPEG, GIF, etc.), music files (mp3, wav, etc.), 
 movie files (wmv, mp4, etc.), data file (.doc, .ppt, .pdf etc.) and 
 non-file formats like vcard (format for contact card), vcal (format for 
-calendar entry) which has contacts and Calendar information. As the data
+calendar entry) which has contacts and calendar information. As the data
  gets more and more distributed, it become the more important to keep 
 the data in sync among the various computing entities.Various 
 protocols(SyncML, MTP, REST etc.) have evolved to keep the user data in 
@@ -70,7 +70,7 @@ sync among the entities.
 particular mobile device supports only a single protocol to keep the 
 user data in sync. It also so happens that two different protocols are 
 also used to synchronize the same kind of data (for example, SyncML and 
-REST API can be used to synchronize Calendar data). The choice of the 
+REST API can be used to synchronize calendar data). The choice of the 
 protocol to use largely depends on the kind of target service from where
  the data is fetched. Also, the device UI has to provide a coherent view
  to the end-user without having to expose the internal protocols being 
@@ -217,7 +217,7 @@ framework should be able to handle synchronization of these different
 kinds of data formats. The concept of “Storage Plugin” is created to 
 cater to this kind of usecases. Backend storage is defined as a 
 component in the platform that holds the user personal data. Some 
-examples are Contacts, Calendar, SMS, MMS, music files, audio files, 
+examples are contacts, calendar, SMS, MMS, music files, audio files, 
 photos etc. Storage plug-in would be loaded along with the corresponding
  client or server plug-in. The decision of which storage plug-in to load
  is made based on the profile information of the deployed service and 
@@ -277,7 +277,7 @@ using some of the fields of a profile that uniquely identify a profile
 combination of two transports. For example, when synchronizing with PC 
 Suite, it is possible to use both BT and/or USB to synchronize with PC 
 Suite 
-</li><li> Sync Content - the databases that this profile is used to synchronize (like Contacts, Calendar, Notes, Music etc.) 
+</li><li> Sync Content - the databases that this profile is used to synchronize (like contacts, calendar, notes, music etc.) 
 </li><li> Sync direction - the direction of synchronization (1-way send, 1-way receive, 2-way sync)
 </li><li> Synchronization status - the status that identi#es the last 
 synchronization status. This inturn will have the following entities: 
@@ -373,7 +373,7 @@ interaction is over d-bus)
  activities that occur in the synchronization framework: 
 </p><p>\image html Synchronization_Framework_Activity_Diagram.jpg
 </p>
-<ul><li> The daemon gets started (by the upstrart tool) during the 
+<ul><li> The daemon gets started (by systemd) during the 
 startup of the device. Once the necessary initialization steps are done 
 (signal handlers and so on), the daemon checks the DB to see if there is
  a need to load any server plug-ins. If there are any server plug-ins to
@@ -594,12 +594,12 @@ Buteo syncfw version 0.1.0 supported only dynamic link library plugins which the
 framework loads into the same process memory as msyncd. This archicture has a
 problem that if any one of the plugin misbehaves (crashes, for example), msyncd
 would also crash and there is a probability that it would never recover. To avoid
-such situations, an out of process plugin architecture was deviced and implemented.
+such situations, an out of process plugin architecture was devised and implemented.
 In this architecture, each of the plugins would be running as separate processes
 and msyncd process would interact with each of the processes to handle the sync
 life cycle and operations.
 
-This new architecture is deviced with the following absolute requirements:
+This new architecture is devised with the following absolute requirements:
 
 - None of the plugin code should change. This is to ensure backward compatibility
 of all existing plugins
@@ -608,7 +608,7 @@ the same for both DLL plugins as well as process plugins
 - Support for DLL plugins still continues and they can co-exist along with process
 plugins 
 
-Keeping the above requirements in context, the following architecture is deviced,
+Keeping the above requirements in context, the following architecture is devised,
 the class diagram of which is depicted below. 
 
 </p><p>\image html Outofprocesspluginclasses.png

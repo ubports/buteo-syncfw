@@ -63,8 +63,9 @@ bool PluginCbImpl::requestStorage(const QString &aStorageName,
         	LOG_WARNING( "Request for storage " << aStorageName << " failed" );
     	else
             requestResult = gotStorages.value();
-    } else
+    } else {
         LOG_WARNING( "msyncd dbus interface is NULL" );
+    }
 
     return requestResult;
 }
@@ -78,8 +79,9 @@ void PluginCbImpl::releaseStorage(const QString &aStorageName,
         QStringList storages;
     	storages << aStorageName;
     	imsyncIface->releaseStorages( storages );
-    } else
+    } else {
         LOG_WARNING( "msyncd dbus interface is NULL" );
+    }
 }
 
 StoragePlugin* PluginCbImpl::createStorage(const QString &aPluginName)
@@ -87,8 +89,7 @@ StoragePlugin* PluginCbImpl::createStorage(const QString &aPluginName)
     FUNCTION_CALL_TRACE;
 
     StoragePlugin* plugin = NULL;
-    if ( !aPluginName.isEmpty() )
-    {
+    if ( !aPluginName.isEmpty() ) {
         plugin = iPluginManager.createStorage(aPluginName);
     } // no else
 

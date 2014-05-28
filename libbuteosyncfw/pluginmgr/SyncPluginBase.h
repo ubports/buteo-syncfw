@@ -25,7 +25,7 @@
 
 #include "SyncCommonDefs.h"
 #include "SyncResults.h"
-#include "ButeoPluginIf.h"
+#include "ButeoPluginIface.h"
 
 #include <QString>
 #include <QMetaType>
@@ -185,7 +185,7 @@ protected:
 
         QMap<QString, ReceivedItemDetails> receivedItems;
 
-        ButeoPluginIf     *iOopPluginIface;
+        ButeoPluginIface     *iOopPluginIface;
 private:
 
 	QString iPluginName;
