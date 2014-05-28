@@ -48,7 +48,6 @@ SOURCES += ServerThread.cpp \
     ServerPluginRunnerTest.cpp \
     SynchronizerTest.cpp \
     SyncAlarmInventory.cpp \
-    NetworkManager.cpp \
     SyncSigHandler.cpp \
     SyncSigHandlerTest.cpp \
     SyncOnChange.cpp \
@@ -84,7 +83,6 @@ HEADERS += ServerThread.h \
     ServerPluginRunnerTest.h \
     SyncAlarmInventory.h \
     SynchronizerTest.h \
-    NetworkManager.h \
     SyncSigHandler.h \
     SyncSigHandlerTest.h \
     SyncOnChange.h \
