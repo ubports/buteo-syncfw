@@ -26,6 +26,7 @@
 #include <QString>
 #include <QMap>
 #include <QReadWriteLock>
+#include <QProcess>
 
 namespace Buteo {
 
@@ -160,6 +161,12 @@ public:
      */
     void destroyServer( ServerPlugin *aPlugin );
 
+protected slots:
+    void onProcessStarted();
+
+    void onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus );
+
+    void onProcessError( QProcess::ProcessError procError );
 private:
 
     struct DllInfo
@@ -180,6 +187,10 @@ private:
 
     void unloadDll( const QString& aPath );
 
+    bool startOOPPlugin( const QString& aPath );
+
+    void stopOOPPlugin( const QString& aPath );
+
     QString                 iPluginPath;
 
     QMap<QString, QString>  iStorageChangeNotifierMaps;
@@ -193,6 +204,10 @@ private:
     QList<DllInfo>          iLoadedDlls;
 
     QReadWriteLock          iDllLock;
+
+    QProcess                *iProcess;
+
+    QString                 iProcBinaryPath;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class ClientPluginTest;
