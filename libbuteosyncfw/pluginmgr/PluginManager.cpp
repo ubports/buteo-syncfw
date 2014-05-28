@@ -294,6 +294,8 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
             return NULL;
         }
     }
+
+    return NULL;
 }
 
 void PluginManager::destroyClient( ClientPlugin *aPlugin )
@@ -405,6 +407,8 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
             return NULL;
         }
     }
+
+    return NULL;
 }
 
 void PluginManager::destroyServer( ServerPlugin *aPlugin )
