@@ -190,5 +190,5 @@ BackgroundActivity::Frequency BackgroundSync::frequencyFromSeconds(int seconds) 
     else if (minutes <= 12 * 60)
         return BackgroundActivity::TwelveHours;
     else
-        return BackgroundActivity::MaximumFrequency; //18h
+        return BackgroundActivity::TwentyFourHours;
 }
