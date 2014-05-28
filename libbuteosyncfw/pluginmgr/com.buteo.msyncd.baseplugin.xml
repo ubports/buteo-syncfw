@@ -31,6 +31,10 @@
       <arg name="aProgressDetail" type="i" direction="out"/>
     </signal>
 
+    <method name="setPluginParams">
+      <arg name="aPluginName" type="s" direction="in" />
+      <arg name="aProfile" type="s" direction="in" />
+    </method>
     <method name="getPluginName">
       <arg type="s" direction="out"/>
     </method>
