@@ -43,19 +43,21 @@ public: // PROPERTIES
 public Q_SLOTS: // METHODS
     void abortSync(uchar aStatus);
     bool cleanUp();
-    void connectivityStateChanged(int aType, int aState);
+    void connectivityStateChanged(int aType, bool aState);
     QString getPluginName();
     QString getProfileName();
     QString getSyncResults();
     bool init();
+    bool uninit();
+    bool startSync();
     QString profile();
-    void resume();
     void setPluginParams(const QString &aPluginName, const QString &aProfileName);
+#ifndef CLIENT_PLUGIN
+    void resume();
     bool startListen();
-    void startSync();
     void stopListen();
     void suspend();
-    bool uninit();
+#endif
     void exitWithSyncSuccess(QString aProfileName, QString aState);
     void exitWithSyncFailed(QString aProfileName, QString aMessage, int aErrorCode);
 Q_SIGNALS: // SIGNALS

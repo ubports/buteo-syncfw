@@ -65,12 +65,13 @@
 
     <method name="connectivityStateChanged">
       <arg name="aType" type="i" direction="in"/>
-      <arg name="aState" type="i" direction="in"/>
+      <arg name="aState" type="b" direction="in"/>
     </method>
     <!-- END: Common plugin methods -->
 
     <!-- BEGIN: Client plugin methods -->
     <method name="startSync">
+      <arg type="b" direction="out"/>
     </method>
 
     <method name="profile">
