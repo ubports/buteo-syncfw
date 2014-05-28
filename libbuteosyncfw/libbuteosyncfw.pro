@@ -32,9 +32,12 @@ HEADERS += common/Logger.h \
            pluginmgr/StorageItem.h \
            pluginmgr/StoragePlugin.h \
            pluginmgr/SyncPluginBase.h \
-	   pluginmgr/BasePluginDBusAdaptor.h \
+           pluginmgr/BasePluginDBusAdaptor.h \
 	   pluginmgr/ClientPluginDBusAdaptor.h \
 	   pluginmgr/ServerPluginDBusAdaptor.h \
+           pluginmgr/OOPPluginManager.h \
+           pluginmgr/OOPClientPlugin.h \
+           pluginmgr/OOPServerPlugin.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
@@ -64,6 +67,9 @@ SOURCES += common/Logger.cpp \
 	   pluginmgr/BasePluginDBusAdaptor.cpp \
 	   pluginmgr/ClientPluginDBusAdaptor.cpp \
 	   pluginmgr/ServerPluginDBusAdaptor.cpp \
+           pluginmgr/OOPPluginManager.cpp \
+           pluginmgr/OOPClientPlugin.cpp \
+           pluginmgr/OOPServerPlugin.cpp \
            profile/BtHelper.cpp \
            profile/Profile.cpp \
            profile/ProfileFactory.cpp \

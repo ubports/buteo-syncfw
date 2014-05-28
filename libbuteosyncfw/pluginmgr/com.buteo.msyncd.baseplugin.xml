@@ -21,7 +21,7 @@
       <arg name="aMessage" type="s" direction="out"/>
     </signal>
 
-    <signal name="acquiredStorage">
+    <signal name="accquiredStorage">
       <arg name="aMimeType" type="s" direction="out"/>
     </signal>
 
