@@ -47,8 +47,9 @@ public Q_SLOTS: // METHODS
     QString getSyncResults();
     bool init();
     bool uninit();
+#ifdef CLIENT_PLUGIN
     bool startSync();
-#ifndef CLIENT_PLUGIN
+#else
     void resume();
     bool startListen();
     void stopListen();
@@ -64,6 +65,8 @@ Q_SIGNALS: // SIGNALS
 
 private:
     CLASSNAME      *iPlugin;
+    QString        iProfileName;
+    QString        iPluginName;
     PluginCbImpl   iPluginCb;
 };
 
