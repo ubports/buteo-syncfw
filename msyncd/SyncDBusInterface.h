@@ -160,6 +160,12 @@ signals:
      */
     void statusChanged(unsigned int aAccountId, int aNewStatus, int aFailedReason, qlonglong aPrevSyncTime, qlonglong aNextSyncTime);
  
+    /*! \brief Returns the connectivity state of a specific medium like
+     * bluetooth, USB or network.
+     * \see SyncCommonDefs::ConnectivityType for arguments
+     */
+    bool isConnectivityAvailable(int connectivityType);
+
 public slots:
 
     /*!

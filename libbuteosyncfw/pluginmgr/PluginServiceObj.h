@@ -26,6 +26,7 @@
 #include <QString>
 #include <Profile.h>
 #include <SyncProfile.h>
+#include <PluginCbImpl.h>
 
 #include CLASSNAME_H
 
@@ -75,6 +76,7 @@ private:
     SyncProfile    *iProfile;
     QString         iPluginName;
     CLASSNAME      *iPlugin;
+    PluginCbImpl   iPluginCb;
 };
 
 #endif // PLUGINSERVICEOBJ_H
