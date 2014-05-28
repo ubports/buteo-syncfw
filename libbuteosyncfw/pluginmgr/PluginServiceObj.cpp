@@ -27,45 +27,33 @@
 
 using namespace Buteo;
 
-PluginServiceObj::PluginServiceObj(QObject *parent) :
-    QObject(parent), iProfile(0), iPlugin(0)
-{
-}
-
 PluginServiceObj::PluginServiceObj( QString aProfileName, QString aPluginName, QObject *parent) :
-    QObject(parent), iProfile(0), iPluginName(aPluginName), iPlugin(0)
+    QObject(parent), iPlugin(0)
 {
     ProfileManager pm;
     SyncProfile *syncProfile = pm.syncProfile( aProfileName );
-    if( syncProfile ) {
-        iProfile = syncProfile;
-    }
 
     // Create the plugin (client or server)
-    iPlugin = new CLASSNAME( iPluginName, *iProfile, &iPluginCb );
+    iPlugin = new CLASSNAME( aPluginName, *syncProfile, &iPluginCb );
+ 
+    // Chain the signals
+    QObject::connect(iPlugin, SIGNAL(transferProgress(const QString&, int, int, const QString, int)),
+                     this, SIGNAL(transferProgress(const QString&, int, int, const QString&, int)));
+    QObject::connect(iPlugin, SIGNAL(error(const QString&, const QStrnig&, int)),
+                     this, SIGNAL(error(const QString&, const QString&, int)));
+    QObject::connect(iPlugin, SIGNAL(success(const QString&, const QString&)),
+                     this, SIGNAL(success(const QString&, const QString&)));
+    QObject::connect(iPlugin, SIGNAL(accquiredStorage(const QString&)),
+                     this, SIGNAL(accquiredStorage(const QString&)));
+    QObject::connect(iPlugin, SIGNAL(syncProgressDetail(const QString&, int)),
+                     this, SIGNAL(syncProgressDetail(const QString&, int)));
 }
 
 PluginServiceObj::~PluginServiceObj()
 {
-    if( iProfile ) {
-        delete iProfile;
-        iProfile = 0;
-    }
-
     if( iPlugin ) {
         delete iPlugin;
         iPlugin = 0;
-    }
-}
-
-void PluginServiceObj::setPluginParams(const QString &aPluginName,
-                                       const QString &aProfileName)
-{
-    iPluginName = aPluginName;
-    ProfileManager pm;
-    SyncProfile *syncProfile = pm.syncProfile(aProfileName);
-    if( syncProfile ) {
-        iProfile = syncProfile;
     }
 }
 
@@ -111,32 +99,11 @@ void PluginServiceObj::connectivityStateChanged(int aType, bool aState)
     iPlugin->connectivityStateChanged( static_cast<Sync::ConnectivityType>(aType), aState );
 }
 
-QString PluginServiceObj::getPluginName()
-{
-    FUNCTION_CALL_TRACE;
-
-    return iPluginName;
-}
-
-QString PluginServiceObj::getProfileName()
-{
-    FUNCTION_CALL_TRACE;
-
-    return iProfile->name();
-}
-
 QString PluginServiceObj::getSyncResults()
 {
     FUNCTION_CALL_TRACE;
 
     return iPlugin->getSyncResults().toString();
-}
-
-QString PluginServiceObj::profile()
-{
-    FUNCTION_CALL_TRACE;
-
-    return iProfile->toString();
 }
 
 #ifndef CLIENT_PLUGIN
@@ -168,14 +135,3 @@ void PluginServiceObj::suspend()
     return iPlugin->suspend();
 }
 #endif
-
-void PluginServiceObj::exitWithSyncSuccess( QString aProfileName,
-                                            QString aState )
-{
-}
-
-void PluginServiceObj::exitWithSyncFailed( QString aProfileName,
-                                           QString aMessage,
-                                           int aErrorCode )
-{
-}

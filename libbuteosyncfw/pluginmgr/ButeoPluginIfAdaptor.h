@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef BUTEOPLUGINIFADAPTOR_H_1383575815
-#define BUTEOPLUGINIFADAPTOR_H_1383575815
+#ifndef BUTEOPLUGINIFADAPTOR_H_1383719541
+#define BUTEOPLUGINIFADAPTOR_H_1383719541
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -55,16 +55,6 @@ class ButeoPluginIfAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"s\" name=\"aProfileName\"/>\n"
 "      <arg direction=\"out\" type=\"i\" name=\"aProgressDetail\"/>\n"
 "    </signal>\n"
-"    <method name=\"setPluginParams\">\n"
-"      <arg direction=\"in\" type=\"s\" name=\"aPluginName\"/>\n"
-"      <arg direction=\"in\" type=\"s\" name=\"aProfile\"/>\n"
-"    </method>\n"
-"    <method name=\"getPluginName\">\n"
-"      <arg direction=\"out\" type=\"s\"/>\n"
-"    </method>\n"
-"    <method name=\"getProfileName\">\n"
-"      <arg direction=\"out\" type=\"s\"/>\n"
-"    </method>\n"
 "    <method name=\"init\">\n"
 "      <arg direction=\"out\" type=\"b\"/>\n"
 "    </method>\n"
@@ -87,9 +77,6 @@ class ButeoPluginIfAdaptor: public QDBusAbstractAdaptor
 "    <method name=\"startSync\">\n"
 "      <arg direction=\"out\" type=\"b\"/>\n"
 "    </method>\n"
-"    <method name=\"profile\">\n"
-"      <arg direction=\"out\" type=\"s\"/>\n"
-"    </method>\n"
 "    <signal name=\"newSession\">\n"
 "      <arg direction=\"out\" type=\"s\" name=\"aDestination\"/>\n"
 "    </signal>\n"
@@ -110,13 +97,9 @@ public Q_SLOTS: // METHODS
     void abortSync(uchar aStatus);
     bool cleanUp();
     void connectivityStateChanged(int aType, bool aState);
-    QString getPluginName();
-    QString getProfileName();
     QString getSyncResults();
     bool init();
-    QString profile();
     void resume();
-    void setPluginParams(const QString &aPluginName, const QString &aProfile);
     bool startListen();
     bool startSync();
     void stopListen();

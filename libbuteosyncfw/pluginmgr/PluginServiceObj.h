@@ -36,7 +36,6 @@ class PluginServiceObj : public QObject
 {
     Q_OBJECT
 public:
-    explicit PluginServiceObj(QObject *parent = 0);
     PluginServiceObj( QString aProfile, QString aPluginName, QObject *parent = 0 );
     virtual ~PluginServiceObj();
 
@@ -45,22 +44,16 @@ public Q_SLOTS: // METHODS
     void abortSync(uchar aStatus);
     bool cleanUp();
     void connectivityStateChanged(int aType, bool aState);
-    QString getPluginName();
-    QString getProfileName();
     QString getSyncResults();
     bool init();
     bool uninit();
     bool startSync();
-    QString profile();
-    void setPluginParams(const QString &aPluginName, const QString &aProfileName);
 #ifndef CLIENT_PLUGIN
     void resume();
     bool startListen();
     void stopListen();
     void suspend();
 #endif
-    void exitWithSyncSuccess(QString aProfileName, QString aState);
-    void exitWithSyncFailed(QString aProfileName, QString aMessage, int aErrorCode);
 Q_SIGNALS: // SIGNALS
     void accquiredStorage(const QString &aMimeType);
     void error(const QString &aProfileName, const QString &aMessage, int aErrorCode);
@@ -69,12 +62,7 @@ Q_SIGNALS: // SIGNALS
     void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
     void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType, int aCommittedItems);
 
-    // Signal to indicate to the main() function of sync done 
-    void syncDone(const Buteo::SyncProfile::CurrentSyncStatus status);
-    
 private:
-    SyncProfile    *iProfile;
-    QString         iPluginName;
     CLASSNAME      *iPlugin;
     PluginCbImpl   iPluginCb;
 };

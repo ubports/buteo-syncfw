@@ -40,9 +40,24 @@ OOPClientPlugin::OOPClientPlugin( const QString& aPluginName,
     // Initialise dbus for client
     iOopClientIface = new ButeoPluginIf( DBUS_SERVICE_NAME_PREFIX + aProfile.name(),
                                          DBUS_SERVICE_OBJ_PATH,
-                                         QDBusConnection::sessionBus(),
-                                         0 );
-  
+                                         QDBusConnection::sessionBus()
+                                       );
+
+    // Chain the signals received over dbus
+    connect(iOopClientIface, SIGNAL(transferProgress(const QString &, int, int, const QString &, int)),
+        this, SIGNAL(transferProgress(const QString &, int, int, const QString &, int)));
+
+    connect(iOopClientIface, SIGNAL(error(const QString &, const QString &, int)),
+        this, SIGNAL(error(const QString &, const QString &, int)));
+
+    connect(iOopClientIface, SIGNAL(success(const QString &, const QString &)),
+        this, SIGNAL(success(const QString &, const QString &)));
+
+    connect(iOopClientIface, SIGNAL(accquiredStorage(const QString &)),
+        this, SIGNAL(accquiredStorage(const QString &)));
+
+    connect(iOopClientIface,SIGNAL(syncProgressDetail(const QString &,int)),
+    		this ,SIGNAL(syncProgressDetail(const QString &,int)));
 }
 
 OOPClientPlugin::~OOPClientPlugin()

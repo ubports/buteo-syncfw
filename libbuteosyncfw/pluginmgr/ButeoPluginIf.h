@@ -8,8 +8,8 @@
  * Do not edit! All changes made to it will be lost.
  */
 
-#ifndef BUTEOPLUGINIF_H_1383575809
-#define BUTEOPLUGINIF_H_1383575809
+#ifndef BUTEOPLUGINIF_H_1383719430
+#define BUTEOPLUGINIF_H_1383719430
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
@@ -56,18 +56,6 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QLatin1String("connectivityStateChanged"), argumentList);
     }
 
-    inline QDBusPendingReply<QString> getPluginName()
-    {
-        QList<QVariant> argumentList;
-        return asyncCallWithArgumentList(QLatin1String("getPluginName"), argumentList);
-    }
-
-    inline QDBusPendingReply<QString> getProfileName()
-    {
-        QList<QVariant> argumentList;
-        return asyncCallWithArgumentList(QLatin1String("getProfileName"), argumentList);
-    }
-
     inline QDBusPendingReply<QString> getSyncResults()
     {
         QList<QVariant> argumentList;
@@ -80,23 +68,10 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QLatin1String("init"), argumentList);
     }
 
-    inline QDBusPendingReply<QString> profile()
-    {
-        QList<QVariant> argumentList;
-        return asyncCallWithArgumentList(QLatin1String("profile"), argumentList);
-    }
-
     inline QDBusPendingReply<> resume()
     {
         QList<QVariant> argumentList;
         return asyncCallWithArgumentList(QLatin1String("resume"), argumentList);
-    }
-
-    inline QDBusPendingReply<> setPluginParams(const QString &aPluginName, const QString &aProfile)
-    {
-        QList<QVariant> argumentList;
-        argumentList << QVariant::fromValue(aPluginName) << QVariant::fromValue(aProfile);
-        return asyncCallWithArgumentList(QLatin1String("setPluginParams"), argumentList);
     }
 
     inline QDBusPendingReply<bool> startListen()
