@@ -50,7 +50,8 @@ enum SyncStatus {
     SYNC_CONNECTION_ERROR,
     SYNC_SERVER_FAILURE,
     SYNC_BAD_REQUEST,
-    SYNC_PLUGIN_ERROR
+    SYNC_PLUGIN_ERROR,
+    SYNC_PLUGIN_TIMEOUT
 };
 
 // UI needs to display a detailed Progress for the Current ongoing sync

@@ -56,9 +56,11 @@ bool PluginServiceObj::init()
     iPlugin = new CLASSNAME( iPluginName, *syncProfile, &iPluginCb );
 #else
     Profile *profile = pm.profile( iProfileName, Profile::TYPE_SERVER );
-    if( !profile ) {
+    if( !profile || !profile->isValid() ) {
         LOG_WARNING( "Profile " << iProfileName << " does not exist" );
         return false;
+    } else {
+        pm.expand( *profile );
     }
 
     // Create the plugin (client or server)
