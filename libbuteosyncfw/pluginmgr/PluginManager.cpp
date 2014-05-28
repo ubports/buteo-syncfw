@@ -283,7 +283,7 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
         // Start the out of process plugin
         QString exePath = iOopClientMaps.value( aPluginName );
 
-        bool procStarted = startOOPPlugin( exePath );
+        bool procStarted = startOOPPlugin( exePath, aPluginName, aProfile.name() );
 
         if( procStarted == false ) {
             LOG_CRITICAL( "Could not start process" );
@@ -399,7 +399,7 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
     {
         // Start the Oop process plugin
         QString exePath = iOoPServerMaps.value( aPluginName );
-        bool procStarted = startOOPPlugin( exePath );
+        bool procStarted = startOOPPlugin( exePath, aPluginName, aProfile.name() );
     
         if( procStarted == false ) {
             LOG_CRITICAL( "Could not start server plugin process" );
@@ -589,7 +589,9 @@ KLUDGE: Due to NB #169065, crashes are seen in QMetaType if we unload DLLs. Henc
 
 }
 
-bool PluginManager::startOOPPlugin( const QString &aPath )
+bool PluginManager::startOOPPlugin( const QString &aPath,
+                                    const QString& aPluginName,
+                                    const QString& aProfileName)
 {
     FUNCTION_CALL_TRACE;
     bool started = false;
@@ -611,6 +613,8 @@ bool PluginManager::startOOPPlugin( const QString &aPath )
     {
         iProcBinaryPath = aPath;
         iProcess = new QProcess();
+        QStringList args;
+        args << aPluginName << aProfileName;
         LOG_DEBUG( "Starting process " << aPath );
         
         /*
@@ -622,7 +626,7 @@ bool PluginManager::startOOPPlugin( const QString &aPath )
                           this, SLOT(onProcessFinished(int,QProcess::ExitStatus)) );
         */
 
-        iProcess->startDetached( aPath );
+        iProcess->startDetached( aPath, args );
         bool state = iProcess->waitForStarted();
         if (state == true)
         {
