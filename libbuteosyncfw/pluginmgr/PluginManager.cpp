@@ -32,6 +32,8 @@
 #include "ServerPlugin.h"
 #include "ClientPlugin.h"
 #include "StorageChangeNotifierPlugin.h"
+#include "OOPClientPlugin.h"
+#include "OOPServerPlugin.h"
 
 #include "LogMacros.h"
 
@@ -290,7 +292,15 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
         }
 
         // Create the client plugin interface to talk to the process
-        
+        OOPClientPlugin* plugin = new OOPClientPlugin( aPluginName, aProfile, aCbInterface );
+        if( plugin ) {
+            return plugin;
+        } else {
+            LOG_CRITICAL( "Could not create plugin instance" );
+            // Stop the process plugin
+            stopOOPPlugin( exePath );
+            return NULL;
+        }
     }
 }
 
@@ -335,6 +345,8 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
     } else if ( iOopClientMaps.contains(pluginName) )
     {
         // Stop the OOP process
+        QString path = iOopClientMaps.value( pluginName );
+        stopOOPPlugin( path );
     }
 }
 
@@ -386,6 +398,23 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
     } else if ( iOoPServerMaps.contains(aPluginName) )
     {
         // Start the Oop process plugin
+        QString exePath = iOoPServerMaps.value( aPluginName );
+        bool procStarted = startOOPPlugin( exePath );
+    
+        if( procStarted == false ) {
+            LOG_CRITICAL( "Could not start server plugin process" );
+            stopOOPPlugin( aPluginName );
+            return NULL;
+        }
+
+        OOPServerPlugin* plugin = new OOPServerPlugin( aPluginName, aProfile, aCbInterface );
+        if( plugin ) {
+            return plugin;
+        } else {
+            LOG_CRITICAL( "Could not start server plugin" );
+            stopOOPPlugin( exePath );
+            return NULL;
+        }
     }
 }
 
@@ -431,6 +460,8 @@ void PluginManager::destroyServer( ServerPlugin *aPlugin )
     } else if ( iOoPServerMaps.contains(pluginName) )
     {
         // Stop the OOP server process
+        QString path = iOoPServerMaps.value( pluginName );
+        stopOOPPlugin( path );
     }
 }
 
