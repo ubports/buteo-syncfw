@@ -23,7 +23,12 @@
 #include "OOPClientPlugin.h"
 using namespace Buteo;
 
+#include <QDomDocument>
+
 #include "LogMacros.h"
+
+#define DBUS_SERVICE_NAME_PREFIX "com.buteo.msyncd.plugin."
+#define DBUS_SERVICE_OBJ_PATH "/"
 
 OOPClientPlugin::OOPClientPlugin( const QString& aPluginName,
                                   const SyncProfile& aProfile,
@@ -31,44 +36,109 @@ OOPClientPlugin::OOPClientPlugin( const QString& aPluginName,
     ClientPlugin( aPluginName, aProfile, aCbInterface )
 {
     FUNCTION_CALL_TRACE;
+
+    // Initialise dbus for client
+    iOopClientIface = new ButeoPluginIf( DBUS_SERVICE_NAME_PREFIX + aProfile.name(),
+                                         DBUS_SERVICE_OBJ_PATH,
+                                         QDBusConnection::sessionBus(),
+                                         0 );
+  
 }
 
 OOPClientPlugin::~OOPClientPlugin()
 {
+    if( iOopClientIface ) {
+        delete iOopClientIface;
+        iOopClientIface = 0;
+    }
 }
 
 bool OOPClientPlugin::init()
 {
     FUNCTION_CALL_TRACE;
+    QDBusReply<bool> reply = iOopClientIface->init();
+    if( !reply.isValid() ) {
+        LOG_WARNING( "Invalid reply for init from plugin" );
+        return false;
+    }
+
+    return reply.value();
 }
 
 bool OOPClientPlugin::uninit()
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<bool> reply = iOopClientIface->uninit();
+    if( !reply.isValid() ) {
+        LOG_WARNING( "Invalid reply for uninit from plugin" );
+        return false;
+    }
+
+    return reply.value();
 }
 
 bool OOPClientPlugin::startSync()
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<bool> reply = iOopClientIface->startSync();
+    if( !reply.isValid() ) {
+        LOG_WARNING( "Invalid reply for startSync from plugin" );
+        return false;
+    }
+
+    return reply.value();
 }
 
 void OOPClientPlugin::abortSync( Sync::SyncStatus aStatus )
 {
     FUNCTION_CALL_TRACE;
+
+    iOopClientIface->abortSync( (uchar)aStatus );
 }
 
 bool OOPClientPlugin::cleanUp()
 {
     FUNCTION_CALL_TRACE;
+
+    QDBusReply<bool> reply = iOopClientIface->cleanUp();
+    if( !reply.isValid() ) {
+        LOG_WARNING( "Invalid reply for cleanUp from plugin" );
+        return false;
+    }
+
+    return reply.value();
 }
 
 SyncResults OOPClientPlugin::getSyncResults() const
 {
     FUNCTION_CALL_TRACE;
+
+    SyncResults errorSyncResult( QDateTime(),
+                            SyncResults::SYNC_RESULT_INVALID,
+                            SyncResults::SYNC_RESULT_INVALID );
+    QDBusReply<QString> reply = iOopClientIface->getSyncResults();
+    if( !reply.isValid() ) {
+        LOG_WARNING( "Invalid reply for getSyncResults from plugin" );
+        return errorSyncResult;
+    }
+
+    QString resultAsXml = reply.value();
+    QDomDocument doc;
+    if( doc.setContent(resultAsXml, true) ) {
+        SyncResults syncResult( doc.documentElement() );
+        return syncResult;
+    } else {
+        LOG_CRITICAL( "Invalid sync results returned from plugin" );
+        return errorSyncResult;
+    }
 }
 
 void OOPClientPlugin::connectivityStateChanged( Sync::ConnectivityType aType,
                                                 bool aState )
 {
     FUNCTION_CALL_TRACE;
+
+    iOopClientIface->connectivityStateChanged( aType, aState );
 }
