@@ -1,10 +1,9 @@
-SOURCES += ClientPluginTest.cpp \
-           ServerPluginTest.cpp \
-           StoragePluginTest.cpp \
-           DeletedItemsIdStorageTest.cpp
+TEMPLATE = subdirs
+SUBDIRS = \
+        ClientPluginTest.pro \
+        DeletedItemsIdStorageTest.pro \
+        ServerPluginTest.pro \
+        StoragePluginTest.pro \
 
-HEADERS += ClientPluginTest.h \
-           ServerPluginTest.h \
-           StoragePluginTest.h \
-           DeletedItemsIdStorageTest.h
-           
+coverage.CONFIG += recursive
+QMAKE_EXTRA_TARGETS += coverage

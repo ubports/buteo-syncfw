@@ -25,7 +25,6 @@
 #include <QDomDocument>
 
 #include "SyncLog.h"
-#include "SyncFwTestLoader.h"
 
 using namespace Buteo;
 
@@ -119,4 +118,4 @@ void SyncLogTest::testAddResults()
 }
 
 
-TESTLOADER_ADD_TEST(SyncLogTest);
+QTEST_MAIN(Buteo::SyncLogTest)

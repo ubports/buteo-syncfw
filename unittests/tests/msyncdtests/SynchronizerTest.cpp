@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-#include "SyncFwTestLoader.h"
 #include "SynchronizerTest.h"
 #include "TransportTracker.h"
 #include "ServerActivator.h"
@@ -243,4 +242,4 @@ void SynchronizerTest::testSignals()
 	iSync->onSessionFinished("Profile", Sync::SYNC_DONE, "Msg", 0);
 	QCOMPARE(sessionStatus.count(), 1);
 }
-TESTLOADER_ADD_TEST(SynchronizerTest);
+QTEST_MAIN(Buteo::SynchronizerTest)

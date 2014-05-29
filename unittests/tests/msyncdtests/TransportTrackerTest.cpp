@@ -27,7 +27,6 @@
 #include <QtTest/QtTest>
 #include <QSignalSpy>
 #include <QDBusVariant>
-#include "SyncFwTestLoader.h"
 
 using namespace Buteo;
 
@@ -134,4 +133,4 @@ void TransportTrackerTest :: testStateChanged()
 
 
 
-TESTLOADER_ADD_TEST(TransportTrackerTest);
+QTEST_MAIN(Buteo::TransportTrackerTest)

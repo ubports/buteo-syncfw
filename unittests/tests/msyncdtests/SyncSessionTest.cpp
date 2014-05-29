@@ -31,7 +31,6 @@
 #include "SyncSession.h"
 #include "PluginManager.h"
 #include "PluginCbInterface.h"
-#include "SyncFwTestLoader.h"
 #include "SyncResults.h"
 
 #include <QString>
@@ -402,4 +401,4 @@ bool SyncSessionPluginRunnerTest :: cleanUp()
 	return true;
 }
 
-//TESTLOADER_ADD_TEST(SyncSessionTest);
+QTEST_MAIN(Buteo::SyncSessionTest)

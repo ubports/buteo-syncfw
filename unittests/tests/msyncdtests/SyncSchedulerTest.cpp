@@ -24,7 +24,6 @@
 #include "SyncScheduler.h"
 #include "SyncProfile.h"
 #include <ctime>
-#include "SyncFwTestLoader.h"
 
 using namespace Buteo;
 
@@ -81,4 +80,4 @@ void SyncSchedulerTest::testSetNextAlarm()
     iSyncScheduler->removeAlarmEvent(alarmId);
 }
 
-TESTLOADER_ADD_TEST(SyncSchedulerTest);
+QTEST_MAIN(Buteo::SyncSchedulerTest)

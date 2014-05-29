@@ -26,7 +26,6 @@
 #include <QDomDocument>
 #include <QScopedPointer>
 
-#include "SyncFwTestLoader.h"
 #include "ProfileEngineDefs.h"
 
 using namespace Buteo;
@@ -437,4 +436,4 @@ QString ProfileTest::profileFileToString(const QString &aName,
 }
 
 
-TESTLOADER_ADD_TEST(ProfileTest);
+QTEST_MAIN(Buteo::ProfileTest)

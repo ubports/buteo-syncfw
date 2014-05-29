@@ -80,12 +80,7 @@ Group: Development/Libraries
 
 %files tests
 %defattr(-,root,root,-)
-/opt/tests/buteo-syncfw/*.so
-/opt/tests/buteo-syncfw/*.pl
-/opt/tests/buteo-syncfw/*.sh
-/opt/tests/buteo-syncfw/sync-fw-tests*
-/opt/tests/buteo-syncfw/syncprofiletests
-/opt/tests/buteo-syncfw/test-definition/*.xml
+/opt/tests/buteo-syncfw/*
 %{_datadir}/accounts/services/*.service
 
 

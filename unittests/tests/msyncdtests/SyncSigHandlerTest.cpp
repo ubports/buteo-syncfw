@@ -24,7 +24,6 @@
 
 
 #include "SyncSigHandlerTest.h"
-#include "SyncFwTestLoader.h"
 
 #include <QtTest/QtTest>
 #include <QSignalSpy>
@@ -53,4 +52,4 @@ void SyncSigHandlerTest :: testSigTerm()
     LOG_DEBUG("Check there should not be any core dump in /home/user/Mydocs/core-dumps");
 }
 
-TESTLOADER_ADD_TEST(SyncSigHandlerTest);
+QTEST_MAIN(Buteo::SyncSigHandlerTest)
