@@ -69,7 +69,7 @@ Group: Documentation
 
 %files doc
 %defattr(-,root,root,-)
-%{_docdir}/sync-fw-doc/*
+%{_docdir}/buteo-syncfw-doc/*
 
 %package tests
 Summary: Tests for %{name}
@@ -91,6 +91,7 @@ Group: Development/Libraries
 %build
 qmake
 make
+make doc
 
 
 %install
