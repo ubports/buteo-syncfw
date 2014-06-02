@@ -27,6 +27,7 @@
 #include <Profile.h>
 #include <SyncProfile.h>
 #include <PluginCbImpl.h>
+#include <SyncCommonDefs.h>
 
 #include CLASSNAME_H
 
@@ -61,7 +62,7 @@ Q_SIGNALS: // SIGNALS
     void newSession(const QString &aDestination);
     void success(const QString &aProfileName, const QString &aMessage);
     void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
-    void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType, int aCommittedItems);
+    void transferProgress(const QString &aProfileName, Sync::TransferDatabase aDatabase, Sync::TransferType aType, const QString &aMimeType, int aCommittedItems);
 
 private:
     CLASSNAME      *iPlugin;

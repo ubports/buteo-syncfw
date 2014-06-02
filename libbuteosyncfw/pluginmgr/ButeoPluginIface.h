@@ -20,6 +20,8 @@
 #include <QtCore/QVariant>
 #include <QtDBus/QtDBus>
 
+#include <SyncCommonDefs.h>
+
 /*
  * Proxy class for interface com.buteo.msyncd.baseplugin
  */
@@ -110,7 +112,7 @@ Q_SIGNALS: // SIGNALS
     void newSession(const QString &aDestination);
     void success(const QString &aProfileName, const QString &aMessage);
     void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
-    void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType, int aCommittedItems);
+    void transferProgress(const QString &aProfileName, Sync::TransferDatabase aDatabase, Sync::TransferType aType, const QString &aMimeType, int aCommittedItems);
 };
 
 namespace com {
