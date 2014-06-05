@@ -48,12 +48,15 @@ private slots:
 
 private:
 
-    Profile *loadFromXmlFile(const QString &aName, const QString &aType);
+    Profile *loadFromXmlFile(const QString &aName, const QString &aType,
+            const QString &aProfileDir = QString());
 
     bool saveToXmlFile(const Profile &aProfile, const QString &aName,
-                       bool aLocalOnly = true);
+            bool aLocalOnly = true,
+            const QString &aProfileDir = QString());
 
-    QString profileFileToString(const QString &aName, const QString &aType);
+    QString profileFileToString(const QString &aName, const QString &aType,
+            const QString &aProfileDir = QString());
 
 };
 

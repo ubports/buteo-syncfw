@@ -37,7 +37,7 @@ void ServerPluginRunnerTest::initTestCase()
 
     iServerActivator = new ServerActivator(*iProfileManager, *iTransportTracker);
 
-    QDir dir = QDir::current();
+    QDir dir = QDir(QCoreApplication::applicationDirPath() + "/..");
     QString path = dir.absolutePath();
     if (dir.cd("../dummyplugins/dummyserver"))
     {

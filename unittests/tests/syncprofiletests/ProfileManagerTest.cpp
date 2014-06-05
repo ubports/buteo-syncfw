@@ -22,6 +22,7 @@
  */
 #include "ProfileManagerTest.h"
 #include "ProfileManager.h"
+#include "Profile_p.h"
 #include "ProfileEngineDefs.h"
 #include "StorageProfile.h"
 #include "SyncResults.h"
@@ -34,7 +35,6 @@ using namespace Buteo;
 static const QString HCALENDAR = "hcalendar";
 static const QString OVI_CALENDAR = "ovi-calendar";
 static const QString CORRUPTED = "corrupted";
-static const QString OVI_COM = "ovi.com";
 static const QString SYNCML = "syncml";
 static const QString USERPROFILE_DIR = "syncprofiletests/testprofiles/user";
 static const QString SYSTEMPROFILE_DIR = "syncprofiletests/testprofiles/system";
@@ -81,22 +81,19 @@ void ProfileManagerTest::testGetProfile()
     QCOMPARE(sp->name(), OVI_CALENDAR);
     QCOMPARE(sp->type(), Profile::TYPE_SYNC);
 
-    // No client sub-profile before expanding.
+    // No merged keys & fields before expanding.
     QCOMPARE(sp->isLoaded(), false);
-    QVERIFY(sp->subProfile(SYNCML, Profile::TYPE_CLIENT) == 0);
+    Profile *sub = sp->subProfile(HCALENDAR, Profile::TYPE_STORAGE);
+    QVERIFY(sub != 0);
+    QCOMPARE(sub->isLoaded(), false);
+    QCOMPARE(sub->name(), HCALENDAR);
+    QCOMPARE(sub->type(), Profile::TYPE_STORAGE);
+    QCOMPARE(sub->key("Local URI"), QString());
 
-    // Client sub-profile available after expanding.
+    // Merged keys & fields available after expanding.
     pm.expand(*sp);
     QCOMPARE(sp->isLoaded(), true);
-    Profile *sub = sp->subProfile(SYNCML, Profile::TYPE_CLIENT);
-    QVERIFY(sub != 0);
     QCOMPARE(sub->isLoaded(), true);
-    QCOMPARE(sub->name(), SYNCML);
-    QCOMPARE(sub->type(), Profile::TYPE_CLIENT);
-
-    // Key merged from sub-sub-profile.
-    sub = sp->subProfile(HCALENDAR, Profile::TYPE_STORAGE);
-    QVERIFY(sub != 0);
     QCOMPARE(sub->key("Local URI"), QString("./Calendar"));
 }
 
@@ -168,22 +165,22 @@ void ProfileManagerTest::testGetByData()
     profiles.clear();
 
     // Get profiles by sub-profile information, no match.
-    profiles = pm.getSyncProfilesByData("unknown", Profile::TYPE_SYNC);
+    profiles = pm.getSyncProfilesByData("unknown", Profile::TYPE_STORAGE);
     QVERIFY(profiles.isEmpty());
 
     // Get profiles by sub-profile information, key and value defined, no match.
-    profiles = pm.getSyncProfilesByData(OVI_COM, Profile::TYPE_SYNC,
-        "Username", "unknown");
+    profiles = pm.getSyncProfilesByData(HCALENDAR, Profile::TYPE_STORAGE,
+        "Target URI", "unknown");
     QVERIFY(profiles.isEmpty());
 
     // Get profiles by sub-profile information, sub-profile name not defined,
     // key and value defined, no match.
-    profiles = pm.getSyncProfilesByData("", Profile::TYPE_SYNC,
-        "Username", "unknown");
+    profiles = pm.getSyncProfilesByData("", Profile::TYPE_STORAGE,
+        "Target URI", "unknown");
     QVERIFY(profiles.isEmpty());
 
     // Get profiles by sub-profile information, no key defined.
-    profiles = pm.getSyncProfilesByData(OVI_COM, Profile::TYPE_SYNC);
+    profiles = pm.getSyncProfilesByData(HCALENDAR, Profile::TYPE_STORAGE);
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
@@ -194,8 +191,8 @@ void ProfileManagerTest::testGetByData()
     profiles.clear();
 
     // Get profiles by sub-profile information, key and value defined.
-    profiles = pm.getSyncProfilesByData(OVI_COM, Profile::TYPE_SYNC,
-        "Username", "your_username");
+    profiles = pm.getSyncProfilesByData(HCALENDAR, Profile::TYPE_STORAGE,
+        "Target URI", "./EventTask/Tasks");
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
@@ -207,8 +204,8 @@ void ProfileManagerTest::testGetByData()
 
     // Get profiles by sub-profile information, sub-profile name not defined,
     // key and value defined.
-    profiles = pm.getSyncProfilesByData("", Profile::TYPE_SYNC,
-        "Username", "your_username");
+    profiles = pm.getSyncProfilesByData("", Profile::TYPE_STORAGE,
+        "Target URI", "./EventTask/Tasks");
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
@@ -276,17 +273,6 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // Get profiles by sub-profile information, no match.
     criteria.iType = ProfileManager::SearchCriteria::EXISTS;
     criteria.iSubProfileName = "unknown";
-    criteria.iSubProfileType = Profile::TYPE_SYNC;
-    criteria.iKey = QString::null;
-    criteria.iValue = QString::null;
-    criteriaList.clear();
-    criteriaList.append(criteria);
-    profiles = pm.getSyncProfilesByData(criteriaList);
-    QVERIFY(profiles.isEmpty());
-
-    // Get profiles by sub-profile, no match.
-    criteria.iType = ProfileManager::SearchCriteria::EXISTS;
-    criteria.iSubProfileName = "hsms";
     criteria.iSubProfileType = Profile::TYPE_STORAGE;
     criteria.iKey = QString::null;
     criteria.iValue = QString::null;
@@ -326,7 +312,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
 
     // Get profiles by sub-profile.
     criteria.iType = ProfileManager::SearchCriteria::NOT_EXISTS;
-    criteria.iSubProfileName = "hsms";
+    criteria.iSubProfileName = "unknown";
     criteria.iSubProfileType = Profile::TYPE_STORAGE;
     criteria.iKey = QString::null;
     criteria.iValue = QString::null;
@@ -343,9 +329,9 @@ void ProfileManagerTest::testGetBySingleCriteria()
 
     // Get profiles by sub-profile information, key and value defined, no match.
     criteria.iType = ProfileManager::SearchCriteria::EQUAL;
-    criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SYNC;
-    criteria.iKey = "Username";
+    criteria.iSubProfileName = HCALENDAR;
+    criteria.iSubProfileType = Profile::TYPE_STORAGE;
+    criteria.iKey = "Target URI";
     criteria.iValue = "unknown";
     criteriaList.clear();
     criteriaList.append(criteria);
@@ -356,8 +342,8 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // key and value defined, no match.
     criteria.iType = ProfileManager::SearchCriteria::EQUAL;
     criteria.iSubProfileName = QString::null;
-    criteria.iSubProfileType = Profile::TYPE_SYNC;
-    criteria.iKey = "Username";
+    criteria.iSubProfileType = Profile::TYPE_STORAGE;
+    criteria.iKey = "Target URI";
     criteria.iValue = "unknown";
     criteriaList.clear();
     criteriaList.append(criteria);
@@ -366,8 +352,8 @@ void ProfileManagerTest::testGetBySingleCriteria()
 
     // Get profiles by sub-profile information, no key defined.
     criteria.iType = ProfileManager::SearchCriteria::EXISTS;
-    criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SYNC;
+    criteria.iSubProfileName = HCALENDAR;
+    criteria.iSubProfileType = Profile::TYPE_STORAGE;
     criteria.iKey = QString::null;
     criteria.iValue = QString::null;
     criteriaList.clear();
@@ -384,10 +370,10 @@ void ProfileManagerTest::testGetBySingleCriteria()
 
     // Get profiles by sub-profile information, key and value defined.
     criteria.iType = ProfileManager::SearchCriteria::EQUAL;
-    criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SYNC;
-    criteria.iKey = "Username";
-    criteria.iValue = "your_username";
+    criteria.iSubProfileName = HCALENDAR;
+    criteria.iSubProfileType = Profile::TYPE_STORAGE;
+    criteria.iKey = "Target URI";
+    criteria.iValue = "./EventTask/Tasks";
     criteriaList.clear();
     criteriaList.append(criteria);
     profiles = pm.getSyncProfilesByData(criteriaList);
@@ -402,10 +388,10 @@ void ProfileManagerTest::testGetBySingleCriteria()
 
     // Get profiles by sub-profile information, key and value defined, no match.
     criteria.iType = ProfileManager::SearchCriteria::NOT_EQUAL;
-    criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SYNC;
-    criteria.iKey = "Username";
-    criteria.iValue = "your_username";
+    criteria.iSubProfileName = HCALENDAR;
+    criteria.iSubProfileType = Profile::TYPE_STORAGE;
+    criteria.iKey = "Target URI";
+    criteria.iValue = "./EventTask/Tasks";
     criteriaList.clear();
     criteriaList.append(criteria);
     profiles = pm.getSyncProfilesByData(criteriaList);
@@ -413,9 +399,9 @@ void ProfileManagerTest::testGetBySingleCriteria()
 
     // Get profiles by sub-profile information, key and value defined.
     criteria.iType = ProfileManager::SearchCriteria::NOT_EQUAL;
-    criteria.iSubProfileName = OVI_COM;
-    criteria.iSubProfileType = Profile::TYPE_SYNC;
-    criteria.iKey = "Username";
+    criteria.iSubProfileName = HCALENDAR;
+    criteria.iSubProfileType = Profile::TYPE_STORAGE;
+    criteria.iKey = "Target URI";
     criteria.iValue = "foobar";
     criteriaList.clear();
     criteriaList.append(criteria);
@@ -432,9 +418,9 @@ void ProfileManagerTest::testGetBySingleCriteria()
     // key and value defined.
     criteria.iType = ProfileManager::SearchCriteria::EQUAL;
     criteria.iSubProfileName = QString::null;
-    criteria.iSubProfileType = Profile::TYPE_SYNC;
-    criteria.iKey = "Username";
-    criteria.iValue = "your_username";
+    criteria.iSubProfileType = Profile::TYPE_STORAGE;
+    criteria.iKey = "Target URI";
+    criteria.iValue = "./EventTask/Tasks";
     criteriaList.clear();
     criteriaList.append(criteria);
     profiles = pm.getSyncProfilesByData(criteriaList);
@@ -594,8 +580,7 @@ void ProfileManagerTest::testSave()
         QVERIFY(p != 0);
         QCOMPARE(p->isEnabled(), true);
         p->setEnabled(false);
-        // NOTE: removed addProfile()
-//        pm.addProfile(*p);
+        pm.updateProfile(*p);
     }
 
     {
@@ -630,7 +615,7 @@ void ProfileManagerTest::testHiddenProfiles()
     QScopedPointer<SyncProfile> p(pm.syncProfile(OVI_CALENDAR));
     QVERIFY(p != 0);
     p->setBoolKey(KEY_HIDDEN, true);
-//    pm.addProfile(*p);
+    pm.updateProfile(*p);
 
     // Verify that number of visible profiles is reduced.
     profiles = pm.allVisibleSyncProfiles();
@@ -652,7 +637,7 @@ void ProfileManagerTest::testRemovingProfiles()
     QScopedPointer<SyncProfile> p(pm.syncProfile(OVI_CALENDAR));
     QVERIFY(p != 0);
     p->setName(TEMP_NAME);
-//    pm.addProfile(*p);
+    pm.updateProfile(*p);
 
     // Try removing protected profile.
     p->setBoolKey(KEY_PROTECTED, true);
@@ -672,18 +657,18 @@ void ProfileManagerTest::testOverrideKey()
     QScopedPointer<SyncProfile> p(static_cast<SyncProfile*>(
         pm.profile(OVI_CALENDAR, Profile::TYPE_SYNC)));
     QVERIFY(p != 0);
-    Profile *service = p->subProfile("ovi.com", Profile::TYPE_SYNC);
-    QVERIFY(service != 0);
+    Profile *storage = p->subProfile(HCALENDAR, Profile::TYPE_STORAGE);
+    QVERIFY(storage != 0);
 
-    // Set username to the main profile (service section).
-    const QString UNAME_KEY = "Username";
-    const QString UNAME = "new user";
-    service->setKey(UNAME_KEY, UNAME);
+    // Set target URI to the main profile (storage section).
+    const QString URI_KEY = "Target URI";
+    const QString URI = "./new/uri";
+    storage->setKey(URI_KEY, URI);
 
-    // Service sub-profile file contains a user name also, but the key defined
+    // Service sub-profile file contains a target uri also, but the key defined
     // in the main profile overrides it.
     pm.expand(*p);
-    QCOMPARE(service->key(UNAME_KEY), UNAME);
+    QCOMPARE(storage->key(URI_KEY), URI);
 }
 
 void ProfileManagerTest::testBackup()

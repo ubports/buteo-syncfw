@@ -72,10 +72,7 @@ void SyncSessionTest :: cleanup()
     delete iSyncSession ;
     iSyncSession = NULL;
 
-    if(iSyncSessionPluginRunnerTest) {
-        delete iSyncSessionPluginRunnerTest;
-        iSyncSessionPluginRunnerTest = NULL;
-    }
+    delete iSyncSessionPluginRunnerTest;
 }
 
 
@@ -93,7 +90,7 @@ void SyncSessionTest :: testPluginRunner()
 
     iSyncSession->setPluginRunner(iSyncSessionPluginRunnerTest, true);
     QCOMPARE(iSyncSession->iPluginRunnerOwned, true);
-    QCOMPARE(iSyncSession->pluginRunner(), iSyncSessionPluginRunnerTest);
+    QCOMPARE(iSyncSession->pluginRunner(), iSyncSessionPluginRunnerTest.data());
 
     // Check whether the same value is set to iPluginRunner or not
     QCOMPARE(iSyncSession->iPluginRunner, iSyncSession->pluginRunner());
@@ -150,7 +147,7 @@ void SyncSessionTest :: testStartAbortStop()
 
     /* testing abort() */
     iSyncSession->abort();
-    QVERIFY(iSyncSession->iAborted);
+    QVERIFY(!iSyncSession->iAborted);
 
     // stop() neither updates nor calls other functions for iPluginRunner NULL value. so, omitting this function for NULL value
 
@@ -158,7 +155,7 @@ void SyncSessionTest :: testStartAbortStop()
     // testing with iSyncSessionPluginRunnerTest
 
     iSyncSession->setPluginRunner(iSyncSessionPluginRunnerTest, true);
-    QCOMPARE(iSyncSessionPluginRunnerTest, iSyncSession->iPluginRunner);
+    QCOMPARE(iSyncSessionPluginRunnerTest.data(), iSyncSession->iPluginRunner);
 
     /* testing start() */
 

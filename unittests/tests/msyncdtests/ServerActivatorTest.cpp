@@ -39,6 +39,9 @@ void ServerActivatorTest::initTestCase()
     iTransportTracker = new TransportTracker(this);
     iProfileManager = new ProfileManager("profile1", "profile2");
 
+    // failure in next step would result in crash upon cleanupTestCase()
+    iServerActivator = 0;
+
     // add server profiles through Profile class
     Profile myProfile("sampleServerProfile", Profile::TYPE_SERVER);
     QVERIFY(!iProfileManager->updateProfile(myProfile).isEmpty());
@@ -98,7 +101,7 @@ void ServerActivatorTest :: testEnabledServers()
 {
     // test enableServers() without adding server name. expected result is empty stringlist
     QStringList serverData = iServerActivator->enabledServers();
-    QVERIFY(serverData.empty() != 0);
+    QVERIFY(serverData.empty());
 
     // add a servername and test the function again(). expected result is added
     // server name as stringlist returned
@@ -141,8 +144,6 @@ void ServerActivatorTest :: testConnectivityStateChanged()
     QCOMPARE(disabledSpy.count(), 0);
     sampleServerActivator.onConnectivityStateChanged(Sync::CONNECTIVITY_USB, false);
     QCOMPARE(disabledSpy.count(), 1);
-
-    QVERIFY(myProfileManager.removeProfile("sampleProfile"));
 }
 
 void ServerActivatorTest :: testTransportsFromProfile()
