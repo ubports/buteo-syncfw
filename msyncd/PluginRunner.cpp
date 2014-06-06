@@ -36,6 +36,14 @@ PluginRunner::PluginRunner(PluginType aPluginType, const QString &aPluginName,
     iPluginName(aPluginName)
 {
     FUNCTION_CALL_TRACE;
+
+    // register various metatypes used in DBus arguments
+    qRegisterMetaType<Sync::SyncStatus>("Sync::SyncStatus");
+    qRegisterMetaType<Sync::TransferDatabase>("Sync::TransferDatabase");
+    qRegisterMetaType<Sync::TransferType>("Sync::TransferType");
+    qRegisterMetaType<Sync::ConnectivityType>("Sync::ConnectivityType");
+    qRegisterMetaType<QProcess::ProcessError>("QProcess::ProcessError");
+    qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 }
 
 PluginRunner::PluginType PluginRunner::pluginType() const

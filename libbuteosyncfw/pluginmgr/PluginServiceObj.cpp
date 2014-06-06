@@ -40,39 +40,53 @@ PluginServiceObj::~PluginServiceObj()
     }
 }
 
+namespace {
+    void initializePlugin(const QString &profileName, const QString &pluginName, Buteo::PluginCbImpl *pluginCb, CLASSNAME **plugin)
+    {
+        ProfileManager pm;
+#ifdef CLIENT_PLUGIN
+        SyncProfile *syncProfile = pm.syncProfile( profileName );
+        if( !syncProfile ) {
+            LOG_WARNING( "Profile " << profileName << " does not exist" );
+            return;
+        }
+
+        // Create the plugin (client)
+        *plugin = new CLASSNAME( pluginName, *syncProfile, pluginCb );
+#else
+        Profile *profile = pm.profile( profileName, Profile::TYPE_SERVER );
+        if( !profile || !profile->isValid() ) {
+            LOG_WARNING( "Profile " << profileName << " does not exist" );
+            return;
+        } else {
+            pm.expand( *profile );
+        }
+
+        // Create the plugin (server)
+        *plugin = new CLASSNAME( pluginName, *profile, pluginCb );
+#endif
+    }
+}
+
 bool PluginServiceObj::init()
 {
     FUNCTION_CALL_TRACE;
 
-    ProfileManager pm;
-#ifdef CLIENT_PLUGIN
-    SyncProfile *syncProfile = pm.syncProfile( iProfileName );
-    if( !syncProfile ) {
-        LOG_WARNING( "Profile " << iProfileName << " does not exist" );
+    initializePlugin(iProfileName, iPluginName, &iPluginCb, &iPlugin);
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::init(): unable to initialize plugin" );
         return false;
     }
 
-    // Create the plugin (client or server)
-    iPlugin = new CLASSNAME( iPluginName, *syncProfile, &iPluginCb );
-#else
-    Profile *profile = pm.profile( iProfileName, Profile::TYPE_SERVER );
-    if( !profile || !profile->isValid() ) {
-        LOG_WARNING( "Profile " << iProfileName << " does not exist" );
-        return false;
-    } else {
-        pm.expand( *profile );
-    }
-
-    // Create the plugin (client or server)
-    iPlugin = new CLASSNAME( iPluginName, *profile, &iPluginCb );
-
+#ifndef CLIENT_PLUGIN
     // Server signals
     QObject::connect(iPlugin, SIGNAL(newSession(const QString&)),
                      this, SIGNAL(newSession(const QString&)));
 #endif
+
     // Chain the signals
-    QObject::connect(iPlugin, SIGNAL(transferProgress(const QString&, int, int, const QString&, int)),
-                     this, SIGNAL(transferProgress(const QString&, int, int, const QString&, int)));
+    QObject::connect(iPlugin, SIGNAL(transferProgress(const QString&, Sync::TransferDatabase, Sync::TransferType, const QString&, int)),
+                     this, SIGNAL(transferProgress(const QString&, Sync::TransferDatabase, Sync::TransferType, const QString&, int)));
     QObject::connect(iPlugin, SIGNAL(error(const QString&, const QString&, int)),
                      this, SIGNAL(error(const QString&, const QString&, int)));
     QObject::connect(iPlugin, SIGNAL(success(const QString&, const QString&)),
@@ -102,6 +116,14 @@ void PluginServiceObj::abortSync(uchar aStatus)
 bool PluginServiceObj::cleanUp()
 {
     FUNCTION_CALL_TRACE;
+
+    if (!iPlugin) {
+        initializePlugin(iProfileName, iPluginName, &iPluginCb, &iPlugin);
+        if (!iPlugin) {
+            LOG_WARNING( "PluginServiceObj::cleanUp(): unable to initialize plugin" );
+            return false;
+        }
+    }
 
     return iPlugin->cleanUp();
 }
