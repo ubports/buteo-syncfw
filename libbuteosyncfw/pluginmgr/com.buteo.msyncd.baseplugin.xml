@@ -1,0 +1,87 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="com.buteo.msyncd.baseplugin">
+
+    <!-- BEGIN: Common plugin methods -->
+    <signal name="transferProgress">
+      <arg name="aProfileName" type="s" direction="out"/>
+      <arg name="aTransferDatabase" type="i" direction="out"/>
+      <arg name="aTransferType" type="i" direction="out"/>
+      <arg name="aMimeType" type="s" direction="out"/>
+      <arg name="aCommittedItems" type="i" direction="out"/>
+    </signal>
+
+    <signal name="error">
+      <arg name="aProfileName" type="s" direction="out"/>
+      <arg name="aMessage" type="s" direction="out"/>
+      <arg name="aErrorCode" type="i" direction="out"/>
+    </signal>
+
+    <signal name="success">
+      <arg name="aProfileName" type="s" direction="out"/>
+      <arg name="aMessage" type="s" direction="out"/>
+    </signal>
+
+    <signal name="accquiredStorage">
+      <arg name="aMimeType" type="s" direction="out"/>
+    </signal>
+
+    <signal name="syncProgressDetail">
+      <arg name="aProfileName" type="s" direction="out"/>
+      <arg name="aProgressDetail" type="i" direction="out"/>
+    </signal>
+
+    <method name="init">
+      <arg type="b" direction="out"/>
+    </method>
+
+    <method name="uninit">
+      <arg type="b" direction="out"/>
+    </method>
+
+    <method name="abortSync">
+      <arg name="aStatus" type="y" direction="in"/>
+    </method>
+
+    <method name="cleanUp">
+      <arg type="b" direction="out"/>
+    </method>
+
+    <method name="getSyncResults"> <!-- We will pass the SyncResults as an XML string and use constructor and toXml to perform serialization/deserialization -->
+      <arg type="s" direction="out"/>
+    </method>
+
+    <method name="connectivityStateChanged">
+      <arg name="aType" type="i" direction="in"/>
+      <arg name="aState" type="b" direction="in"/>
+    </method>
+    <!-- END: Common plugin methods -->
+
+    <!-- BEGIN: Client plugin methods -->
+    <method name="startSync">
+      <arg type="b" direction="out"/>
+    </method>
+
+    <!-- END: Client plugin methods -->
+
+    <!-- BEGIN: Server plugin methods -->
+    <signal name="newSession">
+      <arg name="aDestination" type="s" direction="out"/>
+    </signal>
+
+    <method name="startListen">
+      <arg type="b" direction="out"/>
+    </method>
+
+    <method name="stopListen">
+    </method>
+
+    <method name="suspend">
+    </method>
+
+    <method name="resume">
+    </method>
+    <!-- END: Server plugin methods -->
+
+  </interface>
+</node>

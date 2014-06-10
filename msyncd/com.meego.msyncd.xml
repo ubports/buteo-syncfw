@@ -56,7 +56,7 @@
       <arg name="aResultsAsXml" type="s" direction="out"/>
     </signal>
     <signal name="statusChanged">
-      <arg name="aAccountId" type="i" direction="out"/>
+      <arg name="aAccountId" type="u" direction="out"/>
       <arg name="aNewStatus" type="i" direction="out"/>
       <arg name="aFailedReason" type="i" direction="out"/>
       <arg name="aPrevSyncTime" type="x" direction="out"/>
@@ -81,6 +81,10 @@
     <method name="requestStorages">
       <arg type="b" direction="out"/>
       <arg name="aStorageNames" type="as" direction="in"/>
+    </method>
+    <method name="isConnectivityAvailable">
+      <arg type="b" direction="out"/>
+      <arg name="connectivityType" type="i" direction="in"/>
     </method>
     <method name="releaseStorages">
       <arg name="aStorageNames" type="as" direction="in"/>
@@ -132,7 +136,7 @@
     </method>
     <method name="syncingAccounts">
       <arg type="au" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QList&lt;int&gt;"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QList&lt;uint&gt;"/>
     </method>
     <method name="status">
       <arg type="i" direction="out"/>

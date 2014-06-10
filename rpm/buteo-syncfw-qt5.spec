@@ -28,7 +28,6 @@ Requires: oneshot
 
 %files
 %defattr(-,root,root,-)
-%config %{_sysconfdir}/buteo/*
 %{_libdir}/*.so.*
 %{_oneshotdir}/msyncd-storage-perm
 

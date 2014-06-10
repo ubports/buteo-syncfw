@@ -29,8 +29,8 @@
 
 using namespace Buteo;
 
-// Maximum time in milliseconds to wait for a thread to stop
-static const unsigned long long MAX_THREAD_STOP_WAIT_TIME = 5000;
+// Maximum time in milliseconds for a plugin to finish sync
+static const unsigned long long MAX_PLUGIN_SYNC_TIME = 1800000; //30 mins
 
 ClientPluginRunner::ClientPluginRunner(const QString &aPluginName,
     SyncProfile *aProfile, PluginManager *aPluginMgr,
@@ -132,6 +132,9 @@ bool ClientPluginRunner::start()
     bool rv = false;
     if (iInitialized && iThread != 0)
     {
+        // Set a timer after which the sync session should stop
+        QTimer::singleShot( MAX_PLUGIN_SYNC_TIME, this, SLOT(pluginTimeout()) );
+
         rv = iThread->startThread(iPlugin);
     }
 
@@ -242,3 +245,29 @@ void ClientPluginRunner::onThreadExit()
     emit done();
 }
 
+void ClientPluginRunner::onProcessError( QProcess::ProcessError error )
+{
+    onError( iProfile->name(),
+             "Plugin process error:" + QString::number(error),
+             Sync::SYNC_PLUGIN_ERROR );
+}
+
+void ClientPluginRunner::onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus )
+{
+    if( (exitCode != 0) ||
+        (exitStatus != QProcess::NormalExit) ) {
+    	onError( iProfile->name(),
+             	"Plugin process exited with error code " +
+                 QString::number(exitCode) + " and status " +
+                 QString::number(exitStatus),
+             	Sync::SYNC_PLUGIN_ERROR );
+    }
+}
+
+void ClientPluginRunner::pluginTimeout()
+{
+    FUNCTION_CALL_TRACE;
+
+    emit error(iProfile->name(), "Plugin timeout occured", Sync::SYNC_PLUGIN_TIMEOUT);
+    stop();
+}

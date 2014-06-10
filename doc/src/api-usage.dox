@@ -1,0 +1,360 @@
+/*! \page api-usage Buteo framework API usage
+
+\tableofcontents
+
+\section buteo-apis Available Buteo APIs
+- Plugin API
+- msycnd Dbus API
+- libbuteosyncfw API
+
+\section plugin-api Plugin API
+Refer to \ref plugin-guide
+
+\section dbus-api Dbus API
+The dbus API can be used by application to get the live data from msyncd. Both 
+signals as well as methods are provided. msyncd listens on the bus <b>com.meego.msyncd</b>
+and at the path <b>/synchronizer</b>. A dbus method can be invoked from cmdline as
+\code
+dbus-send --session --type=method_call --print-reply --dest=com.meego.msyncd /synchronizer com.meego.msyncd.startSync string:'abc.com'
+\endcode
+
+Following are the signals available in msyncd
+
+- Signal to give status of an ongoing sync session
+\code
+<signal name="syncStatus">
+  <arg name="aProfileName" type="s" direction="out"/>
+  <arg name="aStatus" type="i" direction="out"/>
+  <arg name="aMessage" type="s" direction="out"/>
+  <arg name="aMoreDetails" type="i" direction="out"/>
+</signal>
+\endcode
+- Signal to indicate the transfer progress (of the number of items transfered and the
+kind of items)
+\code
+<signal name="transferProgress">
+  <arg name="aProfileName" type="s" direction="out"/>
+  <arg name="aTransferDatabase" type="i" direction="out"/>
+  <arg name="aTransferType" type="i" direction="out"/>
+  <arg name="aMimeType" type="s" direction="out"/>
+  <arg name="aCommittedItems" type="i" direction="out"/>
+</signal>
+\endcode
+- Signal to indicate if a profile has changed
+\code
+<signal name="signalProfileChanged">
+  <arg name="aProfileName" type="s" direction="out"/>
+  <arg name="aChangeType" type="i" direction="out"/>
+  <arg name="aProfileAsXml" type="s" direction="out"/>
+</signal>
+\endcode
+- Signal to indicate a backup operation in progress. If a backup service is ongoing
+then msyncd does not start sync until the backup is complete. This signal can be
+use to keep track of an ongoing backup operation
+\code
+<signal name="backupInProgress">
+</signal>
+\endcode
+-Signal to indicate that a backup operation is done
+\code
+<signal name="backupDone">
+</signal>
+\endcode
+- Signal to indicate that restore operation is in progress
+\code
+<signal name="restoreInProgress">
+</signal>
+\endcode
+- Signal to indicate that the restoration process is completed
+\code
+<signal name="restoreDone">
+</signal>
+\endcode
+- Signal to indicate that the results of the just finished sync operation are 
+available
+\code
+<signal name="resultsAvailable">
+  <arg name="aProfileName" type="s" direction="out"/>
+  <arg name="aResultsAsXml" type="s" direction="out"/>
+</signal>
+\endcode
+- Signal to indicate that the status of the sync operation has changed. The status 
+could be that the state has changed from in progress to failed with also the failed 
+reason
+\code
+<signal name="statusChanged">
+  <arg name="aAccountId" type="u" direction="out"/>
+  <arg name="aNewStatus" type="i" direction="out"/>
+  <arg name="aFailedReason" type="i" direction="out"/>
+  <arg name="aPrevSyncTime" type="x" direction="out"/>
+  <arg name="aNextSyncTime" type="x" direction="out"/>
+</signal>
+\endcode
+
+Following are the dbus methods of msyncd
+- Method to start sync given a profile name. The profile name is the name of the
+Sync profile XML file. The startSync operation is valid only for client plugins
+\code
+<method name="startSync">
+  <arg type="b" direction="out"/>
+  <arg name="aProfileId" type="s" direction="in"/>
+</method>
+\endcode
+- Method to cancel an ongoing sync. The profile id has to be specific to cancel
+an ongoing sync operation
+\code
+<method name="abortSync">
+  <arg name="aProfileId" type="s" direction="in"/>
+  <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+</method>
+\endcode
+- Method to remove a profile. A profile can be removed if it is not longer required,
+like for example, removing a sync account
+\code
+<method name="removeProfile">
+  <arg type="b" direction="out"/>
+  <arg name="aProfileId" type="s" direction="in"/>
+</method>
+\endcode
+- Method to update a given sync profile. The profile to be updated should be in the 
+form of an XML and the XML object should be sent so that it can be updated. If the
+updation fails, then false is returned, else true
+\code
+<method name="updateProfile">
+  <arg type="b" direction="out"/>
+  <arg name="aProfileAsXml" type="s" direction="in"/>
+</method>
+\endcode
+- Method to request storages to be loaded. This is useful if a plugin makes use of
+existing storage plugins (contacts, calendar, notes) to perform the sync operation.
+If a plugin has its own way to manage the interaction with plugins, then this method
+need to be used
+\code
+<method name="requestStorages">
+  <arg type="b" direction="out"/>
+  <arg name="aStorageNames" type="as" direction="in"/>
+</method>
+\endcode
+- Method to release a storage that has already been requested using "requestStorage"
+method
+\code
+<method name="releaseStorages">
+  <arg name="aStorageNames" type="as" direction="in"/>
+  <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+</method>
+\endcode
+- Method to check if connectivity for a specific type is avialable. Currently 
+supported type: USB=0, Bluetooth=1 and Network=2
+\code
+<method name="isConnectivityAvailable">
+  <arg type="b" direction="out"/>
+  <arg name="connectivityType" type="i" direction="in"/>
+</method>
+\endcode
+- Method to get a list of all running sync sessions
+\code
+<method name="runningSyncs">
+  <arg type="as" direction="out"/>
+</method>
+\endcode
+- Method to get the current state of backup/restore. True=backup/restore ongoing,
+false otherwise
+\code
+<method name="getBackUpRestoreState">
+  <arg type="b" direction="out"/>
+</method>
+\endcode
+- Method to set the sync schedule
+\code
+<method name="setSyncSchedule">
+  <arg type="b" direction="out"/>
+  <arg name="aProfileId" type="s" direction="in"/>
+  <arg name="aScheduleAsXml" type="s" direction="in"/>
+</method>
+\endcode
+The format of the sync schedule is:
+\code
+"<schedule time="12:34:56" interval="30" days="1,2,3,4,5,6">"
+    "<rush enabled="true" interval="15""
+        "begin="08:00:00" end="16:00:00" days="1,4,5"/>"
+"</schedule>"
+\endcode
+
+<i>\b time </i>is the time starting which the sync schedule has to be enabled \n
+<i>\b interval </i>is in minutes is the frequency of sync \n
+<i>\b days </i>is the days on which the sync has to run \n
+<i>\b rush </i>is the sync setting for peak hours of the day. The idea is to run sync at a
+higher frequency in rush days than in the normal days. The rush begin time and end
+time and the rush days can be specified \n
+- Method to save the sync results. This method can be used to persist the sync results
+given a profile id
+/code
+<method name="saveSyncResults">
+  <arg type="b" direction="out"/>
+  <arg name="aProfileId" type="s" direction="in"/>
+  <arg name="aSyncResults" type="s" direction="in"/>
+</method>
+/endcode
+- Method to get the sync results of the last finished sync session. The sync results
+are returned as an XML string, which then has to be parsed to retrieve the results.
+One can use the SyncResults class of libbuteosycnfw to handle any of the XML data
+received
+\code
+<method name="getLastSyncResult">
+  <arg type="s" direction="out"/>
+  <arg name="aProfileId" type="s" direction="in"/>
+</method>
+\endcode
+- A profile can be made a hidden so as not be be displayed in a UI. This method
+fetches the profiles that have been marked as visible
+\code
+<method name="allVisibleSyncProfiles">
+  <arg type="as" direction="out"/>
+</method>
+\endcode
+- Method to fetch a sync profile object given a profile id. The profile is returned
+in XML and the SyncProfile class of libbuteosyncfw can be used to parse the sync
+profile
+\code
+<method name="syncProfile">
+  <arg type="s" direction="out"/>
+  <arg name="aProfileId" type="s" direction="in"/>
+</method>
+\endcode
+- Method to fetch a specific sync profile based on a key. The key can be anything
+like sync direction, the URL of the target service etc. If there are multiple profiles
+matching the key, then all of them are returned
+\code
+<method name="syncProfilesByKey">
+  <arg type="as" direction="out"/>
+  <arg name="aKey" type="s" direction="in"/>
+  <arg name="aValue" type="s" direction="in"/>
+</method>
+\endcode
+- Method to fetch a sync profile given a type of sync. The type can be client, server,
+storage
+\code
+<method name="syncProfilesByType">
+  <arg type="as" direction="out"/>
+  <arg name="aType" type="s" direction="in"/>
+</method>
+\endcode
+- Method to start a sync session with an account Id. This is useful if Buteo is 
+integrated with AccountS&SSO. The account id is passed to start the sync
+\code
+<method name="start">
+  <arg name="aAccountId" type="u" direction="in"/>
+  <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+</method>
+\endcode
+- Method to stop a sync given an account id
+\code
+<method name="stop">
+  <arg name="aAccountId" type="u" direction="in"/>
+  <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+</method>
+\endcode
+- Method to return the list of account id of all the ongoing sync sessions. This 
+method is useful when Buteo is integrated with Accounts&SSO
+\code
+<method name="syncingAccounts">
+  <arg type="au" direction="out"/>
+  <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QList&lt;uint&gt;"/>
+</method>
+\endcode
+- Method to return the status of a sync given an account id. This method is useful
+if Buteo is integrated with Accounts&SSO
+\code
+<method name="status">
+  <arg type="i" direction="out"/>
+  <arg name="aAccountId" type="u" direction="in"/>
+  <arg name="aFailedReason" type="i" direction="out"/>
+  <arg name="aPrevSyncTime" type="x" direction="out"/>
+  <arg name="aNextSyncTime" type="x" direction="out"/>
+</method>
+\endcode
+
+\section libbuteosyncfw-api libbuteosyncfw API
+If one needs to use the API of the syncfw, then you can do so by using the library
+libbuteosyncfw. The main use of this library is to use the plugin API and the profile
+API. The profile API provides an easy way to manage the sync profiles. Following 
+is the main API available in this library
+- Logging
+- Profile management
+- Plugin management
+- A dbus library interface for client apps, like GUIs
+
+\subsection logging Using Logging API
+The logging API has four main calls
+-# FUNCTION_CALL_TRACE can be used to trace the entry and exit of functions
+-# LOG_DEBUG(msg) - outputs a debug level message
+-# LOG_WARNING(msg) - outputs a warning level message
+-# LOG_CRITICAL(msg) - outputs a critical level message
+-# LOG_FATAL(msg) - outputs a fatal level message and aborts the process
+
+Logging can be enabled by using "DEFINES += BUTEO_ENABLE_DEBUG" in the .pro file. 
+By default logging is disabled
+
+\subsection profile-api Profile Management API
+Profile management API can be used to manage the profile information. For example,
+it can be used to retrive profiles, create profiles from a template, update profiles
+and save them back, fetch the results of the last sync, fetch the logs of the sync
+results etc.
+The main class that handle profile management are:
+- Buteo::ProfileManager,
+- Buteo::Profile,
+- Buteo::SyncProfile,
+- Buteo::SyncSchedule,
+- Buteo::SyncResults,
+- Buteo::StorageProfile,
+- Buteo::SyncLog
+
+\subsubsection update-profile Update a given profile
+Following is a code snippet to update a given profile
+\code
+using namespace Buteo;
+...
+...
+ProfileManager pm;
+SyncProfile *sp = pm.syncProfile(profileName);
+if (sp) {
+    sp->setSyncDirection(SyncProfile::SYNC_DIRECTION_FROM_REMOTE);
+    if (pm.updateProfile(sp).isEmpty()) {
+        LOG_DEBUG("Update failed for profile " << profileName);
+    } else
+        LOG_DEBUG("Profile successfully updated");
+}
+...
+...
+\endcode
+
+\subsubsection sync-schedule Handle sync schedule
+ProfileManager can be used to set the schedule of a sync session
+\code
+using namespace Buteo;
+...
+...
+ProfileManager pm;
+SyncProfile *sp = pm.syncProfile(profileName);
+
+if (sp) {
+    SyncSchedule sched = sp->syncSchedule();
+    if (!sched.isEmpty()) {
+        sched.setInterval(45);
+        sched.setRushEnabled(false);
+        DaySet days;
+        days << Qt::Tuesday << Qt::Thursday << Qt::Sunday;
+        sched.setDays(days);
+        sched.setScheduleEnabled(true);        
+        sp->setSyncSchedule(sched);
+    } else {
+        SyncSchedule newSched;
+        newSched.setInterval(15);
+        newSched.setTime(new QDateTime());
+        newSched.setScheduleEnabled(true);
+        sp->setSyncSchedule(newSched);
+    }
+    pm.updateProfile(sp);
+}
+\endcode
+*/
