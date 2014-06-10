@@ -25,12 +25,15 @@
 
 #include "SyncCommonDefs.h"
 #include "SyncResults.h"
+#include "ButeoPluginIface.h"
+
 #include <QString>
 #include <QMetaType>
 #include <QObject>
 #include <QMap>
 
-
+#define DBUS_SERVICE_NAME_PREFIX "com.buteo.msyncd.plugin."
+#define DBUS_SERVICE_OBJ_PATH "/"
 
 namespace Buteo {
 
@@ -89,7 +92,7 @@ public:
 	 * (success or error) is still expected from the aborted session before
 	 * it terminates.
 	 */
-        virtual void abortSync(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED) { };
+        virtual void abortSync(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED) { Q_UNUSED(aStatus); }
 
 	/*! \brief Cleans up any sync related stuff (e.g sync anchors etc) when the
 	 * profile is deleted
@@ -152,6 +155,9 @@ signals:
 	 */
 	void syncProgressDetail( const QString &aProfileName, int aProgressDetail);
 
+    void processError( QProcess::ProcessError error );
+
+    void processFinished( int exitCode, QProcess::ExitStatus exitStatus );
 
 public slots:
 
@@ -179,6 +185,7 @@ protected:
 
         QMap<QString, ReceivedItemDetails> receivedItems;
 
+        ButeoPluginIface     *iOopPluginIface;
 private:
 
 	QString iPluginName;

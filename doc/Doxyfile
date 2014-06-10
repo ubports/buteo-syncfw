@@ -25,7 +25,7 @@ DOXYFILE_ENCODING      = UTF-8
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded
 # by quotes) that should identify the project.
 
-PROJECT_NAME           = HarmattanSyncFW
+PROJECT_NAME           = Buteo Synchronization Framework
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number.
 # This could be handy for archiving the generated documentation or
@@ -586,9 +586,7 @@ WARN_LOGFILE           =
 
 INPUT                  = src \
                          ../msyncd/ \
-                         ../libsyncprofile/ \
-                         ../libsyncpluginmgr/ \
-                         ../libsyncfwclient
+                         ../libbuteosyncfw/
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -660,7 +658,8 @@ FILE_PATTERNS          = *.c \
                          *.patch \
                          *.moc \
                          *.xpm \
-                         *.dox
+                         *.dox \
+			 *.cpp
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
 # should be searched for input files as well. Possible values are YES and NO.
@@ -686,7 +685,8 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = ../msyncd/moc_*.cpp
+EXCLUDE_PATTERNS       = ../msyncd/moc_*.cpp \
+			 ../libbuteosyncfw/moc_*.cpp
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -720,7 +720,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             =
+IMAGE_PATH             = src
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

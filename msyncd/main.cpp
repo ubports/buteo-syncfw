@@ -32,38 +32,6 @@
 #include "synchronizer.h"
 #include "SyncSigHandler.h"
 
-const QString LOGGER_CONFIG_FILE( "/etc/buteo/set_sync_log_level" );
-const QString SYNC_LOG_FILE_PATH( Sync::syncCacheDir() + QDir::separator() + "synchronizer.log");
-
-void setLogLevelFromFile()
-{
-    if(QFile::exists(LOGGER_CONFIG_FILE)) {
-        // read the config level from the file and set
-        // that level
-        QFile file(LOGGER_CONFIG_FILE);
-        if(file.open(QIODevice::ReadOnly)) {
-            bool ok;
-            int level = file.readLine().simplified().toInt(&ok,10);
-            if(ok)
-            {
-                Buteo::Logger::createInstance(SYNC_LOG_FILE_PATH);
-                if(!Buteo::Logger::instance()->setLogLevel(level)) {
-                    qWarning() << "invalid log level" ;
-                }
-                else
-                {
-                    qDebug()  << "Setting Log Level to " << level;
-                }
-            }
-            else
-            {
-                Buteo::Logger::createInstance();
-            }
-            file.close();
-        }
-    }
-}
-
 Q_DECL_EXPORT int main( int argc, char* argv[] )
 {
     // remove this later on if not needed in harmattan,

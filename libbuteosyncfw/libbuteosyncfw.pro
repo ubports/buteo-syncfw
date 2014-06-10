@@ -8,18 +8,22 @@ VER_MAJ = 0
 VER_MIN = 1
 VER_PAT = 0
 
-QT += sql xml dbus
+QT += sql xml dbus network
 QT -= gui
 
 CONFIG += dll \
     create_pc \
     create_prl
 
+#DEFINES += BUTEO_ENABLE_DEBUG
+
 # Input
 HEADERS += common/Logger.h \
            common/LogMacros.h \
            common/SyncCommonDefs.h \
            common/SyncDBusConnection.h \
+           common/TransportTracker.h \
+           common/NetworkManager.h \
            clientfw/SyncClientInterface.h \
            clientfw/SyncClientInterfacePrivate.h \
            clientfw/SyncDaemonProxy.h \
@@ -45,9 +49,14 @@ HEADERS += common/Logger.h \
            profile/SyncResults.h \
            profile/SyncSchedule.h \
            profile/SyncSchedule_p.h \
-           profile/TargetResults.h
+           profile/TargetResults.h \
+           pluginmgr/OOPClientPlugin.h \
+           pluginmgr/OOPServerPlugin.h \
+           pluginmgr/ButeoPluginIface.h
 SOURCES += common/Logger.cpp \
            common/SyncDBusConnection.cpp \
+           common/TransportTracker.cpp \
+           common/NetworkManager.cpp \
            clientfw/SyncClientInterface.cpp \
            clientfw/SyncClientInterfacePrivate.cpp \
            clientfw/SyncDaemonProxy.cpp \
@@ -68,7 +77,10 @@ SOURCES += common/Logger.cpp \
            profile/SyncProfile.cpp \
            profile/SyncResults.cpp \
            profile/SyncSchedule.cpp \
-           profile/TargetResults.cpp
+           profile/TargetResults.cpp \
+           pluginmgr/OOPClientPlugin.cpp \
+           pluginmgr/OOPServerPlugin.cpp \
+           pluginmgr/ButeoPluginIface.cpp
 
 QMAKE_CXXFLAGS = -Wall \
     -g \
@@ -87,10 +99,19 @@ target.path = /usr/lib/
 equals(QT_MAJOR_VERSION, 4): headers.path = /usr/include/buteosyncfw
 equals(QT_MAJOR_VERSION, 5): headers.path = /usr/include/buteosyncfw5
 
+sources.path = /usr/include/buteosyncfw5/
+
+sources.files = pluginmgr/plugin_main.cpp \
+                pluginmgr/PluginServiceObj.cpp \
+                pluginmgr/ButeoPluginIfaceAdaptor.cpp \
+                pluginmgr/PluginCbImpl.cpp
+
 headers.files = common/Logger.h \
            common/LogMacros.h \
            common/SyncCommonDefs.h \
            common/SyncDBusConnection.h \
+           common/TransportTracker.h \
+           common/NetworkManager.h \
            clientfw/SyncClientInterface.h \
            clientfw/SyncClientInterfacePrivate.h \
            clientfw/SyncDaemonProxy.h \
@@ -103,6 +124,10 @@ headers.files = common/Logger.h \
            pluginmgr/StorageItem.h \
            pluginmgr/StoragePlugin.h \
            pluginmgr/SyncPluginBase.h \
+           pluginmgr/PluginServiceObj.h \
+           pluginmgr/ButeoPluginIfaceAdaptor.h \
+           pluginmgr/ButeoPluginIface.h \
+           pluginmgr/PluginCbImpl.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
@@ -122,7 +147,7 @@ utility.path = /opt/tests/buteo-syncfw
 utility.files = ../bin/*.pl \
     ../bin/*.sh
 
-INSTALLS += target headers utility
+INSTALLS += target headers utility sources
 
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 QMAKE_PKGCONFIG_LIBDIR  = $$target.path

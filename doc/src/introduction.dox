@@ -1,14 +1,651 @@
-/* \page introduction Introduction to Synchronization Framework 
-*
-* \section aboutsyncfw  About Synchronization Framework 
-*
-* The Synchronization framework subsystem provides a generic framework for
-* application developers wanting to develop Synchronization plug-ins for any
-* synchronization service. It provides a plug-in API for the client, server and the storage
-* plug-ins in the framework. It also provides services like profile management, sync
-* controller functionality for sequencing simultaneous sync requests, a sync daemon and
-* other common sync related functionality. This subsystem also provides an
-* implementation of the OMA DS SyncML specification. The SyncML engine is provided as a
-* public API for application developers. It also provides an implementation of the MTP 1.0
-* specification, but this library interface is not open.
+/*! \page introduction Introduction to Synchronization Framework 
+
+\section aboutsyncfw  About Synchronization Framework 
+
+The Buteo Synchronization framework provides a generic framework for
+creating sync plugins that can perform sync operations across devices, PC, Cloud.
+The framework provides the capability to manage the lifecycle of a sync plugin.
+It also provides scheduling, bearer sensing (USB, BT, Network), support for both
+client and server plugins and also storage plugins. The client plugin gets loaded
+for the instant of the sync session and gets unloaded thereafter. A server plugin
+stays alive until the sync engine is alive. The storage plugin provides a generic
+interface for fetching the objects, changed objects. The storage plugin can be
+used across multiple plugins and avoid duplication of code.
+
+
+			<table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2> </div>
+<ul>
+<li class="toclevel-1"><a href="#Introduction"><span class="tocnumber">1</span> <span class="toctext">Introduction</span></a></li>
+<li class="toclevel-1"><a href="#Requirements"><span class="tocnumber">2</span> <span class="toctext">Requirements</span></a>
+<ul>
+<li class="toclevel-2"><a href="#Functional_Requirements"><span class="tocnumber">2.1</span> <span class="toctext">Functional Requirements</span></a></li>
+<li class="toclevel-2"><a href="#Performance_Requirements"><span class="tocnumber">2.2</span> <span class="toctext">Performance Requirements</span></a></li>
+<li class="toclevel-2"><a href="#Non-Functional_Requirements"><span class="tocnumber">2.3</span> <span class="toctext">Non-Functional Requirements</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1"><a href="#Architecture_Details"><span class="tocnumber">3</span> <span class="toctext">Architecture Details</span></a>
+<ul>
+<li class="toclevel-2"><a href="#Framework_Components"><span class="tocnumber">3.1</span> <span class="toctext">Framework Components</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Plug-in_Manager"><span class="tocnumber">3.1.1</span> <span class="toctext">Plug-in Manager</span></a></li>
+<li class="toclevel-3"><a href="#Profile_Manager"><span class="tocnumber">3.1.2</span> <span class="toctext">Profile Manager</span></a></li>
+<li class="toclevel-3"><a href="#Scheduler"><span class="tocnumber">3.1.3</span> <span class="toctext">Scheduler</span></a></li>
+<li class="toclevel-3"><a href="#Accounts_Integration"><span class="tocnumber">3.1.4</span> <span class="toctext">Accounts Integration</span></a></li>
+<li class="toclevel-3"><a href="#Synchronization_Daemon"><span class="tocnumber">3.1.5</span> <span class="toctext">Synchronization Daemon</span></a></li>
+<li class="toclevel-3"><a href="#Developer_API"><span class="tocnumber">3.1.6</span> <span class="toctext">Developer API</span></a></li>
+<li class="toclevel-3"><a href="#Hardware_Hookup"><span class="tocnumber">3.1.7</span> <span class="toctext">Hardware Hookup</span></a></li>
+<li class="toclevel-3"><a href="#Device_State_Based_Sync"><span class="tocnumber">3.1.8</span> <span class="toctext">Device State Based Sync</span></a></li>
+<li class="toclevel-3"><a href="#Change_Based_Sync"><span class="tocnumber">3.1.9</span> <span class="toctext">Change Based Sync</span></a></li>
+<li class="toclevel-3"><a href="#Handling_Deleted_item_list"><span class="tocnumber">3.1.10</span> <span class="toctext">Handling Deleted item list</span></a></li>
+<li class="toclevel-3"><a href="#Profile_Deletion"><span class="tocnumber">3.1.11</span> <span class="toctext">Profile Deletion</span></a></li>
+<li class="toclevel-3"><a href="#Framework_Client_Library"><span class="tocnumber">3.1.12</span> <span class="toctext">Framework Client Library</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#System_Context"><span class="tocnumber">3.2</span> <span class="toctext">System Context</span></a></li>
+<li class="toclevel-2"><a href="#Interfaces"><span class="tocnumber">3.3</span> <span class="toctext">Interfaces</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Interfaces_Used"><span class="tocnumber">3.3.1</span> <span class="toctext">Interfaces Used</span></a></li>
+<li class="toclevel-3"><a href="#Interfaces_Provided"><span class="tocnumber">3.3.2</span> <span class="toctext">Interfaces Provided</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</td></tr></table>
+<a name="Introduction" id="Introduction"></a><h1> <span class="mw-headline"> Introduction </span></h1>
+<p>Personal computing, cloud computing and mobile computing have 
+increasingly made users to store their personal data in personal 
+computers, Internet based cloud services and mobile devices. The kind of
+ personal data varies from normal text files to a varied range of media 
+data like pictures (JPEG, GIF, etc.), music files (mp3, wav, etc.), 
+movie files (wmv, mp4, etc.), data file (.doc, .ppt, .pdf etc.) and 
+non-file formats like vcard (format for contact card), vcal (format for 
+calendar entry) which has contacts and calendar information. As the data
+ gets more and more distributed, it become the more important to keep 
+the data in sync among the various computing entities.Various 
+protocols(SyncML, MTP, REST etc.) have evolved to keep the user data in 
+sync among the entities.
+</p><p>These various protocols work over different kinds of transports 
+(like Bluetooth, USB, IP etc.). So it is no more enough that a 
+particular mobile device supports only a single protocol to keep the 
+user data in sync. It also so happens that two different protocols are 
+also used to synchronize the same kind of data (for example, SyncML and 
+REST API can be used to synchronize calendar data). The choice of the 
+protocol to use largely depends on the kind of target service from where
+ the data is fetched. Also, the device UI has to provide a coherent view
+ to the end-user without having to expose the internal protocols being 
+used to keep the user data in sync. In order to handle the various 
+synchronization protocols, it is important to have a framework that 
+dynamically chooses the protocol to use for a particular sync session 
+and also provide various kinds of platform based services to the sync 
+session. The Buteo Synchronization Framework tries to create a unified 
+architecture for any kind of synchronization protocol and also enables 
+application developers to create a unified user interface to merge all 
+the synchronization services in the device (here the device can be a PC,
+ mobile device or any other computing device).
+</p><p>The Buteo SyncFW does not provide any synchronization 
+capabilities by itself. It is only the plug-ins and the corresponding 
+protocol stacks that provide the synchronization capabilities.
+</p><p>Note: The name <i><b>Buteo</b></i> is the Latin name for a Hawk (more from here: <a href="http://en.wikipedia.org/wiki/Buteo" class="external free" title="http://en.wikipedia.org/wiki/Buteo" rel="nofollow">http://en.wikipedia.org/wiki/Buteo</a>)
+</p>
+<a name="Requirements" id="Requirements"></a><h1> <span class="mw-headline"> Requirements </span></h1>
+<p>Following diagram shows the end-user usecases for Buteo Sync solution.
+</p><p>
+\image html Buteo_Sync_Solution_-_End_User_Usecases.jpg
+</p><p>The high level end-application use-cases are taking into consideration while creating the architecture 
+</p>
+<ul><li> Supporting synchronization of data between mobile devices 
+</li><li> Synchronization of data between mobile devices and PC 
+</li><li> Synchronization of data between mobile device and the cloud 
+based services. The cloud based services are any internet based online 
+services
+</li></ul>
+<p>The main usecases are to allow a 3'rd party synchronization 
+application developer to create synchronization services and deploy to 
+the framework and to provide various other features like deploy/undeploy
+ synchronization plug-ins, develop storage plug-ins for already existing
+ synchronization services etc.
+</p>
+<a name="Functional_Requirements" id="Functional_Requirements"></a><h2> <span class="mw-headline"> Functional Requirements </span></h2>
+<ul><li> The solution should provide a d-bus API for on device application to interact and use the framework features and properties
+</li><li> The framework should provide the end-user a means to initiate,
+ abort, suspend/resume, getting status and logs of synchronization. 
+These API methods would end up in the GUI functionality for the end-user
+</li><li> As a user of the solution, it should allow me to deploy a synchronization service on the fly
+</li><li> As a user of the solution, it should allow me to remove an 
+already deployed synchronization service. Even after remvoal of all the 
+deployed services, there should not be any affect in the working nature 
+of the computing device
+</li><li> It should allow integration to the platform databases as 
+pluggable components, so that support for the synchronization of 
+databases can be added and removed on the fly
+</li><li> There should be a facility to schedule sychronization 
+sessions. Scheduling is used as an automated mechanism to initiate 
+synchronization with online services at periodic intervals of time 
+without the end-user intervention
+</li><li> It should be possible to run multiple synchronization sessions in parallel
+</li><li> If it is not possible to run multiple synchronization 
+sessions, then the requests should be queued and the requests should be 
+executed in the order of the queued requests 
+</li><li> There should be a mechanism to activate/de-activate 
+synchronization based on the context. The context mainly is related to 
+network availability, in which case, synchronization should be intiated 
+when the network is enabled and available and should be disabled and 
+scheduled for later incase the network is not available 
+</li><li> In low battery conditions, synchronization should be disabled and should be rescheduled for a later session
+</li><li> It should be possible to backup the configuration files of the
+ framework and restore it another machine/device. This requirement needs
+ to be considered carefully, as it cannot be satisfied to the fullest 
+extent
+</li><li> The framework should support synchronization with transport 
+requirements for network based, PC based and device-device 
+synchronization. The PC based synchronization could use sort range 
+connectivity solutions like USB and Bluetooth
+</li><li> The architecture should support any kind of data and also 
+different kinds of data. For example, it should support Contacts in 
+Vcard format, but it should also be able to support Vcard versions 2.0, 
+2.1 and 3.0
+</li><li> Optional: should support "Push Based Sync"
+</li><li> Optional: Should support changed based synchronization
+</li></ul>
+<a name="Performance_Requirements" id="Performance_Requirements"></a><h2> <span class="mw-headline"> Performance Requirements </span></h2>
+<ul><li> There should not be a theoritical limit on the number of 
+synchronization services that the framework can support. But practically
+ this could be limited by the resources available on the target device
+</li><li> Usage of the network resources on a device at random intervals
+ of time could increase the number of times the processor is woken up, 
+because of which the use-time of the battery could reduce drastically. 
+For this reason, the framework should optimize the usage of the network 
+through some mechanism available in the device
+</li></ul>
+<a name="Non-Functional_Requirements" id="Non-Functional_Requirements"></a><h2> <span class="mw-headline"> Non-Functional Requirements </span></h2>
+<ul><li> The solution should be generic in nature and should not be tied to or depend on any synchronization protocol 
+</li><li> The solution should be as much portal as possible across all Linux distributions (GNOME, KDE etc.) 
+</li><li> The framework should provide backward compatibility so as to 
+allow any synchronization services that are deployed with an older API 
+</li><li> The solution should provide a simple API for 3'rd party developers 
+</li><li> The framework should be implemented in a transport independent manner 
+</li><li> It should be possible to change the end-user graphical user 
+interface without the need to change the core engine. The architecture 
+should be extensible and scalable for any kind of data to be 
+synchronized and for any kind of protocol
+</li></ul>
+<p>Following diagram depicts some more usecases of the framework
+</p><p>\image html ButeoFW_Usecase_Diagram.jpg
+</p>
+<a name="Architecture_Details" id="Architecture_Details"></a><h1> <span class="mw-headline"> Architecture Details </span></h1>
+<p>The Buteo Synchronization framework architecture is created taking 
+into consideration the extensibility and scalability of the solution for
+ current and future use cases. Effort is made to make use of the 
+existing components as mush as possible.
+</p>
+<a name="Framework_Components" id="Framework_Components"></a><h2> <span class="mw-headline"> Framework Components </span></h2>
+<a name="Plug-in_Manager" id="Plug-in_Manager"></a><h3> <span class="mw-headline"> Plug-in Manager </span></h3>
+<p>A plug-in based architecture is the logical choice to satisfy the 
+requirement of the ability to deploy/undeploy sync services in the 
+device. The plug-in manager forms the core concept of the Buteo SyncFW. 
+Even though the component is named as plug-in manager, the component 
+does not perform any handling of the plug-ins itself. It is the sync 
+daemon that performs the actual functionality of loading/unloading of 
+the plugins. These plugins could also be called as sync agents, since 
+they handle the sync sessions by using the corresponding sync protocols.
+</p><p>In the synchronization world, typically, there are two kinds of 
+sync services - one that acts as a client and initiates a sync towards a
+ sync server; the typical scenario is where a device sync’s PIM data 
+with an online service (like Ovi.com) and another that acts as a sync 
+server that accepts incoming sync requests or one which has to have a 
+persistent connection towards a sync service. In order to satisfy these 
+two kinds of modes, two kinds of plug-ins are designed. One is a <i><b>Client Plugin</b></i> and another is a <i><b>Server Plugin</b></i>.
+ A client plugin is loaded on demand either by a GUI application or 
+through a scheduled sync session and is unloaded once is sync is 
+completed. On the other hand, a server plugin is always loaded for 
+accepting incoming sync requests and is never unloaded. In terms of 
+interface methods, the only difference between these plugins would be a 
+“listen” method, which the server plug-in would have. The client/server 
+role decision is made at the time of writing of the plugin and is 
+defined the plugin configuration file. Since the Buteo SyncFW is a 
+generic architecture for MeeGo platform, which is not just targetted for
+ mobile devices, the server functionality could as well be used for a 
+netbook kind of usecase, where the sync service in the netbook acts as a
+ server and the Buteo SyncFW acts as a client.
+</p><p>Another plugin that is defined is the <i><b>storage plugin</b></i>.
+ Typically every sync service would involve synchronization of different
+ kinds of user data, the formats of which are profoundly different. A 
+sync protocol like OMA DS SyncML would be able to synchronize different 
+kinds of data with different formats, which would mean that the 
+framework should be able to handle synchronization of these different 
+kinds of data formats. The concept of “Storage Plugin” is created to 
+cater to this kind of usecases. Backend storage is defined as a 
+component in the platform that holds the user personal data. Some 
+examples are contacts, calendar, SMS, MMS, music files, audio files, 
+photos etc. Storage plug-in would be loaded along with the corresponding
+ client or server plug-in. The decision of which storage plug-in to load
+ is made based on the profile information of the deployed service and 
+also the protocol request for the storage. More information about a 
+profile is described in the following sections. This kind of plug-in 
+based mechanism for storage provides a scalable architecture where it is
+ possible to provide many storage plug-ins for the same kind of backend 
+storage. The following figure describes the context of the plugins and 
+the plugin manager.
+</p><p>\image html Buteo_FW_-_Plugin_Manager.jpg
+</p><p>The main functionality of storage plug-in would be to obtain the 
+raw data in the protocol message and perform a transformation of the 
+data to the format suitable for the backend storage in the device. For 
+example a SyncML message would provide the Contact information in the 
+form of a vcard, while the storage in the device could be in the form of
+ a SQLite database with an API layer. In this case, the storage plug-in 
+would obtain the vcard from the protocol, use the API layer over the 
+Contacts database and store the vcard entry to the database. A reverse 
+mechanism would be used to retrieve the vcard from the storage and 
+return it to the target sync entity.
+</p><p>Apart from the implementation interfaces, a plugin should also 
+have a configuration file that defines the properties of the plugin, 
+like, whether the plug-in should be visible or hidden to the user, the 
+storage plugins that client/server plugin should use, the target service
+ address, like the ovi sync URL etc. The plugin configuration file has 
+only static information, which is read by the synchronization daemon and
+ used accordingly. The configuration file could also provide extensions,
+ which could specifically be used by the plug-in, but not the framework.
+</p>
+<a name="Profile_Manager" id="Profile_Manager"></a><h3> <span class="mw-headline"> Profile Manager </span></h3>
+<p>Profile Management is quite important both from managing the deployed
+ plug-ins as well as holds the information to be displayed to the 
+end-user. From the end-user point of view, a profile is defined as 
+something that provides information about the synchronization service 
+that the user has synchronized with. A profile has only dynamic 
+information that is created using the plug-in configuration and other 
+information that is generated after a sync has been initiated. For 
+example, if the user has synchronized his data with Ovi.com, then a 
+profile entry would be created with information like the databases the 
+sync session was initiated, time of sync, sync status etc. A profile is 
+also used to display the sync status in a user-friendly manner in a GUI 
+application.
+</p><p>The profile information is stored persistently, so that it could 
+be used across sync sessions and also be available for any GUI 
+application to query the sync status. The profile is the only object 
+that moves across all the synchronization entities (daemon, GUI’s etc.).
+ Some of the properties of a profile can be modified by the user and 
+some properties are only modifiable by the framework. Some of the 
+identified properties of a profile manager are as under: 
+</p>
+<ul><li> Profile ID - a unique identifier generated by the framework 
+using some of the fields of a profile that uniquely identify a profile 
+(like profile name, target address etc.) 
+</li><li> Profile name - is the name of the profile (need not be unique) 
+</li><li> Transport type - the transport type used for the profile 
+(USB/BT/HTTP/HTTPS/TCP). Note that a transport type can also be a 
+combination of two transports. For example, when synchronizing with PC 
+Suite, it is possible to use both BT and/or USB to synchronize with PC 
+Suite 
+</li><li> Sync Content - the databases that this profile is used to synchronize (like contacts, calendar, notes, music etc.) 
+</li><li> Sync direction - the direction of synchronization (1-way send, 1-way receive, 2-way sync)
+</li><li> Synchronization status - the status that identi#es the last 
+synchronization status. This inturn will have the following entities: 
+</li><li> Last sync status (success/failed/cancelled) 
+</li><li> Last sync time
+</li><li> Last sync log (sync item count) 
+</li><li> Credentials - the username/password, if any used for 
+synchronization with the service. These items are expected to be 
+returned from Accounts application 
+</li><li> Synchronization type - a flag to represent manual/automatic 
+synchronization. When manual sync is set, the user has to manually 
+initiate the sync. Incase of automatic sync, the framework will initiate
+ sync as per the automatic sync frequency 
+</li><li> Sync frequency - the frequency at which synchronization should happen (incase of automatic sync)
+</li></ul>
+<a name="Scheduler" id="Scheduler"></a><h3> <span class="mw-headline"> Scheduler </span></h3>
+<p>Another important component of Buteo SyncFW is the synchronization 
+scheduler. The Scheduler is responsible for scheduling synchronization 
+sessions and also for handling parallel synchronizations. It has a queue
+ mechanism to queue the incoming sync requests. The periodic scheduling 
+of the Sync sessions is handled by using an alarm kind of functionality.
+ The frequency is set by the end-user through a well-known GUI 
+interface. The frequency is defined as a repeat event like everyday, a 
+particular day every week, the hour setting etc. This event is converted
+ to an alarm event and the alarm is triggered whenever the timer 
+expired.
+</p><p>\image html Buteo_SyncFW_-_Sync_Scheduler.jpg
+</p><p>One of the main properties of a sync protocol is to provide data 
+consistency. Even though the backend datastores may provide data 
+consistency through database ACID properties simultaneous 
+synchronization sessions might result in inconsistent results in the 
+end-user data. For example, if sync session1 adds 10 data elements, and a
+ simultaneous sync session2 might result in the addition of the same set
+ of data from a different source, resulting in duplication of data. The 
+framework provides a functionality, wherein simultaneous sync requests 
+that access the same backend datastore are queued and are executed in 
+the first-in-first-out order. In the above example, the two sync 
+sessions are queued and are executed one-after-the-other. More details 
+on how this is achieved is explained in the low-level design.
+</p>
+<a name="Accounts_Integration" id="Accounts_Integration"></a><h3> <span class="mw-headline"> Accounts Integration </span></h3>
+<p>Accounts&amp;SSO (<a href="http://wiki.meego.com/Single_sign-on" class="external free" title="http://wiki.meego.com/Single_sign-on" rel="nofollow">http://wiki.meego.com/Single_sign-on</a>)
+ is a component in MeeGo platform that provides a one-stop shop for the 
+end-users to configure online accounts. Examples of online acconts are 
+Ovi, Google etc. Most of the online services have Single Sign On enabled
+ which enables the user to enter the credentials only once and be able 
+to access all the services (like Ovi Music, Ovi Sync, Ovi Sharing etc.) 
+without having to re-enter the credentials again and again. The 
+Accounts&amp;SSO component on the device is the counterpart of the 
+online service accounts management. This subsystem also stores the user 
+credentials in a secure location which is not readable by a non-root 
+user. Since the Buteo SyncFW supports synchronization of user data with 
+online services, it needs to be integrated to the Accounts&amp;SSO 
+subsystem to fetch the SSO token and provide it to the online sync 
+service.
+</p><p>The Accounts&amp;SSO subsystem provides a pluggable interface to 
+hook-in a new online account service. The pluggable component uses a XML
+ file definition similar to Buteo FW. The Buteo SyncFW uses the account 
+identifier defined in the accounts XML definition to link the sync 
+plug-in with the corresponding account. The plug-in developer is also 
+given the option to not use to the Accounts&amp;SSO subsystem, but 
+rather provide the credentials in the service XML.
+</p>
+<a name="Synchronization_Daemon" id="Synchronization_Daemon"></a><h3> <span class="mw-headline"> Synchronization Daemon </span></h3>
+<p>The synchronization daemon is the only always running process in the 
+sync framework. It provides the functionality of loading/unloading the 
+plug-ins, sending d-bus signals, handle profile management (like 
+creating profiles, deleting them etc.) integration with Accounts, 
+hooking up with the hardware layer to register for interested signals 
+(like bluetooth availability, USB and network connectivity etc). The 
+daemon would also load the server plug-ins which would allow external 
+devices to connect to the sync service in the device and perform 
+synchronization. Following is the component context diagram of 
+synchronization daemon depicting the various components that it 
+interacts with. The synchronization daemon is the central component in 
+the framework and is responsible for managing the various states of the 
+framework.
+</p><p>\image html Buteo_SyncFW_-_Component_View.jpg
+</p><p>In the above figure, the boxes in blue represent the Buteo SyncFW
+ components and the boxes in yellow represent the components in MeeGo. 
+The framework provides handlers for each of the external component 
+services that it uses. The main functionality of the daemon is:
+</p>
+<ul><li> to maintain the state machine of the framework
+</li><li> to load/unload synchronization plugins
+</li><li> to initialize the adapters towards external components and 
+maintain the interaction with external components (mainly the 
+interaction is over d-bus)
+</li><li> to make available the d-bus API of the framework
+</li></ul>
+<p>Following is the state machine diagram of the framework, of which the
+ daemon forms the central component Following are the various states and
+ activities that occur in the synchronization framework: 
+</p><p>\image html Synchronization_Framework_Activity_Diagram.jpg
+</p>
+<ul><li> The daemon gets started (by systemd) during the 
+startup of the device. Once the necessary initialization steps are done 
+(signal handlers and so on), the daemon checks the DB to see if there is
+ a need to load any server plug-ins. If there are any server plug-ins to
+ be loaded, the daemon loads them in a separate thread and goes into an 
+idle state.
+</li><li> If the daemon receives client initiated sync, it checks to see
+ if there is an ongoing sync. If there is, it puts the sync request in 
+queue; else it loads the client sync plug-in in a separate thread. Once 
+the client plug-in finishes sync, it releases its resources and sends a 
+signal to the daemon to unload the plug-in. 
+</li><li> If the daemon receives a schedule sync alert from alarm 
+daemon, it takes the same sequence of actions as of initiating a sync by
+ the user from UI.
+</li><li> Whenever the user activates an account from the Accounts UI, a
+ signal is sent to the daemon, whereby it activates the sync account in 
+the sync UI Note that it might be possible that the daemon has to unload
+ and load a sync plug-in for a sync request in queue to perform the same
+ synchronization. This would be not good for performance. While 
+implementation, this should be taken into consideration and some sort of
+ heuristics should be used to avoid unloading/loading of plug-ins.
+</li></ul>
+<a name="Developer_API" id="Developer_API"></a><h3> <span class="mw-headline"> Developer API </span></h3>
+<p>As part of the framework, the solution provides an API for 3'rd party
+ developers to create plug-ins for the MeeGo platform. The framework 
+provides two kinds of APIs:
+</p>
+<ul><li> A plugin API that allows developers to create new 
+synchronization plugins. A client-side DLL API is provided for anyone 
+not willing to understand d-bus
+</li><li> A d-bus API that any application can use to interact with the 
+framework (the API typically includes methods to start sync, abort sync,
+ get sync status etc.). For application that deal with profile data, a 
+client-side API is provided using which the clients can handle the 
+communication with the sync engine.
+</li></ul>
+<a name="Hardware_Hookup" id="Hardware_Hookup"></a><h3> <span class="mw-headline"> Hardware Hookup </span></h3>
+<p>For most of the synchronization services, it is important to initiate
+ the sync on the availability of the underlying transport. For example, 
+when the device is connected to a PC via USB, when bluetooth is switched
+ on in the device, on the availability of the network (wifi/GPRS/3G..) 
+etc. In order to support these usecases, the framework hooks into the 
+hardware notifications services in the device, like Context Framework, 
+Hardware Abstraction Layer (HAL) etc. The Context Framework provides 
+context aware information like Bluetooth availability, network 
+availability etc. The USB connectivity is obtained using HAL. Whenever 
+these events happen, the hardware hookup adapter notifies the daemon to 
+take the appropriate action. The daemon checks all the plugin profiles 
+that have registered to be invoked whenever a particular transport is 
+available and loads those plugins. Once loaded, the plug-ins check if 
+the transport suits their requirements, perform their work and exit, 
+after which they are unloaded by the daemon. There could be some server 
+plugins that are always loaded as long as the underlying transport is 
+available.
+</p>
+<a name="Device_State_Based_Sync" id="Device_State_Based_Sync"></a><h3> <span class="mw-headline"> Device State Based Sync </span></h3>
+<p>The device state based sync is mainly related to handling of the 
+scenarios where sync cannot continue because of low-device-resource 
+conditions. Examples of low resource conditions are less disk space, low
+ memory, low-battery level etc. The framework makes use of Context 
+framework to fetch information related to some of the device state 
+variables, like battery level, but for other conditions like disk space,
+ low memory the native Linux methods should be used. Details are 
+available in the low-level design chapter. Note that if the sync is 
+initiated from the UI, most of these checks should be done in the UI 
+itself to avoid round-trip checks by the engine. This is a performance 
+improvement measure
+</p>
+<a name="Change_Based_Sync" id="Change_Based_Sync"></a><h3> <span class="mw-headline"> Change Based Sync </span></h3>
+<p>Another important feature of any sync solution is to initiate sync 
+whenever the user changes any of his/her personal data. The general term
+ for this is change based sync. There could be two methodologies used to
+ support this kind of feature:
+</p><p>1.If the backend datastores have the ability to send notification
+ signals whenever the database is modified. But it cannot be expected 
+that each datastore supports the notification mechanism. This leads to 
+the next possible option 
+2.The synchronization daemon polls the various databases at periodic 
+intervals of time to know if some changes have been done to the data- 
+stores. If this methodology is chosen, the timing of the interval 
+becomes quite important. In this methodology, the sync cannot be 
+real-time, since if:  
+</p>
+<pre>   the change in the datastore happens at t0, and
+   the periodic datastore check interval is at t1, then
+   the sync would occur only after every n*t1, where n is the periodicity of the sync
+</pre>
+<p>This is a reasonable limitation, since the user might not expect a 
+real-time sync operation. One of the possibilities to implement this 
+functionality is to provide a plug-in that would be loaded in a periodic
+ interval and which would be able to check the backend datastores for 
+any changes. The scheduling functionality of the sync can be used to 
+periodically load this plugin. This design avoids the sync framework to 
+directly access the backend datastores.
+</p>
+<a name="Handling_Deleted_item_list" id="Handling_Deleted_item_list"></a><h3> <span class="mw-headline"> Handling Deleted item list </span></h3>
+<p>Most of the synchronization protocols support a feature called “fast 
+sync” [Ref: TBD] wherein the consecutive sync’s after the first sync 
+only synchronize the changes from the previous synchronization. The 
+changes include the data that was added/modified/deleted. The protocol 
+implementations make use of the backend datastores capability to return 
+the list of added/modified and deleted items. Though most of the 
+datastores are able to provide information related to added and modified
+ items, they do not keep track of the deleted items and purge them for 
+good. In such cases, handling the list of deleted items becomes the job 
+of the synchronization service.
+</p><p>Since this is a feature that is required by most of the storage 
+plug-ins, the framework could as well provide an interface which the 
+storage plug-ins would implement and store a list of deleted items. 
+Couple of mechanisms exists to keep track of the deleted items:
+</p>
+<ul><li> Keep track of deleted items for a particular datastore. This 
+involves maintaining a list of previous list against the current and 
+finding the difference between these two
+</li><li> Maintain a complete list of the items and during every sync 
+session, find the difference between the sync identifier map against the
+ backend datastore id maps. The difference, if any is the list of 
+deleted items. Note that only the ids of the items are stored and not 
+the complete items
+</li></ul>
+<a name="Profile_Deletion" id="Profile_Deletion"></a><h3> <span class="mw-headline"> Profile Deletion </span></h3>
+<p>Apart from a profile being created whenever the user enables the 
+account or synchronizes with a target device, at some points of time, it
+ could also be deleted by the user. Any profile specific data in the 
+sync framework could be handled by the framework itself, but most of the
+ times, the protocol stacks and the plugins also maintain the 
+corresponding profile specific data. For example, the SyncML stack 
+maintains the anchor information and the id mappings, which have to be 
+purged when the corresponding profile is deleted. The SyncFW cannot 
+directly delete this information from the protocol stack, since the data
+ is protocol specific. A good solution to handle this case is to provide
+ a plug-in interace method (say “cleanup”), which every plug-in has to 
+implement to cleanup the plug-in and stack specific data. In order to 
+invoke this method, whenever the user performs a “delete” operation, the
+ plug-in is loaded and the “cleanup” method is invoked. This is a clean 
+approach to handle the plug-in specific operations and shows the 
+strength of the extendability of the plug-in method.
+</p>
+<a name="Framework_Client_Library" id="Framework_Client_Library"></a><h3> <span class="mw-headline"> Framework Client Library </span></h3>
+<p>The framework provides a d-bus API [Developer API] that the client 
+applications can use to interact with the synchronization daemon. This 
+works out as long as the just use simple d-bus API methods like 
+“startSync”, “stopSync” etc., but for complex API methods like 
+“fetchProfile”, “getSyncLogs” the UI clients have to unmarshall the 
+complex d-bus message, parse the message and then take an appropriate 
+action. The more then number of clients towards the framework, the more 
+code replication there is. In order to avoid this, it makes more sense 
+to provide a synchronization framework client library, which the 
+applications can use to interact with the framework. The framework would
+ be responsible for performing the task of un-marshalling the d-bus 
+message, parsing the message and then signal the UI component to fetch 
+the result. More detailed information is provided in further sections.
+</p>
+<a name="System_Context" id="System_Context"></a><h2> <span class="mw-headline"> System Context </span></h2>
+<p>Following is the system context diagram
+</p><p>\image html Buteo-SyncFW-SystemContext.jpg
+</p>
+</li><li> Accounts &amp; SSO subsystem (for accounts integration) that belongs to the “Personal Services” layer
+</li><li> Bluetooth (for Bluetooth related information) that belongs to the “Comms Services” layer
+</li><li> Qt Core (for using the Qt core API classes) (QtAPI) that belongs to the visual services
+</li><li> The d-bus messaging services (for providing the d-bus services) (FreedesktopDbus) that belongs to the “kernel” layer
+</li></ul>
+<a name="Interfaces" id="Interfaces"></a><h2> <span class="mw-headline"> Interfaces </span></h2>
+<a name="Interfaces_Used" id="Interfaces_Used"></a><h3> <span class="mw-headline"> Interfaces Used </span></h3>
+<table class="wikitable" cellpadding="5" cellspacing="0" border="1">
+
+<tr>
+<th> Interface Name
+</th><th> Interface Type
+</th><th> Description
+</th></tr>
+<tr>
+<td> libaccounts
+</td><td> Dynamic link library
+</td><td> The Accounts&amp;SSO library that provides the functionality of accounts registration
+</td></tr>
+<tr>
+<td> libdbus
+</td><td> Dynamic link library
+</td><td> The d-bus library that is used to use as well as provide the d-bus interface for the framework
+</td></tr>
+<tr>
+<td>libbluetooth
+</td><td>d-bus
+</td><td>The BlueZ d-bus API is used to get notifications about availability of bluetooth
+</td></tr></table>
+<a name="Interfaces_Provided" id="Interfaces_Provided"></a><h3> <span class="mw-headline"> Interfaces Provided </span></h3>
+<table class="wikitable" cellpadding="5" cellspacing="0" border="1">
+
+<tr>
+<th> Interface Name
+</th><th> Interface Type
+</th><th> Description
+</th></tr>
+<tr>
+<td>libbuteosyncfw
+</td><td>Dynamic link library
+</td><td>The library provides the framework functionality of Buteo. 
+The API provided by this library includes support for writing plugins, managing
+profiles and obtaining sync results.
+</td></tr>
+<tr>
+<td>Framework d-bus API
+</td><td>d-bus
+</td><td>Apart from the library libbuteosyncfw, this d-bus API is for applications
+to interact with the  synchronization daemon. An application using this API will have to 
+understand d-bus and unmarshall and parse the d-bus messages itself.
+</td></tr>
+<tr>
+<td>Profile XML API
+</td><td>XML file
+</td><td>A plug-in could be deployed to the framework with a default 
+profile XML file. The format of the profile XML file also forms as part 
+of the API
+</td></tr></table>
+
+\section support-oop-plugins Support for out of process plugins
+Buteo syncfw version 0.1.0 supported only dynamic link library plugins which the
+framework loads into the same process memory as msyncd. This archicture has a
+problem that if any one of the plugin misbehaves (crashes, for example), msyncd
+would also crash and there is a probability that it would never recover. To avoid
+such situations, an out of process plugin architecture was devised and implemented.
+In this architecture, each of the plugins would be running as separate processes
+and msyncd process would interact with each of the processes to handle the sync
+life cycle and operations.
+
+This new architecture is devised with the following absolute requirements:
+
+- None of the plugin code should change. This is to ensure backward compatibility
+of all existing plugins
+- The flow of msyncd should not change w.r.t the new plugins, ie., the flow remains
+the same for both DLL plugins as well as process plugins
+- Support for DLL plugins still continues and they can co-exist along with process
+plugins 
+
+Keeping the above requirements in context, the following architecture is devised,
+the class diagram of which is depicted below. 
+
+</p><p>\image html Outofprocesspluginclasses.png
+
+The classes in blue belong to the framework, while the classes in pink to the plugin.
+Two concrete classes, OOPClientPlugin and OOPServerPlugin (that inherit from ClientPlugin
+and ServerPlugin respectively) are created which act as the interface between the
+plugin and the framework. These classes will be responsible for performing any
+back-forth conversion of the data transferred. These classes also ensure that the
+interface between msyncd and the plugins remain the same. In dll based plugin,
+the .so file is opened using dlsym and the binary is loaded into memory and then
+the ClientPlugin object is created. In this mechanism, the plugin process is started
+and then the OOPClientPlugin object is created, which then talks to the process
+plugin over d-bus.
+
+D-bus with its inbuilt capability to marshall data, invoke signals/slots, seamless
+API is chosen as the communication mechanism between the plugins and msyncd. A dbus
+interface is created for communication between msyncd and the plugins. This interface
+is same as the interface provided by both ClientPlugin and ServerPlugin. Using the
+xml interface description (common for both client and server plugin), dbus client
+proxy and server adaptor code is generated (using qdbusxml2cpp tool).
+
+For facilitating that none of the plugin code changes and also to commonalize the
+code across all the plugins, the class PluginServiceObj (that implmenets the dbus
+skeleton adaptor class) is created. This class ensures that none of the existing
+plugin code has to be changed and also performs any transformation of the data
+between msyncd and the plugins (over dbus). This class is a peer class of
+OOPClientPlugin and OOPServerPlugin. Apart from this class, the plugin_main.cpp
+provides the main() function required to generate an executable binary. This class
+takes the plugin name and the profile name as arguments and then initializes the
+PluginServiceObj and registers it as a dbus service.
+
+All signals emitted by the plugin (and msyncd) are automatically relayed by Qt dbus.
+The life cycle of a process plugin is similar to that of a dll plugin.
+
+To convert an existing dll plugin to a process plugin, only a few settings need
+to be added. Described here \ref oop-plugins
+
+</div>
 */

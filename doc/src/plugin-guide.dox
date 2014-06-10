@@ -1,18 +1,171 @@
 /*! \page plugin-guide Writing plugins for Synchronization Framework 
 
-\section clientpluginguide Writing Client plugins
+\tableofcontents
 
-Client plugins are shared libraries loaded by the Plugin Manager. 
-Plugin Manager runs in the Synchronization Daemon. Client Plugins have to 
-implement the ClientPluginInterface 
+\section kinds-of-plugins Kinds of plugins that Buteo supports
+-# <b> Client plugins </b>
+Plugins which act as clients to services running outside the machine (device/PC/
+tablet) domain. These plugins are loaded whenever there is a need for starting
+sync and are unloaded once done. More than one client plugin can be loaded at any 
+point of time, provided that they deal with different kinds of storages 
+(contacts, calendar, notes etc.) 
+-# <b> Server plugins </b>
+Server plugins are alive forever and act as server for clients that would like to
+connect to the server. A typical example of a server plugin is a SyncML server
+plugin that acts as a server for an external client
+-# <b> Storage plugins </b>
+A storage plugin enables a generic API for accessing the data from the device
+databases, like Contacts, File system, Calendar etc. These plugins can then be
+used across multiple protocols like Dropbox, Google services, Caldav etc.
+
+\section create-plugin Creating a plugin
+The buteo-syncfw comes with a tools package to create template plugin code that
+will help the developer to quickly create plugins
+
+The tool uses Cheetah (www.cheetahtemplate.org/‎) template library to generate the
+templates. One can install cheetah in Ubuntu using command: 'sudo apt-get install
+python-cheetah'. Python 2.7 or greater is required 
+
+\subsection generate-plugin-template-code Instructions for generating a plugin
+boiler plate code.
+The configuration files corresponding to a client/server/storage have to be
+filled-in with the appropriate information. Each of the fields in the config files
+are marked with MANDATORY/OPTIONAL. Info about the fields is provided in the config
+files
+
+To generate client plugin, run the command:
+
+\code ./gen_template.py -c client-plugin.cfg -d <output dir> \endcode
+
+To generate server plugin, run the command:
+
+\code ./gen_template.py -c server-plugin.cfg -d <output dir> \endcode
+
+To generate storage plugin, run the command:
+
+\code ./gen_template.py -c storage-plugin.cfg -d <output dir>  \endcode
+
+
+\section oop-plugins Writing Out of process plugins
+Buteo syncfw version 0.1.0 supported only dynamic link library plugins which the
+framework loads into the same process memory as msyncd. This archicture has a
+problem that if any one of the plugin misbehaves (crashes, for example), msyncd
+would also crash and there is a probability that it would not recover. To avoid
+such situations, an out of process plugin architecture was devised and implemented.
+In this architecture, each of the plugins would be running as separate processes
+and msyncd process would interact with each of the processes to handle the sync
+life cycle and operations.
+
+In the new architecture, there is no need to modify any of the existing plugin code.
+The only change that needs to be done is in the .pro files of each of the plugins
+
+The following few lines have to be added to the .pro file to convert a .so plugin
+to a binary executable plugin
 
 \code
 
+TEMPLATE = app
+QT += dbus
+target.path = /usr/lib/buteo-plugins-qt5/oopp
+
+DEFINES += "CLASSNAME=MyPluginClassname"
+DEFINES += CLASSNAME_H=\\\"MyPluginClassname.h\\\"
+INCLUDE_DIR = $$system(pkg-config --cflags buteosyncfw5|cut -f2 -d'I')
+
+HEADERS += $$INCLUDE_DIR/ButeoPluginIfAdaptor.h   \
+           $$INCLUDE_DIR/PluginCbImpl.h           \
+           $$INCLUDE_DIR/PluginServiceObj.h
+
+SOURCES += $$INCLUDE_DIR/ButeoPluginIfAdaptor.cpp \
+           $$INCLUDE_DIR/PluginCbImpl.cpp         \
+           $$INCLUDE_DIR/PluginServiceObj.cpp     \
+           $$INCLUDE_DIR/plugin_main.cpp
+
 \endcode
 
-\section storagepluginguide Writing storage plugins
+In the above, replace "MyPluginClassname" with the name of your plugin class
+and the name of the header
 
-\section serverplugincode Writing Server plugins
+If the plugin is a client plugin, add the following DEFINES, else <b>do not</b> add
 
+\code
+DEFINES += CLIENT_PLUGIN
+\endcode
+
+Also, note that your plugin should have public inheritance from Buteo::ClientPlugin 
+
+If you want your existing plugin dll configuration to exist with the out of process plugin configuration, the good way is to add another configuration to your .pro file. The config would look like:
+
+\code
+PLUGIN_DLL {
+...
+# DLL configuration (the same as your existing configuration)
+...
+}
+
+PLUGIN_EXE {
+...
+# OOP plugin config
+...
+}
+\endcode
+
+To generate the code for a specific configuration, you can run qmake like:
+
+\code
+qmake myplugin.pro CONFIG+=PLUGIN_EXE
+\endcode
+
+\section libsyncml Device sync with libsyncml
+libsyncml is a desktop based sync engine that support sync using SyncML
+protocol
+URL: https://libsyncml.opensync.org/
+It comes with a cmdline tool syncml-ds-tool to perform sync. Following
+instructions help in performing the sync over bluetooth and USB
+
+Buteo works with libsyncml over USB as well as bluetooth. These instructions
+are w.r.t the sailfish OS, but as and when more Linux based OS's are supported,
+these instructions will be extended
+
+\subsection usb-sync Sync over USB
+
+-# Connect the Sailfish based device to your PC over USB.
+-# Select the MTP mode when asked for a USB mode selection
+-# From the PC (Ubuntu or a version supporting libsyncml), install libsyncml-utils
+(in debian, 'sudo apt-get install libsyncml-utils)
+-# Run the following sync command for USB:
+\code
+     sudo syncml-ds-tool -u 1 --identifier "PC Suite" --sync text/x-vcard Contacts 
+\endcode
+    Note: The command has to run as 'sudo', else you will have to add the USB
+    device into your udev list
+-# The above command should fetch all the contacts in the Sailfish phone to your
+PC and dump the output to the screen. For more options of syncml-ds-tool, look at
+its help or the libsyncml website
+
+\subsection bluetooth-sync Sync over bluetooth
+
+-# Pair your bluetooth enabled PC/laptop with Sailfish based device. Also enable
+the bluetooth options of "connect automatically" and "trust" 
+-# Find out the bluetooth address of the sailfish based device by running the
+hcitool.
+\code
+    hcitool scan 
+\endcode
+-# Run the following sync command:
+\code
+    syncml-ds-tool -b <bluetooth address> 26 --identifier "PC Suite" --sync text/x-vcard Contacts 
+\endcode
+   26 is the channel number of the SyncML bluetooth profile
+   Replace <bluetooth address> with the bluetooth address of your sailfish
+   device (something like B4:EE:D4:F6:19:E7)
+-# The above command should fetch all the contacts in the Sailfish device
+to your PC and dump the output to the screen.
+
+\subsection sailfish-N9-contacts Synchronization of Contacts between Sailfish and N9
+
+-# In N9, go to Settings -> Sync & Backup -> Sync -> Add new sync target (+ below)
+-# Choose the Sailfish device in the list of bluetooth devices
+-# Start sync
 
 */

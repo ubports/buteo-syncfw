@@ -26,6 +26,7 @@
 #include <QString>
 #include <QMap>
 #include <QReadWriteLock>
+#include <QProcess>
 
 namespace Buteo {
 
@@ -47,9 +48,14 @@ const QString CLIENTMAP_LOCATION = "-client.so";
 const QString SERVERMAP_LOCATION = "-server.so";
 const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
 
+// OOP plugins binary name suffix
+const QString OOP_CLIENT_SUFFIX = "-client";
+const QString OOP_SERVER_SUFFIX = "-server";
+
 // Default directory from which to look for plugins
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/";
+const QString DEFAULT_OOP_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/oopp";
 #else
 const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins/";
 #endif
@@ -155,6 +161,12 @@ public:
      */
     void destroyServer( ServerPlugin *aPlugin );
 
+protected slots:
+    void onProcessStarted();
+
+    void onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus );
+
+    void onProcessError( QProcess::ProcessError procError );
 private:
 
     struct DllInfo
@@ -169,11 +181,19 @@ private:
 
     void loadPluginMaps( const QString aFilter, QMap<QString, QString>& aTargetMap );
 
+    void loadOOPPluginMaps( const QString aFilter, QMap<QString, QString>& aTargetMap );
+
     void* loadDll( const QString& aPath );
 
     void* getDllHandle( const QString& aPath );
 
     void unloadDll( const QString& aPath );
+
+    QProcess* startOOPPlugin( const QString& aPath,
+                              const QString& aPluginName,
+                              const QString& aProfileName );
+
+    void stopOOPPlugin( const QString& aPath );
 
     QString                 iPluginPath;
 
@@ -182,9 +202,14 @@ private:
     QMap<QString, QString>  iClientMaps;
     QMap<QString, QString>  iServerMaps;
 
+    QMap<QString, QString>  iOopClientMaps;
+    QMap<QString, QString>  iOoPServerMaps;
+
     QList<DllInfo>          iLoadedDlls;
 
     QReadWriteLock          iDllLock;
+
+    QString                 iProcBinaryPath;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class ClientPluginTest;

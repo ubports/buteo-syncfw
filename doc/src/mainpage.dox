@@ -9,7 +9,7 @@
   <tr>
     <td>
       <ul>
-        <li><strong><a href="introduction.html">Introduction to Sync Framework</a></strong></li>
+        <li><strong><a href="introduction.html">Buteo Synchronization Framework</a></strong></li>
       </ul>
     </td>
     <td>
@@ -21,6 +21,7 @@
     <td>
       <ul>
         <li><a href="plugin-guide.html">Writing Synchronization plugins</a></li>
+        <li><a href="api-usage.html">Using Buteo framework API</a></li>
       </ul>
     </td>
   </tr>

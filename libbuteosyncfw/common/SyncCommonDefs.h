@@ -29,6 +29,9 @@
 
 namespace Sync {
 
+#ifdef __GNUC__
+static const QString syncCacheDir() __attribute__ ((unused));
+#endif
 static const QString syncCacheDir()
 {
     const QString HOME_PATH = (::getenv("XDG_CACHE_HOME") == NULL) ? QDir::homePath() + QDir::separator() + ".cache" : ::getenv("XDG_CACHE_HOME");
@@ -49,7 +52,9 @@ enum SyncStatus {
     SYNC_DATABASE_FAILURE,
     SYNC_CONNECTION_ERROR,
     SYNC_SERVER_FAILURE,
-    SYNC_BAD_REQUEST
+    SYNC_BAD_REQUEST,
+    SYNC_PLUGIN_ERROR,
+    SYNC_PLUGIN_TIMEOUT
 };
 
 // UI needs to display a detailed Progress for the Current ongoing sync
