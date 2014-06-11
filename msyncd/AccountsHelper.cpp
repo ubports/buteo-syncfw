@@ -282,7 +282,9 @@ void AccountsHelper::slotAccountUpdated(Accounts::AccountId id)
             delete syncProfile;
         }
     }
-#endif    
+#else
+    Q_UNUSED(id);
+#endif
 }
 
 QList<SyncProfile*> AccountsHelper::getProfilesByAccountId(Accounts::AccountId id)
