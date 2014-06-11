@@ -160,7 +160,7 @@ void ProfileTest::testKeys()
     // Modify keys.
     p.setKey(KEY1, VALUE2);
     p.setKey(KEY2, VALUE1);
-    p.setKey(BOOLKEY, false);
+    p.setKey(BOOLKEY, QString("false"));
     QCOMPARE(p.key(KEY1), VALUE2);
     QCOMPARE(p.keyValues(KEY1).size(), 1);
     QCOMPARE(p.key(KEY2), VALUE1);

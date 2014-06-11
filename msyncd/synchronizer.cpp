@@ -1035,8 +1035,10 @@ void Synchronizer::onStorageAccquired ( const QString &aProfileName,
             else if (aMimeType.compare(QString("text/x-vbookmark"), Qt::CaseInsensitive) == 0)
                 storageMap["hbookmarks"] = true;
             #endif
+            #ifdef SMS_SYNC
             else if (aMimeType.compare(QString("text/x-vmsg"), Qt::CaseInsensitive) == 0)
                 storageMap["hsms"] = true;
+            #endif
             else
                 LOG_DEBUG( "Unsupported mime type" << aMimeType );
 
@@ -1421,7 +1423,9 @@ void Synchronizer::onNewSession(const QString &aDestination)
             #ifdef BM_SYNC
             storageMap["hbookmarks"] = 0;
             #endif
+            #ifdef SMS_SYNC
             storageMap["hsms"] = 0;
+            #endif
 
             session->setStorageMap(storageMap);
 
