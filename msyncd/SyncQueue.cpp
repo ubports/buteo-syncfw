@@ -86,6 +86,13 @@ bool SyncQueue::isEmpty() const
     return iItems.isEmpty();
 }
 
+int SyncQueue::size() const
+{
+    FUNCTION_CALL_TRACE;
+
+    return iItems.size();
+}
+
 bool SyncQueue::contains(const QString &aProfileName) const
 {
     FUNCTION_CALL_TRACE;

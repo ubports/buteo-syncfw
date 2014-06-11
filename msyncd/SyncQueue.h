@@ -67,6 +67,12 @@ public:
      */
     bool isEmpty() const;
 
+    /*! \brief Current size of the sync queue.
+     *
+     * \return Number of elements in the sync queue.
+     */
+    int size() const;
+
     /*! \brief Checks if a profile with the given name is in the queue.
      *
      * \return Is the profile in the queue.
