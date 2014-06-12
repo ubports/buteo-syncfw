@@ -336,7 +336,8 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
             unloadDll( path );
         }
     } else if ( iOopClientMaps.contains(pluginName) ) {
-        // Stop the OOP process
+        // Stop the OOP process        
+        LOG_DEBUG( "Stopping the OOP process for " << pluginName);
         QString path = iOopClientMaps.value( pluginName );
         stopOOPPlugin( path );
     }
@@ -612,49 +613,38 @@ QProcess* PluginManager::startOOPPlugin( const QString &aPath,
     FUNCTION_CALL_TRACE;
     iDllLock.lockForWrite();
 
-    LOG_DEBUG( "Searching for oop plugin " << aPath);
-    QProcess *process = NULL;
+    LOG_DEBUG( "Startingr oop plugin " << aProfileName);
 
-    for( int i = 0; i < iLoadedDlls.count(); ++i ) {
-        if ( iLoadedDlls[i].iPath == aPath ) {
-            process = (QProcess*)iLoadedDlls[i].iHandle;
-            ++iLoadedDlls[i].iRefCount;
-        }
+    bool started = false;
+    QStringList args;
+    args << aPluginName << aProfileName;
+    LOG_DEBUG( "Starting process " << aPath <<
+               " with plugin name " << aPluginName <<
+               " and profile name " << aProfileName);
+
+    QProcess *process = new QProcess();
+    process->setProcessChannelMode( QProcess::ForwardedChannels );
+    process->start( aPath, args );
+
+    // This check is a workaround for the bug https://codereview.qt-project.org/#change,62897
+    QThread::sleep(1);         // The process state does not seem be in a proper state immediately
+    if( process->state() == QProcess::Starting ) {
+        started = process->waitForStarted();
     }
 
-    // If process is not running, then start it
-    if( !process ) {
-        bool started = false;
-        QStringList args;
-        args << aPluginName << aProfileName;
-        LOG_DEBUG( "Starting process " << aPath <<
-                   " with plugin name " << aPluginName <<
-                   " and profile name " << aProfileName);
-        
-        process = new QProcess();
-        process->setProcessChannelMode( QProcess::ForwardedChannels );
-        process->start( aPath, args );
+    if (started == true) {
+        DllInfo info;
+        info.iPath = aPath;
+        info.iHandle = (void*)process;
+        info.iRefCount = 1;
 
-        // This check is a workaround for the bug https://codereview.qt-project.org/#change,62897
-        QThread::sleep(1);         // The process state does not seem be in a proper state immediately
-        if( process->state() == QProcess::Starting ) {
-            started = process->waitForStarted();
-        }
+        iLoadedDlls.append( info );
+        LOG_DEBUG( "Process " << process->program() << " started with pid " << process->pid() );
 
-        if (started == true) {
-            DllInfo info;
-    	    info.iPath = aPath;
-    	    info.iHandle = (void*)process;
-    	    info.iRefCount = 1;
-
-    	    iLoadedDlls.append( info );
-            LOG_DEBUG( "Process " << process->program() << " started with pid " << process->pid() );
-
-        } else {
-            LOG_CRITICAL( "Unable to start process plugin " << aPath <<
-                          ". Error " << process->error());
-            return NULL;
-        }
+    } else {
+        LOG_CRITICAL( "Unable to start process plugin " << aPath <<
+                      ". Error " << process->error());
+        return NULL;
     }
 
     iDllLock.unlock();
