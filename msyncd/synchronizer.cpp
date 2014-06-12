@@ -414,6 +414,13 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
 
     session->setScheduled(aScheduled);
 
+    if (clientProfileActive(profile->clientProfile()->name())) {
+        LOG_DEBUG( "Sync request of the same type in progress, adding request to the sync queue" );
+        iSyncQueue.enqueue(session);
+        emit syncStatus(aProfileName, Sync::SYNC_QUEUED, "", 0);
+        return false;
+    }
+
     // @todo: Complete profile with data from account manager.
     //iAccounts->addAccountData(*profile);
 
@@ -762,6 +769,10 @@ bool Synchronizer::startNextSync()
         LOG_DEBUG( "Needed storage(s) already in use" );
         tryNext = false;
     }
+    else if (clientProfileActive(profile->clientProfile()->name())) {
+        LOG_DEBUG( "Client profile active, wait for finish" );
+        return false;
+    }
     else
     {
         // Sync can be started now.
@@ -891,6 +902,22 @@ bool Synchronizer::cleanupProfile(const QString &aProfileId)
         delete pluginRunner;
     }
     return status;
+}
+
+bool Synchronizer::clientProfileActive(const QString &clientProfileName)
+{
+    QList<SyncSession*> activeSessions = iActiveSessions.values();
+    foreach(SyncSession *session, activeSessions)
+    {
+        if(session->profile())
+        {
+            SyncProfile *profile = session->profile();
+            if (profile->clientProfile()->name() == clientProfileName) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 bool Synchronizer::removeProfile(QString aProfileId)

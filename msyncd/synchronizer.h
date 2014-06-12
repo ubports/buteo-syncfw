@@ -355,6 +355,8 @@ private:
      */
     bool cleanupProfile(const QString &profileId);
 
+    bool clientProfileActive(const QString &clientProfileName);
+
     QMap<QString, SyncSession*> iActiveSessions;
 
     QList<QString> iProfilesToRemove;
