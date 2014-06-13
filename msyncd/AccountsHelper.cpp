@@ -140,14 +140,13 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
             QList<SyncProfile*> profiles = getProfilesByAccountId(changedAccount->id());
             foreach(SyncProfile *profile, profiles)
             {
-                LOG_DEBUG("Changing profile enabled" << profile->name() << enabled);
-                if(enabled)
+                // Check if the status really changed here
+                // saving the account can trigger the emition of enabledChanged()
+                if (profile->isEnabled() != enabled)
                 {
-                    // Set profile to enabled, only if the corresponding service
-                    // is also enabled
-                    //const Profile *serviceProfile = profile->serviceProfile();
-                    //if(serviceProfile)
-                    //{
+                    LOG_DEBUG("Changing profile enabled" << profile->name() << enabled);
+                    if(enabled)
+                    {
                         // The service pointer must not be deleted here. It is
                         // cached by the Account manager object
                         Accounts::Service service = iAccountManager->service(profile->name());
@@ -162,17 +161,13 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
                             iProfileManager.updateProfile(*profile);
                             emit scheduleUpdated(profile->name());
                         }
-                    //}
-                    //else
-                    //{
-                        //LOG_WARNING("Service profile is NULL for ::" << profile->name());
-                    //}
-                }
-                else
-                {
-                    // Unconditionally, set the profile as disabled
-                    profile->setEnabled(enabled);
-                    iProfileManager.updateProfile(*profile);
+                    }
+                    else
+                    {
+                        // Unconditionally, set the profile as disabled
+                        profile->setEnabled(enabled);
+                        iProfileManager.updateProfile(*profile);
+                    }
                 }
                 delete profile;
             }
@@ -184,22 +179,16 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
             foreach(SyncProfile *profile, profiles)
             {
                 // See if the service name matches
-                //Profile *serviceProfile = profile->serviceProfile();
-                //if(serviceProfile)
-                //{
-                    if(serviceName == profile->name())
-                    {
-                        // We can assume that the account is already enabled if
-                        // we get this
+                if(serviceName == profile->name())
+                {
+                    // Check if the status really changed here
+                    // saving the account can trigger the emition of enabledChanged()
+                    if (profile->isEnabled() != enabled) {
                         profile->setEnabled(enabled);
                         iProfileManager.updateProfile(*profile);
                         emit scheduleUpdated(profile->name());
                     }
-                //}
-                //else
-                //{
-                //    LOG_WARNING("No service profile found for ::" << profile->name());
-                //}
+                }
                 delete profile;
             }
         }
