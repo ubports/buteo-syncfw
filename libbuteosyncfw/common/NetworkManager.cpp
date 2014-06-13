@@ -116,8 +116,10 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
 void NetworkManager::sessionConnectionTimeout()
 {
     if (!m_errorEmitted && m_networkSession) {
-        qWarning() << "No network reply received after 10 seconds, emitting session error.";
-        slotSessionError(m_networkSession->error());
+        if (!m_networkSession->isOpen()) {
+            qWarning() << "No network reply received after 10 seconds, emitting session error.";
+            slotSessionError(m_networkSession->error());
+        }
     }
 }
 
