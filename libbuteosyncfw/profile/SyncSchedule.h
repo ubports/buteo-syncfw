@@ -229,6 +229,14 @@ public:
      */
     QDateTime nextSyncTime(const QDateTime &aPrevSync) const;
 
+    /*! \brief Gets next time to switch rush/off-rush schedule intervals.
+     *
+     * \param aFromTime From time to calculate next switch, usually current time.
+     * \return Next time to switch rush/off-rush schedule intervals. Null object if schedule is not defined for rush/off-rush
+     *  or if the rush and off-rush intervals are the same.
+     */
+    QDateTime nextRushSwitchTime(const QDateTime& aFromTime) const;
+
 private:
 
     SyncSchedulePrivate* d_ptr;

@@ -390,7 +390,29 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
     return nextSync;
 }
 
-
+QDateTime SyncSchedule::nextRushSwitchTime(const QDateTime &aFromTime) const
+{
+    if (rushEnabled() && scheduleEnabled()) {
+        if (d_ptr->iRushInterval == d_ptr->iInterval) {
+            LOG_DEBUG("Rush interval is the same as normal interval no need to switch");
+            return QDateTime();
+        }
+        if (d_ptr->isRush(aFromTime)) {
+            return QDateTime(aFromTime.date(), d_ptr->iRushEnd);
+        } else {
+            // If rush day and before rush end next switch is at rush begin
+            if (d_ptr->iRushDays.contains(aFromTime.date().dayOfWeek()) && aFromTime.time() < d_ptr->iRushBegin) {
+                return QDateTime(aFromTime.date(), d_ptr->iRushBegin);
+            } else {
+                // Not a rush day or the rush period has ended, attemp switch at next day rush begin,
+                // we can only schedule for 24h
+                return QDateTime(aFromTime.date().addDays(1), d_ptr->iRushBegin);
+            }
+        }
+    } else {
+        return QDateTime();
+    }
+}
 
 
 DaySet SyncSchedulePrivate::parseDays(const QString &aDays) const

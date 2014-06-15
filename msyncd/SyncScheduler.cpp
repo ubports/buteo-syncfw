@@ -42,6 +42,7 @@ SyncScheduler::SyncScheduler(QObject *aParent)
     iBackgroundActivity = new BackgroundSync(this);
 
     connect(iBackgroundActivity,SIGNAL(onBackgroundSyncRunning(QString)),this,SLOT(doIPHeartbeatActions(QString)));
+    connect(iBackgroundActivity,SIGNAL(onBackgroundSwitchRunning(QString)),this,SLOT(rescheduleBackgroundActivity(QString)));
 #else
      iIPHeartBeatMan = new IPHeartBeat(this);
 
@@ -162,6 +163,20 @@ void SyncScheduler::doIPHeartbeatActions(QString aProfileName)
     emit syncNow(aProfileName);
 }
 
+#ifdef USE_KEEPALIVE
+void SyncScheduler::rescheduleBackgroundActivity(const QString& aProfileName)
+{
+    FUNCTION_CALL_TRACE;
+
+    SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
+    if (profile) {
+        setNextAlarm(profile);
+    } else {
+        LOG_WARNING("Invalid profile, can't reschedule switch timer for " << aProfileName);
+    }
+}
+#endif
+
 int SyncScheduler::setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSyncTime)
 {
     FUNCTION_CALL_TRACE;
@@ -190,6 +205,19 @@ int SyncScheduler::setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSync
 #ifdef USE_KEEPALIVE
         alarmEventID = 1;
         iBackgroundActivity->set(aProfile->name(), QDateTime::currentDateTime().secsTo(nextSyncTime) + 1);
+
+        if (aProfile->rushEnabled()) {
+            QDateTime nextSyncSwitch = aProfile->nextRushSwitchTime(QDateTime::currentDateTime());
+            if (nextSyncSwitch.isValid()) {
+                iBackgroundActivity->setSwitch(aProfile->name(), nextSyncSwitch);
+            } else {
+                iBackgroundActivity->removeSwitch(aProfile->name());
+                LOG_DEBUG("Removing switch timer for"
+                            << aProfile->name() << " invalid switch timer");
+            }
+        } else {
+            iBackgroundActivity->removeSwitch(aProfile->name());
+        }
 #else
         iAlarmInventory->addAlarm(nextSyncTime);
 #endif
