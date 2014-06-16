@@ -26,7 +26,8 @@
 #include <QStringList>
 #include <keepalive/backgroundactivity.h>
 
-const int MAX_FREQUENCY = 1080;
+// 24 hours
+const int MAX_FREQUENCY = 1440;
 
 BackgroundSync::BackgroundSync(QObject* aParent)
  :  QObject(aParent)
@@ -56,11 +57,15 @@ void BackgroundSync::removeAll()
     for(int i=0; i<profNames.size(); i++) {
         remove(profNames[i]);
     }
+
+    removeAllSwitches();
 }
 
 bool BackgroundSync::remove(const QString &aProfName)
 {
     FUNCTION_CALL_TRACE;
+
+    removeSwitch(aProfName);
 
     if(iScheduledSyncs.contains(aProfName) == false)
         return false;
@@ -145,7 +150,7 @@ void BackgroundSync::onBackgroundSyncCompleted(QString aProfName)
     remove(aProfName);
 }
 
-QString BackgroundSync::getProfNameFromId(const QString activityId)
+QString BackgroundSync::getProfNameFromId(const QString activityId) const
 {
     FUNCTION_CALL_TRACE;
 
@@ -191,4 +196,100 @@ BackgroundActivity::Frequency BackgroundSync::frequencyFromSeconds(int seconds) 
         return BackgroundActivity::TwelveHours;
     else
         return BackgroundActivity::TwentyFourHours;
+}
+
+// sync switches
+
+void BackgroundSync::removeAllSwitches()
+{
+    FUNCTION_CALL_TRACE;
+
+    QStringList profNames;
+    QMapIterator<QString,BActivitySwitchStruct> iter(iScheduledSwitch);
+    while (iter.hasNext()) {
+        iter.next();
+        profNames.append(iter.key());
+    }
+
+    for(int i=0; i<profNames.size(); i++) {
+        removeSwitch(profNames[i]);
+    }
+}
+
+bool BackgroundSync::removeSwitch(const QString &aProfName)
+{
+    FUNCTION_CALL_TRACE;
+
+    if(iScheduledSwitch.contains(aProfName) == false)
+        return false;
+
+    BActivitySwitchStruct& tmp = iScheduledSwitch[aProfName];
+
+    tmp.backgroundActivity->stop();
+    delete tmp.backgroundActivity;
+
+    iScheduledSwitch.remove(aProfName);
+    return true;
+}
+
+bool BackgroundSync::setSwitch(const QString &aProfName, const QDateTime &aSwitchTime)
+{
+    FUNCTION_CALL_TRACE;
+
+    if(aProfName.isEmpty())
+        return false;
+
+    if(iScheduledSwitch.contains(aProfName) == true) {
+        BActivitySwitchStruct &newSwitch = iScheduledSwitch[aProfName];
+        if (newSwitch.nextSwitch != aSwitchTime) {
+            newSwitch.nextSwitch = aSwitchTime;
+            newSwitch.backgroundActivity->wait(QDateTime::currentDateTime().secsTo(aSwitchTime));
+            LOG_DEBUG("BackgroundSync::setSwitch(), Rescheduling for " << aProfName << " at " << aSwitchTime.toString());
+        } else {
+            LOG_DEBUG("Profile already with the same switch timer... No new switch timer");
+        }
+    } else {
+        BActivitySwitchStruct &newSwitch = iScheduledSwitch[aProfName];
+        newSwitch.backgroundActivity = new BackgroundActivity(this);
+        newSwitch.id = newSwitch.backgroundActivity->id();
+        connect(newSwitch.backgroundActivity,SIGNAL(running()), this, SLOT(onBackgroundSwitchStarted()));
+        newSwitch.nextSwitch = aSwitchTime;
+        newSwitch.backgroundActivity->wait(QDateTime::currentDateTime().secsTo(aSwitchTime));
+        LOG_DEBUG("BackgroundSync::setSwitch(), profile name = " << aProfName << " at " << aSwitchTime.toString());
+    }
+    return true;
+}
+
+void BackgroundSync::onBackgroundSwitchStarted()
+{
+    FUNCTION_CALL_TRACE;
+
+    BackgroundActivity *tempAct = static_cast<BackgroundActivity*>(sender());
+
+    QString profName = getProfNameFromSwitchId(tempAct->id());
+
+    if (!profName.isEmpty()) {
+        LOG_DEBUG("Background switch timer started, for profile = " << profName);
+        emit onBackgroundSwitchRunning(profName);
+    } else {
+        LOG_DEBUG("Error profile for background switch timer not found");
+    }
+}
+
+QString BackgroundSync::getProfNameFromSwitchId(const QString activityId) const
+{
+    FUNCTION_CALL_TRACE;
+
+    QMapIterator<QString,BActivitySwitchStruct> iter(iScheduledSwitch);
+
+    while (iter.hasNext()) {
+        iter.next();
+        const BActivitySwitchStruct& tmp = iter.value();
+        if(tmp.id == activityId) {
+            return iter.key();
+            break;
+        }
+    }
+
+    return QString();
 }

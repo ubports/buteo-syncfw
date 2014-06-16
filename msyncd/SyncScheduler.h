@@ -25,6 +25,7 @@
 
 #ifdef USE_KEEPALIVE
 #include "BackgroundSync.h"
+#include "ProfileManager.h"
 #else
 #include "SyncAlarmInventory.h"
 #include "IPHeartBeat.h"
@@ -111,6 +112,15 @@ private slots:
      */
     void doIPHeartbeatActions(QString aProfileName);
 
+#ifdef USE_KEEPALIVE
+    /**
+     * \brief Reschedule backgroundActivity for a profile
+     *
+     * @param aProfileName Name of the profile to reschedule
+     */
+    void rescheduleBackgroundActivity(const QString& aProfileName);
+#endif
+
 signals:
     /*! \brief Signal emitted when a sync session should be launched based on
      *   the sync schedule settings of the profile.
@@ -154,6 +164,7 @@ private: // data
 #ifdef USE_KEEPALIVE
     /// BackgroundSync management object
     BackgroundSync *iBackgroundActivity;
+    ProfileManager iProfileManager;
 #else
     /// A list of sync schedule profiles
     QMap<QString, int> iSyncScheduleProfiles;
