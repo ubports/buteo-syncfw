@@ -155,6 +155,12 @@ public:
     //! \see Profile::toXml
     virtual QDomElement toXml(QDomDocument &aDoc, bool aLocalOnly = true) const;
 
+    /*! \brief Checks if rush/off-rush schedule is enabled.
+     *
+     * \return True if rush/off-rush schedule is enabled. False, if rush/off-rush scheduling is off.
+     */
+    virtual bool rushEnabled() const;
+
     /*! \brief Gets the time of last completed sync session with this profile.
      *
      * \return Last sync time. Null object if this could not be determined.
@@ -174,6 +180,14 @@ public:
      *  time could not be determined for some other reason.
      */
     virtual QDateTime nextSyncTime(QDateTime aDateTime = QDateTime::currentDateTime()) const;
+
+    /*! \brief Gets next time to switch rush/off-rush schedule intervals.
+     *
+     * \param aFromTime From time to calculate next switch, usually current time.
+     * \return Next time to switch rush/off-rush schedule intervals. Null object if schedule is not defined for rush/off-rush
+     *  or if the rush and off-rush intervals are the same.
+     */
+    QDateTime nextRushSwitchTime(const QDateTime& aFromTime) const;
 
     /*! \brief Gets the results of the last sync from the sync log.
      *

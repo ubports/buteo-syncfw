@@ -26,6 +26,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QDateTime>
 #include <keepalive/backgroundactivity.h>
 
 class BackgroundActivity;
@@ -43,6 +44,14 @@ class BackgroundSync : public QObject
         QString id;
         BackgroundActivity* backgroundActivity;
         BackgroundActivity::Frequency frequency;
+    };
+
+     /// \brief Internal structure to hold profile-background activity switch stucture-notifier map
+    struct BActivitySwitchStruct
+    {
+        QString id;
+        BackgroundActivity* backgroundActivity;
+        QDateTime nextSwitch;
     };
 
 public:
@@ -76,6 +85,23 @@ public:
      */
     void removeAll();
 
+    // Sync switch
+
+    /*! \brief Schedules a switch(rush/off-rush) for a background sync running for this profile, the switch should be
+     *  added after the background activity.
+     *
+     * \param aProfName Name of the profile.
+     * \param aSwitchTime when the switch will occurs
+     * \return Success indicator.
+     */
+    bool setSwitch(const QString& aProfName, const QDateTime& aSwitchTime);
+
+    /*! \brief Removes  a switch(rush/off-rush) for a profile.
+     *
+     * \param aProfName Name of the profile.
+     */
+    bool removeSwitch(const QString& aProfName);
+
 signals:
 
     /*! \brief This signal will be emitted when a background sync timer for particular profile is triggered.
@@ -83,6 +109,12 @@ signals:
      * \param aProfName Name of the profile for which background sync timer is triggered.
      */
     void onBackgroundSyncRunning(QString aProfName);
+
+    /*! \brief This signal will be emitted when a switch timer for particular profile is triggered.
+     *
+     * \param aProfName Name of the profile for which switch timer is triggered.
+     */
+    void onBackgroundSwitchRunning(const QString& aProfName);
 
 public slots:
     /*! \brief Called when background sync is completed
@@ -97,6 +129,10 @@ private slots:
      */
     void onBackgroundSyncStarted();
 
+    /*! \brief Called when a switch timer starts running
+     */
+    void onBackgroundSwitchStarted();
+
 private:
 
     /*! \brief Finds the name of the profile which uses particular background activity
@@ -104,7 +140,7 @@ private:
      * \param activityId Id of the background activity
      * \return name of the profile.
      */
-    QString getProfNameFromId(const QString activityId);
+    QString getProfNameFromId(const QString activityId) const;
 
     /*! \brief Returns a valid BackgroundActivity frequency
      *
@@ -114,10 +150,26 @@ private:
 
     BackgroundActivity::Frequency frequencyFromSeconds(int seconds);
 
+    // Sync switch
+
+    /*! \brief Removes all scheduled switches(rush/off-rush) for all profiles.
+     */
+    void removeAllSwitches();
+
+    /*! \brief Finds the name of the profile which uses particular switch activity id
+     *
+     * \param activityId Id of the switch activity
+     * \return name of the profile.
+     */
+    QString getProfNameFromSwitchId(const QString activityId) const;
+
 private:
 
     ///Map of structures waiting for background sync
     QMap<QString, BActivityStruct> iScheduledSyncs;
+
+    ///Map of switch timer structures
+    QMap<QString, BActivitySwitchStruct> iScheduledSwitch;
 };
 
 #endif // BACKGROUNDSYNC_H

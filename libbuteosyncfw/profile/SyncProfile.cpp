@@ -218,6 +218,10 @@ void SyncProfile::setName(const QStringList &aKeys)
     d_ptr->iLog->setProfileName(Profile::name());
 }
 
+bool SyncProfile::rushEnabled() const
+{
+    return d_ptr->iSchedule.rushEnabled() && d_ptr->iSchedule.scheduleEnabled();
+}
 
 QDateTime SyncProfile::lastSyncTime() const
 {
@@ -266,6 +270,16 @@ QDateTime SyncProfile::nextSyncTime(QDateTime aDateTime) const
 
     }
     return nextSync;
+}
+
+QDateTime SyncProfile::nextRushSwitchTime(const QDateTime &aFromTime) const
+{
+    QDateTime nextSwitch;
+    if(syncType() == SYNC_SCHEDULED)
+    {
+        nextSwitch = d_ptr->iSchedule.nextRushSwitchTime(aFromTime);
+    }
+    return nextSwitch;
 }
 
 const SyncResults *SyncProfile::lastResults() const
