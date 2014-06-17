@@ -168,20 +168,7 @@ CONFIG(debug,debug|release) {
         $(OBJECTS_DIR)/*.gcov
 }
 
-# for compiling on meego
-linux-g++-maemo {
-  message("Maemo specific install")
-  DEFINES += __USBMODED__
-  HEADERS += USBModedProxy.h
-  SOURCES += USBModedProxy.cpp
-} else {
+!linux-g++-maemo {
   message("Meego specific install")
   INSTALLS += meego
-}
-
-usb-moded {
-  message("Building with usb-moded")
-  DEFINES += __USBMODED__
-  HEADERS += USBModedProxy.h
-  SOURCES += USBModedProxy.cpp
 }

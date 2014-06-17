@@ -82,6 +82,13 @@ SOURCES += common/Logger.cpp \
            pluginmgr/OOPServerPlugin.cpp \
            pluginmgr/ButeoPluginIface.cpp
 
+usb-moded {
+  message("Building with usb-moded")
+  DEFINES += __USBMODED__
+  HEADERS += common/USBModedProxy.h
+  SOURCES += common/USBModedProxy.cpp
+}
+
 QMAKE_CXXFLAGS = -Wall \
     -g \
     -Wno-cast-align \
