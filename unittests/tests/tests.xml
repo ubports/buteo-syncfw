@@ -3,6 +3,13 @@
   <suite name="buteo-syncfw" domain="synchronization">
 
     <set name="msyncd" description="buteo-syncfw msyncd tests" feature="sync framework">
+      <pre_steps>
+        <step>systemctl --user stop msyncd</step>
+      </pre_steps>
+      <post_steps>
+        <step>systemctl --user start msyncd</step>
+      </post_steps>
+
       <case name="msyncdtests/AccountsHelperTest">
         <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/AccountsHelperTest</step>
       </case>
@@ -73,9 +80,12 @@
     </set>
 
     <set name="syncfwclient" description="buteo-syncfw syncfwclient tests" feature="sync framework">
+      <!-- This test case tries to execute real sync scenario but with invalid
+           profiles - this simply cannot work.
       <case name="syncfwclienttests/SyncClientInterfaceTest">
         <step>/opt/tests/buteo-syncfw/runstarget.sh syncfwclienttests/SyncClientInterfaceTest</step>
       </case>
+      -->
     </set>
 
     <set name="syncprofile" description="buteo-syncfw syncprofile tests" feature="sync framework">

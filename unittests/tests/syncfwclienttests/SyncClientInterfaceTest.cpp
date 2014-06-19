@@ -34,6 +34,9 @@ using namespace Buteo;
 static const QString USERPROFILE_DIR = "syncprofiletests/testprofiles/user";
 static const QString SYSTEMPROFILE_DIR = "syncprofiletests/testprofiles/system";
 
+// FIXME: This test case tries to execute real sync scenario but with invalid
+// profiles - this simply cannot work.
+
 void SyncClientInterfaceTest::initTestCase()
 {
 	iSync = new Synchronizer(NULL);
@@ -95,27 +98,26 @@ void SyncClientInterfaceTest::testSetSyncSchedule()
 {
 	QString profile("testsync-ovi");
 	Buteo::SyncSchedule schedule;
-	QSignalSpy sigProfile(iInterface, SIGNAL(profileChanged(QString,int,Buteo::Profile)));
+	QSignalSpy sigProfile(iInterface, SIGNAL(profileChanged(QString,int,QString)));
 	QCOMPARE(iInterface->setSyncSchedule(profile,schedule),true);
 }
 
 void SyncClientInterfaceTest::testAddProfile()
 {
 	Buteo::SyncProfile profileToAdd("testsync-ovi");
-	profileToAdd.setName("NewlyAddedProfile");
-// 	QVERIFY(iInterface->addProfile(profileToAdd));
+	QVERIFY(iInterface->updateProfile(profileToAdd));
 }
 
 void SyncClientInterfaceTest::testUpdateProfile()
 {
-	Buteo::SyncProfile profileToChange("NewlyAddedProfile");
+	Buteo::SyncProfile profileToChange("testsync-ovi");
 	QVERIFY(iInterface->updateProfile(profileToChange));
 }
 
 void SyncClientInterfaceTest::testRemoveProfile()
 {
-	Buteo::SyncProfile profileToChange("NewlyAddedProfile");
-// 	QVERIFY(iInterface->addProfile(profileToChange));
+	QString profileToChange("testsync-ovi");
+	QVERIFY(iInterface->removeProfile(profileToChange));
 }
 
 QTEST_MAIN(Buteo::SyncClientInterfaceTest)
