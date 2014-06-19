@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-#include "SyncFwTestLoader.h"
 #include "SyncBackupTest.h"
 
 #include <QDBusMessage>
@@ -72,4 +71,4 @@ void SyncBackupTest::testBackup()
 	QCOMPARE(iBackup->getBackUpRestoreState(), 0); 
 }
 
-TESTLOADER_ADD_TEST(SyncBackupTest);
+QTEST_MAIN(Buteo::SyncBackupTest)

@@ -25,7 +25,6 @@
 #include <QDomDocument>
 
 #include "StorageProfile.h"
-#include "SyncFwTestLoader.h"
 
 using namespace Buteo;
 
@@ -65,4 +64,4 @@ void StorageProfileTest::testStorageProfile()
     QCOMPARE(p->isEnabled(), true);
 }
 
-TESTLOADER_ADD_TEST(StorageProfileTest);
+QTEST_MAIN(Buteo::StorageProfileTest)

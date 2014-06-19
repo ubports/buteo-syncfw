@@ -23,7 +23,6 @@
 #include "SyncScheduleTest.h"
 #include "SyncSchedule.h"
 #include "SyncSchedule_p.h"
-#include "SyncFwTestLoader.h"
 
 #include <QDomDocument>
 
@@ -212,4 +211,4 @@ void SyncScheduleTest::testNextSyncTime()
     QCOMPARE(next.time(), s.rushBegin());
 }
 
-TESTLOADER_ADD_TEST(SyncScheduleTest);
+QTEST_MAIN(Buteo::SyncScheduleTest)

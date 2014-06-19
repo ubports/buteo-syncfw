@@ -26,7 +26,6 @@
 #include <QScopedPointer>
 
 #include "SyncProfile.h"
-#include "SyncFwTestLoader.h"
 #include "ProfileEngineDefs.h"
 
 using namespace Buteo;
@@ -224,4 +223,4 @@ void SyncProfileTest::testSubProfiles()
 
 }
 
-TESTLOADER_ADD_TEST(SyncProfileTest);
+QTEST_MAIN(Buteo::SyncProfileTest)

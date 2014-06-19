@@ -22,7 +22,6 @@
  */
 #include "StoragePluginTest.h"
 
-#include "SyncFwTestLoader.h"
 
 #include "PluginManager.h"
 
@@ -57,4 +56,4 @@ void StoragePluginTest::testCreateDestroy()
     QVERIFY( pluginManager.iLoadedDlls.count() == 0 );
 }
 
-TESTLOADER_ADD_TEST(StoragePluginTest);
+QTEST_MAIN(Buteo::StoragePluginTest)

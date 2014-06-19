@@ -22,7 +22,6 @@
  */
 #include "SyncQueueTest.h"
 #include "SyncQueue.h"
-#include "SyncFwTestLoader.h"
 #include "SyncSession.h"
 #include <SyncProfile.h>
 
@@ -63,4 +62,4 @@ void SyncQueueTest::testQueue()
 
 }
 
-TESTLOADER_ADD_TEST(SyncQueueTest);
+QTEST_MAIN(Buteo::SyncQueueTest)

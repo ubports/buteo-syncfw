@@ -23,7 +23,6 @@
 #include "ProfileManagerTest.h"
 #include "ProfileManager.h"
 #include "ProfileEngineDefs.h"
-#include "SyncFwTestLoader.h"
 #include "StorageProfile.h"
 #include "SyncResults.h"
 
@@ -707,4 +706,4 @@ void ProfileManagerTest::testBackup()
     QVERIFY(!QFile::exists(fileName + ".bak"));
 }
 
-TESTLOADER_ADD_TEST(ProfileManagerTest);
+QTEST_MAIN(Buteo::ProfileManagerTest)

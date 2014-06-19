@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-#include "SyncFwTestLoader.h"
 #include "SyncClientInterfaceTest.h"
 #include "synchronizer.h"
 #include "Profile.h"
@@ -119,4 +118,4 @@ void SyncClientInterfaceTest::testRemoveProfile()
 // 	QVERIFY(iInterface->addProfile(profileToChange));
 }
 
-TESTLOADER_ADD_TEST(SyncClientInterfaceTest);
+QTEST_MAIN(Buteo::SyncClientInterfaceTest)

@@ -1,50 +1,25 @@
-include(../../../msyncd/unittest.pri)
+TEMPLATE = subdirs
+SUBDIRS = \
+        AccountsHelperTest.pro \
+        ClientPluginRunnerTest.pro \
+        ClientThreadTest.pro \
+        PluginRunnerTest.pro \
+        ServerActivatorTest.pro \
+        ServerPluginRunnerTest.pro \
+        ServerThreadTest.pro \
+        StorageBookerTest.pro \
+        SyncBackupTest.pro \
+        SyncQueueTest.pro \
+        SyncSessionTest.pro \
+        SyncSigHandlerTest.pro \
+        SynchronizerTest.pro \
+        TransportTrackerTest.pro \
 
-QT += xml \
-    dbus
-QT -= gui
-CONFIG += \
-    link_pkgconfig
-
-equals(QT_MAJOR_VERSION, 4): {
-    CONFIG += mobility
-    MOBILITY += systeminfo
+!contains(DEFINES, USE_KEEPALIVE) {
+SUBDIRS += \
+        IPHeartBeatTest.pro \
+        SyncSchedulerTest.pro \
 }
 
-PKGCONFIG += dbus-1
-
-equals(QT_MAJOR_VERSION, 5): PKGCONFIG += Qt5SystemInfo
-
-LIBS += -L../../../libbuteosyncfw -lbuteosyncfw5
-
-SOURCES += \
-    ServerThreadTest.cpp \
-    StorageBookerTest.cpp \
-    SyncQueueTest.cpp \
-    AccountsHelperTest.cpp \
-    SyncSessionTest.cpp \
-    ClientThreadTest.cpp\
-    TransportTrackerTest.cpp \
-    PluginRunnerTest.cpp \
-    ServerActivatorTest.cpp \
-    ClientPluginRunnerTest.cpp \
-    SyncBackupTest.cpp \
-    ServerPluginRunnerTest.cpp \
-    SynchronizerTest.cpp \
-    SyncSigHandlerTest.cpp \
-
-HEADERS += \
-    ServerThreadTest.h \
-    StorageBookerTest.h \
-    SyncQueueTest.h \
-    AccountsHelperTest.h \
-    SyncSessionTest.h \
-    ClientThreadTest.h\
-    TransportTrackerTest.h \
-    PluginRunnerTest.h \
-    ServerActivatorTest.h \
-    ClientPluginRunnerTest.h \
-    SyncBackupTest.h \
-    ServerPluginRunnerTest.h \
-    SynchronizerTest.h \
-    SyncSigHandlerTest.h \
+coverage.CONFIG += recursive
+QMAKE_EXTRA_TARGETS += coverage

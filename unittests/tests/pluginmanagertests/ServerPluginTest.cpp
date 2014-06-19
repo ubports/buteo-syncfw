@@ -22,7 +22,6 @@
  */
 #include "ServerPluginTest.h"
 
-#include "SyncFwTestLoader.h"
 
 #include "PluginManager.h"
 #include "SyncProfile.h"
@@ -59,4 +58,4 @@ void ServerPluginTest::testCreateDestroy()
     QVERIFY( pluginManager.iLoadedDlls.count() == 0 );
 }
 
-TESTLOADER_ADD_TEST(ServerPluginTest);
+QTEST_MAIN(Buteo::ServerPluginTest)

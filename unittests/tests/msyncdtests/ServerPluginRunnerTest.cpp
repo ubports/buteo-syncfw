@@ -25,7 +25,6 @@
 #include <SyncCommonDefs.h>
 #include <QtTest/QtTest>
 #include <QSignalSpy>
-#include "SyncFwTestLoader.h"
 
 using namespace Buteo;
 
@@ -138,4 +137,4 @@ void ServerPluginRunnerTest::testSignals()
 }
 
 
-TESTLOADER_ADD_TEST(ServerPluginRunnerTest);
+QTEST_MAIN(Buteo::ServerPluginRunnerTest)

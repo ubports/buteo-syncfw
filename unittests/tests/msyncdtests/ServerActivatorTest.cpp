@@ -28,7 +28,6 @@
 #include <QtTest/QtTest>
 #include <QSignalSpy>
 #include "Profile.h"
-#include "SyncFwTestLoader.h"
 
 #include <QStringList>
 #include <QDomDocument>
@@ -193,4 +192,4 @@ void ServerActivatorTest :: testTransportsFromProfile()
 }
 
 
-TESTLOADER_ADD_TEST(ServerActivatorTest);
+QTEST_MAIN(Buteo::ServerActivatorTest)
