@@ -1,4 +1,4 @@
-include(doc/doc.pro)
+include(doc/doc.pri)
 
 TEMPLATE = subdirs
 
@@ -6,7 +6,6 @@ SUBDIRS += \
     libbuteosyncfw \
     msyncd \
     unittests \
-    doc \
     tools
 
 msyncd.depends = libbuteosyncfw

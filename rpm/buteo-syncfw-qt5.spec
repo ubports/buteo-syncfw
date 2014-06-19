@@ -74,7 +74,7 @@ Group: Documentation
 
 %files doc
 %defattr(-,root,root,-)
-%{_docdir}/sync-fw-doc/*
+%{_docdir}/buteo-syncfw-doc/*
 
 %package tests
 Summary: Tests for %{name}
@@ -96,6 +96,7 @@ Group: Development/Libraries
 %build
 %qmake5 -recursive CONFIG+=usb-moded DEFINES+=USE_KEEPALIVE
 make %{_smp_mflags}
+make doc %{_smp_mflags}
 
 
 %install
