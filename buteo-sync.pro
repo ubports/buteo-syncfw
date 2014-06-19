@@ -10,7 +10,7 @@ SUBDIRS += \
     tools
 
 msyncd.depends = libbuteosyncfw
-unittests.depends = libbuteosyncfw
+unittests.depends = libbuteosyncfw msyncd
 
 coverage.CONFIG += recursive
 
