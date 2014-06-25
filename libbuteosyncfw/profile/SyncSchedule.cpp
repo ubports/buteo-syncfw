@@ -321,6 +321,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
     	LOG_DEBUG("Calculating next sync time with rush settings.Rush Interval is " << d_ptr->iRushInterval);
         // Calculate next sync time with rush settings.
         QDateTime nextSyncRush;
+        bool nextSyncRushInNextRushPeriod = false;
         if (d_ptr->isRush(now))
         {
             LOG_DEBUG("Current time is in rush");
@@ -348,6 +349,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
                 // interval, choose the next available rush time as the begin
                 // time for the rush interval
             	LOG_DEBUG("isRush False");
+                nextSyncRushInNextRushPeriod = true;
                 nextSyncRush.setTime(d_ptr->iRushBegin);
                 if (nextSyncRush < now)
                 {
@@ -369,13 +371,24 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         }
 
         LOG_DEBUG("nextSyncRush" << nextSyncRush.toString());
-        // Use next sync time calculated with rush settings is sooner than
-        // with normal settings, use the rush sync time.
-        if (nextSyncRush.isValid() &&
-            (!nextSync.isValid() || nextSyncRush < nextSync))
-        {
-            LOG_DEBUG("Using rush time as the next sync time");
-            nextSync = nextSyncRush;
+        // Use next sync time calculated with rush settings if necessary.
+        if (nextSyncRush.isValid()) {
+            // check to see if we should use it, or instead use the next non-rush sync time.
+            if (nextSync.isValid()
+                    && nextSync > now
+                    && nextSync < nextSyncRush
+                    && (!d_ptr->isRush(nextSync) || nextSyncRushInNextRushPeriod)) {
+                // the next non-rush sync time occurs after now
+                // but before the next rush sync time, and either it
+                // doesn't fall within the rush period itself or the
+                // next rush sync time is in the next rush period.
+                // we should use the non-rush schedule.
+                LOG_DEBUG("Using non-rush time as the next sync time");
+            } else {
+                // we should use the rush schedule.
+                LOG_DEBUG("Using rush time as the next sync time");
+                nextSync = nextSyncRush;
+            }
         } // no else
     } // no else
 
