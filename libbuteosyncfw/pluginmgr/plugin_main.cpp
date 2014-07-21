@@ -21,6 +21,7 @@
 */
 #include <QCoreApplication>
 #include <QDBusConnection>
+#include <QRegExp>
 #include "PluginServiceObj.h"
 #include "ButeoPluginIfaceAdaptor.h"
 #include "LogMacros.h"
@@ -54,19 +55,37 @@ int main( int argc, char** argv )
 
     new ButeoPluginIfaceAdaptor( serviceObj );
 
-    // Create a session bus
+    // randomly-generated profile names cannot be registered
+    // as dbus service paths due to being purely numeric.
+    int numericIdx = profileName.indexOf(QRegExp("[0123456789]"));
+    QString servicePath = numericIdx == 0
+                        ? QString(QLatin1String("%1%2%3"))
+                              .arg(DBUS_SERVICE_NAME_PREFIX)
+                              .arg("profile-")
+                              .arg(profileName)
+                        : QString(QLatin1String("%1%2"))
+                              .arg(DBUS_SERVICE_NAME_PREFIX)
+                              .arg(profileName);
+
+    LOG_DEBUG( "attempting to register dbus service:" << servicePath );
     QDBusConnection connection = QDBusConnection::sessionBus();
-    if( connection.registerService( DBUS_SERVICE_NAME_PREFIX + profileName ) == true ) {
+    if( connection.registerService( servicePath ) == true ) {
         if( connection.registerObject(DBUS_SERVICE_OBJ_PATH, serviceObj) == true ) {
             LOG_DEBUG( "Plugin " << pluginName << " with profile "
                        << profileName << " registered at dbus "
                        << DBUS_SERVICE_NAME_PREFIX + profileName
                        << " and path " << DBUS_SERVICE_OBJ_PATH );
         } else {
-            LOG_FATAL( "Unable to register dbus service" );
+            QByteArray errorMsg = QString(QLatin1String(
+                    "Unable to register dbus object for service: %1"))
+                    .arg(servicePath).toLocal8Bit();
+            qFatal( "%s", errorMsg.constData() );
         }
     } else {
-        LOG_FATAL( "Unable to register service" );
+        QByteArray errorMsg = QString(QLatin1String(
+                "Unable to register dbus service: %1"))
+                .arg(servicePath).toLocal8Bit();
+        qFatal( "%s", errorMsg.constData() );
     }
 
     // TODO: Should any unix signals be handled?
