@@ -41,25 +41,18 @@
 #define LOG_CRITICAL(msg) qCritical() << msg
 #define LOG_WARNING(msg) qWarning() << msg
 
-#if defined(BUTEO_ENABLE_DEBUG)
-# define LOG_PROTOCOL(msg) qDebug() << msg
-# define LOG_INFO(msg) qDebug() << msg
-# define LOG_DEBUG(msg) qDebug() << msg
-# define LOG_TRACE(msg) qDebug() << msg
-# define LOG_TRACE_PLAIN(msg) qDebug() << msg
+// use relevant logging level numbers from syslog.h where possible
+# define LOG_PROTOCOL(msg) if (Buteo::Logger::instance()->getLogLevel() >= 6) qDebug() << msg
+# define LOG_INFO(msg) if (Buteo::Logger::instance()->getLogLevel() >= 6) qDebug() << msg
+# define LOG_DEBUG(msg) if (Buteo::Logger::instance()->getLogLevel() >= 7) qDebug() << msg
+# define LOG_TRACE(msg) if (Buteo::Logger::instance()->getLogLevel() >= 8) qDebug() << msg
+# define LOG_TRACE_PLAIN(msg) if (Buteo::Logger::instance()->getLogLevel() >= 8) qDebug() << msg
+
  /*!
   * Creates a trace message to log when the function is entered and exited.
   * Logs also to time spent in the function.
   */
-# define FUNCTION_CALL_TRACE Buteo::LogTimer timerDebugVariable(QString(__PRETTY_FUNCTION__));
-#else
-# define LOG_PROTOCOL(msg) if (false) qDebug() << msg
-# define LOG_INFO(msg) if (false) qDebug() << msg
-# define LOG_DEBUG(msg) if (false) qDebug() << msg
-# define LOG_TRACE(msg) if (false) qDebug() << msg
-# define LOG_TRACE_PLAIN(msg) if (false) qDebug() << msg
-# define FUNCTION_CALL_TRACE
-#endif
+# define FUNCTION_CALL_TRACE if (Buteo::Logger::instance()->getLogLevel() >= 9) Buteo::LogTimer timerDebugVariable(QString(__PRETTY_FUNCTION__));
 
 namespace Buteo {
 
