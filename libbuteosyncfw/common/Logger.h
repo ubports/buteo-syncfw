@@ -130,10 +130,17 @@ public:
      */
     QBitArray getLogLevelArray();
 
+    /*!
+     * \brief Gets the logging level as a single number.
+     */
+    int getLogLevel() const;
+
     bool enabled(){return iEnabled;}
 
 private:
     Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize);
+
+    static int defaultLogLevel();
 
     static Logger *sInstance;
 
@@ -154,6 +161,8 @@ private:
     QMutex      iMutex;
 
     bool        iEnabled;
+
+    int         iLogLevel;
 };
 
 }

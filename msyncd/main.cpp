@@ -45,10 +45,8 @@ Q_DECL_EXPORT int main( int argc, char* argv[] )
     QDBusConnection::sessionBus();
     QDBusConnection::systemBus();
 
-    // This could be enabled to log the output to file
-    // Disabling the output to file for now. To get the output, run msyncd from
-    // cmd-line
-    //setLogLevelFromFile();
+    // Initialize the logger
+    Buteo::Logger::instance();
 
     LOG_DEBUG("Starting Log At :"  << QDateTime::currentDateTime()  );
 
