@@ -43,12 +43,6 @@
 #include <QMap>
 #include <QString>
 #include <QDBusInterface>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <QDeviceInfo>
-#include <QBatteryInfo>
-#else
-#include <QtSystemInfo/QSystemDeviceInfo>
-#endif
 
 
 namespace Buteo {
@@ -386,12 +380,6 @@ private:
     ServerActivator *iServerActivator;
 
     AccountsHelper *iAccounts;
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    QBatteryInfo iDeviceInfo;
-#else
-    QtMobility::QSystemDeviceInfo iDeviceInfo;
-#endif
 
     bool iClosing;
 
