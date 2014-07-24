@@ -41,6 +41,12 @@
 #include "SyncDBusConnection.h"
 #include "BtHelper.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QDeviceInfo>
+#include <QBatteryInfo>
+#else
+#include <QtSystemInfo/QSystemDeviceInfo>
+#endif
 #include <QtDebug>
 #include <fcntl.h>
 #include <termios.h>
@@ -425,10 +431,13 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     //iAccounts->addAccountData(*profile);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+    QBatteryInfo iDeviceInfo;
     QBatteryInfo::LevelStatus batteryStat = iDeviceInfo.levelStatus();
 #elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
+    QBatteryInfo iDeviceInfo;
     QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
 #else
+    QtMobility::QSystemDeviceInfo iDeviceInfo;
     QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
 #endif
 
@@ -743,14 +752,17 @@ bool Synchronizer::startNextSync()
     LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName );
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+    QBatteryInfo iDeviceInfo;
     QBatteryInfo::LevelStatus batteryStat = iDeviceInfo.levelStatus();
     if (session->isScheduled() && ((batteryStat == QBatteryInfo::LevelEmpty) ||
                              (batteryStat == QBatteryInfo::LevelLow)))
 #elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
+    QBatteryInfo iDeviceInfo;
     QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
     if (session->isScheduled() && ((batteryStat == QBatteryInfo::BatteryEmpty) ||
                              (batteryStat == QBatteryInfo::BatteryLow)))
 #else
+    QtMobility::QSystemDeviceInfo iDeviceInfo;
     QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
 
     if (session->isScheduled() && ((batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
