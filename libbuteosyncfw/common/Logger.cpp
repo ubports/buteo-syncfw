@@ -33,19 +33,6 @@
 
 using namespace Buteo;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-void logMessageHandler(QtMsgType aType, const QMessageLogContext&, const QString& aMsg)
-#else
-void logMessageHandler(QtMsgType aType, const char *aMsg)
-#endif
-{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-  Logger::instance()->write(aType, qPrintable(aMsg));
-#else
-  Logger::instance()->write(aType, aMsg);
-#endif
-}
-
 const int Logger::DEFAULT_INDENT_SIZE = 4;
 
 Logger *Logger::sInstance = NULL;
@@ -57,6 +44,17 @@ Logger *Logger::instance()
         createInstance();
     }
     return sInstance;
+}
+
+int Logger::defaultLogLevel() {
+    QByteArray levelByteArray = qgetenv("MSYNCD_LOGGING_LEVEL");
+    QString levelStr = QString::fromLocal8Bit(levelByteArray.constData());
+    bool ok = false;
+    int level = levelStr.toInt(&ok);
+    if (!ok) {
+        level = 4;  // warning level
+    }
+    return level;
 }
 
 void Logger::createInstance(const QString &aLogFileName, bool aUseStdOut,
@@ -79,8 +77,11 @@ Logger::Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize)
     iFileStream(0),
     iStdOutStream(0),
     iStdErrStream(0),
-    iEnabled(false)
+    iEnabled(false),
+    iLogLevel(0)
 {
+    iLogLevel = defaultLogLevel();
+
     if (aUseStdOut)
     {
         // Create a stream for writing log messages to standard output.
@@ -101,24 +102,10 @@ Logger::Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize)
             iFileStream = new QTextStream(&iFile);
         } // no else
     } // no else
-
-    // Install our own message handler.
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    qInstallMessageHandler(logMessageHandler);
-#else
-    qInstallMsgHandler(logMessageHandler);
-#endif
 }
 
 Logger::~Logger()
 {
-    // Restore default message handler.
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    qInstallMessageHandler(0);
-#else
-    qInstallMsgHandler(0);
-#endif
-
     delete iFileStream;
     iFileStream = 0;
 
@@ -135,6 +122,7 @@ bool  Logger::setLogLevel(int aLevel)
     bool retVal = false;
     if ((aLevel > 0)  && (aLevel <= NUM_LEVELS))
     {
+        iLogLevel = aLevel;
         disable(iEnabledLevels);
         QBitArray iLevels(NUM_LEVELS, false);
         for(int i = aLevel; i > 0; i--)
@@ -150,6 +138,11 @@ bool  Logger::setLogLevel(int aLevel)
 QBitArray Logger::getLogLevelArray()
 {
         return iEnabledLevels;
+}
+
+int Logger::getLogLevel() const
+{
+    return iLogLevel;
 }
 
 void Logger::enable(const QBitArray &aLevels)
