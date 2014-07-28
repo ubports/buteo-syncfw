@@ -45,7 +45,7 @@ namespace Buteo {
  * or by simply logging some message, which will automatically create the
  * logger instance with default parameters.
  */
-class Logger
+class Q_DECL_EXPORT Logger
 {
 public:
     
