@@ -321,6 +321,7 @@ SyncProfile::SyncType SyncProfile::syncType() const
     return (d_ptr->iSchedule.scheduleEnabled() || d_ptr->iSchedule.rushEnabled()) ? SYNC_SCHEDULED : SYNC_MANUAL;;
 }
 
+// TODO: seems effectless since d6d974e (Added functions to enable/disable normal scheduling.)
 void SyncProfile::setSyncType(SyncType aType)
 {
     setBoolKey(KEY_SYNC_SCHEDULED, aType == SYNC_SCHEDULED);

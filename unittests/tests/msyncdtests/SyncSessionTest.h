@@ -25,6 +25,7 @@
 #ifndef SYNCSESSIONTEST_H
 #define SYNCSESSIONTEST_H
 
+#include <QPointer>
 
 #include "SyncResults.h"
 #include "StorageBooker.h"
@@ -61,7 +62,7 @@ private:
     SyncSession *iSyncSession;
     SyncProfile *iSyncProfile;
     PluginRunner *iNullPluginRunner;
-    SyncSessionPluginRunnerTest *iSyncSessionPluginRunnerTest;
+    QPointer<SyncSessionPluginRunnerTest> iSyncSessionPluginRunnerTest;
 
 public:
     static bool isValuePassedTrue;

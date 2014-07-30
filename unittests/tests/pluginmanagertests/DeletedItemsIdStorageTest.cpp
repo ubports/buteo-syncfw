@@ -21,7 +21,6 @@
  *
  */
 #include "DeletedItemsIdStorageTest.h"
-#include "SyncFwTestLoader.h"
 #include "DeletedItemsIdStorage.h"
 
 #include <QList>
@@ -123,4 +122,4 @@ void DeletedItemsIdStorageTest::testSnapshot()
 }
 
 
-TESTLOADER_ADD_TEST(DeletedItemsIdStorageTest);
+QTEST_MAIN(Buteo::DeletedItemsIdStorageTest)

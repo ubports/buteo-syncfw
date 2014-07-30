@@ -72,13 +72,13 @@ TransportTracker::TransportTracker(QObject *aParent) :
     
     // Add signal to track the bluetooth state changes
     QDBusConnection bus = QDBusConnection::systemBus();
-    if (bus.connect("org.bluez",
-                    "",
-                    "org.bluez.Adapter",
-                    "PropertyChanged",
-                    this,
-                    SLOT(onBtStateChanged(QString, QDBusVariant)
-                    )))
+    if (!bus.connect("org.bluez",
+                     "",
+                     "org.bluez.Adapter",
+                     "PropertyChanged",
+                     this,
+                     SLOT(onBtStateChanged(QString, QDBusVariant)
+                     )))
     {
         LOG_WARNING("Unable to connect to system bus for org.bluez.Adapter");
     }

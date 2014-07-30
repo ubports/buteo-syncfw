@@ -1,26 +1,119 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <testdefinition version="0.1">
-  <!-- Test suite, name mandatory - the same as test package name -->
-  <suite name="sync-fw-tests" domain="synchronization"> 
-    <!-- At least one set per suite, name and description mandatory -->
-    <set name="Syncml-FW " description="tests for sync fw" feature="sync framework">
-      <!-- Possibly some pre-steps to execute before running the test cases -->
+  <suite name="buteo-syncfw" domain="synchronization">
+
+    <set name="msyncd" description="buteo-syncfw msyncd tests" feature="sync framework">
       <pre_steps>
-        <step>export LD_LIBRARY_PATH=/usr/share/sync-fw-tests:$LD_LIBRARY_PATH</step>
-        <step>timed -d</step>
+        <step>systemctl --user stop msyncd</step>
       </pre_steps>
+      <post_steps>
+        <step>systemctl --user start msyncd</step>
+      </post_steps>
 
-      <case name="sync-fw-all" type="Functional" description="Running Tests for Synchronization Framework" timeout="1000" subfeature="">
-        <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
-        <step expected_result="0">/opt/tests/buteo-syncfw/./runstarget.sh  /opt/tests/buteo-syncfw/sync-fw-tests </step>
+      <case name="msyncdtests/AccountsHelperTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/AccountsHelperTest</step>
       </case>
-
-      <!-- Get optional - fetches additional result files -->
-      <get>
-        <file>/tmp/sync-fw-tests.out</file>
-        <file>/tmp/sync-fw-tests.cmp</file>
-      </get>
-
+      <case name="msyncdtests/ClientPluginRunnerTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/ClientPluginRunnerTest</step>
+      </case>
+      <case name="msyncdtests/ClientThreadTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/ClientThreadTest</step>
+      </case>
+      <!-- Not built on nemo
+      <case name="msyncdtests/IPHeartBeatTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/IPHeartBeatTest</step>
+      </case>
+      -->
+      <case name="msyncdtests/PluginRunnerTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/PluginRunnerTest</step>
+      </case>
+      <case name="msyncdtests/ServerActivatorTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/ServerActivatorTest</step>
+      </case>
+      <case name="msyncdtests/ServerPluginRunnerTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/ServerPluginRunnerTest</step>
+      </case>
+      <case name="msyncdtests/ServerThreadTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/ServerThreadTest</step>
+      </case>
+      <case name="msyncdtests/StorageBookerTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/StorageBookerTest</step>
+      </case>
+      <case name="msyncdtests/SyncBackupTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/SyncBackupTest</step>
+      </case>
+      <case name="msyncdtests/SyncQueueTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/SyncQueueTest</step>
+      </case>
+      <case name="msyncdtests/SyncSessionTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/SyncSessionTest</step>
+      </case>
+      <!-- Not built on nemo
+      <case name="msyncdtests/SyncSchedulerTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/SyncSchedulerTest</step>
+      </case>
+      -->
+      <case name="msyncdtests/SyncSigHandlerTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/SyncSigHandlerTest</step>
+      </case>
+      <case name="msyncdtests/SynchronizerTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/SynchronizerTest</step>
+      </case>
+      <case name="msyncdtests/TransportTrackerTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh msyncdtests/TransportTrackerTest</step>
+      </case>
     </set>
+
+    <set name="pluginmanager" description="buteo-syncfw pluginmanager tests" feature="sync framework">
+      <case name="pluginmanagertests/ClientPluginTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh pluginmanagertests/ClientPluginTest</step>
+      </case>
+      <case name="pluginmanagertests/DeletedItemsIdStorageTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh pluginmanagertests/DeletedItemsIdStorageTest</step>
+      </case>
+      <case name="pluginmanagertests/ServerPluginTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh pluginmanagertests/ServerPluginTest</step>
+      </case>
+      <case name="pluginmanagertests/StoragePluginTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh pluginmanagertests/StoragePluginTest</step>
+      </case>
+    </set>
+
+    <set name="syncfwclient" description="buteo-syncfw syncfwclient tests" feature="sync framework">
+      <!-- This test case tries to execute real sync scenario but with invalid
+           profiles - this simply cannot work.
+      <case name="syncfwclienttests/SyncClientInterfaceTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh syncfwclienttests/SyncClientInterfaceTest</step>
+      </case>
+      -->
+    </set>
+
+    <set name="syncprofile" description="buteo-syncfw syncprofile tests" feature="sync framework">
+      <case name="syncprofiletests/ProfileFactoryTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh syncprofiletests/ProfileFactoryTest</step>
+      </case>
+      <case name="syncprofiletests/ProfileFieldTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh syncprofiletests/ProfileFieldTest</step>
+      </case>
+      <case name="syncprofiletests/ProfileManagerTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh syncprofiletests/ProfileManagerTest</step>
+      </case>
+      <case name="syncprofiletests/ProfileTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh syncprofiletests/ProfileTest</step>
+      </case>
+      <case name="syncprofiletests/StorageProfileTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh syncprofiletests/StorageProfileTest</step>
+      </case>
+      <case name="syncprofiletests/SyncLogTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh syncprofiletests/SyncLogTest</step>
+      </case>
+      <case name="syncprofiletests/SyncProfileTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh syncprofiletests/SyncProfileTest</step>
+      </case>
+      <case name="syncprofiletests/SyncScheduleTest">
+        <step>/opt/tests/buteo-syncfw/runstarget.sh syncprofiletests/SyncScheduleTest</step>
+      </case>
+    </set>
+
   </suite>
 </testdefinition>

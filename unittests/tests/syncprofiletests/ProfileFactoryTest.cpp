@@ -26,7 +26,6 @@
 #include <QScopedPointer>
 
 #include "ProfileFactory.h"
-#include "SyncFwTestLoader.h"
 #include "SyncProfile.h"
 #include "StorageProfile.h"
 
@@ -104,4 +103,4 @@ void ProfileFactoryTest::testCreateFromXml()
 
 }
 
-TESTLOADER_ADD_TEST(ProfileFactoryTest);
+QTEST_MAIN(Buteo::ProfileFactoryTest)

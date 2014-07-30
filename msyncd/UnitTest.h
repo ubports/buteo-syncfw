@@ -1,9 +1,9 @@
 /*
  * This file is part of buteo-syncfw package
  *
- * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2014 Jolla Ltd
  *
- * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
+ * Contact: Valerio Valerio <valerio.valerio@jolla.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -20,22 +20,22 @@
  * 02110-1301 USA
  *
  */
-#ifndef SYNCFWTESTRUNNER_H_
-#define SYNCFWTESTRUNNER_H_
 
-#include <QList>
-class QObject;
+#ifndef UNITTEST_H
+#define UNITTEST_H
 
-class SyncFwTestRunner {
-public:
-    ~SyncFwTestRunner();
-    static SyncFwTestRunner* getInstance();
-    void addTest(QObject* aTest);
-    int runTests(int argc, char** argv);
+#include <QtGlobal>
 
-private:
-    SyncFwTestRunner();
-    QList<QObject*> iTests;
-};
+/*!
+ * \brief A dirty hack to allow modified behavior during unit test execution.
+ *
+ * If you are writing a unit test, \c include(msyncd/unittest.pri) in your
+ * project file.
+ */
+#define SYNCFW_UNIT_TESTS_RUNTIME Q_UNLIKELY(__SYNCFW_UNIT_TESTS_RUNTIME)
 
-#endif /* SYNCFWTESTRUNNER_H_ */
+/*! \cond __false */
+extern bool __SYNCFW_UNIT_TESTS_RUNTIME;
+/*! \endcond __false */
+
+#endif // UNITTEST_H

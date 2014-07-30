@@ -25,7 +25,6 @@
 #include <QDomDocument>
 
 #include "ProfileField.h"
-#include "SyncFwTestLoader.h"
 
 using namespace Buteo;
 
@@ -71,4 +70,4 @@ void ProfileFieldTest::testField()
     QCOMPARE(doc.toString(), doc2.toString());
 }
 
-TESTLOADER_ADD_TEST(ProfileFieldTest);
+QTEST_MAIN(Buteo::ProfileFieldTest)

@@ -21,7 +21,6 @@
  *
  */
 #include "AccountsHelperTest.h"
-#include "SyncFwTestLoader.h"
 #include <Profile.h>
 #include <ProfileEngineDefs.h>
 
@@ -87,4 +86,4 @@ void AccountsHelperTest::testAddAccountData()
 
 }
 
-TESTLOADER_ADD_TEST(AccountsHelperTest);
+QTEST_MAIN(Buteo::AccountsHelperTest)

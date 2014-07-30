@@ -27,7 +27,6 @@
 #include <QtTest/QtTest>
 #include <QSignalSpy>
 #include <QDBusVariant>
-#include "SyncFwTestLoader.h"
 
 using namespace Buteo;
 
@@ -88,50 +87,46 @@ void TransportTrackerTest :: testConnectivityAvailable()
 
 void TransportTrackerTest :: testStateChanged()
 {
+    qRegisterMetaType<Sync::ConnectivityType>("Sync::ConnectivityType");
+    QSignalSpy connectivityStateSpy(iTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)));
+    QSignalSpy networkStateSpy(iTransportTracker, SIGNAL(networkStateChanged(bool)));
+
     // change USB state and verify
-
-    iTransportTracker->onUsbStateChanged(false);
-    QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_USB), false);
-
+    bool usbCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_USB);
+    iTransportTracker->onUsbStateChanged(!usbCurrentState);
+    QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_USB), !usbCurrentState);
+    QCOMPARE(connectivityStateSpy.count(), 1);
+    QCOMPARE(connectivityStateSpy.first().at(0).value<Sync::ConnectivityType>(), Sync::CONNECTIVITY_USB);
+    QCOMPARE(connectivityStateSpy.first().at(1).value<bool>(), !usbCurrentState);
+    connectivityStateSpy.clear();
 
     // change BT state and verify
+    bool btCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    bool setBTState = false;
-    QDBusVariant v(QVariant(true));
-    iTransportTracker->onBtStateChanged("Powered", v);
+    iTransportTracker->onBtStateChanged("Powered", QDBusVariant(QVariant(!btCurrentState)));
 #else
-    bool setBTState = iTransportTracker->iDeviceInfo.currentBluetoothPowerState();
-    iTransportTracker->onBtStateChanged(setBTState);
+    iTransportTracker->onBtStateChanged(!btCurrentState);
 #endif
-    QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT), setBTState);
-
+    QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT), !btCurrentState);
+    QCOMPARE(connectivityStateSpy.count(), 1);
+    QCOMPARE(connectivityStateSpy.first().at(0).value<Sync::ConnectivityType>(), Sync::CONNECTIVITY_BT);
+    QCOMPARE(connectivityStateSpy.first().at(1).value<bool>(), !btCurrentState);
+    connectivityStateSpy.clear();
 
     // change internet state and verify
-
-    /* Memory allocation for iInternet is commented in TransportTracker.cpp, because of which
-     * the below code core dumps. Once the memory allocation is done in the source file, the following
-     * code needs to be uncommented
-     */
-/*
-    bool setInternetState = iTransportTracker->iInternet->value().toBool();
-    QVERIFY(iTransportTracker->iInternet);
-    iTransportTracker->onInternetStateChanged();
-    QCOMPARE(iTransportTracker->isConnectivityAvailable((Sync::CONNECTIVITY_INTERNET), setInternetState);
-*/
-
-    // Check signal emissions
-    // register metatypes not known to QSignalSpy
-     qRegisterMetaType<Sync::ConnectivityType>("Sync::ConnectivityType");
-
-    QSignalSpy sampleSpy(iTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)));
-
-    bool usbCurrentState = iTransportTracker->iTransportStates[Sync::CONNECTIVITY_USB];
-    iTransportTracker->updateState((Sync::CONNECTIVITY_USB), !usbCurrentState);
-    // check for the signal emission
-    QCOMPARE(sampleSpy.count(), 1);
-
+    bool internetCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_INTERNET);
+    iTransportTracker->onInternetStateChanged(!internetCurrentState);
+    QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_INTERNET), !internetCurrentState);
+    QEXPECT_FAIL("", "IMO connectivityStateChanged() should be emitted also for CONNECTIVITY_INTERNET", Continue);
+    QCOMPARE(connectivityStateSpy.count(), 1);
+    //QCOMPARE(connectivityStateSpy.first().at(0).value<Sync::ConnectivityType>(), Sync::CONNECTIVITY_INTERNET);
+    //QCOMPARE(connectivityStateSpy.first().at(1).value<bool>(), !internetCurrentState);
+    //connectivityStateSpy.clear();
+    QCOMPARE(networkStateSpy.count(), 1);
+    QCOMPARE(networkStateSpy.first().at(0).value<bool>(), !internetCurrentState);
+    networkStateSpy.clear();
 }
 
 
 
-TESTLOADER_ADD_TEST(TransportTrackerTest);
+QTEST_MAIN(Buteo::TransportTrackerTest)

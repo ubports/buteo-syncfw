@@ -21,7 +21,6 @@
  *
  */
 
-#include "SyncFwTestLoader.h"
 #include "ServerThreadTest.h"
 #include "PluginManager.h"
 
@@ -141,5 +140,5 @@ void ServerThreadTest::testStopThErrorSignal()
 	QCOMPARE(spy.count(), 1);
 }
 
-TESTLOADER_ADD_TEST(ServerThreadTest);
+QTEST_MAIN(Buteo::ServerThreadTest)
 

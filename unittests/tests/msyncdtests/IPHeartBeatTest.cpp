@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-#include "SyncFwTestLoader.h"
 #include "IPHeartBeatTest.h"
 #include "IPHeartBeat.h"
 
@@ -79,4 +78,4 @@ void IPHeartBeatTest::onBeatTriggered(QString /*aProfName*/)
     iBeatReceived = true;
 }
 
-TESTLOADER_ADD_TEST(IPHeartBeatTest);
+QTEST_MAIN(Buteo::IPHeartBeatTest)

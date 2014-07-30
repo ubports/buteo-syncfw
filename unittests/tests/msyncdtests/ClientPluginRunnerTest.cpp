@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-#include "SyncFwTestLoader.h"
 #include "ClientPluginRunnerTest.h"
 #include "PluginManager.h"
 #include "synchronizer.h"
@@ -133,4 +132,4 @@ void ClientPluginRunnerTest::testSignals()
 					   Sync::ITEM_ADDED, "Mime",1);
 	QCOMPARE(transferSignal.count(), 1);
 }
-TESTLOADER_ADD_TEST(ClientPluginRunnerTest);
+QTEST_MAIN(Buteo::ClientPluginRunnerTest)

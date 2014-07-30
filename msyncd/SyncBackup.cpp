@@ -25,6 +25,7 @@
 #include "SyncBackupAdaptor.h"
 #include "LogMacros.h"
 #include "SyncDBusConnection.h"
+#include "UnitTest.h"
 
 #include <QtDBus/QtDBus>
 #include <QtDBus/QDBusServiceWatcher>
@@ -95,9 +96,10 @@ void SyncBackup::backupServiceUnregistered(const QString  &serviceName)
 uchar SyncBackup::sendDelayReply (const QDBusMessage &message)
 {
     FUNCTION_CALL_TRACE;
-#ifdef UNIT_TEST
+
+    if (SYNCFW_UNIT_TESTS_RUNTIME)
          return 0;
-#endif 
+
     // coverity[unreachable]  //Suppressing false positives with code annotations
     message.setDelayedReply(true);
     if (!iReply)
@@ -109,9 +111,10 @@ uchar SyncBackup::sendDelayReply (const QDBusMessage &message)
 void SyncBackup::sendReply (uchar aResult)
 {
     FUNCTION_CALL_TRACE;
-#ifdef UNIT_TEST
+
+    if (SYNCFW_UNIT_TESTS_RUNTIME)
          return ;
-#endif
+
     // coverity[unreachable]  //Suppressing false positives with code annotations
     if (iReply) {
 	    LOG_DEBUG ("Send Reply");

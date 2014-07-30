@@ -74,7 +74,7 @@ Group: Documentation
 
 %files doc
 %defattr(-,root,root,-)
-%{_docdir}/sync-fw-doc/*
+%{_docdir}/buteo-syncfw-doc/*
 
 %package tests
 Summary: Tests for %{name}
@@ -85,12 +85,7 @@ Group: Development/Libraries
 
 %files tests
 %defattr(-,root,root,-)
-/opt/tests/buteo-syncfw/*.so
-/opt/tests/buteo-syncfw/*.pl
-/opt/tests/buteo-syncfw/*.sh
-/opt/tests/buteo-syncfw/sync-fw-tests*
-/opt/tests/buteo-syncfw/syncprofiletests
-/opt/tests/buteo-syncfw/test-definition/*.xml
+/opt/tests/buteo-syncfw/*
 %{_datadir}/accounts/services/*.service
 
 
@@ -101,6 +96,7 @@ Group: Development/Libraries
 %build
 %qmake5 -recursive CONFIG+=usb-moded DEFINES+=USE_KEEPALIVE
 make %{_smp_mflags}
+make doc %{_smp_mflags}
 
 
 %install

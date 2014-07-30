@@ -1,20 +1,27 @@
-#!/bin/sh
+#!/bin/sh -e
 
-echo "running ${1}..."
+if [ $# -lt 1 ]; then
+    echo "You need to pass test executable as an argument!"
+    exit 1
+fi
 
-FILE=${1##*/}  
+TESTS_DIR="$(dirname "${0}")"
+TMP_DIR="/tmp/$(basename "${TESTS_DIR}")"
 
-cd /opt/tests/buteo-syncfw
-export LD_LIBRARY_PATH=/opt/tests/buteo-syncfw:$LD_LIBRARY_PATH
+rm -rf "${TMP_DIR}"
+mkdir -p "${TMP_DIR}"
 
-${1} -maxwarnings 0 1>/tmp/$FILE.out 2>&1
-RESULT=$?
+# Copy test data into tmp dir (read/write enabled location)
+mkdir -p "${TMP_DIR}/syncprofiletests"
+cp -a "${TESTS_DIR}/syncprofiletests/testprofiles" "${TMP_DIR}/syncprofiletests/"
 
-echo "$RESULT is return value of executing ${1}" >> /tmp/$FILE.out
+# Test data are searched with paths relative to CWD
+cd "${TMP_DIR}"
 
-grep "Totals:" /tmp/$FILE.out >/tmp/$FILE.cmp
+export LD_LIBRARY_PATH="${TESTS_DIR}:${LD_LIBRARY_PATH}"
 
-# Exit with the same code as the test binary
-exit $RESULT
-# Exit always with zero until problems in CI environment are resolved
-#exit 0
+# Accept both absolute and relative path to test executable
+TEST="$(cd "${TESTS_DIR}"; readlink -f "${1}")"
+shift
+
+exec "${TEST}" "${@}" -maxwarnings 0
