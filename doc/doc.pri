@@ -7,6 +7,6 @@ QMAKE_EXTRA_TARGETS += doc
 QMAKE_CLEAN += $${PWD}/html/* $${PWD}/buteo-syncfw.tag
 
 # Install rules
-htmldocs.files = $${PWD}/html/
+htmldocs.files = $${PWD}/html/*
 htmldocs.path = /usr/share/doc/buteo-syncfw-doc/
 INSTALLS += htmldocs
