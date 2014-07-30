@@ -1,5 +1,5 @@
 Name: buteo-syncfw-qt5
-Version: 0.7.4
+Version: 0.7.5
 Release: 1
 Summary: Synchronization backend
 Group: System/Libraries
@@ -19,6 +19,7 @@ BuildRequires: pkgconfig(libiphb)
 BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: pkgconfig(keepalive)
 BuildRequires: oneshot
+BuildRequires: doxygen
 Requires: mapplauncherd-qt5
 Requires: oneshot
 %{_oneshot_requires_post}
