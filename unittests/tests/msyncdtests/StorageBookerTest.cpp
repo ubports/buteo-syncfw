@@ -22,7 +22,6 @@
  */
 #include "StorageBookerTest.h"
 #include "StorageBooker.h"
-#include "SyncFwTestLoader.h"
 
 using namespace Buteo;
 
@@ -92,4 +91,4 @@ void StorageBookerTest::testBooking()
 
 }
 
-TESTLOADER_ADD_TEST(StorageBookerTest);
+QTEST_MAIN(Buteo::StorageBookerTest)

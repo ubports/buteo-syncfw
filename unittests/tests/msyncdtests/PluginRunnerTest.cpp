@@ -21,7 +21,6 @@
  *
  */
 
-#include "SyncFwTestLoader.h"
 #include "PluginRunnerTest.h"
 
 using namespace Buteo;
@@ -62,4 +61,4 @@ void PluginRunnerTest::cleanupTestCase()
 
 
 
-TESTLOADER_ADD_TEST(PluginRunnerTest);
+QTEST_MAIN(Buteo::PluginRunnerTest)

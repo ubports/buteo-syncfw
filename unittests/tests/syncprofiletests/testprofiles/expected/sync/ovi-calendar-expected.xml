@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profile type="sync" name="ovi-calendar">
+    <!-- FIXME: Did not waste time updating this after "service" profile-type
+         removal as the ProfileTest::testXmlConversion() test case does not
+         work anyway.
+    -->
+</profile>

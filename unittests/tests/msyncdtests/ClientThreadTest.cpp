@@ -20,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-#include "SyncFwTestLoader.h"
 #include "ClientThreadTest.h"
 #include "SyncResults.h"
 
@@ -145,4 +144,4 @@ void ClientThreadTest::testInitError()
 	QCOMPARE(spy.count(), 1);
 }
 
-TESTLOADER_ADD_TEST(ClientThreadTest);
+QTEST_MAIN(Buteo::ClientThreadTest)

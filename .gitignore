@@ -1,9 +1,11 @@
 Makefile
+Makefile.*
 *.so*
 *.prl
 pkgconfig/
 *.list
 *.tag
+msyncd/libmsyncd.a
 msyncd/msyncd
 doc/html
 unittests/tests/sync-fw-tests

@@ -1,9 +1,9 @@
 /*
  * This file is part of buteo-syncfw package
  *
- * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2014 Jolla Ltd
  *
- * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
+ * Contact: Valerio Valerio <valerio.valerio@jolla.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -21,3 +21,10 @@
  *
  */
 
+#include "UnitTest.h"
+
+#ifdef SYNCFW_UNIT_TESTS
+bool __SYNCFW_UNIT_TESTS_RUNTIME = true;
+#else
+bool __SYNCFW_UNIT_TESTS_RUNTIME = false;
+#endif
