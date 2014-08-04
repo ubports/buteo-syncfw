@@ -89,5 +89,9 @@ int main( int argc, char** argv )
     }
 
     // TODO: Should any unix signals be handled?
-    return app.exec();
+    int retn = app.exec();
+    connection.unregisterService(servicePath);
+    connection.unregisterObject(DBUS_SERVICE_OBJ_PATH);
+    delete serviceObj;
+    return retn;
 }
