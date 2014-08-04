@@ -103,6 +103,10 @@ bool PluginServiceObj::uninit()
 {
     FUNCTION_CALL_TRACE;
 
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::uninit(): called on uninitialized plugin" );
+        return true;
+    }
     return iPlugin->uninit();
 }
 
@@ -110,6 +114,10 @@ void PluginServiceObj::abortSync(uchar aStatus)
 {
     FUNCTION_CALL_TRACE;
 
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::abortSync(): called on uninitialized plugin" );
+        return;
+    }
     iPlugin->abortSync( static_cast<Sync::SyncStatus>(aStatus) );
 }
 
@@ -132,6 +140,10 @@ void PluginServiceObj::connectivityStateChanged(int aType, bool aState)
 {
     FUNCTION_CALL_TRACE;
 
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::connectivityStateChanged(): called on uninitialized plugin" );
+        return;
+    }
     iPlugin->connectivityStateChanged( static_cast<Sync::ConnectivityType>(aType), aState );
 }
 
@@ -139,6 +151,10 @@ QString PluginServiceObj::getSyncResults()
 {
     FUNCTION_CALL_TRACE;
 
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::getSyncResults(): called on uninitialized plugin" );
+        return QString();
+    }
     return iPlugin->getSyncResults().toString();
 }
 
@@ -147,6 +163,10 @@ bool PluginServiceObj::startSync()
 {
     FUNCTION_CALL_TRACE;
 
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::startSync(): called on uninitialized plugin" );
+        return false;
+    }
     return iPlugin->startSync();
 }
 
@@ -155,6 +175,10 @@ void PluginServiceObj::resume()
 {
     FUNCTION_CALL_TRACE;
 
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::resume(): called on uninitialized plugin" );
+        return;
+    }
     iPlugin->resume();
 }
 
@@ -162,6 +186,10 @@ bool PluginServiceObj::startListen()
 {
     FUNCTION_CALL_TRACE;
 
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::startListen(): called on uninitialized plugin" );
+        return false;
+    }
     return iPlugin->startListen();
 }
 
@@ -169,6 +197,10 @@ void PluginServiceObj::stopListen()
 {
     FUNCTION_CALL_TRACE;
 
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::stopListen(): called on uninitialized plugin" );
+        return;
+    }
     return iPlugin->stopListen();
 }
 
@@ -176,6 +208,10 @@ void PluginServiceObj::suspend()
 {
     FUNCTION_CALL_TRACE;
 
+    if (!iPlugin) {
+        LOG_WARNING( "PluginServiceObj::suspend(): called on uninitialized plugin" );
+        return;
+    }
     return iPlugin->suspend();
 }
 #endif
