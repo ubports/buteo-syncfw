@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2014 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -89,6 +90,7 @@ public:
     unsigned iInterval;
 
     bool iEnabled;
+    bool iExternalEnabled;
 
     // ============ RUSH HOUR SETTINGS =========== 
 
@@ -106,6 +108,9 @@ public:
 
     //! Indicates if Rush Hour is Enabled
     bool iRushEnabled;
+
+    //! Indicates if External Rush Hour schedule is Enabled
+    bool iExternalRushEnabled;
 };
 
 }

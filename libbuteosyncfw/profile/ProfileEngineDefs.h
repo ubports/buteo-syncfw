@@ -47,6 +47,7 @@ const QString ATTR_MAJOR_CODE("majorcode");
 const QString ATTR_MINOR_CODE("minorcode");
 const QString ATTR_ENABLED("enabled");
 const QString ATTR_SYNC_CONFIGURE("syncconfiguredtime");
+const QString ATTR_EXTERNAL_SYNC("externalsync");
 
 const QString TAG_FIELD("field");
 const QString TAG_PROFILE("profile");
