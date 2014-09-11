@@ -87,8 +87,10 @@ typedef void (*FUNC_DESTROY_STORAGECHANGENOTIFIER)(StorageChangeNotifierPlugin*)
  * Is responsible for creating and destroying storage,
  * server and client plugins.
  */
-class PluginManager
+class PluginManager : public QObject
 {
+    Q_OBJECT
+
 public:
     /*! \brief Constructor
      *
@@ -162,11 +164,9 @@ public:
     void destroyServer( ServerPlugin *aPlugin );
 
 protected slots:
-    void onProcessStarted();
 
     void onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus );
 
-    void onProcessError( QProcess::ProcessError procError );
 private:
 
     struct DllInfo
