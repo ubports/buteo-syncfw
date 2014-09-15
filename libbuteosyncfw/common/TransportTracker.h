@@ -29,6 +29,7 @@
 #include <QMap>
 #include <QMutex>
 #include <QDBusVariant>
+#include <QDBusConnection>
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #include <QtSystemInfo/QSystemDeviceInfo>
 #endif
@@ -111,6 +112,7 @@ private:
 #endif
 
     NetworkManager *iInternet;
+    QDBusConnection *iSystemBus;
 
     mutable QMutex iMutex;
 
