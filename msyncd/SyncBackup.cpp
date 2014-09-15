@@ -24,7 +24,6 @@
 #include "SyncBackup.h"
 #include "SyncBackupAdaptor.h"
 #include "LogMacros.h"
-#include "SyncDBusConnection.h"
 #include "UnitTest.h"
 
 #include <QtDBus/QtDBus>
@@ -49,7 +48,7 @@ SyncBackup::SyncBackup() :
 	Q_ASSERT(false);
     }
 
-    QDBusConnection dbus = SyncDBusConnection::sessionBus();
+    QDBusConnection dbus = QDBusConnection::sessionBus();
 
     if (dbus.registerObject(DBUS_BACKUP_OBJECT, this)) {
 	    LOG_DEBUG("Registered sync backup to D-Bus");
@@ -73,7 +72,7 @@ SyncBackup::~SyncBackup()
     FUNCTION_CALL_TRACE;
     iBackupRestore = false;
     //Unregister from D-Bus.
-    QDBusConnection dbus = SyncDBusConnection::sessionBus();
+    QDBusConnection dbus = QDBusConnection::sessionBus();
     dbus.unregisterObject(DBUS_BACKUP_OBJECT);
     delete iWatchService;
     iWatchService = 0;
@@ -122,7 +121,7 @@ void SyncBackup::sendReply (uchar aResult)
 	    QVariant vt = QVariant::fromValue((uchar)aResult);
             arguments.append(vt);
             iReply->setArguments(arguments);
-	    SyncDBusConnection::sessionBus().send(*iReply);
+	    QDBusConnection::sessionBus().send(*iReply);
 	    delete iReply;
 	    iReply = 0;
     }
