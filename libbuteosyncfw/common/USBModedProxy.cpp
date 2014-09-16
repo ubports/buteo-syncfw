@@ -30,9 +30,9 @@
  * If this file is to be regenerated, the changes must be backed up and merged
  */
 
+#include <QDBusConnection>
 #include "USBModedProxy.h"
 #include "LogMacros.h"
-#include "SyncDBusConnection.h"
 
 using namespace Buteo;
 static const QString USB_MODE_SERVICE("com.meego.usb_moded");
@@ -44,7 +44,7 @@ static const QString SYNC_MODE_NAME("pc_suite");
  */
 
 USBModedProxy::USBModedProxy(QObject *parent)
-    : QDBusAbstractInterface(USB_MODE_SERVICE, USB_MODE_OBJECT, staticInterfaceName(), SyncDBusConnection::systemBus(), parent)
+    : QDBusAbstractInterface(USB_MODE_SERVICE, USB_MODE_OBJECT, staticInterfaceName(), QDBusConnection::systemBus(), parent)
 {
     FUNCTION_CALL_TRACE;
     if(false == QObject::connect(this, SIGNAL(sig_usb_state_ind(const QString&)), this, SLOT(slotModeChanged(const QString&))))
