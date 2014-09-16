@@ -21,7 +21,6 @@ CONFIG += dll \
 HEADERS += common/Logger.h \
            common/LogMacros.h \
            common/SyncCommonDefs.h \
-           common/SyncDBusConnection.h \
            common/TransportTracker.h \
            common/NetworkManager.h \
            clientfw/SyncClientInterface.h \
@@ -54,7 +53,6 @@ HEADERS += common/Logger.h \
            pluginmgr/OOPServerPlugin.h \
            pluginmgr/ButeoPluginIface.h
 SOURCES += common/Logger.cpp \
-           common/SyncDBusConnection.cpp \
            common/TransportTracker.cpp \
            common/NetworkManager.cpp \
            clientfw/SyncClientInterface.cpp \
@@ -116,7 +114,6 @@ sources.files = pluginmgr/plugin_main.cpp \
 headers.files = common/Logger.h \
            common/LogMacros.h \
            common/SyncCommonDefs.h \
-           common/SyncDBusConnection.h \
            common/TransportTracker.h \
            common/NetworkManager.h \
            clientfw/SyncClientInterface.h \
