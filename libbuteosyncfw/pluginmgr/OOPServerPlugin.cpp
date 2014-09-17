@@ -30,8 +30,7 @@ OOPServerPlugin::OOPServerPlugin( const QString& aPluginName,
                                   const Profile& aProfile,
                                   PluginCbInterface* aCbInterface,
                                   QProcess& aProcess ) :
-    ServerPlugin( aPluginName, aProfile, aCbInterface )
-    
+    ServerPlugin( aPluginName, aProfile, aCbInterface ), iDone( false )
 {
     FUNCTION_CALL_TRACE;
 
@@ -59,11 +58,11 @@ OOPServerPlugin::OOPServerPlugin( const QString& aPluginName,
     connect(iOopPluginIface, SIGNAL(transferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &, int)),
         this, SIGNAL(transferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &, int)));
 
-    connect(iOopPluginIface, SIGNAL(error(const QString &, const QString &, int)),
-        this, SIGNAL(error(const QString &, const QString &, int)));
+    connect(iOopPluginIface, SIGNAL(error(QString,QString,int)),
+        this, SLOT(onError(QString,QString,int)));
 
-    connect(iOopPluginIface, SIGNAL(success(const QString &, const QString &)),
-        this, SIGNAL(success(const QString &, const QString &)));
+    connect(iOopPluginIface, SIGNAL(success(QString,QString)),
+        this, SLOT(onSuccess(QString,QString)));
 
     connect(iOopPluginIface, SIGNAL(accquiredStorage(const QString &)),
         this, SIGNAL(accquiredStorage(const QString &)));
@@ -71,11 +70,12 @@ OOPServerPlugin::OOPServerPlugin( const QString& aPluginName,
     connect(iOopPluginIface, SIGNAL(newSession(const QString&)),
             this, SIGNAL(newSession(const QString&)));
 
+    // Handle the signals from the process
     connect(&aProcess, SIGNAL(error(QProcess::ProcessError)),
-            this, SIGNAL(processError(QProcess::ProcessError)));
+            this, SLOT(onProcessError(QProcess::ProcessError)));
 
     connect(&aProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
-            this, SIGNAL(processFinished(int,QProcess::ExitStatus)));
+            this, SLOT(onProcessFinished(int,QProcess::ExitStatus)));
 }
 
 OOPServerPlugin::~OOPServerPlugin()
@@ -183,4 +183,46 @@ void OOPServerPlugin::connectivityStateChanged( Sync::ConnectivityType aType,
     reply.waitForFinished();
     if( !reply.isValid() )
         LOG_WARNING( "Invalid reply for connectivityStateChanged from plugin" );
+}
+
+void OOPServerPlugin::onProcessError( QProcess::ProcessError error )
+{
+    if( !iDone ) {
+        onError( iProfile.name(),
+                 "Plugin process error:" + QString::number(error),
+                 Sync::SYNC_PLUGIN_ERROR );
+    }
+}
+
+void OOPServerPlugin::onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus )
+{
+    if ( !iDone ) {
+        if( (exitCode != 0) || (exitStatus != QProcess::NormalExit) ) {
+            onError( iProfile.name(),
+                    "Plugin process exited with error code " +
+                     QString::number(exitCode) + " and status " +
+                     QString::number(exitStatus),
+                    Sync::SYNC_PLUGIN_ERROR );
+        } else {
+            onError( iProfile.name(),
+                    "Plugin process exited unexpectedly",
+                    Sync::SYNC_PLUGIN_ERROR );
+        }
+    }
+}
+
+void OOPServerPlugin::onError(QString aProfileName, QString aMessage, int aErrorCode)
+{
+    if ( !iDone ) {
+        iDone = true;
+        emit error(aProfileName, aMessage, aErrorCode);
+    }
+}
+
+void OOPServerPlugin::onSuccess(QString aProfileName, QString aMessage)
+{
+    if ( !iDone ) {
+        iDone = true;
+        emit success(aProfileName, aMessage);
+    }
 }

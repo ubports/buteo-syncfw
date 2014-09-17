@@ -245,25 +245,6 @@ void ClientPluginRunner::onThreadExit()
     emit done();
 }
 
-void ClientPluginRunner::onProcessError( QProcess::ProcessError error )
-{
-    onError( iProfile->name(),
-             "Plugin process error:" + QString::number(error),
-             Sync::SYNC_PLUGIN_ERROR );
-}
-
-void ClientPluginRunner::onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus )
-{
-    if( (exitCode != 0) ||
-        (exitStatus != QProcess::NormalExit) ) {
-    	onError( iProfile->name(),
-             	"Plugin process exited with error code " +
-                 QString::number(exitCode) + " and status " +
-                 QString::number(exitStatus),
-             	Sync::SYNC_PLUGIN_ERROR );
-    }
-}
-
 void ClientPluginRunner::pluginTimeout()
 {
     FUNCTION_CALL_TRACE;
