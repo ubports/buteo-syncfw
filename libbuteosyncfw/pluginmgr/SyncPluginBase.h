@@ -155,10 +155,6 @@ signals:
 	 */
 	void syncProgressDetail( const QString &aProfileName, int aProgressDetail);
 
-    void processError( QProcess::ProcessError error );
-
-    void processFinished( int exitCode, QProcess::ExitStatus exitStatus );
-
 public slots:
 
 	/*! \brief Slot that is invoked by sync framework when changes occur in

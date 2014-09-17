@@ -28,6 +28,8 @@
 namespace Buteo {
 class OOPServerPlugin : public ServerPlugin
 {
+    Q_OBJECT
+
 public:
     OOPServerPlugin( const QString& aPluginName,
                      const Profile& aProfile,
@@ -54,6 +56,16 @@ public slots:
 
     virtual void connectivityStateChanged( Sync::ConnectivityType aType,
                                            bool aState );
+    void onProcessError(QProcess::ProcessError error);
+
+    void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+
+    void onError(QString aProfileName, QString aMessage, int aErrorCode);
+
+    void onSuccess(QString aProfileName, QString aMessage);
+
+private:
+    bool iDone;
 };
 
 }
