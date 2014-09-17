@@ -611,9 +611,8 @@ QProcess* PluginManager::startOOPPlugin( const QString &aPath,
                                     const QString& aProfileName)
 {
     FUNCTION_CALL_TRACE;
-    iDllLock.lockForWrite();
 
-    LOG_DEBUG( "Startingr oop plugin " << aProfileName);
+    LOG_DEBUG( "Starting oop plugin " << aProfileName);
 
     bool started = false;
     QStringList args;
@@ -638,41 +637,67 @@ QProcess* PluginManager::startOOPPlugin( const QString &aPath,
         info.iHandle = (void*)process;
         info.iRefCount = 1;
 
+        iDllLock.lockForWrite();
         iLoadedDlls.append( info );
+        iDllLock.unlock();
+
         LOG_DEBUG( "Process " << process->program() << " started with pid " << process->pid() );
+        connect(process, SIGNAL(finished(int,QProcess::ExitStatus)),
+                this, SLOT(onProcessFinished(int,QProcess::ExitStatus)));
+        return process;
 
     } else {
         LOG_CRITICAL( "Unable to start process plugin " << aPath <<
                       ". Error " << process->error());
+        delete process;
         return NULL;
     }
-
-    iDllLock.unlock();
-    return process;
 }
 
 void PluginManager::stopOOPPlugin( const QString &aPath )
 {
     FUNCTION_CALL_TRACE;
 
+    QProcess *process = NULL;
+
     iDllLock.lockForWrite();
 
     for( int i = 0; i < iLoadedDlls.size(); ++i ) {
         if( iLoadedDlls[i].iPath == aPath ) {
-            --iLoadedDlls[i].iRefCount;
-
-            // Stop the process using the handle
-            QProcess *process = (QProcess*)iLoadedDlls[i].iHandle; 
-            process->terminate();
-            if (process->waitForFinished() == false)
-                process->kill();
-
-            if( iLoadedDlls[i].iRefCount == 0 )
-                iLoadedDlls.removeAt( i );
-
+            process = (QProcess*)iLoadedDlls[i].iHandle;
             break;
         }
     }
 
     iDllLock.unlock();
+
+    // We must terminate the process outside of the locked section because
+    // onProcessFinished handler below will want to acquire the same lock.
+    // It will also schedule the deletion of the QProcess object.
+    if (process) {
+        process->terminate();
+        if (process->waitForFinished() == false)
+            process->kill();
+    }
+}
+
+void PluginManager::onProcessFinished( int exitCode, QProcess::ExitStatus )
+{
+    FUNCTION_CALL_TRACE;
+
+    QProcess* process = (QProcess*)sender();
+    LOG_DEBUG( "Process " << process->program() << " finished with exit code" << exitCode );
+
+    iDllLock.lockForWrite();
+
+    for( int i = 0; i < iLoadedDlls.size(); ++i ) {
+        if( iLoadedDlls[i].iHandle == (void*)process ) {
+            iLoadedDlls.removeAt( i );
+            break;
+        }
+    }
+
+    iDllLock.unlock();
+
+    process->deleteLater();
 }
