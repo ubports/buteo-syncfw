@@ -340,6 +340,7 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
         LOG_DEBUG( "Stopping the OOP process for " << pluginName);
         QString path = iOopClientMaps.value( pluginName );
         stopOOPPlugin( path );
+        delete aPlugin;
     }
 }
 
@@ -454,6 +455,7 @@ void PluginManager::destroyServer( ServerPlugin *aPlugin )
         // Stop the OOP server process
         QString path = iOoPServerMaps.value( pluginName );
         stopOOPPlugin( path );
+        delete aPlugin;
     }
 }
 

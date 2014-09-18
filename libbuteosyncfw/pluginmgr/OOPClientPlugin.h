@@ -29,6 +29,8 @@ namespace Buteo {
 
 class OOPClientPlugin : public ClientPlugin
 {
+    Q_OBJECT
+
 public:
     OOPClientPlugin( const QString& aPluginName,
                      const Buteo::SyncProfile& aProfile,
@@ -53,6 +55,17 @@ public slots:
 
     virtual void connectivityStateChanged(Sync::ConnectivityType aType,
                                           bool aState);
+
+    void onProcessError(QProcess::ProcessError error);
+
+    void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+
+    void onError(QString aProfileName, QString aMessage, int aErrorCode);
+
+    void onSuccess(QString aProfileName, QString aMessage);
+
+private:
+    bool iDone;
 };
 
 }
