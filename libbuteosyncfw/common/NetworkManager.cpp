@@ -69,18 +69,11 @@ NetworkManager::~NetworkManager()
 bool NetworkManager::isOnline()
 {
     FUNCTION_CALL_TRACE;
-#ifndef __ARMEL__
-    return true;
-#endif
     return m_isOnline;
 }
 
 void NetworkManager::connectSession(bool connectInBackground /* = false*/)
 {
-#ifndef __ARMEL__
-    emit connectionSuccess();
-    return;
-#endif
     FUNCTION_CALL_TRACE;
     if(m_isSessionActive)
     {
@@ -125,9 +118,6 @@ void NetworkManager::sessionConnectionTimeout()
 
 void NetworkManager::disconnectSession()
 {
-#ifndef __ARMEL__
-    return;
-#endif
     FUNCTION_CALL_TRACE;
     if(m_refCount > 0)
     {
@@ -146,9 +136,6 @@ void NetworkManager::disconnectSession()
 
 void NetworkManager::slotOnlineStateChanged(bool isOnline)
 {
-#ifndef __ARMEL__
-    return;
-#endif
     FUNCTION_CALL_TRACE;
     LOG_DEBUG("Online status changed, is online is now::" << isOnline);
     if(m_isOnline != isOnline)
@@ -162,9 +149,6 @@ void NetworkManager::slotOnlineStateChanged(bool isOnline)
 
 void NetworkManager::slotSessionState(QNetworkSession::State status)
 {
-#ifndef __ARMEL__
-    return;
-#endif
     FUNCTION_CALL_TRACE;
     switch(status)
     {
@@ -215,9 +199,6 @@ void NetworkManager::slotSessionState(QNetworkSession::State status)
 
 void NetworkManager::slotSessionError(QNetworkSession::SessionError error)
 {
-#ifndef __ARMEL__
-    return;
-#endif
     FUNCTION_CALL_TRACE;
 
     // Emit network errors only once per request
