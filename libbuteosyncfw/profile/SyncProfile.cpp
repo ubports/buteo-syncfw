@@ -687,7 +687,7 @@ SyncProfile::CurrentSyncStatus SyncProfile::currentSyncStatus() const
 {
     //Fetch the last sync result
     const SyncResults *syncResult = lastResults();
-    SyncProfile::CurrentSyncStatus syncStatus;
+    SyncProfile::CurrentSyncStatus syncStatus = SyncProfile::SYNC_NEVER_HAPPENED;
 
     if (syncResult)
     {
@@ -698,8 +698,7 @@ SyncProfile::CurrentSyncStatus SyncProfile::currentSyncStatus() const
             syncStatus = SyncProfile::SYNC_FAILED;
         else if (syncResult->majorCode() == SyncResults::SYNC_RESULT_CANCELLED)
             syncStatus = SyncProfile::SYNC_CANCLLED;
-    } else
-        syncStatus = SyncProfile::SYNC_NEVER_HAPPENED;
+    }
 
     return syncStatus;
 }
