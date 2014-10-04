@@ -20,6 +20,9 @@
  * 02110-1301 USA
  *
  */
+
+#include <unistd.h>
+
 #include "SyncClientInterfaceTest.h"
 #include "synchronizer.h"
 #include "Profile.h"
