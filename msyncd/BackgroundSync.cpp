@@ -97,6 +97,7 @@ bool BackgroundSync::set(const QString &aProfName, int seconds)
             BackgroundActivity::Frequency frequency = frequencyFromSeconds(seconds);
 
             if (newAct.frequency != frequency) {
+                newAct.backgroundActivity->stop();
                 newAct.frequency = frequency;
                 newAct.backgroundActivity->setWakeupFrequency(newAct.frequency);
                 newAct.backgroundActivity->wait();
