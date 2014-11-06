@@ -134,8 +134,9 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
     if(0 != changedAccount)
     {
         LOG_DEBUG("Received account enabled changed signal" << serviceName << enabled << changedAccount->displayName());
-        if(serviceName == ACCOUNTS_GLOBAL_SERVICE)
+        if(serviceName == ACCOUNTS_GLOBAL_SERVICE || serviceName.isEmpty())
         {
+            LOG_DEBUG("Entire account state changed to " << enabled << changedAccount->displayName());
             // Entire account disabled/enabled
             QList<SyncProfile*> profiles = getProfilesByAccountId(changedAccount->id());
             foreach(SyncProfile *profile, profiles)
@@ -167,6 +168,7 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
                         // Unconditionally, set the profile as disabled
                         profile->setEnabled(enabled);
                         iProfileManager.updateProfile(*profile);
+                        emit removeScheduledSync(profile->name());
                     }
                 }
                 delete profile;
@@ -174,6 +176,12 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
         }
         else
         {
+            // If the account is in disabled state that will take precedence over the changed value
+            // since those signals can come later
+            if (!changedAccount->enabled()) {
+                LOG_DEBUG("Account in disabled state, profile will be also set as disabled " << changedAccount->displayName());
+                enabled = false;
+            }
             // A service in the account is enabled/disabled
             QList<SyncProfile*> profiles = getProfilesByAccountId(changedAccount->id());
             foreach(SyncProfile *profile, profiles)
@@ -186,7 +194,11 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
                     if (profile->isEnabled() != enabled) {
                         profile->setEnabled(enabled);
                         iProfileManager.updateProfile(*profile);
-                        emit scheduleUpdated(profile->name());
+                        if (enabled) {
+                            emit scheduleUpdated(profile->name());
+                        } else {
+                            emit removeScheduledSync(profile->name());
+                        }
                     }
                 }
                 delete profile;

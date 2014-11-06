@@ -141,6 +141,9 @@ bool Synchronizer::initialize()
     connect(iAccounts, SIGNAL(removeProfile(QString)),
             this, SLOT(removeProfile(QString)),
             Qt::QueuedConnection);
+    connect(iAccounts, SIGNAL(removeScheduledSync(QString)),
+            this, SLOT(removeScheduledSync(QString)),
+            Qt::QueuedConnection);
     connect(this, SIGNAL(storageReleased()),
             this, SLOT(onStorageReleased()), Qt::QueuedConnection);
 
@@ -1559,6 +1562,22 @@ void Synchronizer::slotSyncStatus(QString aProfileName, int aStatus, QString /*a
             }
         }
         delete profile;
+    }
+}
+
+void Synchronizer::removeScheduledSync(const QString &aProfileName)
+{
+    FUNCTION_CALL_TRACE;
+
+    if (iSyncScheduler == 0)
+        return;
+
+    SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+
+    if(profile && !profile->isEnabled())
+    {
+        LOG_DEBUG("Sync got disabled for" << aProfileName);
+        iSyncScheduler->removeProfile(aProfileName);
     }
 }
 
