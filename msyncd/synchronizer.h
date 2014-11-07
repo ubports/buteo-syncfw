@@ -287,6 +287,13 @@ private slots:
      */
     void slotSyncStatus(QString aProfileName, int aStatus,
                         QString aMessage, int aMoreDetails);
+
+    /*! \brief Handles the removed scheduled sync signal
+     *
+     * @param aProfileName Name of the profile
+     */
+    void removeScheduledSync(const QString &aProfileName);
+
 private:
 
     bool startSync(const QString &aProfileName, bool aScheduled);
