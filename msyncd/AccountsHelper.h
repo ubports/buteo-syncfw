@@ -100,6 +100,7 @@ Q_SIGNALS:
     void enableSOC(const QString& aProfileName);
     void scheduleUpdated(const QString& aProfileName);
     void removeProfile(QString profileId);
+    void removeScheduledSync(const QString& profileId);
 
 private:
 
