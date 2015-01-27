@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -165,6 +166,17 @@ signals:
      * \see SyncCommonDefs::ConnectivityType for arguments
      */
     bool isConnectivityAvailable(int connectivityType);
+
+    /*! \brief Notifies sync externally status for an account and client profile.
+     *
+     * This signal is sent when the sync externally status of a particular
+     * account changes or a client queries for the state via 'isSyncedExternally'
+     *
+     * \param aAccountId The account IDs that changed state/was queried the state
+     * \param aClientProfileName The name of the client profile resposible for the sync.
+     * \param aState The current status of sync externally(on/off).
+     */
+    void syncedExternallyStatus(uint aAccountId, const QString &aClientProfileName, bool aState);
 
 public slots:
 
@@ -351,6 +363,16 @@ public slots:
      * 1 = Last sync succeeded, 2 = last sync failed
      */
     virtual int status(unsigned int aAccountId, int &aFailedReason, qlonglong &aPrevSyncTime, qlonglong &aNextSyncTime) = 0;
+
+    /*! \brief Queries the sync externally status of a given account,
+     * 'syncedExternallyStatus' signal is emitted with the reply is ready, clients should listen
+     * to the later.
+     *
+     * \param aAccountId The account ID.
+     * \param aClientProfileName The name of the client profile resposible for the sync, this is used to distinguish accounts
+     *  having several services enabled
+     */
+    virtual Q_NOREPLY void isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName) = 0;
 };
 
 }

@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -218,9 +219,25 @@ void SyncProfile::setName(const QStringList &aKeys)
     d_ptr->iLog->setProfileName(Profile::name());
 }
 
+bool SyncProfile::syncExternallyEnabled() const
+{
+    return boolKey(KEY_SYNC_EXTERNALLY, false);
+}
+
 bool SyncProfile::rushEnabled() const
 {
     return d_ptr->iSchedule.rushEnabled() && d_ptr->iSchedule.scheduleEnabled();
+}
+
+bool SyncProfile::syncExternallyDuringRush() const
+{
+    return d_ptr->iSchedule.scheduleEnabled() && d_ptr->iSchedule.rushEnabled()
+            && d_ptr->iSchedule.syncExternallyDuringRush();
+}
+
+bool SyncProfile::inExternalSyncRushPeriod(QDateTime aDateTime) const
+{
+    return d_ptr->iSchedule.inExternalSyncRushPeriod(aDateTime);
 }
 
 QDateTime SyncProfile::lastSyncTime() const
@@ -318,7 +335,7 @@ void SyncProfile::addResults(const SyncResults &aResults)
 SyncProfile::SyncType SyncProfile::syncType() const
 {
     // Sync schedule is enabled for peak or manual -> it is scheduled type.
-    return (d_ptr->iSchedule.scheduleEnabled() || d_ptr->iSchedule.rushEnabled()) ? SYNC_SCHEDULED : SYNC_MANUAL;;
+    return !syncExternallyEnabled() && (d_ptr->iSchedule.scheduleEnabled() || d_ptr->iSchedule.rushEnabled()) ? SYNC_SCHEDULED : SYNC_MANUAL;
 }
 
 // TODO: seems effectless since d6d974e (Added functions to enable/disable normal scheduling.)
