@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -210,6 +211,16 @@ public slots:
      */
     int status(unsigned int aAccountId, int &aFailedReason, qlonglong &aPrevSyncTime, qlonglong &aNextSyncTime);
 
+    /*! \brief Queries the sync externally status of a given account,
+     * 'syncedExternallyStatus' signal is emitted with the reply is ready, clients should listen
+     * to the later.
+     *
+     * \param aAccountId The account ID.
+     * \param aClientProfileName The name of the client profile resposible for the sync, this is used to distinguish accounts
+     *  having several services enabled.
+     */
+    void isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName);
+
 signals:
 
         //! emitted by releaseStorages call
@@ -358,7 +369,25 @@ private:
 
     bool clientProfileActive(const QString &clientProfileName);
 
+    /*! \brief Checks the status of external sync for a given profile, when the status
+     * changes(or aQuery param is set to true) or the profile is added for the first time 'syncedExternallyStatus' dbus signal
+     * will be emitted to notify possible clients.
+     *
+     * @param aProfile the profile that the state will be checked
+     * @param aQuery When true 'syncedExternallyStatus' dbus signal will be emitted even if the state did not change.
+     */
+    void externalSyncStatus(const SyncProfile *aProfile, bool aQuery=false);
+
+    /*! \brief Removes the external sync status for a given profile, if status changes
+     * 'syncedExternallyStatus' dbus signal will be emitted to notify possible clients.
+     *
+     * @param aProfile the profile that the status should be removed.
+     */
+    void removeExternalSyncStatus(const SyncProfile *aProfile);
+
     QMap<QString, SyncSession*> iActiveSessions;
+
+    QMap<int, bool> iExternalSyncProfileStatus;
 
     QList<QString> iProfilesToRemove;
 

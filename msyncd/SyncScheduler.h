@@ -140,7 +140,6 @@ private: // functions
      */
     int setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSyncTime = QDateTime());
     
-    
     /**
      * \brief Creates a DBUS adaptor for the scheduler
      */

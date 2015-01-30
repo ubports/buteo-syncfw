@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -74,6 +75,11 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"i\" name=\"aFailedReason\"/>\n"
 "      <arg direction=\"out\" type=\"x\" name=\"aPrevSyncTime\"/>\n"
 "      <arg direction=\"out\" type=\"x\" name=\"aNextSyncTime\"/>\n"
+"    </signal>\n"
+"    <signal name=\"syncedExternallyStatus\">\n"
+"      <arg direction=\"out\" type=\"u\" name=\"AccountId\"/>\n"
+"      <arg direction=\"out\" type=\"s\" name=\"aClientProfileName\"/>\n"
+"      <arg direction=\"out\" type=\"b\" name=\"aState\"/>\n"
 "    </signal>\n"
 "    <method name=\"startSync\">\n"
 "      <arg direction=\"out\" type=\"b\"/>\n"
@@ -158,6 +164,11 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"x\" name=\"aPrevSyncTime\"/>\n"
 "      <arg direction=\"out\" type=\"x\" name=\"aNextSyncTime\"/>\n"
 "    </method>\n"
+"    <method name=\"isSyncedExternally\">\n"
+"      <arg direction=\"in\" type=\"u\" name=\"aAccountId\"/>\n"
+"      <arg direction=\"in\" type=\"s\" name=\"aClientProfileName\"/>\n"
+"      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
+"    </method>\n"
 "  </interface>\n"
         "")
 public:
@@ -186,6 +197,7 @@ public Q_SLOTS: // METHODS
     QStringList syncProfilesByType(const QString &aType);
     QList<uint> syncingAccounts();
     bool updateProfile(const QString &aProfileAsXml);
+    Q_NOREPLY void isSyncedExternally(uint aAccountId, const QString aClientProfileName);
 Q_SIGNALS: // SIGNALS
     void backupDone();
     void backupInProgress();
@@ -196,6 +208,7 @@ Q_SIGNALS: // SIGNALS
     void statusChanged(uint aAccountId, int aNewStatus, int aFailedReason, qlonglong aPrevSyncTime, qlonglong aNextSyncTime);
     void syncStatus(const QString &aProfileName, int aStatus, const QString &aMessage, int aMoreDetails);
     void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType, int aCommittedItems);
+    void syncedExternallyStatus(uint aAccountId, const QString &aClientProfileName, bool aState);
 };
 
 #endif

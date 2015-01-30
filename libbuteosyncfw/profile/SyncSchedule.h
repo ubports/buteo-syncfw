@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014 Jolla Ltd
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -38,10 +38,8 @@ class SyncScheduleTest;
 typedef QSet<int> DaySet;
 
 const QString SYNC_SCHEDULE_ENABLED_KEY_BOOL("scheduler/schedule_enabled");
-const QString SYNC_EXTERNAL_SCHEDULE_ENABLED_KEY_BOOL("scheduler/external_schedule_enabled");
 const QString SYNC_SCHEDULE_PEAK_ENABLED_KEY_BOOL("scheduler/schedule_peak_enabled");
 const QString SYNC_SCHEDULE_OFFPEAK_ENABLED_KEY_BOOL("scheduler/schedule_offpeak_enabled");
-const QString SYNC_SCHEDULE_EXTERNAL_PEAK_ENABLED_KEY_BOOL("scheduler/schedule_external_peak_enabled");
 const QString SYNC_SCHEDULE_PEAK_DAYS_KEY_INT ("scheduler/schedule_peak_days");
 const QString SYNC_SCHEDULE_PEAK_START_TIME_KEY_INT ("scheduler/schedule_peak_start_time");
 const QString SYNC_SCHEDULE_PEAK_END_TIME_KEY_INT ("scheduler/schedule_peak_end_time");
@@ -165,20 +163,6 @@ public:
      */
     void setScheduleEnabled(bool aEnabled);
 
-    /*! \brief Checks if schedule is controlled by a external process (e.g always-up-to-date).
-     *
-     * \return True if schedule is controlled by a external process. External process will control the sync,
-     * buteo schedule is disabled in this case.
-     */
-    bool externalScheduleEnabled() const;
-
-    /*! \brief Sets if schedule is controlled by a external process.
-     *
-     * \param aEnabled Specify if schedule is contolled by a external process. If set to true, buteo schedule will be set to disabled.
-     */
-    void setExternalScheduleEnabled(bool aEnabled);
-
-
     // ============== RUSH HOUR SETTINGS ============================
 
 
@@ -194,20 +178,19 @@ public:
      */
     void setRushEnabled(bool aEnabled);
 
-    /*! \brief Checks if external rush schedule is to be obeyed.
+    /*! \brief Checks if rush schedule is controlled by a external process.
      *
-     * \return True if rush hour schedule is to be used by a external process, The external process will control the sync, buteo will just call
-     * the corresponding plugins when a switch from rush to offRush or vice-versa is necessary, corresponding plugins should be prepared to do any needed
-     * changes.
+     * \return True if rush hour schedule is to be used by a external process, The external process will control the sync, buteo will just
+     * controll the schedule outside rush hours and will be responsible to switch from rush to no-rush(and vice-versa) modes.
      * False, if rush hour scheduling is controlled by this process or if rush hour scheduling is off (i.e. manual mode).
      */
-    bool externalRushEnabled() const;
+    bool syncExternallyDuringRush() const;
 
-    /*! \brief Sets external rush schedule is to be obeyed.
+    /*! \brief Sets if rush schedule is controlled by a external process.
      *
      * \param aEnabled If set to true, corresponds to external rush hour scheduling on, i.e. sync controlled by a external process.
      */
-    void setExternalRushEnabled(bool aEnabled);
+    void setSyncExternallyDuringRush(bool aEnabled);
 
     /*! \brief Gets days enabled for rush hours.
      *
@@ -251,6 +234,12 @@ public:
      * \param aInterval Interval.
      */
     void setRushInterval(unsigned aInterval);
+
+    /*! \brief Checks if a given time is inside rush hour and if the sync is controlled by a external process.
+     *
+     * \param aDateTime DateTime to check.
+     */
+    bool inExternalSyncRushPeriod(const QDateTime &aDateTime) const;
 
     /*! \brief Gets next sync time based on the sync schedule settings.
      *

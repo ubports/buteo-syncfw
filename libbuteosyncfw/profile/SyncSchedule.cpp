@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014 Jolla Ltd
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -43,7 +43,6 @@ SyncSchedulePrivate::SyncSchedulePrivate(const SyncSchedulePrivate &aSource)
     iScheduleConfiguredTime(aSource.iScheduleConfiguredTime),
     iInterval(aSource.iInterval),
     iEnabled(aSource.iEnabled),
-    iExternalEnabled(aSource.iExternalEnabled),
     iRushDays(aSource.iRushDays),
     iRushBegin(aSource.iRushBegin),
     iRushEnd(aSource.iRushEnd),
@@ -69,7 +68,6 @@ SyncSchedule::SyncSchedule(const QDomElement &aRoot)
     d_ptr->iTime = QTime::fromString(aRoot.attribute(ATTR_TIME), Qt::ISODate);
     d_ptr->iInterval = aRoot.attribute(ATTR_INTERVAL).toUInt();
     d_ptr->iEnabled = (aRoot.attribute(ATTR_ENABLED) == BOOLEAN_TRUE);
-    d_ptr->iExternalEnabled = (aRoot.attribute(ATTR_EXTERNAL_SYNC) == BOOLEAN_TRUE);
     d_ptr->iDays = d_ptr->parseDays(aRoot.attribute(ATTR_DAYS));
     d_ptr->iScheduleConfiguredTime = QDateTime::fromString(aRoot.attribute(ATTR_SYNC_CONFIGURE),Qt::ISODate);
 
@@ -124,8 +122,6 @@ bool SyncSchedule::operator==(const SyncSchedule &aRhs)
         return false;	    
     else if (d_ptr->iEnabled  != aRhs.d_ptr->iEnabled)
         return false;
-    else if (d_ptr->iExternalEnabled  != aRhs.d_ptr->iExternalEnabled)
-        return false;
     else if (d_ptr->iRushEnabled  != aRhs.d_ptr->iRushEnabled) 
         return false;
     else if (d_ptr->iExternalRushEnabled  != aRhs.d_ptr->iExternalRushEnabled)
@@ -138,8 +134,6 @@ QDomElement SyncSchedule::toXml(QDomDocument &aDoc) const
 {
     QDomElement root = aDoc.createElement(TAG_SCHEDULE);
     root.setAttribute(ATTR_ENABLED, d_ptr->iEnabled ? BOOLEAN_TRUE :
-        BOOLEAN_FALSE);
-    root.setAttribute(ATTR_EXTERNAL_SYNC, d_ptr->iExternalEnabled ? BOOLEAN_TRUE :
         BOOLEAN_FALSE);
     root.setAttribute(ATTR_TIME, d_ptr->iTime.toString(Qt::ISODate));
     root.setAttribute(ATTR_INTERVAL, QString::number(d_ptr->iInterval));
@@ -221,22 +215,6 @@ bool SyncSchedule::scheduleEnabled() const
 void SyncSchedule::setScheduleEnabled(bool aEnabled)
 {
     d_ptr->iEnabled = aEnabled;
-    if (aEnabled) {
-        d_ptr->iExternalEnabled = false;
-    }
-}
-
-bool SyncSchedule::externalScheduleEnabled() const
-{
-    return d_ptr->iExternalEnabled;
-}
-
-void SyncSchedule::setExternalScheduleEnabled(bool aEnabled)
-{
-    d_ptr->iExternalEnabled = aEnabled;
-    if (aEnabled) {
-        d_ptr->iEnabled = false;
-    }
 }
 
 bool SyncSchedule::rushEnabled() const
@@ -249,12 +227,12 @@ void SyncSchedule::setRushEnabled(bool aEnabled)
     d_ptr->iRushEnabled = aEnabled;
 }
 
-bool SyncSchedule::externalRushEnabled() const
+bool SyncSchedule::syncExternallyDuringRush() const
 {
     return d_ptr->iExternalRushEnabled;
 }
 
-void SyncSchedule::setExternalRushEnabled(bool aEnabled)
+void SyncSchedule::setSyncExternallyDuringRush(bool aEnabled)
 {
     d_ptr->iExternalRushEnabled = aEnabled;
 }
@@ -293,6 +271,16 @@ unsigned SyncSchedule::rushInterval() const
 void SyncSchedule::setRushInterval(unsigned aInterval)
 {
     d_ptr->iRushInterval = aInterval;
+}
+
+bool SyncSchedule::inExternalSyncRushPeriod(const QDateTime &aDateTime) const
+{
+    if (d_ptr->iEnabled && d_ptr->iRushEnabled && d_ptr->iExternalRushEnabled) {
+        if (d_ptr->isRush(aDateTime)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const                                 
@@ -355,41 +343,13 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
 
     LOG_DEBUG("next non rush hour sync is at:: " << nextSync);
 
-    // Rush is controlled by a external process, buteo controls the switch from rush to offRush
-    // so, this will trigger an "extra", Buteo-controlled sync, to ensure that the profile switches from rush to non-rush mode.
+    // Rush is controlled by a external process(e.g always-up-to-date), buteo controls the switch from rush to offRush
     if (d_ptr->iRushEnabled && d_ptr->iExternalRushEnabled)
     {
-        LOG_DEBUG("Calculating next sync time with rush settings.Rush Interval is controlled by a external process.");
-        // Calculate next sync time with rush settings.
-        QDateTime nextSyncRush;
-        bool nextSyncInOffRush = false;
-
-        if (d_ptr->isRush(now))
-        {
-            QDateTime rushStart;
-            QDateTime rushEnd;
-            rushStart.setTime(d_ptr->iRushBegin);
-            rushStart.setDate(now.date());
-            rushEnd.setTime(d_ptr->iRushEnd);
-            rushEnd.setDate(now.date());
-            // Check if the previous sync is valid and if occured inside rush already
-            // we just need to sync once inside rush period to make a switch if necessary.
-            if(aPrevSync.isValid() && aPrevSync > rushStart && aPrevSync < rushEnd)
-            {
-                nextSyncInOffRush = true;
-            }
-            else
-            {
-                // sync now to make a switch if necessary.
-                nextSyncRush = now.addSecs(30);
-            }
-        }
-        else
-        {
-            nextSyncInOffRush = true;
-        }
+        LOG_DEBUG("Rush Interval is controlled by a external process.");
         // Set next sync to rush end
-        if (nextSyncInOffRush) {
+        QDateTime nextSyncRush;
+        if (d_ptr->isRush(now)) {
             nextSyncRush.setTime(d_ptr->iRushEnd);
             nextSyncRush.setDate(now.date());
             if (now.time() > d_ptr->iRushEnd)
@@ -397,7 +357,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
                 nextSyncRush = nextSyncRush.addDays(1);
             }
             d_ptr->adjustDate(nextSyncRush, d_ptr->iRushDays);
-            LOG_DEBUG("Rush controlled by external process, next sync at rush end " << nextSyncRush.toString());
+            LOG_DEBUG("Rush controlled by external process, next scheduled sync at rush end " << nextSyncRush.toString());
         }
         LOG_DEBUG("nextSyncRush" << nextSyncRush.toString());
         // Use next sync time calculated with rush settings if necessary.
@@ -414,14 +374,13 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
                 // we should use the non-rush schedule.
                 LOG_DEBUG("Using non-rush time as the next sync time");
             } else {
-                LOG_DEBUG("Rush controlled by external process, sync now to activate switch " << nextSyncRush.toString());
                 nextSync = nextSyncRush;
             }
         }
     }
-    else if (d_ptr->iRushEnabled && d_ptr->iRushInterval > 0)
+    else if (d_ptr->iRushEnabled && d_ptr->iRushInterval > 0 && !d_ptr->iExternalRushEnabled)
     {
-    	LOG_DEBUG("Calculating next sync time with rush settings.Rush Interval is " << d_ptr->iRushInterval);
+        LOG_DEBUG("Calculating next sync time with rush settings. Rush Interval is " << d_ptr->iRushInterval);
         // Calculate next sync time with rush settings.
         QDateTime nextSyncRush;
         bool nextSyncRushInNextRushPeriod = false;

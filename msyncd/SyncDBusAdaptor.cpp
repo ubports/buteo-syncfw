@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -197,5 +198,11 @@ bool SyncDBusAdaptor::updateProfile(const QString &aProfileAsXml)
     bool out0;
     QMetaObject::invokeMethod(parent(), "updateProfile", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileAsXml));
     return out0;
+}
+
+void SyncDBusAdaptor::isSyncedExternally(uint aAccountId, const QString aClientProfileName)
+{
+    // handle method call com.meego.msyncd.isSyncedExternally
+    QMetaObject::invokeMethod(parent(), "isSyncedExternally", Q_ARG(uint, aAccountId), Q_ARG(QString, aClientProfileName));
 }
 
