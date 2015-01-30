@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -889,6 +890,9 @@ bool Synchronizer::cleanupProfile(const QString &aProfileId)
             iSyncScheduler->removeProfile(aProfileId);
         }
 
+        // Remove external sync status if it exist
+        removeExternalSyncStatus(profile);
+
         PluginRunner *pluginRunner;
         if (client) {
             pluginRunner = new ClientPluginRunner(subProfile->name(), profile, &iPluginManager, this, this);
@@ -1133,6 +1137,7 @@ void Synchronizer::initializeScheduler()
             {
                 iSyncScheduler->addProfile(profile);
             } // no else
+            externalSyncStatus(profile);
         }
         qDeleteAll(profiles);
     }
@@ -1516,12 +1521,12 @@ void Synchronizer::reschedule(const QString &aProfileName)
     {
         iSyncScheduler->addProfile(profile);
     } else {
-        LOG_DEBUG("Sync got disabled for" << aProfileName);
+        LOG_DEBUG("Scheduled sync got disabled for" << aProfileName);
         iSyncScheduler->removeProfile(aProfileName);
-
     }
     if(profile)
     {
+        externalSyncStatus(profile);
         LOG_DEBUG("Reschdule profile" << aProfileName << profile->syncType() << profile->isEnabled());
         delete profile;
         profile = NULL;
@@ -1579,6 +1584,8 @@ void Synchronizer::removeScheduledSync(const QString &aProfileName)
         LOG_DEBUG("Sync got disabled for" << aProfileName);
         iSyncScheduler->removeProfile(aProfileName);
     }
+    // Check if external sync status changed, profile might be turned to sync externally and thus buteo sync set to disable
+    externalSyncStatus(profile);
 }
 
 bool Synchronizer::isBackupRestoreInProgress ()
@@ -1984,3 +1991,88 @@ QString Synchronizer::getValue(const QString& aAddress, const QString& aKey)
     }
     return value;
 }
+
+void Synchronizer::externalSyncStatus(const SyncProfile* aProfile, bool aQuery)
+{
+    int accountId = aProfile->key(KEY_ACCOUNT_ID).toInt();
+    if (accountId) {
+        const QString &clientProfile = aProfile->clientProfile()->name();
+        // Account in set to sync externally, buteo will let external process handle the syncs in this case
+        if (aProfile->syncExternallyEnabled()) {
+            if (!iExternalSyncProfileStatus.value(accountId)) {
+                LOG_DEBUG("Sync externally status changed from false to true for account:" << accountId);
+                iExternalSyncProfileStatus.insert(accountId, true);
+                emit syncedExternallyStatus(accountId, clientProfile, true);
+            } else if (aQuery) {
+                LOG_DEBUG("Account is in set to sync externally:" << accountId);
+                emit syncedExternallyStatus(accountId, clientProfile, true);
+            }
+            // Account set to sync externally in rush mode
+        } else if (aProfile->syncExternallyDuringRush()) {
+            // Check if we are currently inside rush
+            bool isSyncExternally = aProfile->inExternalSyncRushPeriod();
+            if (iExternalSyncProfileStatus.contains(accountId)) {
+                LOG_DEBUG("We already have account id, lets check the status " << accountId);
+                bool prevSyncExtState = iExternalSyncProfileStatus.value(accountId);
+                if (prevSyncExtState != isSyncExternally) {
+                    iExternalSyncProfileStatus.insert(accountId, isSyncExternally);
+                    LOG_DEBUG("Sync externally status changed to " << isSyncExternally << "for account:" << accountId);
+                    emit syncedExternallyStatus(accountId, clientProfile, isSyncExternally);
+                } else if (aQuery){
+                    LOG_DEBUG("Sync externally status did not change, current state is: " << prevSyncExtState);
+                    emit syncedExternallyStatus(accountId, clientProfile, prevSyncExtState);
+                }
+            } else {
+                iExternalSyncProfileStatus.insert(accountId, isSyncExternally);
+                LOG_DEBUG("Inserting sync externally status:" << isSyncExternally << "for account:" << accountId);
+                emit syncedExternallyStatus(accountId, clientProfile, isSyncExternally);
+            }
+        } else {
+            if (iExternalSyncProfileStatus.contains(accountId)) {
+                iExternalSyncProfileStatus.remove(accountId);
+                emit syncedExternallyStatus(accountId, clientProfile, false);
+                LOG_DEBUG("Removing sync externally status for account:" << accountId);
+            } else if (aQuery) {
+                LOG_DEBUG("Sync externally is off for account:" << accountId);
+                emit syncedExternallyStatus(accountId, clientProfile, false);
+            }
+        }
+    }
+}
+
+void Synchronizer::removeExternalSyncStatus(const SyncProfile *aProfile)
+{
+    int accountId = aProfile->key(KEY_ACCOUNT_ID).toInt();
+    if (accountId) {
+        if (iExternalSyncProfileStatus.contains(accountId)) {
+            // if profile was set to sync externally emit the change state signal
+            if (iExternalSyncProfileStatus.value(accountId)) {
+                emit syncedExternallyStatus(accountId, aProfile->clientProfile()->name(),false);
+            }
+            iExternalSyncProfileStatus.remove(accountId);
+            LOG_DEBUG("Removing sync externally status for account: " << accountId);
+        }
+    }
+}
+
+void Synchronizer::isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName)
+{
+    LOG_DEBUG("Received isSyncedExternally request for account:" << aAccountId);
+    bool profileFound = false;
+    QList<SyncProfile*> syncProfiles = iAccounts->getProfilesByAccountId(aAccountId);
+    if (!syncProfiles.isEmpty()) {
+        foreach(SyncProfile *profile, syncProfiles) {
+            if (profile->clientProfile()->name() == aClientProfileName) {
+                externalSyncStatus(profile, true);
+                profileFound = true;
+                break;
+            }
+        }
+    }
+    if (!profileFound) {
+        LOG_DEBUG("We don't have a profile for account:" << aAccountId << "emitting sync external status false");
+        emit syncedExternallyStatus(aAccountId, QString(), false);
+    }
+    qDeleteAll(syncProfiles);
+}
+

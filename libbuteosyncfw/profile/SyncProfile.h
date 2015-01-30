@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -155,11 +156,33 @@ public:
     //! \see Profile::toXml
     virtual QDomElement toXml(QDomDocument &aDoc, bool aLocalOnly = true) const;
 
+    /*! \brief Checks if schedule is controlled by a external process (e.g always-up-to-date).
+     *
+     * \return True if schedule is controlled by a external process. External process will control the sync,
+     * buteo schedule is disabled in this case.
+     */
+    virtual bool syncExternallyEnabled() const;
+
     /*! \brief Checks if rush/off-rush schedule is enabled.
      *
      * \return True if rush/off-rush schedule is enabled. False, if rush/off-rush scheduling is off.
      */
     virtual bool rushEnabled() const;
+
+    /*! \brief Checks if external rush schedule is to be obeyed.
+     *
+     * \return True if rush hour schedule is to be used by a external process, The external process will control the sync, buteo will just call
+     * the corresponding plugins when a switch from rush to offRush or vice-versa is necessary, corresponding plugins should be prepared to do any needed
+     * changes.
+     * False, if rush hour scheduling is controlled by this process or if rush hour scheduling is off (i.e. manual mode).
+     */
+    virtual bool syncExternallyDuringRush() const;
+
+    /*! \brief Checks if a given time is inside rush hour and if the sync is controlled by a external process.
+     *
+     * \param aDateTime DateTime to check, current DateTime used by default.
+     */
+    virtual bool inExternalSyncRushPeriod(QDateTime aDateTime = QDateTime::currentDateTime()) const;
 
     /*! \brief Gets the time of last completed sync session with this profile.
      *
