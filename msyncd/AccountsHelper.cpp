@@ -100,7 +100,6 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
                 delete syncProfile;
             }
         }
-        delete newAccount;
     }
 }
 
@@ -265,7 +264,6 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
         syncSchedule.setRushDays(rdays);
         syncSchedule.setDays(days);
         syncProfile->setSyncSchedule (syncSchedule);
-        delete account;
     }
 }
 
@@ -413,7 +411,6 @@ void AccountsHelper::addSetting(Accounts::AccountId id, QString key, QVariant va
         if (!success) {
             LOG_WARNING("Could not save settings to Account : Reason = " << iAccountManager->lastError().message());
         }
-        delete account;
     }
 }
 

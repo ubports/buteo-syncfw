@@ -12,7 +12,7 @@ BuildRequires: pkgconfig(Qt5DBus)
 BuildRequires: pkgconfig(Qt5Sql)
 BuildRequires: pkgconfig(Qt5Test)
 BuildRequires: pkgconfig(dbus-1)
-BuildRequires: pkgconfig(accounts-qt5)
+BuildRequires: pkgconfig(accounts-qt5) >= 1.13
 BuildRequires: pkgconfig(libsignon-qt5)
 BuildRequires: pkgconfig(Qt5SystemInfo)
 BuildRequires: pkgconfig(libiphb)
