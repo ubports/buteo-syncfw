@@ -1992,48 +1992,53 @@ QString Synchronizer::getValue(const QString& aAddress, const QString& aKey)
     return value;
 }
 
+// Here we store profile names since they are unique, but can be anything, and we emit signals
+// containing the client profile name, since those are always associated with a
+// specific plugin, this way potential listeners of these signals can distinguish the signals
+// based on the accountId and client profile name.
 void Synchronizer::externalSyncStatus(const SyncProfile* aProfile, bool aQuery)
 {
     int accountId = aProfile->key(KEY_ACCOUNT_ID).toInt();
     if (accountId) {
+        const QString &profileName = aProfile->name();
         const QString &clientProfile = aProfile->clientProfile()->name();
         // Account in set to sync externally, buteo will let external process handle the syncs in this case
         if (aProfile->syncExternallyEnabled()) {
-            if (!iExternalSyncProfileStatus.value(accountId)) {
-                LOG_DEBUG("Sync externally status changed from false to true for account:" << accountId);
-                iExternalSyncProfileStatus.insert(accountId, true);
+            if (!iExternalSyncProfileStatus.value(profileName)) {
+                LOG_DEBUG("Sync externally status changed from false to true for profile:" << profileName);
+                iExternalSyncProfileStatus.insert(profileName, true);
                 emit syncedExternallyStatus(accountId, clientProfile, true);
             } else if (aQuery) {
-                LOG_DEBUG("Account is in set to sync externally:" << accountId);
+                LOG_DEBUG("Account is in set to sync externally for profile:" << profileName);
                 emit syncedExternallyStatus(accountId, clientProfile, true);
             }
             // Account set to sync externally in rush mode
         } else if (aProfile->syncExternallyDuringRush()) {
             // Check if we are currently inside rush
             bool isSyncExternally = aProfile->inExternalSyncRushPeriod();
-            if (iExternalSyncProfileStatus.contains(accountId)) {
-                LOG_DEBUG("We already have account id, lets check the status " << accountId);
-                bool prevSyncExtState = iExternalSyncProfileStatus.value(accountId);
+            if (iExternalSyncProfileStatus.contains(profileName)) {
+                LOG_DEBUG("We already have this profile, lets check the status for profile:" << profileName);
+                bool prevSyncExtState = iExternalSyncProfileStatus.value(profileName);
                 if (prevSyncExtState != isSyncExternally) {
-                    iExternalSyncProfileStatus.insert(accountId, isSyncExternally);
-                    LOG_DEBUG("Sync externally status changed to " << isSyncExternally << "for account:" << accountId);
+                    iExternalSyncProfileStatus.insert(profileName, isSyncExternally);
+                    LOG_DEBUG("Sync externally status changed to " << isSyncExternally << "for profile:" << profileName);
                     emit syncedExternallyStatus(accountId, clientProfile, isSyncExternally);
                 } else if (aQuery){
-                    LOG_DEBUG("Sync externally status did not change, current state is: " << prevSyncExtState);
+                    LOG_DEBUG("Sync externally status did not change, current state is: " << prevSyncExtState << "for profile:" << profileName);
                     emit syncedExternallyStatus(accountId, clientProfile, prevSyncExtState);
                 }
             } else {
-                iExternalSyncProfileStatus.insert(accountId, isSyncExternally);
-                LOG_DEBUG("Inserting sync externally status:" << isSyncExternally << "for account:" << accountId);
+                iExternalSyncProfileStatus.insert(profileName, isSyncExternally);
+                LOG_DEBUG("Inserting sync externally status:" << isSyncExternally << "for profile:" << profileName);
                 emit syncedExternallyStatus(accountId, clientProfile, isSyncExternally);
             }
         } else {
-            if (iExternalSyncProfileStatus.contains(accountId)) {
-                iExternalSyncProfileStatus.remove(accountId);
+            if (iExternalSyncProfileStatus.contains(profileName)) {
+                iExternalSyncProfileStatus.remove(profileName);
                 emit syncedExternallyStatus(accountId, clientProfile, false);
-                LOG_DEBUG("Removing sync externally status for account:" << accountId);
+                LOG_DEBUG("Removing sync externally status for profile:" << profileName);
             } else if (aQuery) {
-                LOG_DEBUG("Sync externally is off for account:" << accountId);
+                LOG_DEBUG("Sync externally is off for profile:" << profileName);
                 emit syncedExternallyStatus(accountId, clientProfile, false);
             }
         }
@@ -2044,13 +2049,14 @@ void Synchronizer::removeExternalSyncStatus(const SyncProfile *aProfile)
 {
     int accountId = aProfile->key(KEY_ACCOUNT_ID).toInt();
     if (accountId) {
-        if (iExternalSyncProfileStatus.contains(accountId)) {
+        const QString &profileName = aProfile->name();
+        if (iExternalSyncProfileStatus.contains(profileName)) {
             // if profile was set to sync externally emit the change state signal
-            if (iExternalSyncProfileStatus.value(accountId)) {
+            if (iExternalSyncProfileStatus.value(profileName)) {
                 emit syncedExternallyStatus(accountId, aProfile->clientProfile()->name(),false);
             }
-            iExternalSyncProfileStatus.remove(accountId);
-            LOG_DEBUG("Removing sync externally status for account: " << accountId);
+            iExternalSyncProfileStatus.remove(profileName);
+            LOG_DEBUG("Removing sync externally status for profile:" << profileName);
         }
     }
 }
