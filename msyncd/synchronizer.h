@@ -387,7 +387,7 @@ private:
 
     QMap<QString, SyncSession*> iActiveSessions;
 
-    QMap<int, bool> iExternalSyncProfileStatus;
+    QMap<QString, bool> iExternalSyncProfileStatus;
 
     QList<QString> iProfilesToRemove;
 
