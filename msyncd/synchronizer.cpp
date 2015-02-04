@@ -1136,8 +1136,12 @@ void Synchronizer::initializeScheduler()
             if (profile->syncType() == SyncProfile::SYNC_SCHEDULED)
             {
                 iSyncScheduler->addProfile(profile);
-            } // no else
-            externalSyncStatus(profile);
+            }
+            // Emit external sync status for all profiles
+            // on startup, in case of a crash/abort of this
+            // process, we should update pontential listeners with
+            // the correct status
+            externalSyncStatus(profile, true);
         }
         qDeleteAll(profiles);
     }
