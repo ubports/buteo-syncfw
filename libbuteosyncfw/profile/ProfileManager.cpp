@@ -804,9 +804,9 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
     return tProfile;
 }
 
-
 void ProfileManager::enableStorages(Profile &aProfile,
-                                    QMap<QString, bool> &aStorageMap)
+                                    QMap<QString, bool> &aStorageMap,
+                                    bool *aModified)
 {
     FUNCTION_CALL_TRACE;
 
@@ -815,16 +815,23 @@ void ProfileManager::enableStorages(Profile &aProfile,
     while (i.hasNext()) {
         i.next();
         Profile *profile = aProfile.subProfile(i.key(), Profile::TYPE_STORAGE);
-        if (profile)
-            profile->setEnabled(i.value());
-        else
+        if (profile) {
+            if (profile->isEnabled() != i.value()) {
+                profile->setEnabled(i.value());
+                if (aModified) {
+                    *aModified = true;
+                }
+            }
+        } else {
             LOG_WARNING("No storage profile by key :" << i.key());
+        }
     }
     return ;
 }
 
 void ProfileManager::setStoragesVisible(Profile &aProfile,
-                                        QMap<QString, bool> &aStorageMap)
+                                        QMap<QString, bool> &aStorageMap,
+                                        bool *aModified)
 {
     FUNCTION_CALL_TRACE;
 
@@ -836,7 +843,12 @@ void ProfileManager::setStoragesVisible(Profile &aProfile,
 
         if (profile) {
             // For setting the "hidden" value to correspond visiblity, invert the value from map.
-            profile->setBoolKey(Buteo::KEY_HIDDEN, !i.value());
+            if (profile->boolKey(Buteo::KEY_HIDDEN) == i.value()) {
+                profile->setBoolKey(Buteo::KEY_HIDDEN, !i.value());
+                if (aModified) {
+                    *aModified = true;
+                }
+            }
         } else {
             LOG_WARNING("No storage profile by key :" << i.key());
         }
@@ -1137,7 +1149,8 @@ QDomDocument ProfileManagerPrivate::constructProfileDocument(const Profile &aPro
 bool ProfileManagerPrivate::writeProfileFile(const QString &aProfilePath,
         const QDomDocument &aDoc)
 {
-    //FUNCTION_CALL_TRACE;
+    FUNCTION_CALL_TRACE;
+    LOG_WARNING("writeProfileFile() called, forcing disk write:" << aProfilePath);
 
     QFile file(aProfilePath);
     bool profileWritten = false;

@@ -624,19 +624,21 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
             {
             case Sync::SYNC_DONE:
             {
+                bool enabledUpdated = false, visibleUpdated = false;
                 QMap<QString,bool> storageMap = session->getStorageMap();
-                //session->setFailureResult(SyncResults::SYNC_RESULT_SUCCESS, Buteo::SyncResults::NO_ERROR);
                 SyncProfile *sessionProf = session->profile();
-                iProfileManager.enableStorages(*sessionProf, storageMap);
+                iProfileManager.enableStorages(*sessionProf, storageMap, &enabledUpdated);
 
                 // If caps have not been modified, i.e. fetched from the remote device yet, set
                 // enabled storages also visible. If caps have been modified, we must not touch visibility anymore
                 if (sessionProf->boolKey(KEY_CAPS_MODIFIED) == false)
                 {
-                    iProfileManager.setStoragesVisible(*sessionProf, storageMap);
+                    iProfileManager.setStoragesVisible(*sessionProf, storageMap, &visibleUpdated);
                 }
 
-                iProfileManager.updateProfile(*sessionProf);
+                if (enabledUpdated || visibleUpdated) {
+                    iProfileManager.updateProfile(*sessionProf);
+                }
                 iProfileManager.retriesDone(sessionProf->name());
                 break;
             }
