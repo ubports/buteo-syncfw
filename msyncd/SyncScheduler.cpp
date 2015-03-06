@@ -171,6 +171,9 @@ void SyncScheduler::rescheduleBackgroundActivity(const QString& aProfileName)
 
     SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
     if (profile) {
+        if (profile->syncExternallyEnabled() || profile->syncExternallyDuringRush()) {
+            emit externalSyncChanged(profile, false);
+        }
         setNextAlarm(profile);
     } else {
         LOG_WARNING("Invalid profile, can't reschedule switch timer for " << aProfileName);
