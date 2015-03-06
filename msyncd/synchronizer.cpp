@@ -1130,6 +1130,8 @@ void Synchronizer::initializeScheduler()
         iSyncScheduler = new SyncScheduler(this);
         connect(iSyncScheduler, SIGNAL(syncNow(QString)),
                 this, SLOT(startScheduledSync(QString)), Qt::QueuedConnection);
+        connect(iSyncScheduler, SIGNAL(externalSyncChanged(const SyncProfile*,bool)),
+                this, SLOT(externalSyncStatus(const SyncProfile*,bool)), Qt::QueuedConnection);
         QList<SyncProfile*> profiles = iProfileManager.allSyncProfiles();
         foreach (SyncProfile *profile, profiles)
         {
