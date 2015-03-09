@@ -305,6 +305,15 @@ private slots:
      */
     void removeScheduledSync(const QString &aProfileName);
 
+    /*! \brief Checks the status of external sync for a given profile, when the status
+     * changes(or aQuery param is set to true) or the profile is added for the first time 'syncedExternallyStatus' dbus signal
+     * will be emitted to notify possible clients.
+     *
+     * @param aProfile the profile that the state will be checked
+     * @param aQuery When true 'syncedExternallyStatus' dbus signal will be emitted even if the state did not change.
+     */
+    void externalSyncStatus(const SyncProfile *aProfile, bool aQuery=false);
+
 private:
 
     bool startSync(const QString &aProfileName, bool aScheduled);
@@ -368,15 +377,6 @@ private:
     bool cleanupProfile(const QString &profileId);
 
     bool clientProfileActive(const QString &clientProfileName);
-
-    /*! \brief Checks the status of external sync for a given profile, when the status
-     * changes(or aQuery param is set to true) or the profile is added for the first time 'syncedExternallyStatus' dbus signal
-     * will be emitted to notify possible clients.
-     *
-     * @param aProfile the profile that the state will be checked
-     * @param aQuery When true 'syncedExternallyStatus' dbus signal will be emitted even if the state did not change.
-     */
-    void externalSyncStatus(const SyncProfile *aProfile, bool aQuery=false);
 
     /*! \brief Removes the external sync status for a given profile, if status changes
      * 'syncedExternallyStatus' dbus signal will be emitted to notify possible clients.

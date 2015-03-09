@@ -129,6 +129,13 @@ signals:
      */
     void syncNow(QString aProfileName);
 
+    /*! \brief Signal emitted when a sync session should be launched based on
+     *   the sync schedule settings of the profile.
+     *
+     * \param aProfileName Name of the profile.
+     */
+    void externalSyncChanged(const SyncProfile* aProfile, bool aQuery=false);
+
 private: // functions
     
     /**
