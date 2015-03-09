@@ -1,7 +1,7 @@
 /*
 * This file is part of buteo-sync-plugins package
 *
-* Copyright (C) 2013 Jolla Ltd. and/or its subsidiary(-ies).
+* Copyright (C) 2013-2015 Jolla Ltd. and/or its subsidiary(-ies).
 *
 * Author: Sateesh Kavuri <sateesh.kavuri@gmail.com>
 *
@@ -67,6 +67,7 @@ int main( int argc, char** argv )
                               .arg(DBUS_SERVICE_NAME_PREFIX)
                               .arg(profileName);
 
+    int retn;
     LOG_DEBUG( "attempting to register dbus service:" << servicePath );
     QDBusConnection connection = QDBusConnection::sessionBus();
     if( connection.registerService( servicePath ) == true ) {
@@ -75,23 +76,21 @@ int main( int argc, char** argv )
                        << profileName << " registered at dbus "
                        << DBUS_SERVICE_NAME_PREFIX + profileName
                        << " and path " << DBUS_SERVICE_OBJ_PATH );
+            // TODO: Should any unix signals be handled?
+            retn = app.exec();
+            connection.unregisterObject(DBUS_SERVICE_OBJ_PATH);
         } else {
-            QByteArray errorMsg = QString(QLatin1String(
-                    "Unable to register dbus object for service: %1"))
-                    .arg(servicePath).toLocal8Bit();
-            qFatal( "%s", errorMsg.constData() );
+            LOG_WARNING("Unable to register dbus object for service"
+                        << servicePath << ", terminating.");
+            retn = -2;
         }
+        connection.unregisterService(servicePath);
     } else {
-        QByteArray errorMsg = QString(QLatin1String(
-                "Unable to register dbus service: %1"))
-                .arg(servicePath).toLocal8Bit();
-        qFatal( "%s", errorMsg.constData() );
+        LOG_WARNING("Unable to register dbus service"
+                    << servicePath << ", terminating.");
+        retn = -1;
     }
 
-    // TODO: Should any unix signals be handled?
-    int retn = app.exec();
-    connection.unregisterService(servicePath);
-    connection.unregisterObject(DBUS_SERVICE_OBJ_PATH);
     delete serviceObj;
     return retn;
 }
