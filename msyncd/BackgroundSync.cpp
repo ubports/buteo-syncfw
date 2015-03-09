@@ -243,6 +243,9 @@ bool BackgroundSync::setSwitch(const QString &aProfName, const QDateTime &aSwitc
     if(iScheduledSwitch.contains(aProfName) == true) {
         BActivitySwitchStruct &newSwitch = iScheduledSwitch[aProfName];
         if (newSwitch.nextSwitch != aSwitchTime) {
+            // If activity's state was already Waiting, the state doesn't change, nothing happens and
+            // the existing background activity keeps running until the previously set time expires, so we have to stop it.
+            newSwitch.backgroundActivity->stop();
             newSwitch.nextSwitch = aSwitchTime;
             newSwitch.backgroundActivity->wait(QDateTime::currentDateTime().secsTo(aSwitchTime));
             LOG_DEBUG("BackgroundSync::setSwitch(), Rescheduling for " << aProfName << " at " << aSwitchTime.toString());
