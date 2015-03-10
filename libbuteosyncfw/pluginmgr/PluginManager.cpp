@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2014-2015 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -27,6 +28,8 @@
 #include <QProcess>
 
 #include <dlfcn.h>
+#include <errno.h>
+#include <signal.h>
 
 #include "StoragePlugin.h"
 #include "ServerPlugin.h"
@@ -608,11 +611,39 @@ KLUDGE: Due to NB #169065, crashes are seen in QMetaType if we unload DLLs. Henc
 
 }
 
+bool PluginManager::killProcess( const QString& aPath )
+{
+    const QFileInfo pluginFile(aPath);
+    const QDir proc("/proc");
+    QStringList entries = proc.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach (QString entry, entries) {
+        int pid = entry.toInt();
+        if (pid) {
+            QString exe = QFile::symLinkTarget(proc.filePath(entry).append("/exe"));
+            if (!exe.isEmpty() && QFileInfo(exe) == pluginFile) {
+                if (kill(pid, SIGTERM) == 0) {
+                    LOG_DEBUG( "Process" << pid << "has been killed");
+                    return true;
+                } else {
+                    LOG_WARNING("Failed to kill" << aPath <<
+                                "[" << pid << "]" << strerror(errno));
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 QProcess* PluginManager::startOOPPlugin( const QString &aPath,
                                     const QString& aPluginName,
                                     const QString& aProfileName)
 {
     FUNCTION_CALL_TRACE;
+
+    if (killProcess(aPath)) {
+        LOG_INFO( "Killed runaway plugin" << aProfileName);
+    }
 
     LOG_DEBUG( "Starting oop plugin " << aProfileName);
 
