@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2014-2015 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -188,6 +189,8 @@ private:
     void* getDllHandle( const QString& aPath );
 
     void unloadDll( const QString& aPath );
+
+    static bool killProcess( const QString& aPath );
 
     QProcess* startOOPPlugin( const QString& aPath,
                               const QString& aPluginName,
