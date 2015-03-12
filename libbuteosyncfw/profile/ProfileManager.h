@@ -307,17 +307,20 @@ public:
      * \param aProfile Profile of the remote device
      * \param aStorageMap Map of storage names(hcalendar, hcontacts) and if sync
      * enabled value true/false
-     *
+     * \param aModified Whether the profile was updated as a result of this function call,
+     * and thus requires writing to disk
      */ 
-    void enableStorages (Profile &aProfile, QMap<QString , bool> &aStorageMap); 
+    void enableStorages (Profile &aProfile, QMap<QString , bool> &aStorageMap, bool *aModified = NULL);
    
      /*! \brief Sets storage subprofiles hidden status for the given profile
      *
      * \param aProfile Profile of the remote device
      * \param aStorageMap Map of storage names (hcalendar, hcontacts) and visibility status. With value \e true
      * the storage will be set visible (equals profile attribute hidden=false)
+     * \param aModified Whether the profile was updated as a result of this function call,
+     * and thus requires writing to disk
      */ 
-    void setStoragesVisible(Profile &aProfile, QMap<QString, bool> &aStorageMap);
+    void setStoragesVisible(Profile &aProfile, QMap<QString, bool> &aStorageMap, bool *aModified = NULL);
     
     /*! \brief Sets remote target in profile
      *
