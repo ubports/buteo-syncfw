@@ -11,3 +11,9 @@ chown privileged $storage_dir
 chgrp privileged $storage_dir
 chmod 770 $storage_dir
 
+sync_dir="/home/$DEVICEUSER/.cache/msyncd/sync"
+mkdir -p $sync_dir
+chown privileged $sync_dir
+chgrp privileged $sync_dir
+chmod 770 $sync_dir
+
