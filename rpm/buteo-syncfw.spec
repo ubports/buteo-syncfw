@@ -106,7 +106,7 @@ ln -s ../msyncd.service %{buildroot}%{_libdir}/systemd/user/user-session.target.
 /sbin/ldconfig
 if [ "$1" -ge 1 ]; then
     systemctl-user daemon-reload || true
-    systemctl-user restart msyncd.service || true
+    systemctl-user try-restart msyncd.service || true
 fi
 
 %postun

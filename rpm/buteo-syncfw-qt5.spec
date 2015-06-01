@@ -117,7 +117,7 @@ install -D -m 755 oneshot/msyncd-storage-perm %{buildroot}/%{_oneshotdir}
 
 if [ "$1" -ge 1 ]; then
     systemctl-user daemon-reload || true
-    systemctl-user restart msyncd.service || true
+    systemctl-user try-restart msyncd.service || true
 fi
 
 %postun
