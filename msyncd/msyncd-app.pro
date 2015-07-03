@@ -59,7 +59,9 @@ target.path = /usr/bin/
 loglevel.files = bin/set_sync_log_level
 loglevel.path = /etc/buteo/
 service.files = bin/msyncd.service
+upstart.files = bin/msyncd.conf
 service.path = /usr/lib/systemd/user/
+upstart.path = /usr/share/upstart/sessions/
 syncwidget.path = /etc/syncwidget/
 syncwidget.files = com.meego.msyncd
 gschemas.path = /usr/share/glib-2.0/schemas
@@ -68,7 +70,8 @@ INSTALLS += target \
     loglevel \
     syncwidget \
     service \
-    gschemas
+    gschemas \
+    upstart
 
 # #####################################################################
 # make coverage (debug)
