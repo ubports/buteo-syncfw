@@ -257,6 +257,8 @@ private slots:
 
     void onNewSession(const QString &aDestination);
 
+    void slotProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
+
     void slotNetworkSessionOpened();
 
     void slotNetworkSessionError();
