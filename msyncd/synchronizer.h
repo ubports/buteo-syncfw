@@ -259,10 +259,6 @@ private slots:
 
     void slotProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
 
-    void slotNetworkSessionOpened();
-
-    void slotNetworkSessionError();
-
     /*! \brief Starts a server plug-in
      *
      * @param aProfileName Server profile name

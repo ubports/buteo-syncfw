@@ -185,7 +185,7 @@ bool Synchronizer::initialize()
         else
         {
             QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(QString)),
-                             this, SLOT(startSync(QString)),
+                             this, SLOT(startScheduledSync(QString)),
                              Qt::QueuedConnection);
             iSOCEnabled = true;
         }
@@ -218,7 +218,7 @@ void Synchronizer::enableSOCSlot(const QString& aProfileName)
         else
         {
             QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(const QString&)),
-                             this, SLOT(startSync(const QString&)),
+                             this, SLOT(startScheduledSync(const QString&)),
                              Qt::QueuedConnection);
             iSOCEnabled = true;
             LOG_DEBUG("Sync on change enabled for profile" << aProfileName);
@@ -292,53 +292,16 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
     // All scheduled syncs are online syncs
     // Add this to the waiting online syncs and it will be started when we
     // receive a session connection status from the NetworkManager
-    bool sessionConnected = !iWaitingOnlineSyncs.isEmpty();
-    if(!iWaitingOnlineSyncs.contains(aProfileName))
+    if(iNetworkManager->isOnline())
     {
+        startSync(aProfileName, true);
+    }
+    else if (!iWaitingOnlineSyncs.contains(aProfileName))
+    {
+        LOG_DEBUG("Wait for internet connection:" << aProfileName);
         iWaitingOnlineSyncs.append(aProfileName);
     }
-    if(!sessionConnected)
-    {
-        QObject::connect(iNetworkManager, SIGNAL(connectionSuccess()), this,
-                    SLOT(slotNetworkSessionOpened()), Qt::QueuedConnection);
-        QObject::connect(iNetworkManager, SIGNAL(connectionError()), this,
-                    SLOT(slotNetworkSessionError()), Qt::QueuedConnection);
-        // Request for a network session
-        iNetworkManager->connectSession(true);
-    }
     return true;
-}
-
-void Synchronizer::slotNetworkSessionOpened()
-{
-    FUNCTION_CALL_TRACE;
-    QObject::disconnect(iNetworkManager, SIGNAL(connectionSuccess()), this,
-                SLOT(slotNetworkSessionOpened()));
-    QObject::disconnect(iNetworkManager, SIGNAL(connectionError()), this,
-                SLOT(slotNetworkSessionError()));
-    foreach(QString profileName, iWaitingOnlineSyncs)
-    {
-        startSync(profileName, true);
-    }
-    iWaitingOnlineSyncs.clear();
-}
-
-void Synchronizer::slotNetworkSessionError()
-{
-    FUNCTION_CALL_TRACE;
-    QObject::disconnect(iNetworkManager, SIGNAL(connectionSuccess()), this,
-                SLOT(slotNetworkSessionOpened()));
-    QObject::disconnect(iNetworkManager, SIGNAL(connectionError()), this,
-                SLOT(slotNetworkSessionError()));
-    // Cancel all open sessions
-    foreach(QString profileName, iWaitingOnlineSyncs)
-    {
-        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, SyncResults::CONNECTION_ERROR);
-        iProfileManager.saveSyncResults(profileName, syncResults);
-        reschedule(profileName);
-    }
-    iWaitingOnlineSyncs.clear();
-    iNetworkManager->disconnectSession();
 }
 
 bool Synchronizer::setSyncSchedule(QString aProfileId , QString aScheduleAsXml)
@@ -755,7 +718,7 @@ bool Synchronizer::startNextSync()
     }
 
     QString profileName = session->profileName();
-    LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName );
+    LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName << session->isScheduled());
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
     QBatteryInfo iDeviceInfo;
@@ -1916,7 +1879,19 @@ QStringList Synchronizer::syncProfilesByType(const QString &aType)
 void Synchronizer::onNetworkStateChanged(bool aState)
 {
     FUNCTION_CALL_TRACE;
-    if(!aState) {
+    if(aState)
+    {
+        LOG_DEBUG("Restart sync for profiles that need network");
+        foreach(QString profileName, iWaitingOnlineSyncs)
+        {
+            // start sync now, we do not need to call 'startScheduledSync' since that function
+            // only checks for internet connection
+            startSync(profileName, true);
+        }
+        iWaitingOnlineSyncs.clear();
+    }
+    else
+    {
         QList<QString> profiles = iActiveSessions.keys();
         foreach(QString profileId, profiles)
         {
@@ -1929,8 +1904,8 @@ void Synchronizer::onNetworkStateChanged(bool aState)
                 delete profile;
                 profile = NULL;
             }
-            else {
-
+            else
+            {
                 LOG_DEBUG("No profile found with aProfileId"<<profileId);
             }
         }
