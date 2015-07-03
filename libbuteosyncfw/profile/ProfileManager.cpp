@@ -129,7 +129,6 @@ ProfileManagerPrivate::ProfileManagerPrivate(const QString &aPrimaryPath,
 
 Profile *ProfileManagerPrivate::load(const QString &aName, const QString &aType)
 {
-
     QString profilePath = findProfileFile(aName, aType);
     QString backupProfilePath = profilePath + BACKUP_EXT;
 
@@ -739,6 +738,14 @@ QString ProfileManager::updateProfile(const Profile &aProfile)
     bool exists = d_ptr->profileExists(aProfile.name(),aProfile.type());
 
     QString profileId("");
+
+    // We need to save before emit the signalProfileChanged, if this is the first
+    // update the profile will only exists on disk after the save and any operation
+    // using this profile triggered by the signal will fail.
+    if(d_ptr->save(aProfile)) {
+        profileId = aProfile.name();
+    }
+
     // Profile did not exist, it was a new one. Add it and emit signal with "added" value:
     if (!exists) {
         emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_ADDED,aProfile.toString());
@@ -746,9 +753,6 @@ QString ProfileManager::updateProfile(const Profile &aProfile)
         emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_MODIFIED,aProfile.toString());
     }
 
-    if(d_ptr->save(aProfile)) {
-        profileId = aProfile.name();
-    }
     return profileId;
 }
 
@@ -1254,7 +1258,7 @@ QDateTime ProfileManager::getNextRetryInterval(const SyncProfile* aProfile)
        !iSyncRetriesInfo[aProfile->name()].isEmpty())
     {
        quint32 mins = iSyncRetriesInfo[aProfile->name()].takeFirst();
-       nextRetryInterval = QDateTime::currentDateTime().addSecs(mins * 60); 
+       nextRetryInterval = QDateTime::currentDateTime().addSecs(mins * 60);
        LOG_DEBUG("syncretries : retry for profile" << aProfile->name() << "in" << mins <<"minutes");
        LOG_DEBUG("syncretries :" << iSyncRetriesInfo[aProfile->name()].count() <<"attempts remain");
     }
