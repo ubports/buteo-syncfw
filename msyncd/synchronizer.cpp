@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
@@ -352,6 +352,12 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
 
     LOG_DEBUG( "Start sync requested for profile:" << aProfileName );
 
+    // This function can be called from a client app as manual sync:
+    // If we receive a manual sync to a profile that is peding to sync due a
+    // data change we can remove it from the iSyncOnChangeScheduler, to avoid a
+    // second sync.
+    iSyncOnChangeScheduler.removeProfile(aProfileName);
+
     if (iActiveSessions.contains(aProfileName))
     {
         LOG_DEBUG( "Sync already in progress" );
@@ -362,6 +368,14 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         LOG_DEBUG( "Sync request already in queue" );
         emit syncStatus(aProfileName, Sync::SYNC_QUEUED, "", 0);
         return true;
+    }
+    else if (!aScheduled && iWaitingOnlineSyncs.contains(aProfileName))
+    {
+        // Manual sync is allowed to happen in any kind of connection
+        // if sync is not scheduled remove it from iWaitingOnlineSyncs to avoid
+        // sync it twice later
+        iWaitingOnlineSyncs.removeOne(aProfileName);
+        LOG_DEBUG("Removing" << aProfileName << "from online waiting list.");
     }
 
     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
@@ -494,7 +508,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
         return false;
     }
 
-    LOG_DEBUG("Disable sync on change");
+    LOG_DEBUG("Disable sync on change:" << iSOCEnabled);
     //As sync is ongoing, disable sync on change for now, we can query later if
     //there are changes.
     if(iSOCEnabled)
