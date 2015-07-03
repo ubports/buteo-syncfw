@@ -26,6 +26,7 @@
 
 #include <QMetaType>
 #include <QDir>
+#include <QtNetwork/QNetworkConfiguration>
 
 namespace Sync {
 
@@ -81,6 +82,22 @@ enum ConnectivityType {
     CONNECTIVITY_USB,
     CONNECTIVITY_BT,
     CONNECTIVITY_INTERNET
+};
+
+enum InternetConnectionType {
+    INTERNET_CONNECTION_UNKNOWN = QNetworkConfiguration::BearerUnknown,
+    INTERNET_CONNECTION_ETHERNET = QNetworkConfiguration::BearerEthernet,
+    INTERNET_CONNECTION_WLAN = QNetworkConfiguration::BearerWLAN,
+    INTERNET_CONNECTION_2G = QNetworkConfiguration::Bearer2G,
+    INTERNET_CONNECTION_3G = QNetworkConfiguration::Bearer3G,
+    INTERNET_CONNECTION_4G = QNetworkConfiguration::Bearer4G,
+    INTERNET_CONNECTION_CDMA2000 = QNetworkConfiguration::BearerCDMA2000,
+    INTERNET_CONNECTION_WCDMA = QNetworkConfiguration::BearerWCDMA,
+    INTERNET_CONNECTION_HSPA = QNetworkConfiguration::BearerHSPA,
+    INTERNET_CONNECTION_BLUETOOTH = QNetworkConfiguration::BearerBluetooth,
+    INTERNET_CONNECTION_WIMAX = QNetworkConfiguration::BearerWiMAX,
+    INTERNET_CONNECTION_EVDO = QNetworkConfiguration::BearerEVDO,
+    INTERNET_CONNECTION_LTE = QNetworkConfiguration::BearerLTE
 };
 
 } // namespace Sync

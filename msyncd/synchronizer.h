@@ -271,7 +271,7 @@ private slots:
      */
     void stopServer(const QString &aProfileName);
 
-    void onNetworkStateChanged(bool aState);
+    void onNetworkStateChanged(bool aState, Sync::InternetConnectionType type);
 
     /*! \brief call this to request the sync daemon to enable soc
      * for a profile. The sync daemon decides as of now for which storages
@@ -382,6 +382,12 @@ private:
      * @param aProfile the profile that the status should be removed.
      */
     void removeExternalSyncStatus(const SyncProfile *aProfile);
+
+    /*! \brief Check if sheduled sync is allowed for this type of connection.
+     *
+     * @param aType the connection type;
+     */
+    bool acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const;
 
     QMap<QString, SyncSession*> iActiveSessions;
 
