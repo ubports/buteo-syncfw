@@ -44,7 +44,9 @@
 #include <QMap>
 #include <QString>
 #include <QDBusInterface>
+#include <QScopedPointer>
 
+struct _GSettings;
 
 namespace Buteo {
 
@@ -450,6 +452,7 @@ private:
 #endif
 
     QDBusInterface *iSyncUIInterface;
+    _GSettings *iSettings;
 };
 
 }

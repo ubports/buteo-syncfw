@@ -62,10 +62,13 @@ service.files = bin/msyncd.service
 service.path = /usr/lib/systemd/user/
 syncwidget.path = /etc/syncwidget/
 syncwidget.files = com.meego.msyncd
+gschemas.path = /usr/share/glib-2.0/schemas
+gschemas.files = gschemas/com.meego.msyncd.gschema.xml
 INSTALLS += target \
     loglevel \
     syncwidget \
-    service
+    service \
+    gschemas
 
 # #####################################################################
 # make coverage (debug)
