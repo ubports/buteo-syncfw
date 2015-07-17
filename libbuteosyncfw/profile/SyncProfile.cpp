@@ -259,14 +259,11 @@ QDateTime SyncProfile::lastSuccessfulSyncTime () const
     if (d_ptr->iLog)
     {
         QList<const SyncResults*> allResults = d_ptr->iLog->allResults();
-        if (allResults.size () > 0)
-        {
-            lastSuccessSyncTime = allResults.at (0)->syncTime ();
-            foreach (const SyncResults* result, allResults) {
-                if ((result->majorCode () == SyncResults::SYNC_RESULT_SUCCESS) &&
-                    (result->minorCode () == SyncResults::NO_ERROR) &&
-                    (result->syncTime () > lastSuccessSyncTime))
-                        lastSuccessSyncTime = result->syncTime ();
+        foreach (const SyncResults* result, allResults) {
+            if ((result->majorCode () == SyncResults::SYNC_RESULT_SUCCESS) &&
+                (result->minorCode () == SyncResults::NO_ERROR) &&
+                (lastSyncTime().isNull() || (result->syncTime () > lastSuccessSyncTime))) {
+                    lastSuccessSyncTime = result->syncTime ();
             }
         }
     }
