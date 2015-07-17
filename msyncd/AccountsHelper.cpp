@@ -371,9 +371,11 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
         // Add the account ID to the profile
         newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
         // Check if service is enabled
-        LOG_DEBUG("Service:: " << service.displayName() << "enabled status::" << account->enabled());
+        LOG_DEBUG("Service:: " << service.displayName() <<
+                  "enabled status::" << (account->enabled() && account->enabledServices().contains(service)));
         // Set profile as enabled
-        newProfile->setEnabled(account->enabled());
+        newProfile->setEnabled(account->enabled() &&
+                               account->enabledServices().contains(service));
         setSyncSchedule (newProfile, account->id(), true);
 
         // Save the newly created profile
