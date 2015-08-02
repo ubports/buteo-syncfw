@@ -339,6 +339,11 @@ bool Synchronizer::saveSyncResults(QString aProfileId, QString aSyncResults)
     return status;
 }
 
+QString Synchronizer::createSyncProfileForAccount(uint aAccountId)
+{
+    return iAccounts->createProfileForAccount(aAccountId);
+}
+
 bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
 {
     FUNCTION_CALL_TRACE;
