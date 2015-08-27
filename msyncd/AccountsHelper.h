@@ -102,6 +102,10 @@ Q_SIGNALS:
     void removeProfile(QString profileId);
     void removeScheduledSync(const QString& profileId);
 
+private Q_SLOTS:
+
+    void registerAccountListeners();
+
 private:
 
     /*!
@@ -117,7 +121,6 @@ private:
                                const SyncProfile *baseProfile);
 
     void setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew = false);
-    void registerAccountListeners();
 
     void addSetting(Accounts::AccountId id, QString key, QVariant value);
 
