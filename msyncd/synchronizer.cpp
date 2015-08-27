@@ -115,8 +115,9 @@ bool Synchronizer::initialize()
             this, SLOT(slotSyncStatus(QString, int, QString, int)),
             Qt::QueuedConnection);
 
+    // use queued connection because the profile will be stored after the signal
     connect(&iProfileManager ,SIGNAL(signalProfileChanged(QString,int,QString)),
-            this, SIGNAL(signalProfileChanged(QString,int,QString)));
+            this, SLOT(slotProfileChanged(QString,int,QString)), Qt::QueuedConnection);
 
     iNetworkManager = new NetworkManager(this);
     Q_ASSERT(iNetworkManager);
@@ -1514,6 +1515,15 @@ void Synchronizer::onNewSession(const QString &aDestination)
     {
         LOG_WARNING("Could not resolve server, session object not created");
     }
+}
+
+void Synchronizer::slotProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml)
+{
+    // start sync when a new profile is added
+    if (aChangeType == ProfileManager::PROFILE_ADDED) {
+        startSync(aProfileName);
+    }
+    emit signalProfileChanged(aProfileName, aChangeType, aProfileAsXml);
 }
 
 void Synchronizer::reschedule(const QString &aProfileName)
