@@ -24,8 +24,9 @@
 #define NETWORKMANAGER_H_
 
 #include <QNetworkSession>
+#include <QTimer>
+#include "SyncCommonDefs.h"
 
-class QTimer;
 class QNetworkConfigurationManager;
 
 namespace Buteo
@@ -61,6 +62,13 @@ namespace Buteo
              */
             bool isOnline();
 
+            /*! \brief Returns the type of connection used by the device.
+             *
+
+             * @return Sync::InternetConnectionType the type of connection.
+             */
+            Sync::InternetConnectionType connectionType() const;
+
             /*! \brief Connects a new network session. If a session was already
              * open, the signal connectionSuccess will be emitted immediately,
              * else the function will return and the signal connectionSuccess or
@@ -84,7 +92,7 @@ signals:
              *
              * @param aConnected If true, the device is online
              */
-            void valueChanged(bool aConnected);
+            void statusChanged(bool aConnected, Sync::InternetConnectionType aType);
 
             /*! \brief This signal is emitted when a network session gets
              * connected
@@ -105,11 +113,15 @@ signals:
             static int                      m_refCount;                 // Reference counter for number of open connections
             bool                            m_errorEmitted;             // Network error emited flag
             QTimer                          *m_sessionTimer;
+            Sync::InternetConnectionType    m_connectionType;
+            QTimer                          m_idleRefreshTimer;
+
 private slots:
-            void slotOnlineStateChanged(bool isOnline);
             void slotSessionState(QNetworkSession::State status);
             void slotSessionError(QNetworkSession::SessionError error);
             void sessionConnectionTimeout();
+            void slotConfigurationChanged();
+            void idleRefresh();
     };
 }
 

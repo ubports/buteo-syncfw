@@ -128,8 +128,9 @@ bool Synchronizer::initialize()
     {
         iServerActivator = new ServerActivator(iProfileManager,
                 *iTransportTracker, this);
-        connect(iTransportTracker, SIGNAL(networkStateChanged(bool)),
-                this, SLOT(onNetworkStateChanged(bool)));
+        connect(iTransportTracker,
+                SIGNAL(networkStateChanged(bool,Sync::InternetConnectionType)),
+                SLOT(onNetworkStateChanged(bool,Sync::InternetConnectionType)));
     }
 
     // Initialize account manager.
@@ -292,14 +293,23 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
     // All scheduled syncs are online syncs
     // Add this to the waiting online syncs and it will be started when we
     // receive a session connection status from the NetworkManager
-    if(iNetworkManager->isOnline())
+    bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType());
+    if(accept)
     {
         startSync(aProfileName, true);
     }
     else if (!iWaitingOnlineSyncs.contains(aProfileName))
     {
-        LOG_DEBUG("Wait for internet connection:" << aProfileName);
-        iWaitingOnlineSyncs.append(aProfileName);
+         LOG_DEBUG("Wait for internet connection:" << aProfileName);
+         if (iNetworkManager->isOnline())
+         {
+             LOG_DEBUG("Connection over mobile data plan. The sync will be postponed untill a full connection is available;");
+         }
+         else
+         {
+             LOG_DEBUG("Device offline. Wait for internet connection.");
+         }
+         iWaitingOnlineSyncs.append(aProfileName);
     }
     return true;
 }
@@ -1876,21 +1886,23 @@ QStringList Synchronizer::syncProfilesByType(const QString &aType)
     return iProfileManager.profileNames(aType);
 }
 
-void Synchronizer::onNetworkStateChanged(bool aState)
+void Synchronizer::onNetworkStateChanged(bool aState, Sync::InternetConnectionType type)
 {
     FUNCTION_CALL_TRACE;
-    if(aState)
+    LOG_DEBUG("Network state changed: OnLine:" << aState << " connection type:" <<  type);
+    if (acceptScheduledSync(aState, type))
     {
         LOG_DEBUG("Restart sync for profiles that need network");
-        foreach(QString profileName, iWaitingOnlineSyncs)
+        QStringList profiles(iWaitingOnlineSyncs);
+        iWaitingOnlineSyncs.clear();
+        foreach(QString profileName, profiles)
         {
             // start sync now, we do not need to call 'startScheduledSync' since that function
             // only checks for internet connection
             startSync(profileName, true);
         }
-        iWaitingOnlineSyncs.clear();
     }
-    else
+    else if (!aState)
     {
         QList<QString> profiles = iActiveSessions.keys();
         foreach(QString profileId, profiles)
@@ -2052,6 +2064,18 @@ void Synchronizer::removeExternalSyncStatus(const SyncProfile *aProfile)
             LOG_DEBUG("Removing sync externally status for profile:" << profileName);
         }
     }
+}
+
+bool Synchronizer::acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const
+{
+    static QList<Sync::InternetConnectionType> allowedTypes;
+    if (allowedTypes.isEmpty())
+    {
+        allowedTypes << Sync::INTERNET_CONNECTION_WLAN
+                     << Sync::INTERNET_CONNECTION_ETHERNET;
+    }
+
+    return (aConnected && allowedTypes.contains(aType));
 }
 
 void Synchronizer::isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName)
