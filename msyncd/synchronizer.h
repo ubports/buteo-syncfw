@@ -139,6 +139,9 @@ public slots:
     //! \see SyncDBusInterface::saveSyncResults
     virtual bool saveSyncResults(QString aProfileId,QString aSyncResults);
 
+    //! \see SyncDBusInterface::createSyncProfileForAccount
+    virtual QString createSyncProfileForAccount(uint aAccountId);
+
     /*! \brief To get lastSyncResult.
      *  \param aProfileId
      *  \return QString of syncResult.
