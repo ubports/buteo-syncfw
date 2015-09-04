@@ -21,6 +21,7 @@
  * 02110-1301 USA
  *
  */
+#include <gio/gio.h>
 #include "synchronizer.h"
 #include "SyncDBusAdaptor.h"
 #include "SyncSession.h"
@@ -51,11 +52,11 @@
 #include <fcntl.h>
 #include <termios.h>
 
+
 using namespace Buteo;
 
 static const QString SYNC_DBUS_OBJECT = "/synchronizer";
 static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
-
 static const QString BT_PROPERTIES_NAME = "Name";
 
 // Maximum time in milliseconds to wait for a thread to stop
@@ -71,10 +72,9 @@ Synchronizer::Synchronizer( QCoreApplication* aApplication )
     iClosing(false),
     iSOCEnabled(false),
     iSyncUIInterface(NULL)
-
 {
+    iSettings = g_settings_new_with_path("com.meego.msyncd", "/com/meego/msyncd/");
     FUNCTION_CALL_TRACE;
-
     this->setParent(aApplication);
 }
 
@@ -86,6 +86,7 @@ Synchronizer::~Synchronizer()
         delete iSyncUIInterface;
         iSyncUIInterface = NULL;
     }
+    g_object_unref(iSettings);
 }
 
 bool Synchronizer::initialize()
@@ -2089,7 +2090,8 @@ bool Synchronizer::acceptScheduledSync(bool aConnected, Sync::InternetConnection
                      << Sync::INTERNET_CONNECTION_ETHERNET;
     }
 
-    return (aConnected && allowedTypes.contains(aType));
+    return (aConnected && (g_settings_get_boolean(iSettings, "allow-scheduled-sync-over-cellular") ||
+                           allowedTypes.contains(aType)));
 }
 
 void Synchronizer::isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName)

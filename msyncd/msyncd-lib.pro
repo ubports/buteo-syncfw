@@ -19,7 +19,7 @@ INCLUDEPATH += . \
     ../libbuteosyncfw/profile
 
 
-PKGCONFIG += dbus-1
+PKGCONFIG += dbus-1 gio-2.0
 
 equals(QT_MAJOR_VERSION, 4): {
     PKGCONFIG += libsignon-qt accounts-qt
