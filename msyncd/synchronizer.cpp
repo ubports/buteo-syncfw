@@ -203,7 +203,7 @@ void Synchronizer::enableSOCSlot(const QString& aProfileName)
 {
     FUNCTION_CALL_TRACE;
     SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
-    if(!iSOCEnabled)
+    if(profile->isSOCProfile() && !iSOCEnabled)
     {
         QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
         QList<SyncProfile*> SOCProfiles;
@@ -226,7 +226,7 @@ void Synchronizer::enableSOCSlot(const QString& aProfileName)
             LOG_DEBUG("Sync on change enabled for profile" << aProfileName);
         }
     }
-    else
+    else if (profile->isSOCProfile())
     {
         iSyncOnChange.addProfile("hcontacts", profile);
     }
@@ -509,7 +509,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
         return false;
     }
 
-    LOG_DEBUG("Disable sync on change:" << iSOCEnabled);
+    LOG_DEBUG("Disable sync on change:" << iSOCEnabled << profile->isSOCProfile());
     //As sync is ongoing, disable sync on change for now, we can query later if
     //there are changes.
     if(iSOCEnabled)
@@ -1508,9 +1508,19 @@ void Synchronizer::onNewSession(const QString &aDestination)
 void Synchronizer::slotProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml)
 {
     // start sync when a new profile is added
-    if (aChangeType == ProfileManager::PROFILE_ADDED) {
+    switch (aChangeType)
+    {
+    case ProfileManager::PROFILE_ADDED:
+        enableSOCSlot(aProfileName);
         startSync(aProfileName);
+        break;
+
+    case ProfileManager::PROFILE_REMOVED:
+        iSyncOnChangeScheduler.removeProfile(aProfileName);
+        iWaitingOnlineSyncs.removeAll(aProfileName);
+        break;
     }
+
     emit signalProfileChanged(aProfileName, aChangeType, aProfileAsXml);
 }
 
