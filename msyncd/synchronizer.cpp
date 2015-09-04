@@ -1510,15 +1510,31 @@ void Synchronizer::slotProfileChanged(QString aProfileName, int aChangeType, QSt
     // start sync when a new profile is added
     switch (aChangeType)
     {
-    case ProfileManager::PROFILE_ADDED:
-        enableSOCSlot(aProfileName);
-        startSync(aProfileName);
-        break;
+        case ProfileManager::PROFILE_ADDED:
+            {
+                enableSOCSlot(aProfileName);
+                SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+                if (profile && profile->isEnabled()) {
+                    startSync(aProfileName);
+                }
+            }
+            break;
 
-    case ProfileManager::PROFILE_REMOVED:
-        iSyncOnChangeScheduler.removeProfile(aProfileName);
-        iWaitingOnlineSyncs.removeAll(aProfileName);
-        break;
+        case ProfileManager::PROFILE_REMOVED:
+            iSyncOnChangeScheduler.removeProfile(aProfileName);
+            iWaitingOnlineSyncs.removeAll(aProfileName);
+            break;
+
+        case ProfileManager::PROFILE_MODIFIED:
+            {
+                // schedule a new sync in case of profile changed;
+                // Example if the profile change from disable -> enable
+                SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+                if (profile->isEnabled()) {
+                    startScheduledSync(aProfileName);
+                }
+            }
+            break;
     }
 
     emit signalProfileChanged(aProfileName, aChangeType, aProfileAsXml);
