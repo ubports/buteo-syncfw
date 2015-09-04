@@ -190,7 +190,7 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
             foreach(SyncProfile *profile, profiles)
             {
                 // See if the service name matches
-                if(serviceName == profile->name())
+                if(serviceName == profile->key(REMOTE_SERVICE_NAME))
                 {
                     // Check if the status really changed here
                     // saving the account can trigger the emition of enabledChanged()
