@@ -1,6 +1,0 @@
-interface: Buteo SyncFW
-type: library
-scope: Platform
-state: unstable
-libs-pkg: sync-fw
-dev-pkg: sync-fw-dev
