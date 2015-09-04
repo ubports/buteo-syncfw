@@ -40,7 +40,7 @@ public:
      *
      * Once the SOC is initiated (by sending a syncNow signal), the profile is
      * removed automatically
-     * 
+     *
      * @param aProfile pointer to sync profile
      * @return true if SOC could be scheduled, false otherwise
      */
@@ -63,6 +63,7 @@ private Q_SLOTS:
 
 private:
     QStringList iSOCProfileNames;
+    QMap<QString, QObject*> iSOCTimers;
 };
 
 class SyncOnChangeTimer : public QObject
