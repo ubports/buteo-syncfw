@@ -1,22 +1,23 @@
-This package was debianized by Lassi Nieminen <lassi.ta.nieminen@nokiacom> on
-Thu, 19 Mar 2009 15:22:13 +0200.
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: buteo-syncfw
+Source: https://github.com/nemomobile/buteo-syncfw.git
 
-It was downloaded from <fill in http/ftp site>
-
-Upstream Author: 
-
-Copyright: <put the year(s) of the copyright, and the names of the
-            copyright holder(s) here>
-
-License:
-
-<Put the license of the package here>
-
-
-The Debian packaging is (C) 2009, N N <n.n@nn.com> and
-is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
-
-
-# Please also look if there are files or directories which have a
-# different copyright/license attached and list them here.
+Files: *
+Copyright: 2010 Nokia Corporation and/or its subsidiary(-ies)
+License: LGPL-2.1
+ These headers are free software; you can redistribute them
+ and/or modify them under the terms of the GNU Lesser General Public
+ License version 2.1 as published by the Free Software Foundation.
+ .
+ These headers are distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ See the GNU Lesser General Public License for more details.
+ .
+ You should have received a copy of the GNU Lesser General Public
+ License along with these headers.
+ If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the full text of the GNU Lesser General Public License
+ version 2.1 can be found in the file /usr/share/common-licenses/LGPL-2.1.
 

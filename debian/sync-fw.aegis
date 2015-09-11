@@ -1,8 +1,0 @@
-<aegis>
-     <request>
-         <credential name="GRP::dialout"/>
-         <credential name="UID::user"/>
-         <credential name="GID::users"/>
-         <for path="/usr/bin/msyncd"/>
-     </request>
-</aegis>

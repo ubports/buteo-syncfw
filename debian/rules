@@ -1,24 +1,18 @@
 #!/usr/bin/make -f
-export DH_VERBOSE=1    
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/qmake.mk
+# -*- makefile -*-
 
-# Add here any variable or target overrides you need.
-CFLAGS += -Wall -Wextra -Wno-unused-parameter 
-CXXFLAGS += -Wall -Wextra -Wno-unused-parameter 
+export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 
-# architecture we're building for
-DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+override_dh_auto_configure:
+	dh_auto_configure -- LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
 
-# This line is for including the Aegis manifest. 
-binary:
+override_dh_auto_install:
+	dh_auto_install
 
-ifeq ($(DEB_HOST_ARCH), arm)
-	aegis-deb-add -control debian/sync-fw/DEBIAN/control .. debian/sync-fw.aegis=_aegis
-else ifeq ($(DEB_HOST_ARCH), armel)
-	aegis-deb-add -control debian/sync-fw/DEBIAN/control .. debian/sync-fw.aegis=_aegis
-endif
+	# remove tests
+	rm -rf debian/tmp/opt
+	rm -rf debian/tmp/usr/share/accounts/services/testsync-ovi.service
 
-DEB_DESTDIR := $(CURDIR)/debian/tmp
-DEB_DH_INSTALL_SOURCEDIR := debian/tmp
+%:
+	dh $@ --fail-missing
 

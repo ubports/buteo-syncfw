@@ -1,0 +1,1544 @@
+From 090b3f497a52d9bdf891bdac418705f5adb18e1c Mon Sep 17 00:00:00 2001
+From: Renato Araujo Oliveira Filho <renato.filho@canonical.com>
+Date: Fri, 3 Jul 2015 13:59:00 -0300
+Subject: [PATCH] Fire 'enableSOC' for accounts already created.
+
+Make sure the the signal 'enableSOC' is fired even for accounts that already exists.
+Fire 'AccountsHelper' signals on idle after the constructor, to allow connections after create object.
+
+Save profile before fire 'signalProfileChanged'.
+
+The profile should be saved before fire the signal 'signalProfileChanged', otherwise the receiver that retrieve the profile will have a old version of it.
+
+Start a sync just after create a new profile.
+
+After create a online-account we want that account to get sync.
+
+Wait untill network connection is available to sync.
+
+Wait for internet connection before sync scheduled sync requests.
+
+Does not run scheduled sync over mobile data connection.
+
+Check for internet connection type before run a scheduled sync.
+
+Added upstart service file.
+
+Create upstart file to start msyncd service.
+
+Avoid sync twice.
+
+Remove pending syncs from 'iWaitingOnlineSyncs' and 'iSyncOnChangeScheduler', before run a sync to avoid sync twice.
+
+Fixed compilation warnings.
+
+Create a gschema to store system-wide configuration.
+
+Check for '/com/meego/msyncd/allow-scheduled-sync-over-gsm' settings to confirm if sync over gsm is enabled for scheduled syncs.
+
+Add new profiles into the Sync On Change list.
+
+Profiles created while the server is running should be added to Sync On Change list.
+
+Fixed AccountsHelper 'scheduleUpdated' emission.
+
+Make sure that the signal get fired for the correct profile.
+
+Fire a new sync if profile data changes.
+
+Fixed profile creation for new accounts.
+
+Set the new profile enabled only if account and service are enabled.
+
+Fix 'lastSuccessfulSyncTime' function.
+
+Fixed an use case where the sync log only contains one failed sync.
+
+Expose "createProfileForAccount" in the DBUS service.
+
+Allow the client to create a profile for a specified account it it does not exists
+---
+ libbuteosyncfw/common/Logger.cpp                   |   4 +-
+ libbuteosyncfw/common/NetworkManager.cpp           |  96 +++++++++---
+ libbuteosyncfw/common/NetworkManager.h             |  18 ++-
+ libbuteosyncfw/common/SyncCommonDefs.h             |  17 +++
+ libbuteosyncfw/common/TransportTracker.cpp         |  24 +--
+ libbuteosyncfw/common/TransportTracker.h           |   7 +-
+ libbuteosyncfw/profile/ProfileManager.cpp          |  14 +-
+ libbuteosyncfw/profile/SyncProfile.cpp             |  13 +-
+ msyncd/AccountsHelper.cpp                          |  66 +++++---
+ msyncd/AccountsHelper.h                            |  59 ++++---
+ msyncd/SyncDBusAdaptor.cpp                         |   8 +
+ msyncd/SyncDBusAdaptor.h                           |   5 +
+ msyncd/SyncDBusInterface.h                         |  37 +++--
+ msyncd/SyncOnChangeScheduler.cpp                   |   9 ++
+ msyncd/SyncOnChangeScheduler.h                     |   3 +-
+ msyncd/SyncSession.h                               |   2 +-
+ msyncd/bin/msyncd.conf                             |  15 ++
+ msyncd/gschemas/com.meego.msyncd.gschema.xml       |  10 ++
+ msyncd/msyncd-app.pro                              |   8 +-
+ msyncd/msyncd-lib.pro                              |   2 +-
+ msyncd/synchronizer.cpp                            | 169 ++++++++++++++-------
+ msyncd/synchronizer.h                              |  18 ++-
+ .../tests/msyncdtests/TransportTrackerTest.cpp     |   4 +-
+ 23 files changed, 427 insertions(+), 181 deletions(-)
+ create mode 100644 msyncd/bin/msyncd.conf
+ create mode 100644 msyncd/gschemas/com.meego.msyncd.gschema.xml
+
+diff --git a/libbuteosyncfw/common/Logger.cpp b/libbuteosyncfw/common/Logger.cpp
+index c6468bd..557b725 100644
+--- a/libbuteosyncfw/common/Logger.cpp
++++ b/libbuteosyncfw/common/Logger.cpp
+@@ -206,7 +206,7 @@ void Logger::write(int aLevel, const char *aMsg)
+     {
+         if(aLevel >= QtCriticalMsg)
+         {
+-            syslog(LOG_CRIT, sysLogMsg.toLocal8Bit().data());
++            syslog(LOG_CRIT, "%s", sysLogMsg.toLocal8Bit().data());
+         }
+         return;
+     }
+@@ -217,7 +217,7 @@ void Logger::write(int aLevel, const char *aMsg)
+         return;
+     }
+ 
+-    syslog(syslogLevel[aLevel], sysLogMsg.toLocal8Bit().data());
++    syslog(syslogLevel[aLevel], "%s", sysLogMsg.toLocal8Bit().data());
+ 
+     if (iFileStream != 0)
+     {
+diff --git a/libbuteosyncfw/common/NetworkManager.cpp b/libbuteosyncfw/common/NetworkManager.cpp
+index 6e430d4..811694c 100644
+--- a/libbuteosyncfw/common/NetworkManager.cpp
++++ b/libbuteosyncfw/common/NetworkManager.cpp
+@@ -36,13 +36,40 @@ bool NetworkManager::m_isSessionActive = false;
+ NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
+     QObject(parent), m_networkConfigManager(0), m_networkSession(0),
+     m_isOnline(false), m_errorEmitted(false),
+-    m_sessionTimer(0)
++    m_sessionTimer(0), m_connectionType(Sync::INTERNET_CONNECTION_UNKNOWN)
+ {
+     FUNCTION_CALL_TRACE;
+     m_networkConfigManager = new QNetworkConfigurationManager();
+     Q_ASSERT(m_networkConfigManager);
+-    connect(m_networkConfigManager, SIGNAL(onlineStateChanged(bool)),
+-                SLOT(slotOnlineStateChanged(bool)));
++
++    // check for network status and configuration change (switch wifi, ethernet, mobile) a
++    connect(m_networkConfigManager,
++            SIGNAL(onlineStateChanged(bool)),
++            SLOT(slotConfigurationChanged()),
++            Qt::QueuedConnection);
++    connect(m_networkConfigManager,
++            SIGNAL(configurationAdded(QNetworkConfiguration)),
++            SLOT(slotConfigurationChanged()),
++            Qt::QueuedConnection);
++    connect(m_networkConfigManager,
++            SIGNAL(configurationChanged(QNetworkConfiguration)),
++            SLOT(slotConfigurationChanged()),
++            Qt::QueuedConnection);
++    connect(m_networkConfigManager,
++            SIGNAL(configurationRemoved(QNetworkConfiguration)),
++            SLOT(slotConfigurationChanged()),
++            Qt::QueuedConnection);
++    connect(m_networkConfigManager,
++            SIGNAL(updateCompleted()),
++            SLOT(slotConfigurationChanged()),
++            Qt::QueuedConnection);
++
++    connect(&m_idleRefreshTimer,
++            SIGNAL(timeout()),
++            SLOT(idleRefresh()),
++            Qt::QueuedConnection);
++    m_idleRefreshTimer.setSingleShot(true);
++
+     m_isOnline = m_networkConfigManager->isOnline();
+     LOG_DEBUG("Online status::" << m_isOnline);
+     m_sessionTimer = new QTimer(this);
+@@ -72,6 +99,11 @@ bool NetworkManager::isOnline()
+     return m_isOnline;
+ }
+ 
++Sync::InternetConnectionType NetworkManager::connectionType() const
++{
++    return m_connectionType;
++}
++
+ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
+ {
+     FUNCTION_CALL_TRACE;
+@@ -110,12 +142,55 @@ void NetworkManager::sessionConnectionTimeout()
+ {
+     if (!m_errorEmitted && m_networkSession) {
+         if (!m_networkSession->isOpen()) {
+-            qWarning() << "No network reply received after 10 seconds, emitting session error.";
++            LOG_WARNING("No network reply received after 10 seconds, emitting session error.");
+             slotSessionError(m_networkSession->error());
+         }
+     }
+ }
+ 
++void NetworkManager::slotConfigurationChanged()
++{
++    // wait for 3 secs before update connection status
++    // this avoid problems with connections that take a while to be stabilished
++    m_idleRefreshTimer.start(3000);
++}
++
++void NetworkManager::idleRefresh()
++{
++    FUNCTION_CALL_TRACE;
++    QList<QNetworkConfiguration> activeConfigs = m_networkConfigManager->allConfigurations(QNetworkConfiguration::Active);
++    QNetworkConfiguration::BearerType connectionType = QNetworkConfiguration::BearerUnknown;
++    QString bearerTypeName;
++
++    bool isOnline = activeConfigs.size() > 0;
++    if (isOnline)
++    {
++        // FIXME: due this bug lp:#1444162 on nm the QNetworkConfigurationManager
++        // returns the wrong default connection.
++        // We will consider the connection with the smallest bearer as the
++        // default connection, with that wifi and ethernet will be the first one
++        // https://bugs.launchpad.net/ubuntu/+source/network-manager/+bug/1444162
++        connectionType = activeConfigs.first().bearerType();
++        bearerTypeName = activeConfigs.first().bearerTypeName();
++        foreach(const QNetworkConfiguration &conf, activeConfigs)
++        {
++            if (conf.bearerType() < connectionType)
++            {
++                connectionType = conf.bearerType();
++                bearerTypeName = conf.bearerTypeName();
++            }
++        }
++    }
++    LOG_DEBUG("New state:" << isOnline << " New type: " << bearerTypeName << "(" << connectionType << ")");
++    if ((isOnline != m_isOnline) ||
++        ((Sync::InternetConnectionType)connectionType != m_connectionType))
++    {
++        m_isOnline = isOnline;
++        m_connectionType = (Sync::InternetConnectionType) connectionType;
++        emit statusChanged(m_isOnline, m_connectionType);
++    }
++}
++
+ void NetworkManager::disconnectSession()
+ {
+     FUNCTION_CALL_TRACE;
+@@ -134,19 +209,6 @@ void NetworkManager::disconnectSession()
+     }
+ }
+ 
+-void NetworkManager::slotOnlineStateChanged(bool isOnline)
+-{
+-    FUNCTION_CALL_TRACE;
+-    LOG_DEBUG("Online status changed, is online is now::" << isOnline);
+-    if(m_isOnline != isOnline)
+-    {
+-        if (m_sessionTimer->isActive())
+-            m_sessionTimer->stop();
+-        m_isOnline = isOnline;
+-        emit valueChanged(m_isOnline);
+-    }
+-}
+-
+ void NetworkManager::slotSessionState(QNetworkSession::State status)
+ {
+     FUNCTION_CALL_TRACE;
+diff --git a/libbuteosyncfw/common/NetworkManager.h b/libbuteosyncfw/common/NetworkManager.h
+index 5a7c696..e375551 100644
+--- a/libbuteosyncfw/common/NetworkManager.h
++++ b/libbuteosyncfw/common/NetworkManager.h
+@@ -24,8 +24,9 @@
+ #define NETWORKMANAGER_H_
+ 
+ #include <QNetworkSession>
++#include <QTimer>
++#include "SyncCommonDefs.h"
+ 
+-class QTimer;
+ class QNetworkConfigurationManager;
+ 
+ namespace Buteo
+@@ -61,6 +62,13 @@ namespace Buteo
+              */
+             bool isOnline();
+ 
++            /*! \brief Returns the type of connection used by the device.
++             *
++
++             * @return Sync::InternetConnectionType the type of connection.
++             */
++            Sync::InternetConnectionType connectionType() const;
++
+             /*! \brief Connects a new network session. If a session was already
+              * open, the signal connectionSuccess will be emitted immediately,
+              * else the function will return and the signal connectionSuccess or
+@@ -84,7 +92,7 @@ signals:
+              *
+              * @param aConnected If true, the device is online
+              */
+-            void valueChanged(bool aConnected);
++            void statusChanged(bool aConnected, Sync::InternetConnectionType aType);
+ 
+             /*! \brief This signal is emitted when a network session gets
+              * connected
+@@ -105,11 +113,15 @@ signals:
+             static int                      m_refCount;                 // Reference counter for number of open connections
+             bool                            m_errorEmitted;             // Network error emited flag
+             QTimer                          *m_sessionTimer;
++            Sync::InternetConnectionType    m_connectionType;
++            QTimer                          m_idleRefreshTimer;
++
+ private slots:
+-            void slotOnlineStateChanged(bool isOnline);
+             void slotSessionState(QNetworkSession::State status);
+             void slotSessionError(QNetworkSession::SessionError error);
+             void sessionConnectionTimeout();
++            void slotConfigurationChanged();
++            void idleRefresh();
+     };
+ }
+ 
+diff --git a/libbuteosyncfw/common/SyncCommonDefs.h b/libbuteosyncfw/common/SyncCommonDefs.h
+index 495b71c..ab35d26 100644
+--- a/libbuteosyncfw/common/SyncCommonDefs.h
++++ b/libbuteosyncfw/common/SyncCommonDefs.h
+@@ -26,6 +26,7 @@
+ 
+ #include <QMetaType>
+ #include <QDir>
++#include <QtNetwork/QNetworkConfiguration>
+ 
+ namespace Sync {
+ 
+@@ -83,6 +84,22 @@ enum ConnectivityType {
+     CONNECTIVITY_INTERNET
+ };
+ 
++enum InternetConnectionType {
++    INTERNET_CONNECTION_UNKNOWN = QNetworkConfiguration::BearerUnknown,
++    INTERNET_CONNECTION_ETHERNET = QNetworkConfiguration::BearerEthernet,
++    INTERNET_CONNECTION_WLAN = QNetworkConfiguration::BearerWLAN,
++    INTERNET_CONNECTION_2G = QNetworkConfiguration::Bearer2G,
++    INTERNET_CONNECTION_3G = QNetworkConfiguration::Bearer3G,
++    INTERNET_CONNECTION_4G = QNetworkConfiguration::Bearer4G,
++    INTERNET_CONNECTION_CDMA2000 = QNetworkConfiguration::BearerCDMA2000,
++    INTERNET_CONNECTION_WCDMA = QNetworkConfiguration::BearerWCDMA,
++    INTERNET_CONNECTION_HSPA = QNetworkConfiguration::BearerHSPA,
++    INTERNET_CONNECTION_BLUETOOTH = QNetworkConfiguration::BearerBluetooth,
++    INTERNET_CONNECTION_WIMAX = QNetworkConfiguration::BearerWiMAX,
++    INTERNET_CONNECTION_EVDO = QNetworkConfiguration::BearerEVDO,
++    INTERNET_CONNECTION_LTE = QNetworkConfiguration::BearerLTE
++};
++
+ } // namespace Sync
+ 
+ Q_DECLARE_METATYPE( Sync::SyncStatus );
+diff --git a/libbuteosyncfw/common/TransportTracker.cpp b/libbuteosyncfw/common/TransportTracker.cpp
+index 7890cf5..0cd5632 100644
+--- a/libbuteosyncfw/common/TransportTracker.cpp
++++ b/libbuteosyncfw/common/TransportTracker.cpp
+@@ -66,7 +66,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
+ 
+     // BT
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+-    
++
+     // Set the bluetooth state
+     iTransportStates[Sync::CONNECTIVITY_BT] = btConnectivityStatus();
+ 
+@@ -97,8 +97,9 @@ TransportTracker::TransportTracker(QObject *aParent) :
+     {
+         iTransportStates[Sync::CONNECTIVITY_INTERNET] =
+             iInternet->isOnline();
+-        connect(iInternet, SIGNAL(valueChanged(bool)),
+-            this, SLOT(onInternetStateChanged(bool)) /*, Qt::QueuedConnection*/);
++        connect(iInternet,
++                SIGNAL(statusChanged(bool, Sync::InternetConnectionType)),
++                SLOT(onInternetStateChanged(bool, Sync::InternetConnectionType)) /*, Qt::QueuedConnection*/);
+     }
+     else
+     {
+@@ -143,7 +144,7 @@ void TransportTracker::onBtStateChanged(bool aState)
+ void TransportTracker::onBtStateChanged(QString aKey, QDBusVariant aValue)
+ {
+     FUNCTION_CALL_TRACE;
+-    
++
+     if (aKey == "Powered")
+     {
+         bool btPowered = aValue.variant().toBool();
+@@ -153,12 +154,13 @@ void TransportTracker::onBtStateChanged(QString aKey, QDBusVariant aValue)
+ }
+ #endif
+ 
+-void TransportTracker::onInternetStateChanged(bool aConnected)
++void TransportTracker::onInternetStateChanged(bool aConnected, Sync::InternetConnectionType aType)
+ {
+     FUNCTION_CALL_TRACE;
+ 
+     LOG_DEBUG("Internet state changed:" << aConnected);
+     updateState(Sync::CONNECTIVITY_INTERNET, aConnected);
++    emit networkStateChanged(aConnected, aType);
+ }
+ 
+ void TransportTracker::updateState(Sync::ConnectivityType aType,
+@@ -175,19 +177,17 @@ void TransportTracker::updateState(Sync::ConnectivityType aType,
+     }
+     if(oldState != aState)
+     {
+-        if (aType != Sync::CONNECTIVITY_INTERNET) {
++        if (aType != Sync::CONNECTIVITY_INTERNET)
++        {
+             emit connectivityStateChanged(aType, aState);
+         }
+-        else {
+-            emit networkStateChanged(aState);
+-        }
+     }
+ }
+ 
+ bool TransportTracker::btConnectivityStatus()
+ {
+     FUNCTION_CALL_TRACE;
+-    
++
+     bool btOn = false;
+     QDBusConnection *systemBus = new QDBusConnection(QDBusConnection::connectToBus(QDBusConnection::SystemBus,
+                                                                                     QStringLiteral("buteo_system_bus2")));
+@@ -207,7 +207,7 @@ bool TransportTracker::btConnectivityStatus()
+     QList<QVariant> adapterList = reply.arguments();
+     // We will take the first adapter in the list
+     QString adapterPath = qdbus_cast<QDBusObjectPath>(adapterList.at(0)).path();
+-    
++
+     if (!adapterPath.isEmpty() || !adapterPath.isNull())
+     {
+         // Retrive the properties of the adapter and check for "Powered" key
+@@ -222,7 +222,7 @@ bool TransportTracker::btConnectivityStatus()
+             delete systemBus;
+             return btOn;
+         }
+-        
++
+         QDBusArgument arg = reply.arguments().at(0).value<QDBusArgument>();
+         if (arg.currentType() == QDBusArgument::MapType)
+         {
+diff --git a/libbuteosyncfw/common/TransportTracker.h b/libbuteosyncfw/common/TransportTracker.h
+index 67456cf..495ebcb 100644
+--- a/libbuteosyncfw/common/TransportTracker.h
++++ b/libbuteosyncfw/common/TransportTracker.h
+@@ -78,8 +78,9 @@ signals:
+     /*! \brief Signal emitted when a n/w state changes
+      *
+      * @param aState New state. True if available, false if not.
++     * @param aType Connection type. The type of connetcion with the Internet.
+      */
+-    void networkStateChanged(bool aState);
++    void networkStateChanged(bool aState, Sync::InternetConnectionType aType);
+ 
+     /*! \brief Signal emitted when a network session is successfully opened
+      */
+@@ -99,7 +100,7 @@ private slots:
+     void onBtStateChanged(QString aKey, QDBusVariant aValue);
+ #endif
+ 
+-    void onInternetStateChanged(bool aConnected);
++    void onInternetStateChanged(bool aConnected, Sync::InternetConnectionType aType);
+ 
+ private:
+ 
+@@ -127,7 +128,7 @@ private:
+     friend class TransportTrackerTest;
+     friend class SynchronizerTest;
+ #endif
+-    
++
+     bool btConnectivityStatus();
+ 
+ };
+diff --git a/libbuteosyncfw/profile/ProfileManager.cpp b/libbuteosyncfw/profile/ProfileManager.cpp
+index f1e4b2a..81406d9 100644
+--- a/libbuteosyncfw/profile/ProfileManager.cpp
++++ b/libbuteosyncfw/profile/ProfileManager.cpp
+@@ -129,7 +129,6 @@ ProfileManagerPrivate::ProfileManagerPrivate(const QString &aPrimaryPath,
+ 
+ Profile *ProfileManagerPrivate::load(const QString &aName, const QString &aType)
+ {
+-
+     QString profilePath = findProfileFile(aName, aType);
+     QString backupProfilePath = profilePath + BACKUP_EXT;
+ 
+@@ -739,6 +738,14 @@ QString ProfileManager::updateProfile(const Profile &aProfile)
+     bool exists = d_ptr->profileExists(aProfile.name(),aProfile.type());
+ 
+     QString profileId("");
++
++    // We need to save before emit the signalProfileChanged, if this is the first
++    // update the profile will only exists on disk after the save and any operation
++    // using this profile triggered by the signal will fail.
++    if(d_ptr->save(aProfile)) {
++        profileId = aProfile.name();
++    }
++
+     // Profile did not exist, it was a new one. Add it and emit signal with "added" value:
+     if (!exists) {
+         emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_ADDED,aProfile.toString());
+@@ -746,9 +753,6 @@ QString ProfileManager::updateProfile(const Profile &aProfile)
+         emit signalProfileChanged(aProfile.name(),ProfileManager::PROFILE_MODIFIED,aProfile.toString());
+     }
+ 
+-    if(d_ptr->save(aProfile)) {
+-        profileId = aProfile.name();
+-    }
+     return profileId;
+ }
+ 
+@@ -1254,7 +1258,7 @@ QDateTime ProfileManager::getNextRetryInterval(const SyncProfile* aProfile)
+        !iSyncRetriesInfo[aProfile->name()].isEmpty())
+     {
+        quint32 mins = iSyncRetriesInfo[aProfile->name()].takeFirst();
+-       nextRetryInterval = QDateTime::currentDateTime().addSecs(mins * 60); 
++       nextRetryInterval = QDateTime::currentDateTime().addSecs(mins * 60);
+        LOG_DEBUG("syncretries : retry for profile" << aProfile->name() << "in" << mins <<"minutes");
+        LOG_DEBUG("syncretries :" << iSyncRetriesInfo[aProfile->name()].count() <<"attempts remain");
+     }
+diff --git a/libbuteosyncfw/profile/SyncProfile.cpp b/libbuteosyncfw/profile/SyncProfile.cpp
+index 564aec5..7cd80d3 100644
+--- a/libbuteosyncfw/profile/SyncProfile.cpp
++++ b/libbuteosyncfw/profile/SyncProfile.cpp
+@@ -259,14 +259,11 @@ QDateTime SyncProfile::lastSuccessfulSyncTime () const
+     if (d_ptr->iLog)
+     {
+         QList<const SyncResults*> allResults = d_ptr->iLog->allResults();
+-        if (allResults.size () > 0)
+-        {
+-            lastSuccessSyncTime = allResults.at (0)->syncTime ();
+-            foreach (const SyncResults* result, allResults) {
+-                if ((result->majorCode () == SyncResults::SYNC_RESULT_SUCCESS) &&
+-                    (result->minorCode () == SyncResults::NO_ERROR) &&
+-                    (result->syncTime () > lastSuccessSyncTime))
+-                        lastSuccessSyncTime = result->syncTime ();
++        foreach (const SyncResults* result, allResults) {
++            if ((result->majorCode () == SyncResults::SYNC_RESULT_SUCCESS) &&
++                (result->minorCode () == SyncResults::NO_ERROR) &&
++                (lastSyncTime().isNull() || (result->syncTime () > lastSuccessSyncTime))) {
++                    lastSuccessSyncTime = result->syncTime ();
+             }
+         }
+     }
+diff --git a/msyncd/AccountsHelper.cpp b/msyncd/AccountsHelper.cpp
+index 064d14f..960132c 100644
+--- a/msyncd/AccountsHelper.cpp
++++ b/msyncd/AccountsHelper.cpp
+@@ -26,6 +26,8 @@
+ #include "Profile.h"
+ #include "ProfileEngineDefs.h"
+ 
++#include <QTimer>
++
+ static const QString ACCOUNTS_GLOBAL_SERVICE("global");
+ 
+ using namespace Buteo;
+@@ -36,13 +38,15 @@ AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent
+     iAccountManager = new Accounts::Manager(this);
+     // Connect to signal for account creation, deletion, and modification
+     QObject::connect(iAccountManager, SIGNAL(accountCreated(Accounts::AccountId)),
+-                     this, SLOT(slotAccountCreated(Accounts::AccountId)));
++                     this, SLOT(createProfileForAccount(Accounts::AccountId)));
+     QObject::connect(iAccountManager, SIGNAL(accountRemoved(Accounts::AccountId)),
+                      this, SLOT(slotAccountRemoved(Accounts::AccountId)));
+     QObject::connect(iAccountManager, SIGNAL(accountUpdated(Accounts::AccountId)),
+                      this, SLOT(slotAccountUpdated(Accounts::AccountId)));
+ 
+-    registerAccountListeners();
++    // load accounts after return from contructor, to allow connection with class singals
++    // that can be fired by 'registerAccountListeners' function
++    QTimer::singleShot(0, this, SLOT(registerAccountListeners()));
+ }
+ 
+ AccountsHelper::~AccountsHelper()
+@@ -54,9 +58,10 @@ AccountsHelper::~AccountsHelper()
+     // their parent, aka, the manager
+ }
+ 
+-void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
++QString AccountsHelper::createProfileForAccount(Accounts::AccountId id)
+ {
+     FUNCTION_CALL_TRACE;
++    QString profileName;
+     Accounts::Account *newAccount = iAccountManager->account(id);
+     bool profileFoundAndCreated = false;
+ 
+@@ -66,7 +71,7 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
+         Accounts::ServiceList serviceList = newAccount->services();
+         foreach(Accounts::Service service, serviceList)
+         {
+-            // Look for a sync profile that matches the service name
++            // Look for a sync profile that matches the service name (template)
+             LOG_DEBUG("Looking for sync profile::" << service.name());
+             SyncProfile *syncProfile = iProfileManager.syncProfile(service.name());
+             LOG_DEBUG("Found profile::" << service.name());
+@@ -74,7 +79,7 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
+                     (true == syncProfile->boolKey(KEY_USE_ACCOUNTS, false))
+                     )
+             {
+-                addAccountIfNotExists(newAccount, service, syncProfile);
++                profileName = addAccountIfNotExists(newAccount, service, syncProfile);
+                 profileFoundAndCreated = true;
+             }
+             if(0 != syncProfile)
+@@ -86,7 +91,7 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
+ 
+         if (profileFoundAndCreated == false)
+         {
+-            // Fetch the key "remote_service_name" from the account settings and 
++            // Fetch the key "remote_service_name" from the account settings and
+             // use it to create a profile
+             QString profileName = newAccount->valueAsString(REMOTE_SERVICE_NAME);
+             LOG_DEBUG("Profile name from account setting:" << profileName);
+@@ -97,10 +102,15 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
+                 if (syncProfile->boolKey (KEY_USE_ACCOUNTS, false) == true)
+                     createProfileForAccount (newAccount, profileName, syncProfile);
+ 
++                profileName = syncProfile->name();
+                 delete syncProfile;
+             }
+         }
++    } else {
++        LOG_DEBUG("Account not found:" << id);
+     }
++
++    return profileName;
+ }
+ 
+ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
+@@ -186,7 +196,7 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool
+             foreach(SyncProfile *profile, profiles)
+             {
+                 // See if the service name matches
+-                if(serviceName == profile->name())
++                if(serviceName == profile->key(REMOTE_SERVICE_NAME))
+                 {
+                     // Check if the status really changed here
+                     // saving the account can trigger the emition of enabledChanged()
+@@ -331,16 +341,16 @@ void AccountsHelper::createProfileForAccount(Accounts::Account *account,
+     delete newProfile;
+ }
+ 
+-void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
+-                                           Accounts::Service service,
+-                                           const SyncProfile *baseProfile)
++QString AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
++                                              Accounts::Service service,
++                                              const SyncProfile *baseProfile)
+ {
+     FUNCTION_CALL_TRACE;
+ 
+     Profile *serviceProfile = iProfileManager.profile(service.name(), Profile::TYPE_SYNC);
+     if (!serviceProfile) {
+         LOG_DEBUG ("!!!! Service not supported !!!!");
+-        return;
++        return QString();
+     }
+ 
+     QString profileName ;
+@@ -367,9 +377,11 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
+         // Add the account ID to the profile
+         newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
+         // Check if service is enabled
+-        LOG_DEBUG("Service:: " << service.displayName() << "enabled status::" << account->enabled());
++        LOG_DEBUG("Service:: " << service.displayName() <<
++                  "enabled status::" << (account->enabled() && account->enabledServices().contains(service)));
+         // Set profile as enabled
+-        newProfile->setEnabled(account->enabled());
++        newProfile->setEnabled(account->enabled() &&
++                               account->enabledServices().contains(service));
+         setSyncSchedule (newProfile, account->id(), true);
+ 
+         // Save the newly created profile
+@@ -398,6 +410,8 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
+     {
+         delete profile;
+     }
++
++    return profileName;
+ }
+ 
+ void AccountsHelper::addSetting(Accounts::AccountId id, QString key, QVariant value) {
+@@ -448,12 +462,27 @@ void AccountsHelper::slotSchedulerSettingsChanged(const char *aKey)
+ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
+ {
+     FUNCTION_CALL_TRACE;
++
+     Accounts::Account *account = iAccountManager->account(id);
++    if (iAccountList.contains(account)) {
++        return;
++    }
+     iAccountList.append(account);
+     // Callback for account enabled/disabled
+-    QObject::connect(account, SIGNAL(enabledChanged(const QString&, bool)),
+-                     this, SLOT(slotAccountEnabledChanged(const QString&, bool)));
+-
++    QObject::connect(account,
++                     SIGNAL(enabledChanged(const QString&, bool)),
++                     SLOT(slotAccountEnabledChanged(const QString&, bool)),
++                     Qt::UniqueConnection);
++
++    // Account SyncOnChange
++    QList<SyncProfile*> profiles = getProfilesByAccountId(id);
++    foreach(SyncProfile *profile, profiles)
++    {
++        if(profile->isSOCProfile())
++        {
++            emit enableSOC(profile->name());
++        }
++    }
+     account->selectService();
+     account->beginGroup("scheduler");
+     LOG_DEBUG("Watching Group :" << account->group());
+@@ -463,5 +492,8 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
+         return;
+     }
+     iAcctWatchMap[watch] = id;
+-    QObject::connect(watch, SIGNAL(notify(const char *)), this, SLOT(slotSchedulerSettingsChanged(const char *)));
++    QObject::connect(watch,
++                     SIGNAL(notify(const char *)),
++                     SLOT(slotSchedulerSettingsChanged(const char *)),
++                     Qt::UniqueConnection);
+ }
+diff --git a/msyncd/AccountsHelper.h b/msyncd/AccountsHelper.h
+index 1f9508b..a2f8a9c 100644
+--- a/msyncd/AccountsHelper.h
++++ b/msyncd/AccountsHelper.h
+@@ -29,12 +29,12 @@
+ #include <Accounts/account.h>
+ 
+ namespace Buteo {
+-                 
++
+ class Profile;
+ class AccountsHelperTest;
+ class ProfileManager;
+ class SyncProfile;
+-    
++
+ const QString REMOTE_SERVICE_NAME("remote_service_name");
+ 
+ /*! \brief Helper Class towards Accounts::Manager and various SSO related
+@@ -57,7 +57,7 @@ public:
+      *
+      */
+     virtual ~AccountsHelper();
+-    
++
+     /*! \brief Returns sync profiles that correspond to a given account ID
+      *
+      * \param id - The account ID.
+@@ -68,30 +68,31 @@ public:
+ 
+ public Q_SLOTS:
+ 
+-	/*! \brief slot for Accounts::Manager accountCreated signal
+-	 *
+-	 * \param id Accounts Id
+-	 */
+-    void slotAccountCreated(Accounts::AccountId id);
++    /*! \brief This method is used to create a profile for a specified
++     * account
++     * \param id Accounts Id
++     * \return A string with the new profile name
++     */
++    QString createProfileForAccount(Accounts::AccountId id);
+ 
+-	/*! \brief slot for Accounts::Manager accountRemoved signal
+-	 *
+-	 * \param id of the accounts
+-	 */
++    /*! \brief slot for Accounts::Manager accountRemoved signal
++     *
++     * \param id of the accounts
++     */
+     void slotAccountRemoved(Accounts::AccountId id);
+ 
+-	/*! \brief slot for Accounts::Account enabledChanged signal
+-	 *
+-	 * \param serviceName The service that was enabled/disabled. Empty if the
++    /*! \brief slot for Accounts::Account enabledChanged signal
++     *
++     * \param serviceName The service that was enabled/disabled. Empty if the
+      * entire account is enabled/disabled
+      * \param enabled Boolean indicating enabled (true) or disabled (false)
+-	 */
++     */
+     void slotAccountEnabledChanged(const QString &serviceName, bool enabled);
+-    
+-	/*! \brief slot for Accounts::Manager displayNameChanged signal
+-	 * *
+-	 * \param id of the accounts
+-	 */
++
++    /*! \brief slot for Accounts::Manager displayNameChanged signal
++     * *
++     * \param id of the accounts
++     */
+     void slotAccountUpdated(Accounts::AccountId id);
+ 
+     void slotSchedulerSettingsChanged(const char *aKey);
+@@ -102,22 +103,20 @@ Q_SIGNALS:
+     void removeProfile(QString profileId);
+     void removeScheduledSync(const QString& profileId);
+ 
+-private:
++private Q_SLOTS:
+ 
+-    /*!
+-     * \brief This method is used to create a profile for a specified
+-     * account
+-     */
++    void registerAccountListeners();
++
++private:
+     void createProfileForAccount(Accounts::Account* account,
+                                  const QString profileName,
+                                  const SyncProfile* baseProfile);
+ 
+-    void addAccountIfNotExists(Accounts::Account *account,
+-                               Accounts::Service service,
+-                               const SyncProfile *baseProfile);
++    QString addAccountIfNotExists(Accounts::Account *account,
++                                  Accounts::Service service,
++                                  const SyncProfile *baseProfile);
+ 
+     void setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew = false);
+-    void registerAccountListeners();
+ 
+     void addSetting(Accounts::AccountId id, QString key, QVariant value);
+ 
+diff --git a/msyncd/SyncDBusAdaptor.cpp b/msyncd/SyncDBusAdaptor.cpp
+index 1b08b49..fd43324 100644
+--- a/msyncd/SyncDBusAdaptor.cpp
++++ b/msyncd/SyncDBusAdaptor.cpp
+@@ -206,3 +206,11 @@ void SyncDBusAdaptor::isSyncedExternally(uint aAccountId, const QString aClientP
+     QMetaObject::invokeMethod(parent(), "isSyncedExternally", Q_ARG(uint, aAccountId), Q_ARG(QString, aClientProfileName));
+ }
+ 
++QString SyncDBusAdaptor::createSyncProfileForAccount(uint aAccountId)
++{
++    // handle method call com.meego.msyncd.createSyncProfileForAccount
++    QString out0;
++    QMetaObject::invokeMethod(parent(), "createSyncProfileForAccount", Q_RETURN_ARG(QString, out0), Q_ARG(uint, aAccountId));
++    return out0;
++}
++
+diff --git a/msyncd/SyncDBusAdaptor.h b/msyncd/SyncDBusAdaptor.h
+index 2aaf803..e15f50b 100644
+--- a/msyncd/SyncDBusAdaptor.h
++++ b/msyncd/SyncDBusAdaptor.h
+@@ -157,6 +157,10 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
+ "      <arg direction=\"out\" type=\"au\"/>\n"
+ "      <annotation value=\"QList&lt;uint>\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+ "    </method>\n"
++"    <method name=\"createSyncProfileForAccount\">\n"
++"      <arg direction=\"out\" type=\"s\"/>\n"
++"      <arg direction=\"in\" type=\"u\" name=\"aAccountId\"/>\n"
++"    </method>\n"
+ "    <method name=\"status\">\n"
+ "      <arg direction=\"out\" type=\"i\"/>\n"
+ "      <arg direction=\"in\" type=\"u\" name=\"aAccountId\"/>\n"
+@@ -198,6 +202,7 @@ public Q_SLOTS: // METHODS
+     QList<uint> syncingAccounts();
+     bool updateProfile(const QString &aProfileAsXml);
+     Q_NOREPLY void isSyncedExternally(uint aAccountId, const QString aClientProfileName);
++    QString createSyncProfileForAccount(uint aAccountId);
+ Q_SIGNALS: // SIGNALS
+     void backupDone();
+     void backupInProgress();
+diff --git a/msyncd/SyncDBusInterface.h b/msyncd/SyncDBusInterface.h
+index 27b5d21..21c9c0e 100644
+--- a/msyncd/SyncDBusInterface.h
++++ b/msyncd/SyncDBusInterface.h
+@@ -103,29 +103,29 @@ signals:
+      *
+      */
+     void signalProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
+-    
+-   
++
++
+     /*! \brief Notifies about Backup start.
+      *
+      * This signal is sent when the backup framework is backing the sync related
+      * data
+      */
+     void backupInProgress ();
+-    
++
+     /*! \brief Notifies about Backup done.
+      *
+      * This signal is sent when the backup framework has completed backing the sync related
+      * data.
+      */
+     void backupDone();
+-    
++
+     /*! \brief Notifies about Restore start.
+      *
+      * This signal is sent when the backup framework is restoring the sync related
+      * data
+      */
+     void restoreInProgress();
+-    
++
+     /*! \brief Notifies about Restore Done.
+      *
+      * This signal is sent when the backup framework has restored the sync related
+@@ -160,7 +160,7 @@ signals:
+      * \param aNextSyncTime This is an out parameter. The next sync time.
+      */
+     void statusChanged(unsigned int aAccountId, int aNewStatus, int aFailedReason, qlonglong aPrevSyncTime, qlonglong aNextSyncTime);
+- 
++
+     /*! \brief Returns the connectivity state of a specific medium like
+      * bluetooth, USB or network.
+      * \see SyncCommonDefs::ConnectivityType for arguments
+@@ -257,16 +257,16 @@ public slots:
+      * \return Profile name list.
+      */
+     virtual QStringList runningSyncs() = 0;
+-    
+-    
++
++
+     /*!
+      * \brief This function returns true if backup/restore in progress else
+      * false.
+      */
+     virtual bool  getBackUpRestoreState() = 0;
+-	
+-	
+-	/*!
++
++
++    /*!
+      * \brief sets the schedule for a profile
+      *
+      * This Function helps in setting a schedule to profile
+@@ -312,7 +312,7 @@ public slots:
+      * \return The sync profile as Xml string.
+      */
+     virtual QString syncProfile(const QString &aProfileId) = 0;
+-    
++
+     /*! \brief Gets a sync profiles matching the key-value.
+      *
+      * Loads and merges also all sub-profiles that are referenced from the
+@@ -323,7 +323,7 @@ public slots:
+      * \return The sync profiles as Xml string list.
+      */
+     virtual QStringList syncProfilesByKey(const QString &aKey, const QString &aValue) = 0;
+-    
++
+     /*! \brief Gets a profiles  matching the profile type.
+      *
+      * \param aType Type of the profile service/storage/sync.
+@@ -336,13 +336,13 @@ public slots:
+      * \param aAccountId The account ID.
+      */
+     virtual Q_NOREPLY void start(unsigned int aAccountId) = 0;
+-    
++
+     /*! \brief Stops sync for all profiles matching the given account ID.
+      *
+      * \param aAccountId The account ID.
+      */
+     virtual Q_NOREPLY void stop(unsigned int aAccountId) = 0;
+-    
++
+     /*! \brief Returns the list of account IDs for which sync is ongoing
+      *
+      * \return The list of account IDs currectly syncing.
+@@ -373,6 +373,13 @@ public slots:
+      *  having several services enabled
+      */
+     virtual Q_NOREPLY void isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName) = 0;
++
++    /*! \brief Create a sync profile for the account if it does not exists
++     *
++     * \param aAccountId The account ID.
++     * \return The profile name if the profile was created successful or empty if it fails
++     */
++    virtual QString createSyncProfileForAccount(uint aAccountId) = 0;
+ };
+ 
+ }
+diff --git a/msyncd/SyncOnChangeScheduler.cpp b/msyncd/SyncOnChangeScheduler.cpp
+index b7f5b75..389618d 100644
+--- a/msyncd/SyncOnChangeScheduler.cpp
++++ b/msyncd/SyncOnChangeScheduler.cpp
+@@ -14,6 +14,11 @@ SyncOnChangeScheduler::SyncOnChangeScheduler()
+ SyncOnChangeScheduler::~SyncOnChangeScheduler()
+ {
+     FUNCTION_CALL_TRACE;
++    foreach(QObject *o, iSOCTimers.values()) {
++        delete o;
++    }
++    iSOCTimers.clear();
++    iSOCProfileNames.clear();
+ }
+ 
+ bool SyncOnChangeScheduler::addProfile(const SyncProfile* aProfile)
+@@ -30,6 +35,7 @@ bool SyncOnChangeScheduler::addProfile(const SyncProfile* aProfile)
+                          Qt::QueuedConnection);
+         SOCtimer->fire();
+         scheduled = true;
++        iSOCTimers.insert(aProfile->name(), SOCtimer);
+         LOG_DEBUG("Sync on change scheduled for profile"<< aProfile->name());
+     }
+     else if(aProfile)
+@@ -43,12 +49,15 @@ void SyncOnChangeScheduler::removeProfile(const QString &aProfileName)
+ {
+     FUNCTION_CALL_TRACE;
+     iSOCProfileNames.removeAll(aProfileName);
++    // cancel timer
++    delete iSOCTimers.take(aProfileName);
+ }
+ 
+ void SyncOnChangeScheduler::sync(const SyncProfile* aProfile)
+ {
+     FUNCTION_CALL_TRACE;
+     iSOCProfileNames.removeAll(aProfile->name());
++    iSOCTimers.remove(aProfile->name());
+     SyncOnChangeTimer *SOCtimer = qobject_cast<SyncOnChangeTimer*>(sender());
+     if(SOCtimer)
+     {
+diff --git a/msyncd/SyncOnChangeScheduler.h b/msyncd/SyncOnChangeScheduler.h
+index 14168bf..aac2241 100644
+--- a/msyncd/SyncOnChangeScheduler.h
++++ b/msyncd/SyncOnChangeScheduler.h
+@@ -40,7 +40,7 @@ public:
+      *
+      * Once the SOC is initiated (by sending a syncNow signal), the profile is
+      * removed automatically
+-     * 
++     *
+      * @param aProfile pointer to sync profile
+      * @return true if SOC could be scheduled, false otherwise
+      */
+@@ -63,6 +63,7 @@ private Q_SLOTS:
+ 
+ private:
+     QStringList iSOCProfileNames;
++    QMap<QString, QObject*> iSOCTimers;
+ };
+ 
+ class SyncOnChangeTimer : public QObject
+diff --git a/msyncd/SyncSession.h b/msyncd/SyncSession.h
+index 401692c..4a3cde7 100644
+--- a/msyncd/SyncSession.h
++++ b/msyncd/SyncSession.h
+@@ -182,7 +182,7 @@ public:
+     void setProfileCreated(bool aProfileCreated);
+ 
+     //! \brief Maps sync failure error code from stack to SyncStatus
+-        Sync::SyncStatus mapToSyncStatusError(int aErrorCode);
++    Sync::SyncStatus mapToSyncStatusError(int aErrorCode);
+ 
+ signals:
+ 
+diff --git a/msyncd/bin/msyncd.conf b/msyncd/bin/msyncd.conf
+new file mode 100644
+index 0000000..d383006
+--- /dev/null
++++ b/msyncd/bin/msyncd.conf
+@@ -0,0 +1,15 @@
++description "address-book-service"
++author "Bill Filler <bill.filler@canonical.com>"
++
++start on started unity8-dash
++stop on runlevel [06]
++
++# give some time to nm be ready
++pre-start script
++    sleep 10;
++end script
++
++respawn
++
++env MSYNCD_LOGGING_LEVEL=10
++exec /usr/bin/msyncd
+diff --git a/msyncd/gschemas/com.meego.msyncd.gschema.xml b/msyncd/gschemas/com.meego.msyncd.gschema.xml
+new file mode 100644
+index 0000000..4e410d5
+--- /dev/null
++++ b/msyncd/gschemas/com.meego.msyncd.gschema.xml
+@@ -0,0 +1,10 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<schemalist>
++  <schema id="com.meego.msyncd" path="/com/meego/msyncd/">
++    <key name="allow-scheduled-sync-over-cellular" type="b">
++      <summary>Scheduled Sync over cellular</summary>
++      <description>Allow scheduled syncs to run over cellular connections.</description>
++      <default>true</default>
++    </key>
++  </schema>
++</schemalist>
+diff --git a/msyncd/msyncd-app.pro b/msyncd/msyncd-app.pro
+index 1d5d338..5dd614e 100644
+--- a/msyncd/msyncd-app.pro
++++ b/msyncd/msyncd-app.pro
+@@ -59,13 +59,19 @@ target.path = /usr/bin/
+ loglevel.files = bin/set_sync_log_level
+ loglevel.path = /etc/buteo/
+ service.files = bin/msyncd.service
++upstart.files = bin/msyncd.conf
+ service.path = /usr/lib/systemd/user/
++upstart.path = /usr/share/upstart/sessions/
+ syncwidget.path = /etc/syncwidget/
+ syncwidget.files = com.meego.msyncd
++gschemas.path = /usr/share/glib-2.0/schemas
++gschemas.files = gschemas/com.meego.msyncd.gschema.xml
+ INSTALLS += target \
+     loglevel \
+     syncwidget \
+-    service
++    service \
++    upstart \
++    gschemas
+ 
+ # #####################################################################
+ # make coverage (debug)
+diff --git a/msyncd/msyncd-lib.pro b/msyncd/msyncd-lib.pro
+index 12a398c..ff7043e 100644
+--- a/msyncd/msyncd-lib.pro
++++ b/msyncd/msyncd-lib.pro
+@@ -19,7 +19,7 @@ INCLUDEPATH += . \
+     ../libbuteosyncfw/profile
+ 
+ 
+-PKGCONFIG += dbus-1
++PKGCONFIG += dbus-1 gio-2.0
+ 
+ equals(QT_MAJOR_VERSION, 4): {
+     PKGCONFIG += libsignon-qt accounts-qt
+diff --git a/msyncd/synchronizer.cpp b/msyncd/synchronizer.cpp
+index b516ccd..6fccca6 100644
+--- a/msyncd/synchronizer.cpp
++++ b/msyncd/synchronizer.cpp
+@@ -1,4 +1,4 @@
+-/*
++﻿/*
+  * This file is part of buteo-syncfw package
+  *
+  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+@@ -21,6 +21,7 @@
+  * 02110-1301 USA
+  *
+  */
++#include <gio/gio.h>
+ #include "synchronizer.h"
+ #include "SyncDBusAdaptor.h"
+ #include "SyncSession.h"
+@@ -51,11 +52,11 @@
+ #include <fcntl.h>
+ #include <termios.h>
+ 
++
+ using namespace Buteo;
+ 
+ static const QString SYNC_DBUS_OBJECT = "/synchronizer";
+ static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
+-
+ static const QString BT_PROPERTIES_NAME = "Name";
+ 
+ // Maximum time in milliseconds to wait for a thread to stop
+@@ -71,10 +72,9 @@ Synchronizer::Synchronizer( QCoreApplication* aApplication )
+     iClosing(false),
+     iSOCEnabled(false),
+     iSyncUIInterface(NULL)
+-
+ {
++    iSettings = g_settings_new_with_path("com.meego.msyncd", "/com/meego/msyncd/");
+     FUNCTION_CALL_TRACE;
+-
+     this->setParent(aApplication);
+ }
+ 
+@@ -86,6 +86,7 @@ Synchronizer::~Synchronizer()
+         delete iSyncUIInterface;
+         iSyncUIInterface = NULL;
+     }
++    g_object_unref(iSettings);
+ }
+ 
+ bool Synchronizer::initialize()
+@@ -115,8 +116,9 @@ bool Synchronizer::initialize()
+             this, SLOT(slotSyncStatus(QString, int, QString, int)),
+             Qt::QueuedConnection);
+ 
++    // use queued connection because the profile will be stored after the signal
+     connect(&iProfileManager ,SIGNAL(signalProfileChanged(QString,int,QString)),
+-            this, SIGNAL(signalProfileChanged(QString,int,QString)));
++            this, SLOT(slotProfileChanged(QString,int,QString)), Qt::QueuedConnection);
+ 
+     iNetworkManager = new NetworkManager(this);
+     Q_ASSERT(iNetworkManager);
+@@ -127,8 +129,9 @@ bool Synchronizer::initialize()
+     {
+         iServerActivator = new ServerActivator(iProfileManager,
+                 *iTransportTracker, this);
+-        connect(iTransportTracker, SIGNAL(networkStateChanged(bool)),
+-                this, SLOT(onNetworkStateChanged(bool)));
++        connect(iTransportTracker,
++                SIGNAL(networkStateChanged(bool,Sync::InternetConnectionType)),
++                SLOT(onNetworkStateChanged(bool,Sync::InternetConnectionType)));
+     }
+ 
+     // Initialize account manager.
+@@ -184,7 +187,7 @@ bool Synchronizer::initialize()
+         else
+         {
+             QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(QString)),
+-                             this, SLOT(startSync(QString)),
++                             this, SLOT(startScheduledSync(QString)),
+                              Qt::QueuedConnection);
+             iSOCEnabled = true;
+         }
+@@ -200,7 +203,7 @@ void Synchronizer::enableSOCSlot(const QString& aProfileName)
+ {
+     FUNCTION_CALL_TRACE;
+     SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
+-    if(!iSOCEnabled)
++    if(profile->isSOCProfile() && !iSOCEnabled)
+     {
+         QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
+         QList<SyncProfile*> SOCProfiles;
+@@ -217,13 +220,13 @@ void Synchronizer::enableSOCSlot(const QString& aProfileName)
+         else
+         {
+             QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(const QString&)),
+-                             this, SLOT(startSync(const QString&)),
++                             this, SLOT(startScheduledSync(const QString&)),
+                              Qt::QueuedConnection);
+             iSOCEnabled = true;
+             LOG_DEBUG("Sync on change enabled for profile" << aProfileName);
+         }
+     }
+-    else
++    else if (profile->isSOCProfile())
+     {
+         iSyncOnChange.addProfile("hcontacts", profile);
+     }
+@@ -291,55 +294,27 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
+     // All scheduled syncs are online syncs
+     // Add this to the waiting online syncs and it will be started when we
+     // receive a session connection status from the NetworkManager
+-    bool sessionConnected = !iWaitingOnlineSyncs.isEmpty();
+-    if(!iWaitingOnlineSyncs.contains(aProfileName))
++    bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType());
++    if(accept)
+     {
+-        iWaitingOnlineSyncs.append(aProfileName);
++        startSync(aProfileName, true);
+     }
+-    if(!sessionConnected)
++    else if (!iWaitingOnlineSyncs.contains(aProfileName))
+     {
+-        QObject::connect(iNetworkManager, SIGNAL(connectionSuccess()), this,
+-                    SLOT(slotNetworkSessionOpened()), Qt::QueuedConnection);
+-        QObject::connect(iNetworkManager, SIGNAL(connectionError()), this,
+-                    SLOT(slotNetworkSessionError()), Qt::QueuedConnection);
+-        // Request for a network session
+-        iNetworkManager->connectSession(true);
++         LOG_DEBUG("Wait for internet connection:" << aProfileName);
++         if (iNetworkManager->isOnline())
++         {
++             LOG_DEBUG("Connection over mobile data plan. The sync will be postponed untill a full connection is available;");
++         }
++         else
++         {
++             LOG_DEBUG("Device offline. Wait for internet connection.");
++         }
++         iWaitingOnlineSyncs.append(aProfileName);
+     }
+     return true;
+ }
+ 
+-void Synchronizer::slotNetworkSessionOpened()
+-{
+-    FUNCTION_CALL_TRACE;
+-    QObject::disconnect(iNetworkManager, SIGNAL(connectionSuccess()), this,
+-                SLOT(slotNetworkSessionOpened()));
+-    QObject::disconnect(iNetworkManager, SIGNAL(connectionError()), this,
+-                SLOT(slotNetworkSessionError()));
+-    foreach(QString profileName, iWaitingOnlineSyncs)
+-    {
+-        startSync(profileName, true);
+-    }
+-    iWaitingOnlineSyncs.clear();
+-}
+-
+-void Synchronizer::slotNetworkSessionError()
+-{
+-    FUNCTION_CALL_TRACE;
+-    QObject::disconnect(iNetworkManager, SIGNAL(connectionSuccess()), this,
+-                SLOT(slotNetworkSessionOpened()));
+-    QObject::disconnect(iNetworkManager, SIGNAL(connectionError()), this,
+-                SLOT(slotNetworkSessionError()));
+-    // Cancel all open sessions
+-    foreach(QString profileName, iWaitingOnlineSyncs)
+-    {
+-        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, SyncResults::CONNECTION_ERROR);
+-        iProfileManager.saveSyncResults(profileName, syncResults);
+-        reschedule(profileName);
+-    }
+-    iWaitingOnlineSyncs.clear();
+-    iNetworkManager->disconnectSession();
+-}
+-
+ bool Synchronizer::setSyncSchedule(QString aProfileId , QString aScheduleAsXml)
+ {
+     bool status = false;
+@@ -364,6 +339,11 @@ bool Synchronizer::saveSyncResults(QString aProfileId, QString aSyncResults)
+     return status;
+ }
+ 
++QString Synchronizer::createSyncProfileForAccount(uint aAccountId)
++{
++    return iAccounts->createProfileForAccount(aAccountId);
++}
++
+ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
+ {
+     FUNCTION_CALL_TRACE;
+@@ -378,6 +358,12 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
+ 
+     LOG_DEBUG( "Start sync requested for profile:" << aProfileName );
+ 
++    // This function can be called from a client app as manual sync:
++    // If we receive a manual sync to a profile that is peding to sync due a
++    // data change we can remove it from the iSyncOnChangeScheduler, to avoid a
++    // second sync.
++    iSyncOnChangeScheduler.removeProfile(aProfileName);
++
+     if (iActiveSessions.contains(aProfileName))
+     {
+         LOG_DEBUG( "Sync already in progress" );
+@@ -389,6 +375,14 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
+         emit syncStatus(aProfileName, Sync::SYNC_QUEUED, "", 0);
+         return true;
+     }
++    else if (!aScheduled && iWaitingOnlineSyncs.contains(aProfileName))
++    {
++        // Manual sync is allowed to happen in any kind of connection
++        // if sync is not scheduled remove it from iWaitingOnlineSyncs to avoid
++        // sync it twice later
++        iWaitingOnlineSyncs.removeOne(aProfileName);
++        LOG_DEBUG("Removing" << aProfileName << "from online waiting list.");
++    }
+ 
+     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+     if (!profile)
+@@ -520,7 +514,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
+         return false;
+     }
+ 
+-    LOG_DEBUG("Disable sync on change");
++    LOG_DEBUG("Disable sync on change:" << iSOCEnabled << profile->isSOCProfile());
+     //As sync is ongoing, disable sync on change for now, we can query later if
+     //there are changes.
+     if(iSOCEnabled)
+@@ -754,7 +748,7 @@ bool Synchronizer::startNextSync()
+     }
+ 
+     QString profileName = session->profileName();
+-    LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName );
++    LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName << session->isScheduled());
+ 
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+     QBatteryInfo iDeviceInfo;
+@@ -1516,6 +1510,36 @@ void Synchronizer::onNewSession(const QString &aDestination)
+     }
+ }
+ 
++void Synchronizer::slotProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml)
++{
++    // start sync when a new profile is added
++    switch (aChangeType)
++    {
++        case ProfileManager::PROFILE_ADDED:
++            enableSOCSlot(aProfileName);
++            startSync(aProfileName);
++            break;
++
++        case ProfileManager::PROFILE_REMOVED:
++            iSyncOnChangeScheduler.removeProfile(aProfileName);
++            iWaitingOnlineSyncs.removeAll(aProfileName);
++            break;
++
++        case ProfileManager::PROFILE_MODIFIED:
++            {
++                // schedule a new sync in case of profile changed;
++                // Example if the profile change from disable -> enable
++                SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
++                if (profile->isEnabled()) {
++                    startScheduledSync(aProfileName);
++                }
++            }
++            break;
++    }
++
++    emit signalProfileChanged(aProfileName, aChangeType, aProfileAsXml);
++}
++
+ void Synchronizer::reschedule(const QString &aProfileName)
+ {
+     FUNCTION_CALL_TRACE;
+@@ -1903,10 +1927,24 @@ QStringList Synchronizer::syncProfilesByType(const QString &aType)
+     return iProfileManager.profileNames(aType);
+ }
+ 
+-void Synchronizer::onNetworkStateChanged(bool aState)
++void Synchronizer::onNetworkStateChanged(bool aState, Sync::InternetConnectionType type)
+ {
+     FUNCTION_CALL_TRACE;
+-    if(!aState) {
++    LOG_DEBUG("Network state changed: OnLine:" << aState << " connection type:" <<  type);
++    if (acceptScheduledSync(aState, type))
++    {
++        LOG_DEBUG("Restart sync for profiles that need network");
++        QStringList profiles(iWaitingOnlineSyncs);
++        iWaitingOnlineSyncs.clear();
++        foreach(QString profileName, profiles)
++        {
++            // start sync now, we do not need to call 'startScheduledSync' since that function
++            // only checks for internet connection
++            startSync(profileName, true);
++        }
++    }
++    else if (!aState)
++    {
+         QList<QString> profiles = iActiveSessions.keys();
+         foreach(QString profileId, profiles)
+         {
+@@ -1919,8 +1957,8 @@ void Synchronizer::onNetworkStateChanged(bool aState)
+                 delete profile;
+                 profile = NULL;
+             }
+-            else {
+-
++            else
++            {
+                 LOG_DEBUG("No profile found with aProfileId"<<profileId);
+             }
+         }
+@@ -2069,6 +2107,19 @@ void Synchronizer::removeExternalSyncStatus(const SyncProfile *aProfile)
+     }
+ }
+ 
++bool Synchronizer::acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const
++{
++    static QList<Sync::InternetConnectionType> allowedTypes;
++    if (allowedTypes.isEmpty())
++    {
++        allowedTypes << Sync::INTERNET_CONNECTION_WLAN
++                     << Sync::INTERNET_CONNECTION_ETHERNET;
++    }
++
++    return (aConnected && (g_settings_get_boolean(iSettings, "allow-scheduled-sync-over-cellular") ||
++                           allowedTypes.contains(aType)));
++}
++
+ void Synchronizer::isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName)
+ {
+     LOG_DEBUG("Received isSyncedExternally request for account:" << aAccountId);
+diff --git a/msyncd/synchronizer.h b/msyncd/synchronizer.h
+index 5564802..8c07eda 100644
+--- a/msyncd/synchronizer.h
++++ b/msyncd/synchronizer.h
+@@ -44,7 +44,9 @@
+ #include <QMap>
+ #include <QString>
+ #include <QDBusInterface>
++#include <QScopedPointer>
+ 
++struct _GSettings;
+ 
+ namespace Buteo {
+ 
+@@ -137,6 +139,9 @@ public slots:
+     //! \see SyncDBusInterface::saveSyncResults
+     virtual bool saveSyncResults(QString aProfileId,QString aSyncResults);
+ 
++    //! \see SyncDBusInterface::createSyncProfileForAccount
++    virtual QString createSyncProfileForAccount(uint aAccountId);
++
+     /*! \brief To get lastSyncResult.
+      *  \param aProfileId
+      *  \return QString of syncResult.
+@@ -257,9 +262,7 @@ private slots:
+ 
+     void onNewSession(const QString &aDestination);
+ 
+-    void slotNetworkSessionOpened();
+-
+-    void slotNetworkSessionError();
++    void slotProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
+ 
+     /*! \brief Starts a server plug-in
+      *
+@@ -273,7 +276,7 @@ private slots:
+      */
+     void stopServer(const QString &aProfileName);
+ 
+-    void onNetworkStateChanged(bool aState);
++    void onNetworkStateChanged(bool aState, Sync::InternetConnectionType type);
+ 
+     /*! \brief call this to request the sync daemon to enable soc
+      * for a profile. The sync daemon decides as of now for which storages
+@@ -385,6 +388,12 @@ private:
+      */
+     void removeExternalSyncStatus(const SyncProfile *aProfile);
+ 
++    /*! \brief Check if sheduled sync is allowed for this type of connection.
++     *
++     * @param aType the connection type;
++     */
++    bool acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const;
++
+     QMap<QString, SyncSession*> iActiveSessions;
+ 
+     QMap<QString, bool> iExternalSyncProfileStatus;
+@@ -446,6 +455,7 @@ private:
+ #endif
+ 
+     QDBusInterface *iSyncUIInterface;
++    _GSettings *iSettings;
+ };
+ 
+ }
+diff --git a/unittests/tests/msyncdtests/TransportTrackerTest.cpp b/unittests/tests/msyncdtests/TransportTrackerTest.cpp
+index 8cc5309..c69a315 100644
+--- a/unittests/tests/msyncdtests/TransportTrackerTest.cpp
++++ b/unittests/tests/msyncdtests/TransportTrackerTest.cpp
+@@ -89,7 +89,7 @@ void TransportTrackerTest :: testStateChanged()
+ {
+     qRegisterMetaType<Sync::ConnectivityType>("Sync::ConnectivityType");
+     QSignalSpy connectivityStateSpy(iTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)));
+-    QSignalSpy networkStateSpy(iTransportTracker, SIGNAL(networkStateChanged(bool)));
++    QSignalSpy networkStateSpy(iTransportTracker, SIGNAL(networkStateChanged(bool,Sync::InternetConnectionType)));
+ 
+     // change USB state and verify
+     bool usbCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_USB);
+@@ -115,7 +115,7 @@ void TransportTrackerTest :: testStateChanged()
+ 
+     // change internet state and verify
+     bool internetCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_INTERNET);
+-    iTransportTracker->onInternetStateChanged(!internetCurrentState);
++    iTransportTracker->onInternetStateChanged(!internetCurrentState, Sync::INTERNET_CONNECTION_UNKNOWN);
+     QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_INTERNET), !internetCurrentState);
+     QEXPECT_FAIL("", "IMO connectivityStateChanged() should be emitted also for CONNECTIVITY_INTERNET", Continue);
+     QCOMPARE(connectivityStateSpy.count(), 1);
+-- 
+2.1.4
+

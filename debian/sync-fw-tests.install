@@ -1,7 +1,0 @@
-/usr/share/sync-fw-tests/*
-/usr/share/sync-fw-tests/syncprofiletests/testprofiles/user/client/*
-/usr/share/sync-fw-tests/syncprofiletests/testprofiles/user/service/*
-/usr/share/sync-fw-tests/syncprofiletests/testprofiles/user/storage/*
-/usr/share/sync-fw-tests/syncprofiletests/testprofiles/user/sync/*
-/usr/share/sync-fw-tests/syncprofiletests/testprofiles/system/sync/*
-/usr/share/accounts/services/*

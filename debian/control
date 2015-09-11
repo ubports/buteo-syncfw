@@ -1,41 +1,53 @@
-Source: sync-fw
+Source: buteo-syncfw
 Section: utils
 Priority: optional
-Maintainer: Duggirala Karthik <karthik.2.duggirala@nokia.com>
-Build-Depends: debhelper (>= 5), cdbs, doxygen, libqt4-dev, libdbus-1-dev , accounts-qt-dev, libqtm-systeminfo-dev, libiphb-dev, libsignon-qt-dev, aegis-builder
-Standards-Version: 3.7.2
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Duggirala Karthik <karthik.2.duggirala@nokia.com>
+Build-Depends: debhelper (>= 9),
+               doxygen,
+               libaccounts-qt5-dev, 
+               libdbus-1-dev,
+               libglib2.0-dev,
+               libgsettings-qt-dev,
+               libiphb-dev,
+               libsignon-qt5-dev,
+               qtsystems5-dev,
+               qt5-default,
+               quilt,
+Standards-Version: 3.9.5
+Homepage: https://github.com/nemomobile/buteo-syncfw
 
-Package: sync-fw
+Package: buteo-syncfw
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         libbuteosyncfw5-0 (= ${binary:Version}),
 Description: Synchronization backend
  Synchronization backend, plugin manager, profile db, and conflict resolver.
 
-Package: sync-fw-dev
+Package: libbuteosyncfw5-0
+Section: libs
 Architecture: any
-Depends: debhelper (>= 5), sync-fw(= ${binary:Version}), cdbs, libdbus-1-dev 
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+Description: Synchronization backend
+ Synchronization backend, plugin manager, profile db, and conflict resolver.
+
+Package: libbuteosyncfw5-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         libbuteosyncfw5-0 (= ${binary:Version}),
+         libdbus-1-dev,
 Description: Files required for synchronizer plugin development
  Header file needed for making plugins.
  
-Package: sync-fw-dbg
-Architecture: any
-Depends: sync-fw (= ${binary:Version})
-Description: Debug symbols for sync-fw
-  Debug symbols for sync-fw
- 
-Package: sync-fw-doc
+Package: libbuteosyncfw5-doc
 Section: doc
-Architecture: any
+Architecture: all
+Depends: ${misc:Depends},
 Description: API documentation for sync-fw.
- Empty documentation package for sync-fw.
-
-Package: sync-fw-tests
-Section: tests
-Priority: optional
-Architecture: any
-Depends: ${shlibs:Depends}, sync-fw, testrunner-lite, meegotouch-dev-tools, timed
-XB-Maemo-CI-Packages: sync-fw-tests
-XB-Maemo-CI-Stage: staging 
-Description: Module test package for sync-fw.
- Module test package for sync-fw.
-
+ API documentation package for sync-fw.
