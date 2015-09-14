@@ -29,6 +29,7 @@
 #include <QTime>
 #include <QDebug>
 #include <QDateTime>
+#include <QScopedPointer>
 #include "Logger.h"
 
 //! Helper macro for writing log messages. Avoid using directly.
@@ -52,7 +53,9 @@
   * Creates a trace message to log when the function is entered and exited.
   * Logs also to time spent in the function.
   */
-# define FUNCTION_CALL_TRACE if (Buteo::Logger::instance()->getLogLevel() >= 9) Buteo::LogTimer timerDebugVariable(QString(__PRETTY_FUNCTION__));
+# define FUNCTION_CALL_TRACE QScopedPointer<Buteo::LogTimer> timerDebugVariable; \
+    if (Buteo::Logger::instance()->getLogLevel() >= 9) \
+        timerDebugVariable.reset(new Buteo::LogTimer(QString(__PRETTY_FUNCTION__)));
 
 namespace Buteo {
 
