@@ -182,7 +182,7 @@ public:
     void setProfileCreated(bool aProfileCreated);
 
     //! \brief Maps sync failure error code from stack to SyncStatus
-        Sync::SyncStatus mapToSyncStatusError(int aErrorCode);
+    Sync::SyncStatus mapToSyncStatusError(int aErrorCode);
 
 signals:
 

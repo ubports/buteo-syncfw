@@ -89,7 +89,7 @@ void TransportTrackerTest :: testStateChanged()
 {
     qRegisterMetaType<Sync::ConnectivityType>("Sync::ConnectivityType");
     QSignalSpy connectivityStateSpy(iTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)));
-    QSignalSpy networkStateSpy(iTransportTracker, SIGNAL(networkStateChanged(bool)));
+    QSignalSpy networkStateSpy(iTransportTracker, SIGNAL(networkStateChanged(bool,Sync::InternetConnectionType)));
 
     // change USB state and verify
     bool usbCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_USB);
@@ -115,7 +115,7 @@ void TransportTrackerTest :: testStateChanged()
 
     // change internet state and verify
     bool internetCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_INTERNET);
-    iTransportTracker->onInternetStateChanged(!internetCurrentState);
+    iTransportTracker->onInternetStateChanged(!internetCurrentState, Sync::INTERNET_CONNECTION_UNKNOWN);
     QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_INTERNET), !internetCurrentState);
     QEXPECT_FAIL("", "IMO connectivityStateChanged() should be emitted also for CONNECTIVITY_INTERNET", Continue);
     QCOMPARE(connectivityStateSpy.count(), 1);

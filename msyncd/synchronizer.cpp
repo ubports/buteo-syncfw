@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
@@ -21,6 +21,7 @@
  * 02110-1301 USA
  *
  */
+#include <gio/gio.h>
 #include "synchronizer.h"
 #include "SyncDBusAdaptor.h"
 #include "SyncSession.h"
@@ -51,11 +52,11 @@
 #include <fcntl.h>
 #include <termios.h>
 
+
 using namespace Buteo;
 
 static const QString SYNC_DBUS_OBJECT = "/synchronizer";
 static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
-
 static const QString BT_PROPERTIES_NAME = "Name";
 
 // Maximum time in milliseconds to wait for a thread to stop
@@ -71,10 +72,9 @@ Synchronizer::Synchronizer( QCoreApplication* aApplication )
     iClosing(false),
     iSOCEnabled(false),
     iSyncUIInterface(NULL)
-
 {
+    iSettings = g_settings_new_with_path("com.meego.msyncd", "/com/meego/msyncd/");
     FUNCTION_CALL_TRACE;
-
     this->setParent(aApplication);
 }
 
@@ -86,6 +86,7 @@ Synchronizer::~Synchronizer()
         delete iSyncUIInterface;
         iSyncUIInterface = NULL;
     }
+    g_object_unref(iSettings);
 }
 
 bool Synchronizer::initialize()
@@ -115,8 +116,9 @@ bool Synchronizer::initialize()
             this, SLOT(slotSyncStatus(QString, int, QString, int)),
             Qt::QueuedConnection);
 
+    // use queued connection because the profile will be stored after the signal
     connect(&iProfileManager ,SIGNAL(signalProfileChanged(QString,int,QString)),
-            this, SIGNAL(signalProfileChanged(QString,int,QString)));
+            this, SLOT(slotProfileChanged(QString,int,QString)), Qt::QueuedConnection);
 
     iNetworkManager = new NetworkManager(this);
     Q_ASSERT(iNetworkManager);
@@ -127,8 +129,9 @@ bool Synchronizer::initialize()
     {
         iServerActivator = new ServerActivator(iProfileManager,
                 *iTransportTracker, this);
-        connect(iTransportTracker, SIGNAL(networkStateChanged(bool)),
-                this, SLOT(onNetworkStateChanged(bool)));
+        connect(iTransportTracker,
+                SIGNAL(networkStateChanged(bool,Sync::InternetConnectionType)),
+                SLOT(onNetworkStateChanged(bool,Sync::InternetConnectionType)));
     }
 
     // Initialize account manager.
@@ -184,7 +187,7 @@ bool Synchronizer::initialize()
         else
         {
             QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(QString)),
-                             this, SLOT(startSync(QString)),
+                             this, SLOT(startScheduledSync(QString)),
                              Qt::QueuedConnection);
             iSOCEnabled = true;
         }
@@ -200,7 +203,7 @@ void Synchronizer::enableSOCSlot(const QString& aProfileName)
 {
     FUNCTION_CALL_TRACE;
     SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
-    if(!iSOCEnabled)
+    if(profile->isSOCProfile() && !iSOCEnabled)
     {
         QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
         QList<SyncProfile*> SOCProfiles;
@@ -217,13 +220,13 @@ void Synchronizer::enableSOCSlot(const QString& aProfileName)
         else
         {
             QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(const QString&)),
-                             this, SLOT(startSync(const QString&)),
+                             this, SLOT(startScheduledSync(const QString&)),
                              Qt::QueuedConnection);
             iSOCEnabled = true;
             LOG_DEBUG("Sync on change enabled for profile" << aProfileName);
         }
     }
-    else
+    else if (profile->isSOCProfile())
     {
         iSyncOnChange.addProfile("hcontacts", profile);
     }
@@ -291,53 +294,25 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
     // All scheduled syncs are online syncs
     // Add this to the waiting online syncs and it will be started when we
     // receive a session connection status from the NetworkManager
-    bool sessionConnected = !iWaitingOnlineSyncs.isEmpty();
-    if(!iWaitingOnlineSyncs.contains(aProfileName))
+    bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType());
+    if(accept)
     {
-        iWaitingOnlineSyncs.append(aProfileName);
+        startSync(aProfileName, true);
     }
-    if(!sessionConnected)
+    else if (!iWaitingOnlineSyncs.contains(aProfileName))
     {
-        QObject::connect(iNetworkManager, SIGNAL(connectionSuccess()), this,
-                    SLOT(slotNetworkSessionOpened()), Qt::QueuedConnection);
-        QObject::connect(iNetworkManager, SIGNAL(connectionError()), this,
-                    SLOT(slotNetworkSessionError()), Qt::QueuedConnection);
-        // Request for a network session
-        iNetworkManager->connectSession(true);
+         LOG_DEBUG("Wait for internet connection:" << aProfileName);
+         if (iNetworkManager->isOnline())
+         {
+             LOG_DEBUG("Connection over mobile data plan. The sync will be postponed untill a full connection is available;");
+         }
+         else
+         {
+             LOG_DEBUG("Device offline. Wait for internet connection.");
+         }
+         iWaitingOnlineSyncs.append(aProfileName);
     }
     return true;
-}
-
-void Synchronizer::slotNetworkSessionOpened()
-{
-    FUNCTION_CALL_TRACE;
-    QObject::disconnect(iNetworkManager, SIGNAL(connectionSuccess()), this,
-                SLOT(slotNetworkSessionOpened()));
-    QObject::disconnect(iNetworkManager, SIGNAL(connectionError()), this,
-                SLOT(slotNetworkSessionError()));
-    foreach(QString profileName, iWaitingOnlineSyncs)
-    {
-        startSync(profileName, true);
-    }
-    iWaitingOnlineSyncs.clear();
-}
-
-void Synchronizer::slotNetworkSessionError()
-{
-    FUNCTION_CALL_TRACE;
-    QObject::disconnect(iNetworkManager, SIGNAL(connectionSuccess()), this,
-                SLOT(slotNetworkSessionOpened()));
-    QObject::disconnect(iNetworkManager, SIGNAL(connectionError()), this,
-                SLOT(slotNetworkSessionError()));
-    // Cancel all open sessions
-    foreach(QString profileName, iWaitingOnlineSyncs)
-    {
-        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, SyncResults::CONNECTION_ERROR);
-        iProfileManager.saveSyncResults(profileName, syncResults);
-        reschedule(profileName);
-    }
-    iWaitingOnlineSyncs.clear();
-    iNetworkManager->disconnectSession();
 }
 
 bool Synchronizer::setSyncSchedule(QString aProfileId , QString aScheduleAsXml)
@@ -364,6 +339,11 @@ bool Synchronizer::saveSyncResults(QString aProfileId, QString aSyncResults)
     return status;
 }
 
+QString Synchronizer::createSyncProfileForAccount(uint aAccountId)
+{
+    return iAccounts->createProfileForAccount(aAccountId);
+}
+
 bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
 {
     FUNCTION_CALL_TRACE;
@@ -378,6 +358,12 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
 
     LOG_DEBUG( "Start sync requested for profile:" << aProfileName );
 
+    // This function can be called from a client app as manual sync:
+    // If we receive a manual sync to a profile that is peding to sync due a
+    // data change we can remove it from the iSyncOnChangeScheduler, to avoid a
+    // second sync.
+    iSyncOnChangeScheduler.removeProfile(aProfileName);
+
     if (iActiveSessions.contains(aProfileName))
     {
         LOG_DEBUG( "Sync already in progress" );
@@ -388,6 +374,14 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         LOG_DEBUG( "Sync request already in queue" );
         emit syncStatus(aProfileName, Sync::SYNC_QUEUED, "", 0);
         return true;
+    }
+    else if (!aScheduled && iWaitingOnlineSyncs.contains(aProfileName))
+    {
+        // Manual sync is allowed to happen in any kind of connection
+        // if sync is not scheduled remove it from iWaitingOnlineSyncs to avoid
+        // sync it twice later
+        iWaitingOnlineSyncs.removeOne(aProfileName);
+        LOG_DEBUG("Removing" << aProfileName << "from online waiting list.");
     }
 
     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
@@ -520,7 +514,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
         return false;
     }
 
-    LOG_DEBUG("Disable sync on change");
+    LOG_DEBUG("Disable sync on change:" << iSOCEnabled << profile->isSOCProfile());
     //As sync is ongoing, disable sync on change for now, we can query later if
     //there are changes.
     if(iSOCEnabled)
@@ -754,7 +748,7 @@ bool Synchronizer::startNextSync()
     }
 
     QString profileName = session->profileName();
-    LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName );
+    LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName << session->isScheduled());
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
     QBatteryInfo iDeviceInfo;
@@ -1516,6 +1510,41 @@ void Synchronizer::onNewSession(const QString &aDestination)
     }
 }
 
+void Synchronizer::slotProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml)
+{
+    // start sync when a new profile is added
+    switch (aChangeType)
+    {
+        case ProfileManager::PROFILE_ADDED:
+            {
+                enableSOCSlot(aProfileName);
+                SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+                if (profile && profile->isEnabled()) {
+                    startSync(aProfileName);
+                }
+            }
+            break;
+
+        case ProfileManager::PROFILE_REMOVED:
+            iSyncOnChangeScheduler.removeProfile(aProfileName);
+            iWaitingOnlineSyncs.removeAll(aProfileName);
+            break;
+
+        case ProfileManager::PROFILE_MODIFIED:
+            {
+                // schedule a new sync in case of profile changed;
+                // Example if the profile change from disable -> enable
+                SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+                if (profile->isEnabled()) {
+                    startScheduledSync(aProfileName);
+                }
+            }
+            break;
+    }
+
+    emit signalProfileChanged(aProfileName, aChangeType, aProfileAsXml);
+}
+
 void Synchronizer::reschedule(const QString &aProfileName)
 {
     FUNCTION_CALL_TRACE;
@@ -1903,10 +1932,24 @@ QStringList Synchronizer::syncProfilesByType(const QString &aType)
     return iProfileManager.profileNames(aType);
 }
 
-void Synchronizer::onNetworkStateChanged(bool aState)
+void Synchronizer::onNetworkStateChanged(bool aState, Sync::InternetConnectionType type)
 {
     FUNCTION_CALL_TRACE;
-    if(!aState) {
+    LOG_DEBUG("Network state changed: OnLine:" << aState << " connection type:" <<  type);
+    if (acceptScheduledSync(aState, type))
+    {
+        LOG_DEBUG("Restart sync for profiles that need network");
+        QStringList profiles(iWaitingOnlineSyncs);
+        iWaitingOnlineSyncs.clear();
+        foreach(QString profileName, profiles)
+        {
+            // start sync now, we do not need to call 'startScheduledSync' since that function
+            // only checks for internet connection
+            startSync(profileName, true);
+        }
+    }
+    else if (!aState)
+    {
         QList<QString> profiles = iActiveSessions.keys();
         foreach(QString profileId, profiles)
         {
@@ -1919,8 +1962,8 @@ void Synchronizer::onNetworkStateChanged(bool aState)
                 delete profile;
                 profile = NULL;
             }
-            else {
-
+            else
+            {
                 LOG_DEBUG("No profile found with aProfileId"<<profileId);
             }
         }
@@ -2067,6 +2110,19 @@ void Synchronizer::removeExternalSyncStatus(const SyncProfile *aProfile)
             LOG_DEBUG("Removing sync externally status for profile:" << profileName);
         }
     }
+}
+
+bool Synchronizer::acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const
+{
+    static QList<Sync::InternetConnectionType> allowedTypes;
+    if (allowedTypes.isEmpty())
+    {
+        allowedTypes << Sync::INTERNET_CONNECTION_WLAN
+                     << Sync::INTERNET_CONNECTION_ETHERNET;
+    }
+
+    return (aConnected && (g_settings_get_boolean(iSettings, "allow-scheduled-sync-over-cellular") ||
+                           allowedTypes.contains(aType)));
 }
 
 void Synchronizer::isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName)

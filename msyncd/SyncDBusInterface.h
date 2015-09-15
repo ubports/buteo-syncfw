@@ -103,29 +103,29 @@ signals:
      *
      */
     void signalProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
-    
-   
+
+
     /*! \brief Notifies about Backup start.
      *
      * This signal is sent when the backup framework is backing the sync related
      * data
      */
     void backupInProgress ();
-    
+
     /*! \brief Notifies about Backup done.
      *
      * This signal is sent when the backup framework has completed backing the sync related
      * data.
      */
     void backupDone();
-    
+
     /*! \brief Notifies about Restore start.
      *
      * This signal is sent when the backup framework is restoring the sync related
      * data
      */
     void restoreInProgress();
-    
+
     /*! \brief Notifies about Restore Done.
      *
      * This signal is sent when the backup framework has restored the sync related
@@ -160,7 +160,7 @@ signals:
      * \param aNextSyncTime This is an out parameter. The next sync time.
      */
     void statusChanged(unsigned int aAccountId, int aNewStatus, int aFailedReason, qlonglong aPrevSyncTime, qlonglong aNextSyncTime);
- 
+
     /*! \brief Returns the connectivity state of a specific medium like
      * bluetooth, USB or network.
      * \see SyncCommonDefs::ConnectivityType for arguments
@@ -257,16 +257,16 @@ public slots:
      * \return Profile name list.
      */
     virtual QStringList runningSyncs() = 0;
-    
-    
+
+
     /*!
      * \brief This function returns true if backup/restore in progress else
      * false.
      */
     virtual bool  getBackUpRestoreState() = 0;
-	
-	
-	/*!
+
+
+    /*!
      * \brief sets the schedule for a profile
      *
      * This Function helps in setting a schedule to profile
@@ -312,7 +312,7 @@ public slots:
      * \return The sync profile as Xml string.
      */
     virtual QString syncProfile(const QString &aProfileId) = 0;
-    
+
     /*! \brief Gets a sync profiles matching the key-value.
      *
      * Loads and merges also all sub-profiles that are referenced from the
@@ -323,7 +323,7 @@ public slots:
      * \return The sync profiles as Xml string list.
      */
     virtual QStringList syncProfilesByKey(const QString &aKey, const QString &aValue) = 0;
-    
+
     /*! \brief Gets a profiles  matching the profile type.
      *
      * \param aType Type of the profile service/storage/sync.
@@ -336,13 +336,13 @@ public slots:
      * \param aAccountId The account ID.
      */
     virtual Q_NOREPLY void start(unsigned int aAccountId) = 0;
-    
+
     /*! \brief Stops sync for all profiles matching the given account ID.
      *
      * \param aAccountId The account ID.
      */
     virtual Q_NOREPLY void stop(unsigned int aAccountId) = 0;
-    
+
     /*! \brief Returns the list of account IDs for which sync is ongoing
      *
      * \return The list of account IDs currectly syncing.
@@ -373,6 +373,13 @@ public slots:
      *  having several services enabled
      */
     virtual Q_NOREPLY void isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName) = 0;
+
+    /*! \brief Create a sync profile for the account if it does not exists
+     *
+     * \param aAccountId The account ID.
+     * \return The profile name if the profile was created successful or empty if it fails
+     */
+    virtual QString createSyncProfileForAccount(uint aAccountId) = 0;
 };
 
 }

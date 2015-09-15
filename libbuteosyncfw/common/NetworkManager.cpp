@@ -36,13 +36,40 @@ bool NetworkManager::m_isSessionActive = false;
 NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
     QObject(parent), m_networkConfigManager(0), m_networkSession(0),
     m_isOnline(false), m_errorEmitted(false),
-    m_sessionTimer(0)
+    m_sessionTimer(0), m_connectionType(Sync::INTERNET_CONNECTION_UNKNOWN)
 {
     FUNCTION_CALL_TRACE;
     m_networkConfigManager = new QNetworkConfigurationManager();
     Q_ASSERT(m_networkConfigManager);
-    connect(m_networkConfigManager, SIGNAL(onlineStateChanged(bool)),
-                SLOT(slotOnlineStateChanged(bool)));
+
+    // check for network status and configuration change (switch wifi, ethernet, mobile) a
+    connect(m_networkConfigManager,
+            SIGNAL(onlineStateChanged(bool)),
+            SLOT(slotConfigurationChanged()),
+            Qt::QueuedConnection);
+    connect(m_networkConfigManager,
+            SIGNAL(configurationAdded(QNetworkConfiguration)),
+            SLOT(slotConfigurationChanged()),
+            Qt::QueuedConnection);
+    connect(m_networkConfigManager,
+            SIGNAL(configurationChanged(QNetworkConfiguration)),
+            SLOT(slotConfigurationChanged()),
+            Qt::QueuedConnection);
+    connect(m_networkConfigManager,
+            SIGNAL(configurationRemoved(QNetworkConfiguration)),
+            SLOT(slotConfigurationChanged()),
+            Qt::QueuedConnection);
+    connect(m_networkConfigManager,
+            SIGNAL(updateCompleted()),
+            SLOT(slotConfigurationChanged()),
+            Qt::QueuedConnection);
+
+    connect(&m_idleRefreshTimer,
+            SIGNAL(timeout()),
+            SLOT(idleRefresh()),
+            Qt::QueuedConnection);
+    m_idleRefreshTimer.setSingleShot(true);
+
     m_isOnline = m_networkConfigManager->isOnline();
     LOG_DEBUG("Online status::" << m_isOnline);
     m_sessionTimer = new QTimer(this);
@@ -70,6 +97,11 @@ bool NetworkManager::isOnline()
 {
     FUNCTION_CALL_TRACE;
     return m_isOnline;
+}
+
+Sync::InternetConnectionType NetworkManager::connectionType() const
+{
+    return m_connectionType;
 }
 
 void NetworkManager::connectSession(bool connectInBackground /* = false*/)
@@ -110,9 +142,52 @@ void NetworkManager::sessionConnectionTimeout()
 {
     if (!m_errorEmitted && m_networkSession) {
         if (!m_networkSession->isOpen()) {
-            qWarning() << "No network reply received after 10 seconds, emitting session error.";
+            LOG_WARNING("No network reply received after 10 seconds, emitting session error.");
             slotSessionError(m_networkSession->error());
         }
+    }
+}
+
+void NetworkManager::slotConfigurationChanged()
+{
+    // wait for 3 secs before update connection status
+    // this avoid problems with connections that take a while to be stabilished
+    m_idleRefreshTimer.start(3000);
+}
+
+void NetworkManager::idleRefresh()
+{
+    FUNCTION_CALL_TRACE;
+    QList<QNetworkConfiguration> activeConfigs = m_networkConfigManager->allConfigurations(QNetworkConfiguration::Active);
+    QNetworkConfiguration::BearerType connectionType = QNetworkConfiguration::BearerUnknown;
+    QString bearerTypeName;
+
+    bool isOnline = activeConfigs.size() > 0;
+    if (isOnline)
+    {
+        // FIXME: due this bug lp:#1444162 on nm the QNetworkConfigurationManager
+        // returns the wrong default connection.
+        // We will consider the connection with the smallest bearer as the
+        // default connection, with that wifi and ethernet will be the first one
+        // https://bugs.launchpad.net/ubuntu/+source/network-manager/+bug/1444162
+        connectionType = activeConfigs.first().bearerType();
+        bearerTypeName = activeConfigs.first().bearerTypeName();
+        foreach(const QNetworkConfiguration &conf, activeConfigs)
+        {
+            if (conf.bearerType() < connectionType)
+            {
+                connectionType = conf.bearerType();
+                bearerTypeName = conf.bearerTypeName();
+            }
+        }
+    }
+    LOG_DEBUG("New state:" << isOnline << " New type: " << bearerTypeName << "(" << connectionType << ")");
+    if ((isOnline != m_isOnline) ||
+        ((Sync::InternetConnectionType)connectionType != m_connectionType))
+    {
+        m_isOnline = isOnline;
+        m_connectionType = (Sync::InternetConnectionType) connectionType;
+        emit statusChanged(m_isOnline, m_connectionType);
     }
 }
 
@@ -131,19 +206,6 @@ void NetworkManager::disconnectSession()
         m_networkSession->close();
         delete m_networkSession;
         m_networkSession = NULL;
-    }
-}
-
-void NetworkManager::slotOnlineStateChanged(bool isOnline)
-{
-    FUNCTION_CALL_TRACE;
-    LOG_DEBUG("Online status changed, is online is now::" << isOnline);
-    if(m_isOnline != isOnline)
-    {
-        if (m_sessionTimer->isActive())
-            m_sessionTimer->stop();
-        m_isOnline = isOnline;
-        emit valueChanged(m_isOnline);
     }
 }
 
