@@ -4,7 +4,7 @@
     <key name="allow-scheduled-sync-over-cellular" type="b">
       <summary>Scheduled Sync over cellular</summary>
       <description>Allow scheduled syncs to run over cellular connections.</description>
-      <default>true</default>
+      <default>false</default>
     </key>
   </schema>
 </schemalist>
