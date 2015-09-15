@@ -1,7 +1,0 @@
-usr/include/libsynccommon/*
-usr/include/libsyncprofile/*
-usr/include/libsyncpluginmgr/*
-usr/include/sync/*
-usr/lib/pkgconfig
-usr/lib/*.prl
-

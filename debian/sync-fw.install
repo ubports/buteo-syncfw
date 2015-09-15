@@ -1,6 +1,0 @@
-etc/sync/*
-etc/syncwidget/*
-usr/lib/lib*.so*
-usr/bin/msyncd
-usr/bin/*.pl
-usr/bin/*.sh

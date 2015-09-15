@@ -78,8 +78,9 @@ signals:
     /*! \brief Signal emitted when a n/w state changes
      *
      * @param aState New state. True if available, false if not.
+     * @param aType Connection type. The type of connetcion with the Internet.
      */
-    void networkStateChanged(bool aState);
+    void networkStateChanged(bool aState, Sync::InternetConnectionType aType);
 
     /*! \brief Signal emitted when a network session is successfully opened
      */
@@ -99,7 +100,7 @@ private slots:
     void onBtStateChanged(QString aKey, QDBusVariant aValue);
 #endif
 
-    void onInternetStateChanged(bool aConnected);
+    void onInternetStateChanged(bool aConnected, Sync::InternetConnectionType aType);
 
 private:
 
@@ -127,7 +128,7 @@ private:
     friend class TransportTrackerTest;
     friend class SynchronizerTest;
 #endif
-    
+
     bool btConnectivityStatus();
 
 };

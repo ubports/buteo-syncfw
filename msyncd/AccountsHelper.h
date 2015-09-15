@@ -29,12 +29,12 @@
 #include <Accounts/account.h>
 
 namespace Buteo {
-                 
+
 class Profile;
 class AccountsHelperTest;
 class ProfileManager;
 class SyncProfile;
-    
+
 const QString REMOTE_SERVICE_NAME("remote_service_name");
 
 /*! \brief Helper Class towards Accounts::Manager and various SSO related
@@ -57,7 +57,7 @@ public:
      *
      */
     virtual ~AccountsHelper();
-    
+
     /*! \brief Returns sync profiles that correspond to a given account ID
      *
      * \param id - The account ID.
@@ -68,30 +68,31 @@ public:
 
 public Q_SLOTS:
 
-	/*! \brief slot for Accounts::Manager accountCreated signal
-	 *
-	 * \param id Accounts Id
-	 */
-    void slotAccountCreated(Accounts::AccountId id);
+    /*! \brief This method is used to create a profile for a specified
+     * account
+     * \param id Accounts Id
+     * \return A string with the new profile name
+     */
+    QString createProfileForAccount(Accounts::AccountId id);
 
-	/*! \brief slot for Accounts::Manager accountRemoved signal
-	 *
-	 * \param id of the accounts
-	 */
+    /*! \brief slot for Accounts::Manager accountRemoved signal
+     *
+     * \param id of the accounts
+     */
     void slotAccountRemoved(Accounts::AccountId id);
 
-	/*! \brief slot for Accounts::Account enabledChanged signal
-	 *
-	 * \param serviceName The service that was enabled/disabled. Empty if the
+    /*! \brief slot for Accounts::Account enabledChanged signal
+     *
+     * \param serviceName The service that was enabled/disabled. Empty if the
      * entire account is enabled/disabled
      * \param enabled Boolean indicating enabled (true) or disabled (false)
-	 */
+     */
     void slotAccountEnabledChanged(const QString &serviceName, bool enabled);
-    
-	/*! \brief slot for Accounts::Manager displayNameChanged signal
-	 * *
-	 * \param id of the accounts
-	 */
+
+    /*! \brief slot for Accounts::Manager displayNameChanged signal
+     * *
+     * \param id of the accounts
+     */
     void slotAccountUpdated(Accounts::AccountId id);
 
     void slotSchedulerSettingsChanged(const char *aKey);
@@ -102,22 +103,20 @@ Q_SIGNALS:
     void removeProfile(QString profileId);
     void removeScheduledSync(const QString& profileId);
 
-private:
+private Q_SLOTS:
 
-    /*!
-     * \brief This method is used to create a profile for a specified
-     * account
-     */
+    void registerAccountListeners();
+
+private:
     void createProfileForAccount(Accounts::Account* account,
                                  const QString profileName,
                                  const SyncProfile* baseProfile);
 
-    void addAccountIfNotExists(Accounts::Account *account,
-                               Accounts::Service service,
-                               const SyncProfile *baseProfile);
+    QString addAccountIfNotExists(Accounts::Account *account,
+                                  Accounts::Service service,
+                                  const SyncProfile *baseProfile);
 
     void setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew = false);
-    void registerAccountListeners();
 
     void addSetting(Accounts::AccountId id, QString key, QVariant value);
 
