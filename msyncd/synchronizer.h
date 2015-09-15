@@ -44,7 +44,9 @@
 #include <QMap>
 #include <QString>
 #include <QDBusInterface>
+#include <QScopedPointer>
 
+struct _GSettings;
 
 namespace Buteo {
 
@@ -136,6 +138,9 @@ public slots:
 
     //! \see SyncDBusInterface::saveSyncResults
     virtual bool saveSyncResults(QString aProfileId,QString aSyncResults);
+
+    //! \see SyncDBusInterface::createSyncProfileForAccount
+    virtual QString createSyncProfileForAccount(uint aAccountId);
 
     /*! \brief To get lastSyncResult.
      *  \param aProfileId
@@ -257,9 +262,7 @@ private slots:
 
     void onNewSession(const QString &aDestination);
 
-    void slotNetworkSessionOpened();
-
-    void slotNetworkSessionError();
+    void slotProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
 
     /*! \brief Starts a server plug-in
      *
@@ -273,7 +276,7 @@ private slots:
      */
     void stopServer(const QString &aProfileName);
 
-    void onNetworkStateChanged(bool aState);
+    void onNetworkStateChanged(bool aState, Sync::InternetConnectionType type);
 
     /*! \brief call this to request the sync daemon to enable soc
      * for a profile. The sync daemon decides as of now for which storages
@@ -385,6 +388,12 @@ private:
      */
     void removeExternalSyncStatus(const SyncProfile *aProfile);
 
+    /*! \brief Check if sheduled sync is allowed for this type of connection.
+     *
+     * @param aType the connection type;
+     */
+    bool acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const;
+
     QMap<QString, SyncSession*> iActiveSessions;
 
     QMap<QString, bool> iExternalSyncProfileStatus;
@@ -446,6 +455,7 @@ private:
 #endif
 
     QDBusInterface *iSyncUIInterface;
+    _GSettings *iSettings;
 };
 
 }

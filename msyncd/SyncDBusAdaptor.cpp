@@ -206,3 +206,11 @@ void SyncDBusAdaptor::isSyncedExternally(uint aAccountId, const QString aClientP
     QMetaObject::invokeMethod(parent(), "isSyncedExternally", Q_ARG(uint, aAccountId), Q_ARG(QString, aClientProfileName));
 }
 
+QString SyncDBusAdaptor::createSyncProfileForAccount(uint aAccountId)
+{
+    // handle method call com.meego.msyncd.createSyncProfileForAccount
+    QString out0;
+    QMetaObject::invokeMethod(parent(), "createSyncProfileForAccount", Q_RETURN_ARG(QString, out0), Q_ARG(uint, aAccountId));
+    return out0;
+}
+

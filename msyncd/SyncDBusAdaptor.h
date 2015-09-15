@@ -157,6 +157,10 @@ class SyncDBusAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"au\"/>\n"
 "      <annotation value=\"QList&lt;uint>\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
 "    </method>\n"
+"    <method name=\"createSyncProfileForAccount\">\n"
+"      <arg direction=\"out\" type=\"s\"/>\n"
+"      <arg direction=\"in\" type=\"u\" name=\"aAccountId\"/>\n"
+"    </method>\n"
 "    <method name=\"status\">\n"
 "      <arg direction=\"out\" type=\"i\"/>\n"
 "      <arg direction=\"in\" type=\"u\" name=\"aAccountId\"/>\n"
@@ -198,6 +202,7 @@ public Q_SLOTS: // METHODS
     QList<uint> syncingAccounts();
     bool updateProfile(const QString &aProfileAsXml);
     Q_NOREPLY void isSyncedExternally(uint aAccountId, const QString aClientProfileName);
+    QString createSyncProfileForAccount(uint aAccountId);
 Q_SIGNALS: // SIGNALS
     void backupDone();
     void backupInProgress();

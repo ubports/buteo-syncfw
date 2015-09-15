@@ -26,6 +26,8 @@
 #include "Profile.h"
 #include "ProfileEngineDefs.h"
 
+#include <QTimer>
+
 static const QString ACCOUNTS_GLOBAL_SERVICE("global");
 
 using namespace Buteo;
@@ -36,13 +38,15 @@ AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent
     iAccountManager = new Accounts::Manager(this);
     // Connect to signal for account creation, deletion, and modification
     QObject::connect(iAccountManager, SIGNAL(accountCreated(Accounts::AccountId)),
-                     this, SLOT(slotAccountCreated(Accounts::AccountId)));
+                     this, SLOT(createProfileForAccount(Accounts::AccountId)));
     QObject::connect(iAccountManager, SIGNAL(accountRemoved(Accounts::AccountId)),
                      this, SLOT(slotAccountRemoved(Accounts::AccountId)));
     QObject::connect(iAccountManager, SIGNAL(accountUpdated(Accounts::AccountId)),
                      this, SLOT(slotAccountUpdated(Accounts::AccountId)));
 
-    registerAccountListeners();
+    // load accounts after return from contructor, to allow connection with class singals
+    // that can be fired by 'registerAccountListeners' function
+    QTimer::singleShot(0, this, SLOT(registerAccountListeners()));
 }
 
 AccountsHelper::~AccountsHelper()
@@ -54,9 +58,10 @@ AccountsHelper::~AccountsHelper()
     // their parent, aka, the manager
 }
 
-void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
+QString AccountsHelper::createProfileForAccount(Accounts::AccountId id)
 {
     FUNCTION_CALL_TRACE;
+    QString profileName;
     Accounts::Account *newAccount = iAccountManager->account(id);
     bool profileFoundAndCreated = false;
 
@@ -66,7 +71,7 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
         Accounts::ServiceList serviceList = newAccount->services();
         foreach(Accounts::Service service, serviceList)
         {
-            // Look for a sync profile that matches the service name
+            // Look for a sync profile that matches the service name (template)
             LOG_DEBUG("Looking for sync profile::" << service.name());
             SyncProfile *syncProfile = iProfileManager.syncProfile(service.name());
             LOG_DEBUG("Found profile::" << service.name());
@@ -74,7 +79,7 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
                     (true == syncProfile->boolKey(KEY_USE_ACCOUNTS, false))
                     )
             {
-                addAccountIfNotExists(newAccount, service, syncProfile);
+                profileName = addAccountIfNotExists(newAccount, service, syncProfile);
                 profileFoundAndCreated = true;
             }
             if(0 != syncProfile)
@@ -86,7 +91,7 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
 
         if (profileFoundAndCreated == false)
         {
-            // Fetch the key "remote_service_name" from the account settings and 
+            // Fetch the key "remote_service_name" from the account settings and
             // use it to create a profile
             QString profileName = newAccount->valueAsString(REMOTE_SERVICE_NAME);
             LOG_DEBUG("Profile name from account setting:" << profileName);
@@ -97,10 +102,15 @@ void AccountsHelper::slotAccountCreated(Accounts::AccountId id)
                 if (syncProfile->boolKey (KEY_USE_ACCOUNTS, false) == true)
                     createProfileForAccount (newAccount, profileName, syncProfile);
 
+                profileName = syncProfile->name();
                 delete syncProfile;
             }
         }
+    } else {
+        LOG_DEBUG("Account not found:" << id);
     }
+
+    return profileName;
 }
 
 void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
@@ -186,7 +196,7 @@ void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool 
             foreach(SyncProfile *profile, profiles)
             {
                 // See if the service name matches
-                if(serviceName == profile->name())
+                if(serviceName == profile->key(REMOTE_SERVICE_NAME))
                 {
                     // Check if the status really changed here
                     // saving the account can trigger the emition of enabledChanged()
@@ -331,16 +341,16 @@ void AccountsHelper::createProfileForAccount(Accounts::Account *account,
     delete newProfile;
 }
 
-void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
-                                           Accounts::Service service,
-                                           const SyncProfile *baseProfile)
+QString AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
+                                              Accounts::Service service,
+                                              const SyncProfile *baseProfile)
 {
     FUNCTION_CALL_TRACE;
 
     Profile *serviceProfile = iProfileManager.profile(service.name(), Profile::TYPE_SYNC);
     if (!serviceProfile) {
         LOG_DEBUG ("!!!! Service not supported !!!!");
-        return;
+        return QString();
     }
 
     QString profileName ;
@@ -367,9 +377,11 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
         // Add the account ID to the profile
         newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
         // Check if service is enabled
-        LOG_DEBUG("Service:: " << service.displayName() << "enabled status::" << account->enabled());
+        LOG_DEBUG("Service:: " << service.displayName() <<
+                  "enabled status::" << (account->enabled() && account->enabledServices().contains(service)));
         // Set profile as enabled
-        newProfile->setEnabled(account->enabled());
+        newProfile->setEnabled(account->enabled() &&
+                               account->enabledServices().contains(service));
         setSyncSchedule (newProfile, account->id(), true);
 
         // Save the newly created profile
@@ -398,6 +410,8 @@ void AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
     {
         delete profile;
     }
+
+    return profileName;
 }
 
 void AccountsHelper::addSetting(Accounts::AccountId id, QString key, QVariant value) {
@@ -448,12 +462,27 @@ void AccountsHelper::slotSchedulerSettingsChanged(const char *aKey)
 void AccountsHelper::registerAccountListener(Accounts::AccountId id)
 {
     FUNCTION_CALL_TRACE;
+
     Accounts::Account *account = iAccountManager->account(id);
+    if (iAccountList.contains(account)) {
+        return;
+    }
     iAccountList.append(account);
     // Callback for account enabled/disabled
-    QObject::connect(account, SIGNAL(enabledChanged(const QString&, bool)),
-                     this, SLOT(slotAccountEnabledChanged(const QString&, bool)));
+    QObject::connect(account,
+                     SIGNAL(enabledChanged(const QString&, bool)),
+                     SLOT(slotAccountEnabledChanged(const QString&, bool)),
+                     Qt::UniqueConnection);
 
+    // Account SyncOnChange
+    QList<SyncProfile*> profiles = getProfilesByAccountId(id);
+    foreach(SyncProfile *profile, profiles)
+    {
+        if(profile->isSOCProfile())
+        {
+            emit enableSOC(profile->name());
+        }
+    }
     account->selectService();
     account->beginGroup("scheduler");
     LOG_DEBUG("Watching Group :" << account->group());
@@ -463,5 +492,8 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
         return;
     }
     iAcctWatchMap[watch] = id;
-    QObject::connect(watch, SIGNAL(notify(const char *)), this, SLOT(slotSchedulerSettingsChanged(const char *)));
+    QObject::connect(watch,
+                     SIGNAL(notify(const char *)),
+                     SLOT(slotSchedulerSettingsChanged(const char *)),
+                     Qt::UniqueConnection);
 }
