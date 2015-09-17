@@ -22,6 +22,7 @@ BuildRequires: oneshot
 BuildRequires: doxygen
 Requires: mapplauncherd-qt5
 Requires: oneshot
+Requires: glib2
 %{_oneshot_requires_post}
 
 %description
@@ -65,6 +66,7 @@ Obsoletes: buteo-syncfw-msyncd < %{version}
 %{_libdir}/systemd/user/user-session.target.wants/*.service
 %config %{_sysconfdir}/syncwidget/*
 %{_bindir}/msyncd
+%{_datadir}/glib-2.0/schemas/*
 
 %package doc
 Summary: Documentation for %{name}
@@ -112,6 +114,8 @@ install -D -m 755 oneshot/msyncd-storage-perm %{buildroot}/%{_oneshotdir}
 
 %post
 /sbin/ldconfig
+
+glib-compile-schemas %{_datadir}/glib-2.0/schemas
 
 %{_bindir}/add-oneshot msyncd-storage-perm
 
