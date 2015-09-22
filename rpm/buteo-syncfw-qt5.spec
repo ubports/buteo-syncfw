@@ -114,15 +114,14 @@ install -D -m 755 oneshot/msyncd-storage-perm %{buildroot}/%{_oneshotdir}
 
 %post
 /sbin/ldconfig
-
-glib-compile-schemas %{_datadir}/glib-2.0/schemas
-
 %{_bindir}/add-oneshot msyncd-storage-perm
-
 if [ "$1" -ge 1 ]; then
     systemctl-user daemon-reload || true
     systemctl-user try-restart msyncd.service || true
 fi
+
+%post msyncd
+glib-compile-schemas %{_datadir}/glib-2.0/schemas
 
 %postun
 /sbin/ldconfig
