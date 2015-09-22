@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
@@ -167,17 +167,18 @@ void NetworkManager::idleRefresh()
     {
         // FIXME: due this bug lp:#1444162 on nm the QNetworkConfigurationManager
         // returns the wrong default connection.
-        // We will consider the connection with the smallest bearer as the
-        // default connection, with that wifi and ethernet will be the first one
-        // https://bugs.launchpad.net/ubuntu/+source/network-manager/+bug/1444162
+        // We will consider the first active connection as default connection
+        // unless that there is a WLAN or Ethernet connection active
         connectionType = activeConfigs.first().bearerType();
         bearerTypeName = activeConfigs.first().bearerTypeName();
         foreach(const QNetworkConfiguration &conf, activeConfigs)
         {
-            if (conf.bearerType() < connectionType)
+            if ((conf.bearerType() == QNetworkConfiguration::BearerWLAN) ||
+                (conf.bearerType() == QNetworkConfiguration::BearerEthernet))
             {
                 connectionType = conf.bearerType();
                 bearerTypeName = conf.bearerTypeName();
+                break;
             }
         }
     }
