@@ -1,0 +1,59 @@
+From e10289937804ad6d779843753727b661d2e14e43 Mon Sep 17 00:00:00 2001
+From: Renato Araujo Oliveira Filho <renato.filho@canonical.com>
+Date: Fri, 3 Jul 2015 14:49:13 -0300
+Subject: [PATCH 1/2] Added upstart service file.
+
+Create upstart file to start msyncd service.
+---
+ msyncd/bin/msyncd.conf | 14 ++++++++++++++
+ msyncd/msyncd-app.pro  |  5 ++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+ create mode 100644 msyncd/bin/msyncd.conf
+
+diff --git a/msyncd/bin/msyncd.conf b/msyncd/bin/msyncd.conf
+new file mode 100644
+index 0000000..7224f87
+--- /dev/null
++++ b/msyncd/bin/msyncd.conf
+@@ -0,0 +1,14 @@
++description "address-book-service"
++author "Bill Filler <bill.filler@canonical.com>"
++
++start on started unity8-dash
++stop on runlevel [06]
++
++# give some time to nm be ready
++pre-start script
++    sleep 10;
++end script
++
++respawn
++
++exec /usr/bin/msyncd
+diff --git a/msyncd/msyncd-app.pro b/msyncd/msyncd-app.pro
+index be59a8c..ca0a53d 100644
+--- a/msyncd/msyncd-app.pro
++++ b/msyncd/msyncd-app.pro
+@@ -59,7 +59,9 @@ target.path = /usr/bin/
+ loglevel.files = bin/set_sync_log_level
+ loglevel.path = /etc/buteo/
+ service.files = bin/msyncd.service
++upstart.files = bin/msyncd.conf
+ service.path = /usr/lib/systemd/user/
++upstart.path = /usr/share/upstart/sessions/
+ syncwidget.path = /etc/syncwidget/
+ syncwidget.files = com.meego.msyncd
+ gschemas.path = /usr/share/glib-2.0/schemas
+@@ -68,7 +70,8 @@ INSTALLS += target \
+     loglevel \
+     syncwidget \
+     service \
+-    gschemas
++    gschemas \
++    upstart
+ 
+ # #####################################################################
+ # make coverage (debug)
+-- 
+2.1.4
+

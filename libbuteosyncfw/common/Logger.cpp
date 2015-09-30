@@ -206,7 +206,7 @@ void Logger::write(int aLevel, const char *aMsg)
     {
         if(aLevel >= QtCriticalMsg)
         {
-            syslog(LOG_CRIT, sysLogMsg.toLocal8Bit().data());
+            syslog(LOG_CRIT, "%s", sysLogMsg.toLocal8Bit().data());
         }
         return;
     }
@@ -217,7 +217,7 @@ void Logger::write(int aLevel, const char *aMsg)
         return;
     }
 
-    syslog(syslogLevel[aLevel], sysLogMsg.toLocal8Bit().data());
+    syslog(syslogLevel[aLevel], "%s", sysLogMsg.toLocal8Bit().data());
 
     if (iFileStream != 0)
     {

@@ -66,7 +66,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
 
     // BT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    
+
     // Set the bluetooth state
     iTransportStates[Sync::CONNECTIVITY_BT] = btConnectivityStatus();
 
@@ -97,8 +97,9 @@ TransportTracker::TransportTracker(QObject *aParent) :
     {
         iTransportStates[Sync::CONNECTIVITY_INTERNET] =
             iInternet->isOnline();
-        connect(iInternet, SIGNAL(valueChanged(bool)),
-            this, SLOT(onInternetStateChanged(bool)) /*, Qt::QueuedConnection*/);
+        connect(iInternet,
+                SIGNAL(statusChanged(bool, Sync::InternetConnectionType)),
+                SLOT(onInternetStateChanged(bool, Sync::InternetConnectionType)) /*, Qt::QueuedConnection*/);
     }
     else
     {
@@ -143,7 +144,7 @@ void TransportTracker::onBtStateChanged(bool aState)
 void TransportTracker::onBtStateChanged(QString aKey, QDBusVariant aValue)
 {
     FUNCTION_CALL_TRACE;
-    
+
     if (aKey == "Powered")
     {
         bool btPowered = aValue.variant().toBool();
@@ -153,12 +154,13 @@ void TransportTracker::onBtStateChanged(QString aKey, QDBusVariant aValue)
 }
 #endif
 
-void TransportTracker::onInternetStateChanged(bool aConnected)
+void TransportTracker::onInternetStateChanged(bool aConnected, Sync::InternetConnectionType aType)
 {
     FUNCTION_CALL_TRACE;
 
     LOG_DEBUG("Internet state changed:" << aConnected);
     updateState(Sync::CONNECTIVITY_INTERNET, aConnected);
+    emit networkStateChanged(aConnected, aType);
 }
 
 void TransportTracker::updateState(Sync::ConnectivityType aType,
@@ -175,11 +177,9 @@ void TransportTracker::updateState(Sync::ConnectivityType aType,
     }
     if(oldState != aState)
     {
-        if (aType != Sync::CONNECTIVITY_INTERNET) {
+        if (aType != Sync::CONNECTIVITY_INTERNET)
+        {
             emit connectivityStateChanged(aType, aState);
-        }
-        else {
-            emit networkStateChanged(aState);
         }
     }
 }
@@ -187,7 +187,7 @@ void TransportTracker::updateState(Sync::ConnectivityType aType,
 bool TransportTracker::btConnectivityStatus()
 {
     FUNCTION_CALL_TRACE;
-    
+
     bool btOn = false;
     QDBusConnection *systemBus = new QDBusConnection(QDBusConnection::connectToBus(QDBusConnection::SystemBus,
                                                                                     QStringLiteral("buteo_system_bus2")));
@@ -207,7 +207,7 @@ bool TransportTracker::btConnectivityStatus()
     QList<QVariant> adapterList = reply.arguments();
     // We will take the first adapter in the list
     QString adapterPath = qdbus_cast<QDBusObjectPath>(adapterList.at(0)).path();
-    
+
     if (!adapterPath.isEmpty() || !adapterPath.isNull())
     {
         // Retrive the properties of the adapter and check for "Powered" key
@@ -222,7 +222,7 @@ bool TransportTracker::btConnectivityStatus()
             delete systemBus;
             return btOn;
         }
-        
+
         QDBusArgument arg = reply.arguments().at(0).value<QDBusArgument>();
         if (arg.currentType() == QDBusArgument::MapType)
         {
