@@ -1,3 +1,10 @@
+buteo-syncfw (0.7.21+15.10.20151015-0ubuntu1) wily; urgency=medium
+
+  [ Renato Araujo Oliveira Filho ]
+  * Enable more debug messages.
+
+ -- Bill Filler <ci-train-bot@canonical.com>  Thu, 15 Oct 2015 19:50:38 +0000
+
 buteo-syncfw (0.7.21+15.10.20150930-0ubuntu1) wily; urgency=medium
 
   [ Ken VanDine ]
