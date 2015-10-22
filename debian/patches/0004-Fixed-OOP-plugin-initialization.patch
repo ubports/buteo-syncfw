@@ -1,0 +1,114 @@
+From 569758a954dedb781288f1195112e680c4dfcc09 Mon Sep 17 00:00:00 2001
+From: Renato Araujo Oliveira Filho <renato.filho@canonical.com>
+Date: Thu, 22 Oct 2015 16:22:31 -0300
+Subject: [PATCH] Fixed OOP plugin initialization.
+
+Wait until the OOP plugin service appear on DBUS, to continue plugin initialization.
+---
+ libbuteosyncfw/pluginmgr/PluginManager.cpp | 33 ++++++++++++++++++++++--------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
+
+diff --git a/libbuteosyncfw/pluginmgr/PluginManager.cpp b/libbuteosyncfw/pluginmgr/PluginManager.cpp
+index c66f537..12d262b 100644
+--- a/libbuteosyncfw/pluginmgr/PluginManager.cpp
++++ b/libbuteosyncfw/pluginmgr/PluginManager.cpp
+@@ -26,6 +26,7 @@
+ 
+ #include <QDir>
+ #include <QProcess>
++#include <QDBusServiceWatcher>
+ 
+ #include <dlfcn.h>
+ #include <errno.h>
+@@ -46,7 +47,7 @@ PluginManager::PluginManager( const QString &aPluginPath )
+  : iPluginPath( aPluginPath )
+ {
+     FUNCTION_CALL_TRACE;
+-    
++
+     if (!iPluginPath.isEmpty() && !iPluginPath.endsWith('/')) {
+         iPluginPath.append('/');
+     }
+@@ -339,7 +340,7 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
+             unloadDll( path );
+         }
+     } else if ( iOopClientMaps.contains(pluginName) ) {
+-        // Stop the OOP process        
++        // Stop the OOP process
+         LOG_DEBUG( "Stopping the OOP process for " << pluginName);
+         QString path = iOopClientMaps.value( pluginName );
+         stopOOPPlugin( path );
+@@ -394,7 +395,7 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
+         QString exePath = iOoPServerMaps.value( aPluginName );
+ 
+         QProcess* process = startOOPPlugin( exePath, aPluginName, aProfile.name() );
+-    
++
+         if( process == NULL ) {
+             LOG_CRITICAL( "Could not start server plugin process" );
+             return NULL;
+@@ -419,10 +420,10 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
+ void PluginManager::destroyServer( ServerPlugin *aPlugin )
+ {
+     FUNCTION_CALL_TRACE;
+-    
++
+     if ( aPlugin == 0 )
+         return;
+-    
++
+     QString pluginName = aPlugin->getPluginName();
+ 
+     if ( ! iServerMaps.contains(pluginName) &&
+@@ -518,7 +519,7 @@ void PluginManager::loadOOPPluginMaps( const QString aFilter, QMap<QString, QStr
+ }
+ void* PluginManager::loadDll( const QString& aPath )
+ {
+-    
++
+     FUNCTION_CALL_TRACE;
+     iDllLock.lockForWrite();
+ 
+@@ -562,7 +563,7 @@ void* PluginManager::loadDll( const QString& aPath )
+ void* PluginManager::getDllHandle( const QString& aPath )
+ {
+     FUNCTION_CALL_TRACE;
+-    
++
+     iDllLock.lockForRead();
+ 
+     void* handle = NULL;
+@@ -654,14 +655,28 @@ QProcess* PluginManager::startOOPPlugin( const QString &aPath,
+                " with plugin name " << aPluginName <<
+                " and profile name " << aProfileName);
+ 
++    QEventLoop serviceWaitLoop;
++    QString pluginDBUSServiceName(QString("com.buteo.msyncd.plugin.profile-%1").arg(aProfileName));
++    QDBusServiceWatcher watcher(pluginDBUSServiceName,
++                                QDBusConnection::sessionBus(),
++                                QDBusServiceWatcher::WatchForRegistration);
++    connect(&watcher, SIGNAL(serviceRegistered(QString)), &serviceWaitLoop, SLOT(quit()));
++    // timeout in case of the service never appears on DBUS
++    QTimer::singleShot(30000, &serviceWaitLoop, SLOT(quit()));
++
++    // start plugin process
+     QProcess *process = new QProcess();
+     process->setProcessChannelMode( QProcess::ForwardedChannels );
+     process->start( aPath, args );
+ 
+-    // This check is a workaround for the bug https://codereview.qt-project.org/#change,62897
+-    QThread::sleep(1);         // The process state does not seem be in a proper state immediately
++    LOG_DEBUG("Waiting for DBUS service:" << pluginDBUSServiceName);
++    // wait until the service is available or timeout
++    serviceWaitLoop.exec();
++
+     if( process->state() == QProcess::Starting ) {
+         started = process->waitForStarted();
++    } else  {
++        started = (process->state() == QProcess::Running);
+     }
+ 
+     if (started == true) {
+-- 
+2.1.4
+
