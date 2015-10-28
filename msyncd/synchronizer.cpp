@@ -1384,12 +1384,8 @@ void Synchronizer::onNewSession(const QString &aDestination)
     {
         SyncProfile *profile = 0;
         QList<SyncProfile*> syncProfiles;
-        BtHelper btHelp(aDestination);
-        QMap <QString , QVariant> mapVal = btHelp.getDeviceProperties();
-        uint classType = mapVal.value("Class").toInt();
-        uint computerclass = 0x100; //Major Device Class - Computer
 
-        if(aDestination.contains("USB") || classType & computerclass)
+        if(aDestination.contains("USB"))
         {
             syncProfiles = iProfileManager.getSyncProfilesByData(
                     QString::null, QString::null, KEY_DISPLAY_NAME, PC_SYNC);
@@ -1982,22 +1978,10 @@ Profile* Synchronizer::getSyncProfileByRemoteAddress(const QString& aAddress)
     }
     else
     {
-        BtHelper btHelp(aAddress);
-        QMap <QString , QVariant> mapVal = btHelp.getDeviceProperties();
-        uint classType = mapVal.value("Class").toInt();
-        uint computerclass = 0x100; //Major Device Class - Computer
-        if(classType & computerclass)
-        {
-            profiles = iProfileManager.getSyncProfilesByData(
-                    QString::null, QString::null, KEY_DISPLAY_NAME, PC_SYNC);
-        }
-        else
-        {
-            profiles = iProfileManager.getSyncProfilesByData("",
-                                          Buteo::Profile::TYPE_SYNC,
-                                          Buteo::KEY_BT_ADDRESS,
-                                          aAddress);
-        }
+        profiles = iProfileManager.getSyncProfilesByData("",
+                                      Buteo::Profile::TYPE_SYNC,
+                                      Buteo::KEY_BT_ADDRESS,
+                                      aAddress);
     }
     if(!profiles.isEmpty())
     {
@@ -2026,17 +2010,7 @@ QString Synchronizer::getValue(const QString& aAddress, const QString& aKey)
         else
         {
             BtHelper btHelper(aAddress);
-            QMap <QString , QVariant> mapVal = btHelper.getDeviceProperties();
-            uint classType = mapVal.value("Class").toInt();
-            uint computerclass = 0x100; //Major Device Class - Computer
-            if(classType & computerclass)
-            {
-                iRemoteName = PC_SYNC;
-            }
-            else
-            {
-                iRemoteName = btHelper.getDeviceProperties().value(BT_PROPERTIES_NAME).toString();
-            }
+            iRemoteName = btHelper.getDeviceProperties().value(BT_PROPERTIES_NAME).toString();
         }
         value = iRemoteName;
     }
