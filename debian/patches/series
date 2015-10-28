@@ -3,3 +3,4 @@ libdir.patch
 0002-Fixed-FUNCTION_CALL_TRACE-macro.patch
 0003-Added-upstart-service-file.patch
 0001-Check-for-WLAN-or-ETHERNET-connections.patch
+0004-Fixed-OOP-plugin-initialization.patch

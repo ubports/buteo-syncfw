@@ -1,0 +1,49 @@
+diff --git a/libbuteosyncfw/pluginmgr/PluginManager.cpp b/libbuteosyncfw/pluginmgr/PluginManager.cpp
+index c66f537..b4a0cb8 100644
+--- a/libbuteosyncfw/pluginmgr/PluginManager.cpp
++++ b/libbuteosyncfw/pluginmgr/PluginManager.cpp
+@@ -658,13 +658,30 @@ QProcess* PluginManager::startOOPPlugin( const QString &aPath,
+     process->setProcessChannelMode( QProcess::ForwardedChannels );
+     process->start( aPath, args );
+ 
+-    // This check is a workaround for the bug https://codereview.qt-project.org/#change,62897
+-    QThread::sleep(1);         // The process state does not seem be in a proper state immediately
++    const QString clientPluginDBusServiceName(QStringLiteral("com.buteo.msyncd.plugin.profile-%1").arg(aProfileName));
++    const QString serverPluginDBusServiceName(QStringLiteral("com.buteo.msyncd.plugin.%1").arg(aProfileName));
++    bool pluginHasRegistered = false;
++    for (int i = 0; i < 30; i++) { // wait for up to thirty seconds for the process to register with dbus
++        QThread::sleep(1);         // sleep for a second to wait for the process to be scheduled, init and register with dbus
++        QDBusReply<bool> clientServiceRegistered = QDBusConnection::sessionBus().interface()->isServiceRegistered(clientPluginDBusServiceName);
++        if (clientServiceRegistered.isValid() && clientServiceRegistered.value()) {
++            pluginHasRegistered = true;
++            break;
++        }
++        QDBusReply<bool> serverServiceRegistered = QDBusConnection::sessionBus().interface()->isServiceRegistered(serverPluginDBusServiceName);
++        if (serverServiceRegistered.isValid() && serverServiceRegistered.value()) {
++            pluginHasRegistered = true;
++            break;
++        }
++    }
++
+     if( process->state() == QProcess::Starting ) {
+         started = process->waitForStarted();
++    } else {
++        started = process->state() == QProcess::Running;
+     }
+ 
+-    if (started == true) {
++    if (started) {
+         DllInfo info;
+         info.iPath = aPath;
+         info.iHandle = (void*)process;
+@@ -675,6 +692,10 @@ QProcess* PluginManager::startOOPPlugin( const QString &aPath,
+         iDllLock.unlock();
+ 
+         LOG_DEBUG( "Process " << process->program() << " started with pid " << process->pid() );
++        if (!pluginHasRegistered) {
++            LOG_DEBUG( "Process " << process->program() << " with pid " << process->pid() <<
++                       "was unable to register DBus service: " << clientPluginDBusServiceName << "|" << serverPluginDBusServiceName );
++        }
+         connect(process, SIGNAL(finished(int,QProcess::ExitStatus)),
+                 this, SLOT(onProcessFinished(int,QProcess::ExitStatus)));
+         return process;
