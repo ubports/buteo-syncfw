@@ -356,11 +356,13 @@ Profile *ProfileManager::profile(const QString &aName, const QString &aType)
 
 SyncProfile *ProfileManager::syncProfile(const QString &aName)
 {
-
+    LOG_DEBUG("ProfileManager::syncProfile(" << aName << ")");
     Profile *p = profile(aName, Profile::TYPE_SYNC);
     SyncProfile *syncProfile = 0;
     if (p != 0 && p->type() == Profile::TYPE_SYNC)
     {
+        LOG_DEBUG("found a valid sync profile with the given name:" << aName);
+
         // RTTI is not allowed, use static_cast. Should be safe, because
         // type is verified.
         syncProfile = static_cast<SyncProfile*>(p);
@@ -379,7 +381,9 @@ SyncProfile *ProfileManager::syncProfile(const QString &aName)
             syncProfile->setLog(log);
         } // no else
     } else {
+        LOG_DEBUG("did not find a valid sync profile with the given name:" << aName);
         if (p != 0) {
+            LOG_DEBUG("but found a profile of type:" << p->type() << "with the given name:" << aName);
             delete p;
         }
     }
@@ -759,51 +763,43 @@ QString ProfileManager::updateProfile(const Profile &aProfile)
 SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, bool &saveNewProfile)
 {
     FUNCTION_CALL_TRACE;
+    LOG_DEBUG("createTempSyncProfile(" << destAddress << ")");
 
     if (destAddress.contains("USB")) { //USB - PCSUite no requirement to save profile
         LOG_INFO("USB connect - pc");
         SyncProfile *profile = new SyncProfile(PC_SYNC);
         profile->setBoolKey(KEY_HIDDEN, true);
         profile->setKey(KEY_DISPLAY_NAME, PC_SYNC);
-        return profile;
-    }
-
-    BtHelper btHelp(destAddress);
-    QMap <QString , QVariant> mapVal = btHelp.getDeviceProperties();
-    uint classType = mapVal.value("Class").toInt();
-    uint pcsuiteClass = 0x100; //Major Device Class - Computer!
-
-    if (classType & pcsuiteClass) {
-        LOG_INFO("Device major class is Computer"); // not required to save profile
-        SyncProfile *profile = new SyncProfile(PC_SYNC);
-        profile->setBoolKey(KEY_HIDDEN, true);
-        profile->setKey(KEY_DISPLAY_NAME, PC_SYNC);
+        LOG_DEBUG("USB connect does not require a sync profile to be created.");
         return profile;
     }
 
     saveNewProfile = true;
-    QString profileDisplayName = mapVal.value("Name").toString();
+    BtHelper btHelp(destAddress);
+    QString profileDisplayName = btHelp.getDeviceProperties().value("Name").toString();
     if (profileDisplayName.isEmpty()) {
-        //Todo : What to show if name is empty !!
         //Fixes 171340
         profileDisplayName = QString ("qtn_sync_dest_name_device_default");
     }
 
     LOG_INFO("Profile Name :" << profileDisplayName);
     SyncProfile *tProfile = syncProfile(BT_PROFILE_TEMPLATE);
-    //Profile *service = tProfile->serviceProfile();
-    //if (service != 0) {
-        tProfile->setKey(KEY_DISPLAY_NAME, profileDisplayName);
-        QStringList keys ;
-        keys << destAddress << tProfile->name();
-        tProfile->setName(keys);
-        tProfile->setEnabled(true);
-        tProfile->setBoolKey("hidden", false);
-        tProfile->setKey(KEY_BT_ADDRESS, destAddress);
-        tProfile->setKey(KEY_BT_NAME, profileDisplayName);
-    //} else {
-    //   LOG_WARNING("No service profile, unable to update properties");
-    //}
+    tProfile->setKey(KEY_DISPLAY_NAME, profileDisplayName);
+    QStringList keys ;
+    keys << destAddress << tProfile->name();
+    tProfile->setName(keys);
+    tProfile->setEnabled(true);
+    tProfile->setBoolKey("hidden", false);
+    QStringList subprofileNames = tProfile->subProfileNames();
+    Q_FOREACH (const QString &spn, subprofileNames) {
+        if (spn == QStringLiteral("bt")) {
+            // this is the bluetooth profile.  Set some Bluetooth-specific keys here.
+            Profile *btSubprofile = tProfile->subProfile(spn);
+            btSubprofile->setKey(KEY_BT_ADDRESS, destAddress);
+            btSubprofile->setKey(KEY_BT_NAME, profileDisplayName);
+            btSubprofile->setEnabled(true);
+        }
+    }
 
     return tProfile;
 }
