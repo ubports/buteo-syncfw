@@ -76,6 +76,10 @@ Synchronizer::Synchronizer( QCoreApplication* aApplication )
     iSettings = g_settings_new_with_path("com.meego.msyncd", "/com/meego/msyncd/");
     FUNCTION_CALL_TRACE;
     this->setParent(aApplication);
+
+    iProfileChangeTriggerTimer.setSingleShot(true);
+    connect(&iProfileChangeTriggerTimer, &QTimer::timeout,
+            this, &Synchronizer::profileChangeTriggerTimeout);
 }
 
 Synchronizer::~Synchronizer()
@@ -363,6 +367,14 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     // data change we can remove it from the iSyncOnChangeScheduler, to avoid a
     // second sync.
     iSyncOnChangeScheduler.removeProfile(aProfileName);
+
+    // Do the same if the profile is pending sync due to a profile change.
+    for (int i = iProfileChangeTriggerQueue.size() - 1; i >= 0; --i) {
+        if (iProfileChangeTriggerQueue[i].first == aProfileName) {
+            LOG_DEBUG("Removing queued profile change sync due to sync trigger:" << aProfileName);
+            iProfileChangeTriggerQueue.removeAt(i);
+        }
+    }
 
     if (iActiveSessions.contains(aProfileName))
     {
@@ -1508,37 +1520,74 @@ void Synchronizer::onNewSession(const QString &aDestination)
 
 void Synchronizer::slotProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml)
 {
-    // start sync when a new profile is added
+    // queue up a sync when a new profile is added or an existing profile is modified.
+    // we coalesce changes to profiles so that we do not trigger syncs immediately
+    // on change, to avoid thrash during backup/restore and races if the client wishes
+    // to trigger manually.  Temporary until we can improve Buteo's SyncOnChange handler.
     switch (aChangeType)
     {
         case ProfileManager::PROFILE_ADDED:
             {
-                enableSOCSlot(aProfileName);
-                SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
-                if (profile && profile->isEnabled()) {
-                    startSync(aProfileName);
-                }
+                iProfileChangeTriggerQueue.append(qMakePair(aProfileName, ProfileManager::PROFILE_ADDED));
+                iProfileChangeTriggerTimer.start(30000); // 30 seconds.
             }
             break;
 
         case ProfileManager::PROFILE_REMOVED:
             iSyncOnChangeScheduler.removeProfile(aProfileName);
             iWaitingOnlineSyncs.removeAll(aProfileName);
+            for (int i = iProfileChangeTriggerQueue.size() - 1; i >= 0; --i) {
+                if (iProfileChangeTriggerQueue[i].first == aProfileName) {
+                    LOG_DEBUG("Removing queued profile change sync due to profile removal:" << aProfileName);
+                    iProfileChangeTriggerQueue.removeAt(i);
+                }
+            }
             break;
 
         case ProfileManager::PROFILE_MODIFIED:
             {
-                // schedule a new sync in case of profile changed;
-                // Example if the profile change from disable -> enable
-                SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
-                if (profile->isEnabled()) {
-                    startScheduledSync(aProfileName);
+                bool alreadyQueued = false;
+                for (int i = 0; i < iProfileChangeTriggerQueue.size(); ++i) {
+                    if (iProfileChangeTriggerQueue.at(i).first == aProfileName) {
+                        alreadyQueued = true;
+                        break;
+                    }
                 }
+                if (!alreadyQueued) {
+                    iProfileChangeTriggerQueue.append(qMakePair(aProfileName, ProfileManager::PROFILE_MODIFIED));
+                }
+                iProfileChangeTriggerTimer.start(30000); // 30 seconds.
             }
             break;
     }
 
     emit signalProfileChanged(aProfileName, aChangeType, aProfileAsXml);
+}
+
+void Synchronizer::profileChangeTriggerTimeout()
+{
+    if (iProfileChangeTriggerQueue.isEmpty()) {
+        return;
+    }
+
+    QPair<QString, ProfileManager::ProfileChangeType> queuedChange = iProfileChangeTriggerQueue.takeFirst();
+    if (queuedChange.second == ProfileManager::PROFILE_ADDED) {
+        enableSOCSlot(queuedChange.first);
+        SyncProfile *profile = iProfileManager.syncProfile(queuedChange.first);
+        if (profile && profile->isEnabled()) {
+            LOG_DEBUG("Triggering queued profile addition sync for:" << queuedChange.first);
+            startSync(queuedChange.first);
+        }
+    } else {
+        SyncProfile *profile = iProfileManager.syncProfile(queuedChange.first);
+        if (profile->isEnabled()) {
+            LOG_DEBUG("Triggering queued profile modification sync for:" << queuedChange.first);
+            startScheduledSync(queuedChange.first);
+        }
+    }
+
+    // continue triggering profiles until we have emptied the queue.
+    QMetaObject::invokeMethod(this, "profileChangeTriggerTimeout", Qt::QueuedConnection);
 }
 
 void Synchronizer::reschedule(const QString &aProfileName)
