@@ -461,6 +461,9 @@ void AccountsHelper::slotSchedulerSettingsChanged(const char *aKey)
 
 void AccountsHelper::registerAccountListener(Accounts::AccountId id)
 {
+#ifndef USE_ACCOUNTSHELPER_LISTENER
+    LOG_DEBUG("AccountsHelper::registerAccountListener() is disabled!  Not listening to change signals for account:" << id);
+#else
     FUNCTION_CALL_TRACE;
 
     Accounts::Account *account = iAccountManager->account(id);
@@ -496,4 +499,5 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
                      SIGNAL(notify(const char *)),
                      SLOT(slotSchedulerSettingsChanged(const char *)),
                      Qt::UniqueConnection);
+#endif
 }
