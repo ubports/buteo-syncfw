@@ -1,3 +1,11 @@
+buteo-syncfw (0.7.21+16.04.20151216.1-0ubuntu1) xenial; urgency=medium
+
+  * Initialize network status on constructor. added:
+    debian/patches/0005-Initialize-network-status-on-constructor.patch
+    debian/patches/0006-Add-missing-include.patch
+
+ -- Renato Araujo Oliveira Filho <renato.filho@canonical.com>  Wed, 16 Dec 2015 19:05:25 +0000
+
 buteo-syncfw (0.7.21+16.04.20151028-0ubuntu1) xenial; urgency=medium
 
   [ Renato Araujo Oliveira Filho ]
