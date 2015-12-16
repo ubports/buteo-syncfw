@@ -1,7 +1,18 @@
-=== modified file 'libbuteosyncfw/common/NetworkManager.cpp'
---- libbuteosyncfw/common/NetworkManager.cpp	2015-08-27 18:10:48 +0000
-+++ libbuteosyncfw/common/NetworkManager.cpp	2015-12-16 16:28:11 +0000
-@@ -70,8 +70,12 @@
+From ad422d2895f5016f6080bb2cb64f76f2e37d7198 Mon Sep 17 00:00:00 2001
+From: Renato Araujo Oliveira Filho <renato.filho@canonical.com>
+Date: Wed, 16 Dec 2015 15:37:59 -0300
+Subject: [PATCH] Initialize network status on constructor.
+
+---
+ libbuteosyncfw/common/NetworkManager.cpp | 10 +++++++---
+ msyncd/synchronizer.cpp                  |  7 ++++---
+ 2 files changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/libbuteosyncfw/common/NetworkManager.cpp b/libbuteosyncfw/common/NetworkManager.cpp
+index 418105a..732bd45 100644
+--- a/libbuteosyncfw/common/NetworkManager.cpp
++++ b/libbuteosyncfw/common/NetworkManager.cpp
+@@ -70,8 +70,12 @@ NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
              Qt::QueuedConnection);
      m_idleRefreshTimer.setSingleShot(true);
  
@@ -16,7 +27,7 @@
      m_sessionTimer = new QTimer(this);
      m_sessionTimer->setSingleShot(true);
      m_sessionTimer->setInterval(10000);
-@@ -181,7 +185,7 @@
+@@ -182,7 +186,7 @@ void NetworkManager::idleRefresh()
              }
          }
      }
@@ -25,11 +36,11 @@
      if ((isOnline != m_isOnline) ||
          ((Sync::InternetConnectionType)connectionType != m_connectionType))
      {
-
-=== modified file 'msyncd/synchronizer.cpp'
---- msyncd/synchronizer.cpp	2015-09-04 21:11:57 +0000
-+++ msyncd/synchronizer.cpp	2015-12-16 16:30:29 +0000
-@@ -297,18 +297,19 @@
+diff --git a/msyncd/synchronizer.cpp b/msyncd/synchronizer.cpp
+index eae297a..dc074f2 100644
+--- a/msyncd/synchronizer.cpp
++++ b/msyncd/synchronizer.cpp
+@@ -297,18 +297,19 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
      bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType());
      if(accept)
      {
@@ -52,4 +63,6 @@
           }
           iWaitingOnlineSyncs.append(aProfileName);
      }
+-- 
+2.1.4
 
