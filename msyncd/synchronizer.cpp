@@ -336,15 +336,15 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
     }
     else
     {
-         LOG_DEBUG("Wait for internet connection:" << aProfileName);
+         LOG_INFO("Wait for internet connection:" << aProfileName);
          if (iNetworkManager->isOnline())
          {
              // see acceptScheduledSync() for the determination of whether the connection type is allowed for sync operations.
-             LOG_DEBUG("Connection is of disallowed type (e.g. mobile data). The sync will be postponed until an allowed connection is available.");
+             LOG_INFO("Connection is of disallowed type (e.g. mobile data). The sync will be postponed until an allowed connection is available.");
          }
          else
          {
-             LOG_DEBUG("Device offline. Wait for internet connection.");
+             LOG_INFO("Device offline. Wait for internet connection.");
          }
 
          if (!iWaitingOnlineSyncs.contains(aProfileName))
