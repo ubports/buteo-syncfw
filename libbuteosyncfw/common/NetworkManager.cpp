@@ -70,8 +70,12 @@ NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
             Qt::QueuedConnection);
     m_idleRefreshTimer.setSingleShot(true);
 
-    m_isOnline = m_networkConfigManager->isOnline();
-    LOG_DEBUG("Online status::" << m_isOnline);
+    // check connection status on startup
+    idleRefresh();
+    LOG_INFO("Networ status:");
+    LOG_INFO("\tOnline::" << m_isOnline);
+    LOG_INFO("\tConnection::" << m_connectionType);
+
     m_sessionTimer = new QTimer(this);
     m_sessionTimer->setSingleShot(true);
     m_sessionTimer->setInterval(10000);
@@ -182,7 +186,7 @@ void NetworkManager::idleRefresh()
             }
         }
     }
-    LOG_DEBUG("New state:" << isOnline << " New type: " << bearerTypeName << "(" << connectionType << ")");
+    LOG_INFO("Network New state:" << isOnline << " New type: " << bearerTypeName << "(" << connectionType << ")");
     if ((isOnline != m_isOnline) ||
         ((Sync::InternetConnectionType)connectionType != m_connectionType))
     {

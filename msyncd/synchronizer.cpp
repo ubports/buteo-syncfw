@@ -330,18 +330,19 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
     bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType());
     if(accept)
     {
+        LOG_DEBUG("Network connection is valid. Will start sheduled sync");
         startSync(aProfileName, true);
     }
     else if (!iWaitingOnlineSyncs.contains(aProfileName))
     {
-         LOG_DEBUG("Wait for internet connection:" << aProfileName);
+         LOG_INFO("Wait for internet connection:" << aProfileName);
          if (iNetworkManager->isOnline())
          {
-             LOG_DEBUG("Connection over mobile data plan. The sync will be postponed untill a full connection is available;");
+             LOG_INFO("Connection over mobile data plan. The sync will be postponed untill a full connection is available;");
          }
          else
          {
-             LOG_DEBUG("Device offline. Wait for internet connection.");
+             LOG_INFO("Device offline. Wait for internet connection.");
          }
          iWaitingOnlineSyncs.append(aProfileName);
     }
