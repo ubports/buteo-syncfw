@@ -5,3 +5,4 @@ libdir.patch
 0001-Check-for-WLAN-or-ETHERNET-connections.patch
 0004-Fixed-OOP-plugin-initialization.patch
 0005-Initialize-network-status-on-constructor.patch
+0006-Add-missing-include.patch
