@@ -4,3 +4,4 @@ libdir.patch
 0003-Added-upstart-service-file.patch
 0001-Check-for-WLAN-or-ETHERNET-connections.patch
 0004-Fixed-OOP-plugin-initialization.patch
+initialize-network-status-on-constructor.patch

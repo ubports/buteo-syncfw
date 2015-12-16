@@ -1,0 +1,55 @@
+=== modified file 'libbuteosyncfw/common/NetworkManager.cpp'
+--- libbuteosyncfw/common/NetworkManager.cpp	2015-08-27 18:10:48 +0000
++++ libbuteosyncfw/common/NetworkManager.cpp	2015-12-16 16:28:11 +0000
+@@ -70,8 +70,12 @@
+             Qt::QueuedConnection);
+     m_idleRefreshTimer.setSingleShot(true);
+ 
+-    m_isOnline = m_networkConfigManager->isOnline();
+-    LOG_DEBUG("Online status::" << m_isOnline);
++    // check connection status on startup
++    idleRefresh();
++    LOG_INFO("Networ status:");
++    LOG_INFO("\tOnline::" << m_isOnline);
++    LOG_INFO("\tConnection::" << m_connectionType);
++
+     m_sessionTimer = new QTimer(this);
+     m_sessionTimer->setSingleShot(true);
+     m_sessionTimer->setInterval(10000);
+@@ -181,7 +185,7 @@
+             }
+         }
+     }
+-    LOG_DEBUG("New state:" << isOnline << " New type: " << bearerTypeName << "(" << connectionType << ")");
++    LOG_INFO("Network New state:" << isOnline << " New type: " << bearerTypeName << "(" << connectionType << ")");
+     if ((isOnline != m_isOnline) ||
+         ((Sync::InternetConnectionType)connectionType != m_connectionType))
+     {
+
+=== modified file 'msyncd/synchronizer.cpp'
+--- msyncd/synchronizer.cpp	2015-09-04 21:11:57 +0000
++++ msyncd/synchronizer.cpp	2015-12-16 16:30:29 +0000
+@@ -297,18 +297,19 @@
+     bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType());
+     if(accept)
+     {
++        LOG_DEBUG("Network connection is valid. Will start sheduled sync");
+         startSync(aProfileName, true);
+     }
+     else if (!iWaitingOnlineSyncs.contains(aProfileName))
+     {
+-         LOG_DEBUG("Wait for internet connection:" << aProfileName);
++         LOG_INFO("Wait for internet connection:" << aProfileName);
+          if (iNetworkManager->isOnline())
+          {
+-             LOG_DEBUG("Connection over mobile data plan. The sync will be postponed untill a full connection is available;");
++             LOG_INFO("Connection over mobile data plan. The sync will be postponed untill a full connection is available;");
+          }
+          else
+          {
+-             LOG_DEBUG("Device offline. Wait for internet connection.");
++             LOG_INFO("Device offline. Wait for internet connection.");
+          }
+          iWaitingOnlineSyncs.append(aProfileName);
+     }
+
