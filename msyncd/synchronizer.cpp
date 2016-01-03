@@ -43,7 +43,6 @@
 #include "BtHelper.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <QDeviceInfo>
 #include <QBatteryInfo>
 #else
 #include <QtSystemInfo/QSystemDeviceInfo>
@@ -59,8 +58,32 @@ static const QString SYNC_DBUS_OBJECT = "/synchronizer";
 static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
 static const QString BT_PROPERTIES_NAME = "Name";
 
-// Maximum time in milliseconds to wait for a thread to stop
-static const unsigned long long MAX_THREAD_STOP_WAIT_TIME = 5000;
+class Buteo::BatteryInfo
+{
+public:
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    QBatteryInfo iBatteryInfo;
+#else
+    QtMobility::QSystemDeviceInfo iDeviceInfo;
+#endif
+
+    bool isLowPower() {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+        QBatteryInfo::LevelStatus batteryStat;
+#  if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+        batteryStat = iBatteryInfo.levelStatus();
+#  else
+        batteryStat = iBatteryInfo.batteryStatus(0);
+#  endif
+        return (batteryStat == QBatteryInfo::LevelEmpty) ||
+               (batteryStat == QBatteryInfo::LevelLow);
+#else
+        QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
+        return (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
+               (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow);
+#endif
+    }
+};
 
 Synchronizer::Synchronizer( QCoreApplication* aApplication )
 :   iNetworkManager(0),
@@ -71,7 +94,8 @@ Synchronizer::Synchronizer( QCoreApplication* aApplication )
     iAccounts(0),
     iClosing(false),
     iSOCEnabled(false),
-    iSyncUIInterface(NULL)
+    iSyncUIInterface(NULL),
+    iBatteryInfo(new BatteryInfo)
 {
     iSettings = g_settings_new_with_path("com.meego.msyncd", "/com/meego/msyncd/");
     FUNCTION_CALL_TRACE;
@@ -91,6 +115,7 @@ Synchronizer::~Synchronizer()
         iSyncUIInterface = NULL;
     }
     g_object_unref(iSettings);
+    delete iBatteryInfo;
 }
 
 bool Synchronizer::initialize()
@@ -443,33 +468,13 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     // @todo: Complete profile with data from account manager.
     //iAccounts->addAccountData(*profile);
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-    QBatteryInfo iDeviceInfo;
-    QBatteryInfo::LevelStatus batteryStat = iDeviceInfo.levelStatus();
-#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-    QBatteryInfo iDeviceInfo;
-    QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
-#else
-    QtMobility::QSystemDeviceInfo iDeviceInfo;
-    QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
-#endif
-
     if (!profile->isValid())
     {
         LOG_WARNING( "Profile is not valid" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
     }
-#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-    else if( aScheduled && ( (batteryStat == QBatteryInfo::LevelEmpty) ||
-                             (batteryStat == QBatteryInfo::LevelLow) ))
-#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-    else if( aScheduled && ( (batteryStat == QBatteryInfo::BatteryEmpty) ||
-                             (batteryStat == QBatteryInfo::BatteryLow) ))
-#else
-    else if( aScheduled && ( (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
-                             (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow) ))
-#endif
+    else if( aScheduled && iBatteryInfo->isLowPower() )
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
@@ -766,23 +771,7 @@ bool Synchronizer::startNextSync()
     QString profileName = session->profileName();
     LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName << session->isScheduled());
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-    QBatteryInfo iDeviceInfo;
-    QBatteryInfo::LevelStatus batteryStat = iDeviceInfo.levelStatus();
-    if (session->isScheduled() && ((batteryStat == QBatteryInfo::LevelEmpty) ||
-                             (batteryStat == QBatteryInfo::LevelLow)))
-#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-    QBatteryInfo iDeviceInfo;
-    QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
-    if (session->isScheduled() && ((batteryStat == QBatteryInfo::BatteryEmpty) ||
-                             (batteryStat == QBatteryInfo::BatteryLow)))
-#else
-    QtMobility::QSystemDeviceInfo iDeviceInfo;
-    QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
-
-    if (session->isScheduled() && ((batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
-                                   (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow)) )
-#endif
+    if (session->isScheduled() && iBatteryInfo->isLowPower())
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         iSyncQueue.dequeue();
