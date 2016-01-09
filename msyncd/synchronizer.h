@@ -57,6 +57,7 @@ class NetworkManager;
 class TransportTracker;
 class ServerActivator;
 class AccountsHelper;
+class BatteryInfo;
 
 /// \brief The main entry point to the synchronization framework.
 ///
@@ -469,6 +470,7 @@ private:
 
     QDBusInterface *iSyncUIInterface;
     _GSettings *iSettings;
+    BatteryInfo *iBatteryInfo;
 };
 
 }
