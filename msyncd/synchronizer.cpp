@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd
+ * Copyright (C) 2014-2016 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -43,7 +43,6 @@
 #include "BtHelper.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <QDeviceInfo>
 #include <QBatteryInfo>
 #else
 #include <QtSystemInfo/QSystemDeviceInfo>
@@ -59,8 +58,32 @@ static const QString SYNC_DBUS_OBJECT = "/synchronizer";
 static const QString SYNC_DBUS_SERVICE = "com.meego.msyncd";
 static const QString BT_PROPERTIES_NAME = "Name";
 
-// Maximum time in milliseconds to wait for a thread to stop
-static const unsigned long long MAX_THREAD_STOP_WAIT_TIME = 5000;
+class Buteo::BatteryInfo
+{
+public:
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    QBatteryInfo iBatteryInfo;
+#else
+    QtMobility::QSystemDeviceInfo iDeviceInfo;
+#endif
+
+    bool isLowPower() {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+        QBatteryInfo::LevelStatus batteryStat;
+#  if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+        batteryStat = iBatteryInfo.levelStatus();
+#  else
+        batteryStat = iBatteryInfo.batteryStatus(0);
+#  endif
+        return (batteryStat == QBatteryInfo::LevelEmpty) ||
+               (batteryStat == QBatteryInfo::LevelLow);
+#else
+        QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
+        return (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
+               (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow);
+#endif
+    }
+};
 
 Synchronizer::Synchronizer( QCoreApplication* aApplication )
 :   iNetworkManager(0),
@@ -71,7 +94,8 @@ Synchronizer::Synchronizer( QCoreApplication* aApplication )
     iAccounts(0),
     iClosing(false),
     iSOCEnabled(false),
-    iSyncUIInterface(NULL)
+    iSyncUIInterface(NULL),
+    iBatteryInfo(new BatteryInfo)
 {
     iSettings = g_settings_new_with_path("com.meego.msyncd", "/com/meego/msyncd/");
     FUNCTION_CALL_TRACE;
@@ -91,6 +115,7 @@ Synchronizer::~Synchronizer()
         iSyncUIInterface = NULL;
     }
     g_object_unref(iSettings);
+    delete iBatteryInfo;
 }
 
 bool Synchronizer::initialize()
@@ -207,32 +232,36 @@ void Synchronizer::enableSOCSlot(const QString& aProfileName)
 {
     FUNCTION_CALL_TRACE;
     SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
-    if(profile->isSOCProfile() && !iSOCEnabled)
+    if (profile && profile->isSOCProfile())
     {
-        QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
-        QList<SyncProfile*> SOCProfiles;
-        SOCProfiles.append(profile);
-        aSOCStorageMap["hcontacts"] = SOCProfiles;
-        QStringList aFailedStorages;
-        bool isSOCEnabled = iSyncOnChange.enable(aSOCStorageMap, &iSyncOnChangeScheduler,
-                                                 &iPluginManager, aFailedStorages);
-        if(!isSOCEnabled)
+        if (iSOCEnabled)
         {
-            LOG_CRITICAL("Sync on change couldn't be enabled for profile" << aProfileName);
-            delete profile;
+            iSyncOnChange.addProfile("hcontacts", profile);
         }
         else
         {
-            QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(const QString&)),
+            QHash<QString,QList<SyncProfile*> > aSOCStorageMap;
+            QList<SyncProfile*> SOCProfiles;
+            SOCProfiles.append(profile);
+            aSOCStorageMap["hcontacts"] = SOCProfiles;
+            QStringList aFailedStorages;
+            if (iSyncOnChange.enable(aSOCStorageMap, &iSyncOnChangeScheduler, &iPluginManager, aFailedStorages))
+            {
+                QObject::connect(&iSyncOnChangeScheduler, SIGNAL(syncNow(const QString&)),
                              this, SLOT(startScheduledSync(const QString&)),
                              Qt::QueuedConnection);
-            iSOCEnabled = true;
-            LOG_DEBUG("Sync on change enabled for profile" << aProfileName);
+                iSOCEnabled = true;
+                LOG_DEBUG("Sync on change enabled for profile" << aProfileName);
+            }
+            else
+            {
+                LOG_CRITICAL("Sync on change couldn't be enabled for profile" << aProfileName);
+            }
         }
     }
-    else if (profile->isSOCProfile())
+    else
     {
-        iSyncOnChange.addProfile("hcontacts", profile);
+        delete profile;
     }
 }
 
@@ -439,33 +468,13 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     // @todo: Complete profile with data from account manager.
     //iAccounts->addAccountData(*profile);
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-    QBatteryInfo iDeviceInfo;
-    QBatteryInfo::LevelStatus batteryStat = iDeviceInfo.levelStatus();
-#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-    QBatteryInfo iDeviceInfo;
-    QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
-#else
-    QtMobility::QSystemDeviceInfo iDeviceInfo;
-    QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
-#endif
-
     if (!profile->isValid())
     {
         LOG_WARNING( "Profile is not valid" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
     }
-#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-    else if( aScheduled && ( (batteryStat == QBatteryInfo::LevelEmpty) ||
-                             (batteryStat == QBatteryInfo::LevelLow) ))
-#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-    else if( aScheduled && ( (batteryStat == QBatteryInfo::BatteryEmpty) ||
-                             (batteryStat == QBatteryInfo::BatteryLow) ))
-#else
-    else if( aScheduled && ( (batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
-                             (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow) ))
-#endif
+    else if( aScheduled && iBatteryInfo->isLowPower() )
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
@@ -762,23 +771,7 @@ bool Synchronizer::startNextSync()
     QString profileName = session->profileName();
     LOG_DEBUG( "Trying to start next sync in queue. Profile:" << profileName << session->isScheduled());
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-    QBatteryInfo iDeviceInfo;
-    QBatteryInfo::LevelStatus batteryStat = iDeviceInfo.levelStatus();
-    if (session->isScheduled() && ((batteryStat == QBatteryInfo::LevelEmpty) ||
-                             (batteryStat == QBatteryInfo::LevelLow)))
-#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-    QBatteryInfo iDeviceInfo;
-    QBatteryInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus(0);
-    if (session->isScheduled() && ((batteryStat == QBatteryInfo::BatteryEmpty) ||
-                             (batteryStat == QBatteryInfo::BatteryLow)))
-#else
-    QtMobility::QSystemDeviceInfo iDeviceInfo;
-    QtMobility::QSystemDeviceInfo::BatteryStatus batteryStat = iDeviceInfo.batteryStatus();
-
-    if (session->isScheduled() && ((batteryStat != QtMobility::QSystemDeviceInfo::BatteryNormal) &&
-                                   (batteryStat != QtMobility::QSystemDeviceInfo::BatteryLow)) )
-#endif
+    if (session->isScheduled() && iBatteryInfo->isLowPower())
     {
         LOG_DEBUG( "Low power, scheduled sync aborted" );
         iSyncQueue.dequeue();
@@ -1571,19 +1564,19 @@ void Synchronizer::profileChangeTriggerTimeout()
     }
 
     QPair<QString, ProfileManager::ProfileChangeType> queuedChange = iProfileChangeTriggerQueue.takeFirst();
-    if (queuedChange.second == ProfileManager::PROFILE_ADDED) {
-        enableSOCSlot(queuedChange.first);
-        SyncProfile *profile = iProfileManager.syncProfile(queuedChange.first);
-        if (profile && profile->isEnabled()) {
-            LOG_DEBUG("Triggering queued profile addition sync for:" << queuedChange.first);
-            startSync(queuedChange.first);
-        }
-    } else {
-        SyncProfile *profile = iProfileManager.syncProfile(queuedChange.first);
-        if (profile->isEnabled()) {
+    SyncProfile *profile = iProfileManager.syncProfile(queuedChange.first);
+    if (profile) {
+        if (queuedChange.second == ProfileManager::PROFILE_ADDED) {
+            enableSOCSlot(queuedChange.first);
+            if (profile->isEnabled()) {
+                LOG_DEBUG("Triggering queued profile addition sync for:" << queuedChange.first);
+                startSync(queuedChange.first);
+            }
+        } else if (profile->isEnabled()) {
             LOG_DEBUG("Triggering queued profile modification sync for:" << queuedChange.first);
             startScheduledSync(queuedChange.first);
         }
+        delete profile;
     }
 
     // continue triggering profiles until we have emptied the queue.
@@ -1661,13 +1654,16 @@ void Synchronizer::removeScheduledSync(const QString &aProfileName)
 
     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
 
-    if(profile && !profile->isEnabled())
-    {
-        LOG_DEBUG("Sync got disabled for" << aProfileName);
-        iSyncScheduler->removeProfile(aProfileName);
+    if (profile) {
+        if (!profile->isEnabled()) {
+            LOG_DEBUG("Sync got disabled for" << aProfileName);
+            iSyncScheduler->removeProfile(aProfileName);
+        }
+        // Check if external sync status changed, profile might be turned
+        // to sync externally and thus buteo sync set to disable
+        externalSyncStatus(profile);
+        delete profile;
     }
-    // Check if external sync status changed, profile might be turned to sync externally and thus buteo sync set to disable
-    externalSyncStatus(profile);
 }
 
 bool Synchronizer::isBackupRestoreInProgress ()
@@ -2000,12 +1996,13 @@ void Synchronizer::onNetworkStateChanged(bool aState, Sync::InternetConnectionTy
         {
             //Getting profile
             SyncProfile *profile = iProfileManager.syncProfile (profileId);
-            if ((profile) && (profile->destinationType() ==
-                            Buteo::SyncProfile::DESTINATION_TYPE_ONLINE))
+            if (profile)
             {
-                iActiveSessions[profileId]->abort(Sync::SYNC_ERROR);
+                if (profile->destinationType() == Buteo::SyncProfile::DESTINATION_TYPE_ONLINE)
+                {
+                    iActiveSessions[profileId]->abort(Sync::SYNC_ERROR);
+                }
                 delete profile;
-                profile = NULL;
             }
             else
             {
