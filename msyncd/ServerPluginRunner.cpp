@@ -46,6 +46,7 @@ ServerPluginRunner::~ServerPluginRunner()
 {
     FUNCTION_CALL_TRACE;
 
+    stop();
     disconnect();
 
     if (iPlugin != 0 && iPluginMgr != 0)
@@ -136,6 +137,7 @@ bool ServerPluginRunner::start()
     if (iInitialized && iThread != 0)
     {
         rv = iThread->startThread(iPlugin);
+        LOG_DEBUG("ServerPluginRunner started thread for plugin:" << iPlugin->getProfileName() << ", returning:" << rv);
     }
 
     return rv;

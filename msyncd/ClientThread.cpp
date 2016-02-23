@@ -117,7 +117,6 @@ bool ClientThread::startThread( ClientPlugin* aClientPlugin )
 void ClientThread::stopThread()
 {
     FUNCTION_CALL_TRACE;
-
     exit();
 }
 
@@ -126,13 +125,13 @@ void ClientThread::run()
     FUNCTION_CALL_TRACE;
 
     if( !iClientPlugin->init() ) {
-        LOG_DEBUG( "Could not initialize client plugin:" << iClientPlugin->getPluginName() );
+        LOG_WARNING( "Could not initialize client plugin:" << iClientPlugin->getPluginName() );
         emit initError( getProfileName(), "", 0 );
         return;
     }
     
     if( !iClientPlugin->startSync() ) {
-        LOG_DEBUG( "Could not start client plugin:" << iClientPlugin->getPluginName() );
+        LOG_WARNING( "Could not start client plugin:" << iClientPlugin->getPluginName() );
         emit initError( getProfileName(), "", 0 );
         return;
     }

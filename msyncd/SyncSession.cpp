@@ -461,10 +461,13 @@ void SyncSession::onNetworkSessionOpened()
 
     if (false == tryStart())
     {
+        LOG_WARNING("attempt to start sync session due to network session opened failed!");
         updateResults(SyncResults(QDateTime::currentDateTime(),
                       SyncResults::SYNC_RESULT_FAILED,
                       Buteo::SyncResults::INTERNAL_ERROR));
         emit finished(profileName(), Sync::SYNC_ERROR, QString(), SyncResults::INTERNAL_ERROR);
+    } else {
+        LOG_DEBUG("attempt to start sync session due to network session opened succeeded.");
     }
 }
 
