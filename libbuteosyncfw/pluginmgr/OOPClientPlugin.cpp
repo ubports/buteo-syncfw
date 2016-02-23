@@ -138,7 +138,7 @@ void OOPClientPlugin::abortSync( Sync::SyncStatus aStatus )
     QDBusPendingReply<void> reply = iOopPluginIface->abortSync( (uchar)aStatus );
     reply.waitForFinished();
     if( !reply.isValid() )
-        LOG_WARNING( "Invalid reply for connectivityStateChanged from plugin" );
+        LOG_WARNING( "Invalid reply for abortSync from plugin" );
 }
 
 bool OOPClientPlugin::cleanUp()

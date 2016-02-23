@@ -497,6 +497,7 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         }
         else
         {
+            LOG_WARNING("Internal error, unable to start sync session for profile:" << aProfileName);
             session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
             emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
         }
@@ -773,7 +774,7 @@ bool Synchronizer::startNextSync()
 
     if (session->isScheduled() && iBatteryInfo->isLowPower())
     {
-        LOG_DEBUG( "Low power, scheduled sync aborted" );
+        LOG_WARNING( "Low power, scheduled sync aborted" );
         iSyncQueue.dequeue();
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
         cleanupSession(session, Sync::SYNC_ERROR);
@@ -799,6 +800,7 @@ bool Synchronizer::startNextSync()
         }
         else
         {
+            LOG_WARNING("unable to start sync with session:" << session->profileName());
             session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
             cleanupSession(session, Sync::SYNC_ERROR);
             emit syncStatus(profileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
