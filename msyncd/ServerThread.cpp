@@ -93,7 +93,6 @@ bool ServerThread::startThread( ServerPlugin* aServerPlugin )
 void ServerThread::stopThread()
 {
     FUNCTION_CALL_TRACE;
-
     exit();
 }
 
@@ -108,13 +107,13 @@ void ServerThread::run()
     }
 
     if( !iServerPlugin->init() ) {
-        LOG_DEBUG( "Could not initialize server plugin:" << iServerPlugin->getPluginName() );
+        LOG_WARNING( "Could not initialize server plugin:" << iServerPlugin->getPluginName() );
         emit initError( iServerPlugin->getProfileName(), "", 0 );
         return;
     }
 
     if( !iServerPlugin->startListen() ) {
-        LOG_DEBUG( "Could not start server plugin:" << iServerPlugin->getPluginName() );
+        LOG_WARNING( "Could not start server plugin:" << iServerPlugin->getPluginName() );
         emit initError( iServerPlugin->getProfileName(), "", 0 );
         return;
     }
