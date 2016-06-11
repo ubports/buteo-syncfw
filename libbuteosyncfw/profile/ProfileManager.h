@@ -26,6 +26,7 @@
 
 #include "SyncProfile.h"
 #include "Profile.h"
+#include <QObject>
 #include <QList>
 #include <QHash>
 
