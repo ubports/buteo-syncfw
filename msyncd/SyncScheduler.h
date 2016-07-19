@@ -32,6 +32,8 @@
 #endif
 #include <QObject>
 #include <QMap>
+#include <QSet>
+#include <QString>
 #include <QDateTime>
 #include <ctime>
 
@@ -92,6 +94,20 @@ public:
      * \param aProfileName Name of the profile to remove from the scheduler.
      */
     void removeProfile(const QString &aProfileName);
+
+public slots:
+    /*! \brief Handles the sync status change signal from the synchronizer
+     *
+     * This allows the SyncScheduler to appropriately wait() or stop() any background
+     * activity which is preventing device suspend.
+     *
+     * @param aProfileName Name of the profile
+     * @param aStatus Status of the sync
+     * @param aMessage Status message as a string
+     * @param aMoreDetails In case of failure, contains detailed reason
+     */
+    void syncStatusChanged(const QString &aProfileName, int aStatus,
+                           const QString &aMessage, int aMoreDetails);
 
 private slots:
 
@@ -171,6 +187,7 @@ private: // data
     /// BackgroundSync management object
     BackgroundSync *iBackgroundActivity;
     ProfileManager iProfileManager;
+    QSet<QString> iActiveBackgroundSyncProfiles;
 #else
     /// A list of sync schedule profiles
     QMap<QString, int> iSyncScheduleProfiles;
