@@ -1610,7 +1610,7 @@ void Synchronizer::reschedule(const QString &aProfileName)
     }
 }
 
-void Synchronizer::slotSyncStatus(QString aProfileName, int aStatus, QString /*aMessage*/, int /*aMoreDetails*/)
+void Synchronizer::slotSyncStatus(QString aProfileName, int aStatus, QString aMessage, int aMoreDetails)
 {
     FUNCTION_CALL_TRACE;
     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
@@ -1643,6 +1643,7 @@ void Synchronizer::slotSyncStatus(QString aProfileName, int aStatus, QString /*a
                     break;
             }
         }
+        iSyncScheduler->syncStatusChanged(aProfileName, aStatus, aMessage, aMoreDetails);
         delete profile;
     }
 }

@@ -28,6 +28,7 @@
 #endif
 #include "SyncScheduler.h"
 #include "SyncProfile.h"
+#include "SyncCommonDefs.h"
 #include "LogMacros.h"
 #include <QtDBus/QtDBus>
 
@@ -160,8 +161,29 @@ void SyncScheduler::removeProfile(const QString &aProfileName)
 void SyncScheduler::doIPHeartbeatActions(QString aProfileName)
 {
     FUNCTION_CALL_TRACE;
-
+    iActiveBackgroundSyncProfiles.insert(aProfileName);
     emit syncNow(aProfileName);
+}
+
+void SyncScheduler::syncStatusChanged(const QString &aProfileName, int aStatus,
+                                      const QString &aMessage, int aMoreDetails)
+{
+    if (iActiveBackgroundSyncProfiles.contains(aProfileName) && aStatus >= Sync::SYNC_ERROR) {
+        // the background sync cycle is finished.
+        // tell the scheduler that it can stop preventing device suspend.
+        LOG_DEBUG("Background sync" << aProfileName << "finished with status:" << aStatus <<
+                  "and extra:" << aMessage << "," << aMoreDetails);
+        iActiveBackgroundSyncProfiles.remove(aProfileName);
+#ifdef USE_KEEPALIVE
+        iBackgroundActivity->onBackgroundSyncCompleted(aProfileName);
+#endif
+
+        // and schedule the next background sync if necessary.
+        SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
+        if (profile) {
+            setNextAlarm(profile);
+        }
+    }
 }
 
 #ifdef USE_KEEPALIVE
@@ -232,6 +254,21 @@ int SyncScheduler::setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSync
         }
     }
     else {
+#ifdef USE_KEEPALIVE
+        // no valid next scheduled sync time for background sync.
+        // stop the background activity to allow device suspend.
+        iBackgroundActivity->remove(aProfile->name());
+        if (aProfile->rushEnabled()) {
+            QDateTime nextSyncSwitch = aProfile->nextRushSwitchTime(QDateTime::currentDateTime());
+            if (nextSyncSwitch.isValid()) {
+                iBackgroundActivity->setSwitch(aProfile->name(), nextSyncSwitch);
+            } else {
+                iBackgroundActivity->removeSwitch(aProfile->name());
+            }
+        } else {
+            iBackgroundActivity->removeSwitch(aProfile->name());
+        }
+#endif
         LOG_WARNING("Next sync time is not valid, sync not scheduled for profile"
             << aProfile->name());
     }
