@@ -1,5 +1,5 @@
 Name: buteo-syncfw-qt5
-Version: 0.7.21
+Version: 0.8.5
 Release: 1
 Summary: Synchronization backend
 Group: System/Libraries
@@ -18,10 +18,12 @@ BuildRequires: pkgconfig(Qt5SystemInfo)
 BuildRequires: pkgconfig(libiphb)
 BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: pkgconfig(keepalive)
+BuildRequires: pkgconfig(gio-2.0)
 BuildRequires: oneshot
 BuildRequires: doxygen
 Requires: mapplauncherd-qt5
 Requires: oneshot
+Requires: glib2
 %{_oneshot_requires_post}
 
 %description
@@ -65,6 +67,7 @@ Obsoletes: buteo-syncfw-msyncd < %{version}
 %{_libdir}/systemd/user/user-session.target.wants/*.service
 %config %{_sysconfdir}/syncwidget/*
 %{_bindir}/msyncd
+%{_datadir}/glib-2.0/schemas/*
 
 %package doc
 Summary: Documentation for %{name}
@@ -112,13 +115,14 @@ install -D -m 755 oneshot/msyncd-storage-perm %{buildroot}/%{_oneshotdir}
 
 %post
 /sbin/ldconfig
-
 %{_bindir}/add-oneshot msyncd-storage-perm
-
 if [ "$1" -ge 1 ]; then
     systemctl-user daemon-reload || true
     systemctl-user try-restart msyncd.service || true
 fi
+
+%post msyncd
+glib-compile-schemas %{_datadir}/glib-2.0/schemas
 
 %postun
 /sbin/ldconfig

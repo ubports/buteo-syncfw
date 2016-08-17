@@ -53,22 +53,22 @@ void SyncBackupTest::testBackup()
 	QSignalSpy sigStatus1(iBackup, SIGNAL(startBackup()));
 	QCOMPARE(iBackup->backupStarts(msg), uchar(0));
 	QCOMPARE(sigStatus1.count(), 1);
-	QCOMPARE(iBackup->getBackUpRestoreState(), 1); 
+	QCOMPARE(iBackup->getBackUpRestoreState(), true); 
 	
 	QSignalSpy sigStatus2(iBackup, SIGNAL(backupDone()));
 	QCOMPARE(iBackup->backupFinished(msg), uchar(0));
 	QCOMPARE(sigStatus2.count(), 1);
-	QCOMPARE(iBackup->getBackUpRestoreState(), 0); 
+	QCOMPARE(iBackup->getBackUpRestoreState(), false); 
 	
 	QSignalSpy sigStatus3(iBackup, SIGNAL(startRestore()));
 	QCOMPARE(iBackup->restoreStarts(msg), uchar(0));
 	QCOMPARE(sigStatus3.count(), 1);
-	QCOMPARE(iBackup->getBackUpRestoreState(), 1); 
+	QCOMPARE(iBackup->getBackUpRestoreState(), true); 
 
 	QSignalSpy  sigStatus4(iBackup, SIGNAL(restoreDone()));
 	QCOMPARE(iBackup->restoreFinished(msg), uchar(0));
 	QCOMPARE(sigStatus4.count(), 1);
-	QCOMPARE(iBackup->getBackUpRestoreState(), 0); 
+	QCOMPARE(iBackup->getBackUpRestoreState(), false); 
 }
 
 QTEST_MAIN(Buteo::SyncBackupTest)
