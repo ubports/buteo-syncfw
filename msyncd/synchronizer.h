@@ -45,6 +45,7 @@
 #include <QString>
 #include <QDBusInterface>
 #include <QScopedPointer>
+#include <QTimer>
 
 struct _GSettings;
 
@@ -56,6 +57,7 @@ class NetworkManager;
 class TransportTracker;
 class ServerActivator;
 class AccountsHelper;
+class BatteryInfo;
 
 /// \brief The main entry point to the synchronization framework.
 ///
@@ -317,6 +319,9 @@ private slots:
      */
     void externalSyncStatus(const SyncProfile *aProfile, bool aQuery=false);
 
+    /*! \brief Triggers sync for profiles which were queued for sync due to profile changes. */
+    void profileChangeTriggerTimeout();
+
 private:
 
     bool startSync(const QString &aProfileName, bool aScheduled);
@@ -450,12 +455,22 @@ private:
 
     QString iRemoteName;
 
+    /*
+     * Temporary, until we can clean up Buteo and properly implement the SyncOnChange
+     * queue to handle all of the required changes (account + profile + connectivity)
+     * in a sane manner (also taking into account BackupRestore status).
+     * However, that change will be far more invasive, so for now this is much simpler.
+     */
+    QList<QPair<QString, ProfileManager::ProfileChangeType> > iProfileChangeTriggerQueue;
+    QTimer iProfileChangeTriggerTimer;
+
 #ifdef SYNCFW_UNIT_TESTS
     friend class SynchronizerTest;
 #endif
 
     QDBusInterface *iSyncUIInterface;
     _GSettings *iSettings;
+    BatteryInfo *iBatteryInfo;
 };
 
 }

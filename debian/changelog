@@ -1,3 +1,12 @@
+buteo-syncfw (0.8.5-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Updated to the latest upstream
+  * Dropped patches that have been merged upstrean
+    - debian/patches/0004-Fixed-OOP-plugin-initialization.patch 
+    - debian/patches/0006-Add-missing-include.patch
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 17 Aug 2016 10:11:26 -0400
+
 buteo-syncfw (0.7.21+16.04.20151216.1-0ubuntu1) xenial; urgency=medium
 
   * Initialize network status on constructor. added:

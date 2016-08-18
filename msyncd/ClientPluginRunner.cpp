@@ -47,6 +47,7 @@ ClientPluginRunner::~ClientPluginRunner()
 {
     FUNCTION_CALL_TRACE;
 
+    stop();
     disconnect();
 
     if (iPlugin != 0 && iPluginMgr != 0)
@@ -134,8 +135,8 @@ bool ClientPluginRunner::start()
     {
         // Set a timer after which the sync session should stop
         QTimer::singleShot( MAX_PLUGIN_SYNC_TIME, this, SLOT(pluginTimeout()) );
-
         rv = iThread->startThread(iPlugin);
+        LOG_DEBUG("ClientPluginRunner started thread for plugin:" << iPlugin->getProfileName() << ", returning:" << rv);
     }
 
     return rv;
