@@ -1,11 +1,15 @@
-buteo-syncfw (0.8.5-0ubuntu1) UNRELEASED; urgency=medium
+buteo-syncfw (0.8.5+16.10.20160818-0ubuntu1) yakkety; urgency=medium
 
+  [ Ken VanDine ]
   * Updated to the latest upstream
   * Dropped patches that have been merged upstrean
     - debian/patches/0004-Fixed-OOP-plugin-initialization.patch 
     - debian/patches/0006-Add-missing-include.patch
 
- -- Ken VanDine <ken.vandine@canonical.com>  Wed, 17 Aug 2016 10:11:26 -0400
+  [ Renato Araujo Oliveira Filho ]
+  * Add missing build dep.
+
+ -- Renato Araujo Oliveira Filho <renato.filho@canonical.com>  Thu, 18 Aug 2016 15:21:11 +0000
 
 buteo-syncfw (0.7.21+16.04.20151216.1-0ubuntu1) xenial; urgency=medium
 
