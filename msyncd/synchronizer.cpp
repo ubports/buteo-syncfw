@@ -324,26 +324,39 @@ bool Synchronizer::startSync(QString aProfileName)
 bool Synchronizer::startScheduledSync(QString aProfileName)
 {
     FUNCTION_CALL_TRACE;
+
     // All scheduled syncs are online syncs
     // Add this to the waiting online syncs and it will be started when we
     // receive a session connection status from the NetworkManager
     bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType());
     if(accept)
     {
+        LOG_DEBUG("Scheduled sync of" << aProfileName << "accepted with current connectivity status.");
         startSync(aProfileName, true);
     }
-    else if (!iWaitingOnlineSyncs.contains(aProfileName))
+    else
     {
          LOG_DEBUG("Wait for internet connection:" << aProfileName);
          if (iNetworkManager->isOnline())
          {
-             LOG_DEBUG("Connection over mobile data plan. The sync will be postponed untill a full connection is available;");
+             // see acceptScheduledSync() for the determination of whether the connection type is allowed for sync operations.
+             LOG_DEBUG("Connection is of disallowed type (e.g. mobile data). The sync will be postponed until an allowed connection is available.");
          }
          else
          {
              LOG_DEBUG("Device offline. Wait for internet connection.");
          }
-         iWaitingOnlineSyncs.append(aProfileName);
+
+         if (!iWaitingOnlineSyncs.contains(aProfileName))
+         {
+            iWaitingOnlineSyncs.append(aProfileName);
+         }
+
+         LOG_DEBUG("Marking" << aProfileName << "sync as NOTPOSSIBLE due to connectivity status");
+         iSyncScheduler->syncStatusChanged(aProfileName,
+                                           Sync::SYNC_NOTPOSSIBLE,
+                                           QStringLiteral("No internet connectivity or connectivity type restricted for sync"),
+                                           Buteo::SyncResults::OFFLINE_MODE);
     }
     return true;
 }
@@ -386,6 +399,7 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     if (isBackupRestoreInProgress()) {
         SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::BACKUP_IN_PROGRESS);
         iProfileManager.saveSyncResults(aProfileName, syncResults);
+        emit syncStatus(aProfileName, Sync::SYNC_NOTPOSSIBLE, "Backup in progress, cannot start sync", Buteo::SyncResults::BACKUP_IN_PROGRESS);
         return success;
     }
 
