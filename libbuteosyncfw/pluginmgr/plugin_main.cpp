@@ -70,25 +70,25 @@ int main( int argc, char** argv )
     int retn;
     LOG_DEBUG( "attempting to register dbus service:" << servicePath );
     QDBusConnection connection = QDBusConnection::sessionBus();
-    if( connection.registerService( servicePath ) == true ) {
-        if( connection.registerObject(DBUS_SERVICE_OBJ_PATH, serviceObj) == true ) {
+    if( connection.registerObject(DBUS_SERVICE_OBJ_PATH, serviceObj) == true ) {
+        if( connection.registerService( servicePath ) == true ) {
             LOG_DEBUG( "Plugin " << pluginName << " with profile "
                        << profileName << " registered at dbus "
                        << DBUS_SERVICE_NAME_PREFIX + profileName
                        << " and path " << DBUS_SERVICE_OBJ_PATH );
             // TODO: Should any unix signals be handled?
             retn = app.exec();
-            connection.unregisterObject(DBUS_SERVICE_OBJ_PATH);
+            connection.unregisterService(servicePath);
         } else {
-            LOG_WARNING("Unable to register dbus object for service"
+            LOG_WARNING("Unable to register dbus service"
                         << servicePath << ", terminating.");
-            retn = -2;
+            retn = -1;
         }
-        connection.unregisterService(servicePath);
+        connection.unregisterObject(DBUS_SERVICE_OBJ_PATH);
     } else {
-        LOG_WARNING("Unable to register dbus service"
+        LOG_WARNING("Unable to register dbus object" << DBUS_SERVICE_OBJ_PATH << "for service"
                     << servicePath << ", terminating.");
-        retn = -1;
+        retn = -2;
     }
 
     delete serviceObj;
