@@ -111,6 +111,16 @@ Q_SIGNALS: // SIGNALS
 	 * @param bConnected - boolean flag to indicate whether the connection is successful or not
 	 */
 	void usbConnection(bool bConnected);
+
+private:
+	/*! \brief - handle replies to async usb mode queries */
+	void handleUsbModeReply(QDBusPendingCallWatcher *call);
+
+	/*! \brief - helper for initializing usb mode tracking from the constructor */
+	void initUsbModeTracking();
+
+	/*! \brief - cached pc_suite/mtp_mode usb connection status */
+	bool m_isConnected;
 };
 }
 
