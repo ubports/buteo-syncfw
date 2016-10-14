@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd
+ * Copyright (C) 2014-2016 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -182,6 +182,7 @@ void SyncScheduler::syncStatusChanged(const QString &aProfileName, int aStatus,
         SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
         if (profile) {
             setNextAlarm(profile);
+            delete profile;
         }
     }
 }
@@ -197,6 +198,7 @@ void SyncScheduler::rescheduleBackgroundActivity(const QString& aProfileName)
             emit externalSyncChanged(profile, false);
         }
         setNextAlarm(profile);
+        delete profile;
     } else {
         LOG_WARNING("Invalid profile, can't reschedule switch timer for " << aProfileName);
     }
