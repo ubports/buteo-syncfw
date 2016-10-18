@@ -310,14 +310,12 @@ private slots:
      */
     void removeScheduledSync(const QString &aProfileName);
 
-    /*! \brief Checks the status of external sync for a given profile, when the status
-     * changes(or aQuery param is set to true) or the profile is added for the first time 'syncedExternallyStatus' dbus signal
-     * will be emitted to notify possible clients.
+    /*! \brief Handles externalSyncChanged signal
      *
-     * @param aProfile the profile that the state will be checked
+     * @param aProfileName Name of the profile
      * @param aQuery When true 'syncedExternallyStatus' dbus signal will be emitted even if the state did not change.
      */
-    void externalSyncStatus(const SyncProfile *aProfile, bool aQuery=false);
+    void externalSyncStatus(const QString &aProfileName, bool aQuery);
 
     /*! \brief Triggers sync for profiles which were queued for sync due to profile changes. */
     void profileChangeTriggerTimeout();
@@ -398,6 +396,15 @@ private:
      * @param aType the connection type;
      */
     bool acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const;
+
+    /*! \brief Checks the status of external sync for a given profile, when the status
+     * changes(or aQuery param is set to true) or the profile is added for the first time 'syncedExternallyStatus' dbus signal
+     * will be emitted to notify possible clients.
+     *
+     * @param aProfile the profile that the state will be checked
+     * @param aQuery When true 'syncedExternallyStatus' dbus signal will be emitted even if the state did not change.
+     */
+    void externalSyncStatus(const SyncProfile *aProfile, bool aQuery=false);
 
     QMap<QString, SyncSession*> iActiveSessions;
 

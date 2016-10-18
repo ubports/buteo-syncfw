@@ -195,7 +195,7 @@ void SyncScheduler::rescheduleBackgroundActivity(const QString& aProfileName)
     SyncProfile* profile = iProfileManager.syncProfile(aProfileName);
     if (profile) {
         if (profile->syncExternallyEnabled() || profile->syncExternallyDuringRush()) {
-            emit externalSyncChanged(profile, false);
+            emit externalSyncChanged(profile->name(), false);
         }
         setNextAlarm(profile);
         delete profile;
