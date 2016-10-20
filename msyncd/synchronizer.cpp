@@ -1147,8 +1147,8 @@ void Synchronizer::initializeScheduler()
         iSyncScheduler = new SyncScheduler(this);
         connect(iSyncScheduler, SIGNAL(syncNow(QString)),
                 this, SLOT(startScheduledSync(QString)), Qt::QueuedConnection);
-        connect(iSyncScheduler, SIGNAL(externalSyncChanged(const SyncProfile*,bool)),
-                this, SLOT(externalSyncStatus(const SyncProfile*,bool)), Qt::QueuedConnection);
+        connect(iSyncScheduler, SIGNAL(externalSyncChanged(QString,bool)),
+                this, SLOT(externalSyncStatus(QString,bool)), Qt::QueuedConnection);
         QList<SyncProfile*> profiles = iProfileManager.allSyncProfiles();
         foreach (SyncProfile *profile, profiles)
         {
@@ -2078,6 +2078,15 @@ QString Synchronizer::getValue(const QString& aAddress, const QString& aKey)
         value = iRemoteName;
     }
     return value;
+}
+
+void Synchronizer::externalSyncStatus(const QString &aProfileName, bool aQuery)
+{
+    SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+    if (profile) {
+        externalSyncStatus(profile, aQuery);
+        delete profile;
+    }
 }
 
 // Here we store profile names since they are unique, but can be anything, and we emit signals

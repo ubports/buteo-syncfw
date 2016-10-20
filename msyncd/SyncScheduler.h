@@ -150,7 +150,7 @@ signals:
      *
      * \param aProfileName Name of the profile.
      */
-    void externalSyncChanged(const SyncProfile* aProfile, bool aQuery=false);
+    void externalSyncChanged(QString aProfileName, bool aQuery=false);
 
 private: // functions
     
