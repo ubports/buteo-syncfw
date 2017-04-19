@@ -113,7 +113,7 @@ private:
 #endif
 
     NetworkManager *iInternet;
-    QDBusConnection *iSystemBus;
+    QDBusConnection iSystemBus;
 
     mutable QMutex iMutex;
 

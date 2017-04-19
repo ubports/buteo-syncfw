@@ -792,7 +792,7 @@ SyncProfile *ProfileManager::createTempSyncProfile (const QString &destAddress, 
     tProfile->setBoolKey("hidden", false);
     QStringList subprofileNames = tProfile->subProfileNames();
     Q_FOREACH (const QString &spn, subprofileNames) {
-        if (spn == QStringLiteral("bt")) {
+        if (spn == QLatin1String("bt")) {
             // this is the bluetooth profile.  Set some Bluetooth-specific keys here.
             Profile *btSubprofile = tProfile->subProfile(spn);
             btSubprofile->setKey(KEY_BT_ADDRESS, destAddress);

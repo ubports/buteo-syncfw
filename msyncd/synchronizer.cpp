@@ -355,7 +355,7 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
          LOG_DEBUG("Marking" << aProfileName << "sync as NOTPOSSIBLE due to connectivity status");
          iSyncScheduler->syncStatusChanged(aProfileName,
                                            Sync::SYNC_NOTPOSSIBLE,
-                                           QStringLiteral("No internet connectivity or connectivity type restricted for sync"),
+                                           QLatin1String("No internet connectivity or connectivity type restricted for sync"),
                                            Buteo::SyncResults::OFFLINE_MODE);
     }
     return true;
