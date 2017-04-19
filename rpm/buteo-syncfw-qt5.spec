@@ -1,5 +1,5 @@
 Name: buteo-syncfw-qt5
-Version: 0.8.11
+Version: 0.8.12
 Release: 1
 Summary: Synchronization backend
 Group: System/Libraries
