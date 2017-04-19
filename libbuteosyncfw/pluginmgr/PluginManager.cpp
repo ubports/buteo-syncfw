@@ -658,8 +658,8 @@ QProcess* PluginManager::startOOPPlugin( const QString &aPath,
     process->setProcessChannelMode( QProcess::ForwardedChannels );
     process->start( aPath, args );
 
-    const QString clientPluginDBusServiceName(QStringLiteral("com.buteo.msyncd.plugin.profile-%1").arg(aProfileName));
-    const QString serverPluginDBusServiceName(QStringLiteral("com.buteo.msyncd.plugin.%1").arg(aProfileName));
+    const QString clientPluginDBusServiceName(QString(QLatin1String("com.buteo.msyncd.plugin.profile-%1")).arg(aProfileName));
+    const QString serverPluginDBusServiceName(QString(QLatin1String("com.buteo.msyncd.plugin.%1")).arg(aProfileName));
     bool pluginHasRegistered = false;
     for (int i = 0; i < 30; i++) { // wait for up to thirty seconds for the process to register with dbus
         QThread::sleep(1);         // sleep for a second to wait for the process to be scheduled, init and register with dbus

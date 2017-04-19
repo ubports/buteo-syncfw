@@ -38,7 +38,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
     QObject(aParent),
     iUSBProxy(0),
     iInternet(0),
-    iSystemBus(0)
+    iSystemBus(QDBusConnection::systemBus())
 {
     FUNCTION_CALL_TRACE;
 
@@ -66,20 +66,14 @@ TransportTracker::TransportTracker(QObject *aParent) :
 
     // BT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-
     // Set the bluetooth state
     iTransportStates[Sync::CONNECTIVITY_BT] = btConnectivityStatus();
-
-    // Add signal to track the bluetooth state changes
-    iSystemBus = new QDBusConnection(QDBusConnection::connectToBus(QDBusConnection::SystemBus,
-                                                                    QStringLiteral("buteo_system_bus")));
-    if (!iSystemBus->connect("org.bluez",
-                     "",
-                     "org.bluez.Adapter",
-                     "PropertyChanged",
-                     this,
-                     SLOT(onBtStateChanged(QString, QDBusVariant)
-                     )))
+    if (!iSystemBus.connect("org.bluez",
+                    "",
+                    "org.bluez.Adapter",
+                    "PropertyChanged",
+                    this,
+                    SLOT(onBtStateChanged(QString, QDBusVariant))))
     {
         LOG_WARNING("Unable to connect to system bus for org.bluez.Adapter");
     }
@@ -110,7 +104,6 @@ TransportTracker::TransportTracker(QObject *aParent) :
 TransportTracker::~TransportTracker()
 {
     FUNCTION_CALL_TRACE;
-    delete iSystemBus;
 }
 
 bool TransportTracker::isConnectivityAvailable(Sync::ConnectivityType aType) const
@@ -189,18 +182,15 @@ bool TransportTracker::btConnectivityStatus()
     FUNCTION_CALL_TRACE;
 
     bool btOn = false;
-    QDBusConnection *systemBus = new QDBusConnection(QDBusConnection::connectToBus(QDBusConnection::SystemBus,
-                                                                                    QStringLiteral("buteo_system_bus2")));
     QDBusMessage methodCallMsg = QDBusMessage::createMethodCall("org.bluez",
                                                                 "/",
                                                                 "org.bluez.Manager",
                                                                 "DefaultAdapter");
 
-    QDBusMessage reply = systemBus->call(methodCallMsg);
+    QDBusMessage reply = iSystemBus.call(methodCallMsg);
     if (reply.type() == QDBusMessage::ErrorMessage)
     {
         LOG_WARNING("This device does not have a BT adapter");
-        delete systemBus;
         return btOn;
     }
 
@@ -215,11 +205,10 @@ bool TransportTracker::btConnectivityStatus()
                                                        adapterPath,
                                                        "org.bluez.Adapter",
                                                        "GetProperties");
-        reply = systemBus->call(methodCallMsg);
+        reply = iSystemBus.call(methodCallMsg);
         if (reply.type() == QDBusMessage::ErrorMessage)
         {
             LOG_WARNING("Error in retrieving bluetooth properties");
-            delete systemBus;
             return btOn;
         }
 
@@ -240,6 +229,5 @@ bool TransportTracker::btConnectivityStatus()
             }
         }
     }
-    delete systemBus;
     return btOn;
 }
