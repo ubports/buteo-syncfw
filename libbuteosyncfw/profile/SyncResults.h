@@ -87,6 +87,8 @@ public:
         INTERNAL_ERROR = 401,
         AUTHENTICATION_FAILURE,
         DATABASE_FAILURE,
+        PLUGIN_ERROR,
+        PLUGIN_TIMEOUT,
 
         // Server/Network errors 5xx
         SUSPENDED = 501,

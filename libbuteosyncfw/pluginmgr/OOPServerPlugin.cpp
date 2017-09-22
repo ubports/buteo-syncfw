@@ -190,7 +190,7 @@ void OOPServerPlugin::onProcessError( QProcess::ProcessError error )
     if( !iDone ) {
         onError( iProfile.name(),
                  "Plugin process error:" + QString::number(error),
-                 Sync::SYNC_PLUGIN_ERROR );
+                 SyncResults::PLUGIN_ERROR );
     }
 }
 
@@ -202,11 +202,11 @@ void OOPServerPlugin::onProcessFinished( int exitCode, QProcess::ExitStatus exit
                     "Plugin process exited with error code " +
                      QString::number(exitCode) + " and status " +
                      QString::number(exitStatus),
-                    Sync::SYNC_PLUGIN_ERROR );
+                    SyncResults::PLUGIN_ERROR );
         } else {
             onError( iProfile.name(),
                     "Plugin process exited unexpectedly",
-                    Sync::SYNC_PLUGIN_ERROR );
+                    SyncResults::PLUGIN_ERROR );
         }
     }
 }
