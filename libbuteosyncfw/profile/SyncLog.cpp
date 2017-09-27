@@ -39,6 +39,13 @@ bool syncResultPointerLessThan(const SyncResults *&aLhs, const SyncResults *&aRh
         return false;
     }
 }
+
+bool isSyncSuccessful(const SyncResults &aResults)
+{
+    return (aResults.majorCode() == SyncResults::SYNC_RESULT_SUCCESS
+            && aResults.minorCode() == SyncResults::NO_ERROR
+            && !aResults.syncTime().isNull());
+}
     
 // Private implementation class for SyncLog.
 class SyncLogPrivate
@@ -55,6 +62,11 @@ public:
 
     // List of the sync results this log consists of.
     QList<const SyncResults*> iResults;
+
+    // Last successful sync result as stored in the log.
+    SyncResults *iLastSuccessfulResults;
+
+    void updateLastSuccessfulResults(const SyncResults &aResults);
 };
 
 }
@@ -62,21 +74,34 @@ public:
 using namespace Buteo;
 
 SyncLogPrivate::SyncLogPrivate()
+:   iLastSuccessfulResults(0)
 {
 }
 
 SyncLogPrivate::SyncLogPrivate(const SyncLogPrivate &aSource)
-:   iProfileName(aSource.iProfileName)
+:   iProfileName(aSource.iProfileName), iLastSuccessfulResults(0)
 {
     foreach (const SyncResults *results, aSource.iResults) {
         iResults.append(new SyncResults(*results));
     }
+    if (aSource.iLastSuccessfulResults)
+        iLastSuccessfulResults = new SyncResults(*aSource.iLastSuccessfulResults);
 }
 
 SyncLogPrivate::~SyncLogPrivate()
 {
     qDeleteAll(iResults);
     iResults.clear();
+    delete iLastSuccessfulResults;
+}
+
+void SyncLogPrivate::updateLastSuccessfulResults(const SyncResults &aResults)
+{
+    if (isSyncSuccessful(aResults)
+        && (!iLastSuccessfulResults || *iLastSuccessfulResults < aResults)) {
+        delete iLastSuccessfulResults;
+        iLastSuccessfulResults = new SyncResults(aResults);
+    }
 }
 
 SyncLog::SyncLog(const QString &aProfileName)
@@ -93,7 +118,7 @@ SyncLog::SyncLog(const QDomElement &aRoot)
     QDomElement results = aRoot.firstChildElement(TAG_SYNC_RESULTS);
     for (; !results.isNull();
          results = results.nextSiblingElement(TAG_SYNC_RESULTS)) {
-        d_ptr->iResults.append(new SyncResults(results));
+        addResults(SyncResults(results));
     }
 
     // Sort result entries by sync time.
@@ -127,9 +152,14 @@ QDomElement SyncLog::toXml(QDomDocument &aDoc) const
     QDomElement root = aDoc.createElement(TAG_SYNC_LOG);
     root.setAttribute(ATTR_NAME, d_ptr->iProfileName);
 
-    foreach (const SyncResults *results, d_ptr->iResults) {
-        root.appendChild(results->toXml(aDoc));
+    if (d_ptr->iLastSuccessfulResults
+        && (d_ptr->iResults.isEmpty()
+            || *d_ptr->iLastSuccessfulResults < *d_ptr->iResults.first())) {
+        root.appendChild(d_ptr->iLastSuccessfulResults->toXml(aDoc));
     }
+
+    foreach (const SyncResults *results, d_ptr->iResults)
+        root.appendChild(results->toXml(aDoc));
 
     return root;
 }
@@ -150,6 +180,11 @@ QList<const SyncResults*> SyncLog::allResults() const
     return d_ptr->iResults;
 }
 
+const SyncResults* SyncLog::lastSuccessfulResults() const
+{
+    return d_ptr->iLastSuccessfulResults;
+}
+
 void SyncLog::addResults(const SyncResults &aResults)
 {
     FUNCTION_CALL_TRACE;
@@ -157,7 +192,7 @@ void SyncLog::addResults(const SyncResults &aResults)
     //the log is defined
     const int MAXLOGENTRIES = 5;
     
-    if (d_ptr->iResults.size() == MAXLOGENTRIES) {
+    if (d_ptr->iResults.size() >= MAXLOGENTRIES) {
         // The list is sorted so that the oldest item is in the beginning
         delete d_ptr->iResults.takeFirst();
     } // no else
@@ -166,4 +201,6 @@ void SyncLog::addResults(const SyncResults &aResults)
 
     // Sort result entries by sync time.
     //qSort(d_ptr->iResults.begin(), d_ptr->iResults.end(), syncResultPointerLessThan);
+
+    d_ptr->updateLastSuccessfulResults(aResults);
 }
