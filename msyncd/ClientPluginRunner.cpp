@@ -250,6 +250,6 @@ void ClientPluginRunner::pluginTimeout()
 {
     FUNCTION_CALL_TRACE;
 
-    emit error(iProfile->name(), "Plugin timeout occured", Sync::SYNC_PLUGIN_TIMEOUT);
+    emit error(iProfile->name(), "Plugin timeout occured", SyncResults::PLUGIN_TIMEOUT);
     stop();
 }

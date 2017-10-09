@@ -159,7 +159,7 @@ SyncResults OOPClientPlugin::getSyncResults() const
 {
     FUNCTION_CALL_TRACE;
 
-    SyncResults errorSyncResult( QDateTime(),
+    SyncResults errorSyncResult( QDateTime::currentDateTime(),
                             SyncResults::SYNC_RESULT_INVALID,
                             SyncResults::SYNC_RESULT_INVALID );
     QDBusPendingReply<QString> reply = iOopPluginIface->getSyncResults();
@@ -196,7 +196,7 @@ void OOPClientPlugin::onProcessError( QProcess::ProcessError error )
     if( !iDone ) {
         onError( iProfile.name(),
                  "Plugin process error:" + QString::number(error),
-                 Sync::SYNC_PLUGIN_ERROR );
+                 SyncResults::PLUGIN_ERROR );
     }
 }
 
@@ -208,11 +208,11 @@ void OOPClientPlugin::onProcessFinished( int exitCode, QProcess::ExitStatus exit
                     "Plugin process exited with error code " +
                      QString::number(exitCode) + " and status " +
                      QString::number(exitStatus),
-                    Sync::SYNC_PLUGIN_ERROR );
+                    SyncResults::PLUGIN_ERROR );
         } else {
             onError( iProfile.name(),
                     "Plugin process exited unexpectedly",
-                    Sync::SYNC_PLUGIN_ERROR );
+                    SyncResults::PLUGIN_ERROR );
         }
     }
 }
