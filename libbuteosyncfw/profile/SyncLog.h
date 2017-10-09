@@ -99,6 +99,13 @@ public:
      */
     QList<const SyncResults*> allResults() const;
 
+    /*! \brief Gets the last successful results in the sync log.
+     *
+     * \return The results. NULL if no successful result have already
+     * been registered.
+     */
+    const SyncResults* lastSuccessfulResults() const;
+
     /*! \brief Adds results to the sync log.
      *  Also makes sure that log size doesn't exceed given size limit
      *

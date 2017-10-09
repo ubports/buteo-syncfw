@@ -46,6 +46,7 @@ void SyncLogTest::testLog()
     QCOMPARE(log1.profileName(), NAME);
     QVERIFY(log1.lastResults() == 0);
     QCOMPARE(log1.allResults().size(), 0);
+    QVERIFY(log1.lastSuccessfulResults() == 0);
 
     // Create from XML.
     QDomDocument doc;
@@ -53,6 +54,7 @@ void SyncLogTest::testLog()
     SyncLog log2(doc.documentElement());
     QCOMPARE(log2.profileName(), NAME);
     QVERIFY(log2.lastResults() != 0);
+    QVERIFY(log2.lastSuccessfulResults() == 0);
     QCOMPARE(log2.allResults().size(), 1);
     TargetResults tr2 = log2.lastResults()->targetResults().at(0);
     QCOMPARE(tr2.targetName(), QString("hcalendar"));
@@ -73,6 +75,14 @@ void SyncLogTest::testLog()
     QVERIFY(doc2.toString().size() >= LOG_XML.size());
     QCOMPARE(doc2.toString(), doc3.toString());
 
+    // Add a successful results.
+    QDateTime successTime = QDateTime::fromString("2017-08-30T11:53:27",
+                                                  "yyyy-MM-ddThh:mm:ss");
+    log2.addResults(SyncResults(successTime, Buteo::SyncResults::SYNC_RESULT_SUCCESS,
+                                Buteo::SyncResults::NO_ERROR));
+    QVERIFY(log2.lastSuccessfulResults() != 0);
+    QCOMPARE(log2.lastSuccessfulResults()->syncTime(), successTime);
+
     // Add new results.
     SyncResults newResults;
     newResults.setMajorCode(Buteo::SyncResults::SYNC_RESULT_CANCELLED);
@@ -83,8 +93,10 @@ void SyncLogTest::testLog()
     log2.addResults(newResults);
     QVERIFY(log2.lastResults() != 0);
     QCOMPARE(log2.lastResults()->majorCode(), 2);
-    QCOMPARE(log2.allResults().size(), 2);
+    QCOMPARE(log2.allResults().size(), 3);
     QCOMPARE(log2.allResults().at(0)->majorCode(), 1);
+    QVERIFY(log2.lastSuccessfulResults() != 0);
+    QCOMPARE(log2.lastSuccessfulResults()->syncTime(), successTime);
 
     // Verify target results contents.
     QCOMPARE(log2.lastResults()->targetResults().size(), 1);
@@ -97,6 +109,34 @@ void SyncLogTest::testLog()
     QCOMPARE(tr.remoteItems().deleted, (unsigned)6);
     QCOMPARE(tr.remoteItems().modified, (unsigned)7);
 
+    // Update last successful results.
+    successTime = QDateTime::fromString("2017-08-30T12:00:00", "yyyy-MM-ddThh:mm:ss");
+    log2.addResults(SyncResults(successTime, Buteo::SyncResults::SYNC_RESULT_SUCCESS,
+                                Buteo::SyncResults::NO_ERROR));
+    QVERIFY(log2.lastSuccessfulResults() != 0);
+    QCOMPARE(log2.lastSuccessfulResults()->syncTime(), successTime);
+
+    // Push out last successful results from allResults.
+    SyncResults failed;
+    failed.setMajorCode(Buteo::SyncResults::SYNC_RESULT_FAILED);
+    log2.addResults(failed);
+    log2.addResults(failed);
+    log2.addResults(failed);
+    log2.addResults(failed);
+    log2.addResults(failed);
+    log2.addResults(failed);
+    QCOMPARE(log2.allResults().size(), 5);
+    QVERIFY(log2.lastSuccessfulResults() != 0);
+    QCOMPARE(log2.lastSuccessfulResults()->syncTime(), successTime);
+    QDomDocument docFailed;
+    docFailed.appendChild(log2.toXml(docFailed));
+    SyncLog logFailed(docFailed.documentElement());
+    QCOMPARE(logFailed.allResults().size(), 5);
+    QVERIFY(logFailed.lastSuccessfulResults() != 0);
+    QCOMPARE(logFailed.lastSuccessfulResults()->syncTime(), successTime);
+    QDomDocument docFailed2;
+    docFailed2.appendChild(logFailed.toXml(docFailed2));
+    QCOMPARE(docFailed.toString(), docFailed2.toString());
 }
 
 void SyncLogTest::testAddResults()
