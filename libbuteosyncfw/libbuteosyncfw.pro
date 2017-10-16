@@ -99,7 +99,7 @@ QMAKE_CLEAN += $(OBJECTS_DIR)/moc_*
 QMAKE_CLEAN += lib$${TARGET}.prl pkgconfig/*
 
 # install
-target.path = /usr/lib/
+target.path  = $${LIBDIR}
 
 equals(QT_MAJOR_VERSION, 4): headers.path = /usr/include/buteosyncfw
 equals(QT_MAJOR_VERSION, 5): headers.path = /usr/include/buteosyncfw5
