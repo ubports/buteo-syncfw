@@ -1,0 +1,81 @@
+buteo-syncfw-qml (0.7.21-0ubports) vivid; urgency=medium
+
+  * Imported to UBports
+
+ -- UBports auto importer <infra@ubports.com>  Mon, 16 Oct 2017 18:17:09 +0200
+
+buteo-syncfw (0.7.21+16.04.20151216.1-0ubuntu1) xenial; urgency=medium
+
+  * Initialize network status on constructor. added:
+    debian/patches/0005-Initialize-network-status-on-constructor.patch
+    debian/patches/0006-Add-missing-include.patch
+
+ -- Renato Araujo Oliveira Filho <renato.filho@canonical.com>  Wed, 16 Dec 2015 19:05:25 +0000
+
+buteo-syncfw (0.7.21+16.04.20151028-0ubuntu1) xenial; urgency=medium
+
+  [ Renato Araujo Oliveira Filho ]
+  * Fixed OOP plugin initialization. (LP: #1509053)
+
+ -- Bill Filler <ci-train-bot@canonical.com>  Wed, 28 Oct 2015 11:58:20 +0000
+
+buteo-syncfw (0.7.21+15.10.20151015-0ubuntu1) wily; urgency=medium
+
+  [ Renato Araujo Oliveira Filho ]
+  * Enable more debug messages.
+
+ -- Bill Filler <ci-train-bot@canonical.com>  Thu, 15 Oct 2015 19:50:38 +0000
+
+buteo-syncfw (0.7.21+15.10.20150930-0ubuntu1) wily; urgency=medium
+
+  [ Ken VanDine ]
+  * debian/control
+    - Added build depends on libglib2.0-dev
+  * added packaging removed: debian/ debian/api debian/changelog
+    debian/compat debian/control debian/copyright debian/dirs
+    debian/docs debian/rules debian/sync-fw-dev.dirs debian/sync-fw-
+    dev.install debian/sync-fw-doc.install debian/sync-fw-tests.install
+    debian/sync-fw.aegis debian/sync-fw.dirs debian/sync-fw.install
+    debian/sync-fw.postinst debian/sync-fw.preinst added: .bzr-builddeb/
+    .bzr-builddeb/default.conf debian/ debian/buteo-syncfw.install
+    debian/changelog debian/compat debian/control debian/copyright
+    debian/dirs debian/docs debian/libbuteosyncfw5-0.install
+    debian/libbuteosyncfw5-dev.install debian/libbuteosyncfw5-
+    doc.install debian/patches/ debian/patches/0001-Ubuntu-phone-
+    changes.patch debian/patches/libdir.patch debian/patches/series
+    debian/rules debian/source/ debian/source/format
+
+  [ Renato Araujo Oliveira Filho ]
+  * Remove patches already applied on trunk. Create individual patches
+    for ubuntu specific changes.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Wed, 30 Sep 2015 18:15:03 +0000
+
+buteo-syncfw (0.7.21-0ubuntu1) wily; urgency=medium
+
+  * New package
+  * debian/patches/0001-Ubuntu-phone-changes.patch
+    - Fire 'enableSOC' for accounts already created.
+    - Make sure the the signal 'enableSOC' is fired even for accounts 
+      that already exists.
+    - Fire 'AccountsHelper' signals on idle after the constructor, to 
+      allow connections after create object.
+    - Save profile before fire 'signalProfileChanged'.
+    - The profile should be saved before fire the signal 
+      'signalProfileChanged', otherwise the receiver that retrieve 
+      the profile will have a old version of it.
+    - Start a sync just after create a new profile.
+    - After create a online-account we want that account to get sync.
+    - Wait untill network connection is available to sync.
+    - Wait for internet connection before sync scheduled sync requests.
+    - Does not run scheduled sync over mobile data connection.
+    - Check for internet connection type before run a scheduled sync.
+    - Added upstart service file.
+    - Create upstart file to start msyncd service.
+    - Avoid sync twice.
+    - Remove pending syncs from 'iWaitingOnlineSyncs' and 
+      'iSyncOnChangeScheduler', before run a sync to avoid sync twice.
+  * debian/patches/libdir.patch
+    - Set LIBDIR to be multi-arch friendly
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Mon, 03 Aug 2015 09:47:20 -0400

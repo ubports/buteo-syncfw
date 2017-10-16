@@ -1,0 +1,53 @@
+Source: buteo-syncfw
+Section: utils
+Priority: optional
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Duggirala Karthik <karthik.2.duggirala@nokia.com>
+Build-Depends: debhelper (>= 9),
+               doxygen,
+               libaccounts-qt5-dev, 
+               libdbus-1-dev,
+               libglib2.0-dev,
+               libgsettings-qt-dev,
+               libiphb-dev,
+               libsignon-qt5-dev,
+               qtsystems5-dev,
+               qt5-default,
+               quilt,
+Standards-Version: 3.9.5
+Homepage: https://github.com/nemomobile/buteo-syncfw
+
+Package: buteo-syncfw
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         libbuteosyncfw5-0 (= ${binary:Version}),
+Description: Synchronization backend
+ Synchronization backend, plugin manager, profile db, and conflict resolver.
+
+Package: libbuteosyncfw5-0
+Section: libs
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+Description: Synchronization backend
+ Synchronization backend, plugin manager, profile db, and conflict resolver.
+
+Package: libbuteosyncfw5-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         libbuteosyncfw5-0 (= ${binary:Version}),
+         libdbus-1-dev,
+Description: Files required for synchronizer plugin development
+ Header file needed for making plugins.
+ 
+Package: libbuteosyncfw5-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends},
+Description: API documentation for sync-fw.
+ API documentation package for sync-fw.
