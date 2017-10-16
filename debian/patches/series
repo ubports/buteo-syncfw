@@ -1,8 +1,0 @@
-libdir.patch
-0001-Disable-sheduled-syncs-over-cellular-connections.patch
-0002-Fixed-FUNCTION_CALL_TRACE-macro.patch
-0003-Added-upstart-service-file.patch
-0001-Check-for-WLAN-or-ETHERNET-connections.patch
-0004-Fixed-OOP-plugin-initialization.patch
-0005-Initialize-network-status-on-constructor.patch
-0006-Add-missing-include.patch
