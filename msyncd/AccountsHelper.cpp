@@ -224,6 +224,7 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
     if(0 != account) {
         //Sync schedule settings should be global
         account->selectService();
+        account->beginGroup("scheduler");
         SyncSchedule syncSchedule;
 
         int peakStart = account->valueAsInt(Buteo::SYNC_SCHEDULE_PEAK_START_TIME_KEY_INT);
@@ -273,6 +274,7 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
         }
         syncSchedule.setRushDays(rdays);
         syncSchedule.setDays(days);
+        account->endGroup();
         syncProfile->setSyncSchedule (syncSchedule);
     }
 }
@@ -490,6 +492,7 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
     account->beginGroup("scheduler");
     LOG_DEBUG("Watching Group :" << account->group());
     Accounts::Watch *watch = account->watchKey();
+    account->endGroup();
     if(!watch){
         LOG_DEBUG("Failed to add watch for acct with id:" << id);
         return;
