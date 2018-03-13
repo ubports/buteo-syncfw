@@ -1,3 +1,9 @@
+buteo-syncfw (0.8.6+ubports) xenial; urgency=medium
+
+  * Imported to UBports
+
+ -- UBports auto importer <infra@ubports.com>  Tue, 13 Mar 2018 18:19:26 +0100
+
 buteo-syncfw (0.8.5+16.10.20160818-0ubuntu1) yakkety; urgency=medium
 
   [ Ken VanDine ]
