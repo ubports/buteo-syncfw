@@ -47,9 +47,9 @@ Depends: ${misc:Depends},
 Description: Files required for synchronizer plugin development
  Header file needed for making plugins.
  
-Package: libbuteosyncfw5-doc
-Section: doc
-Architecture: all
-Depends: ${misc:Depends},
-Description: API documentation for sync-fw.
- API documentation package for sync-fw.
+#Package: libbuteosyncfw5-doc
+#Section: doc
+#Architecture: all
+#Depends: ${misc:Depends},
+#Description: API documentation for sync-fw.
+# API documentation package for sync-fw.
