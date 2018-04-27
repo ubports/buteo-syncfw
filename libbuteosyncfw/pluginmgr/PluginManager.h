@@ -54,12 +54,8 @@ const QString OOP_CLIENT_SUFFIX = "-client";
 const QString OOP_SERVER_SUFFIX = "-server";
 
 // Default directory from which to look for plugins
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/";
 const QString DEFAULT_OOP_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/oopp";
-#else
-const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins/";
-#endif
 
 // The name of the function which is used to create a plugin
 const QString CREATE_FUNCTION = "createPlugin";

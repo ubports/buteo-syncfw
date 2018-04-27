@@ -1,6 +1,5 @@
 TEMPLATE = lib
-equals(QT_MAJOR_VERSION, 4): TARGET = buteosyncfw
-equals(QT_MAJOR_VERSION, 5): TARGET = buteosyncfw5
+TARGET = buteosyncfw5
 DEPENDPATH += . clientfw  common  pluginmgr  profile
 INCLUDEPATH += . clientfw  common  pluginmgr  profile
 
@@ -103,11 +102,8 @@ isEmpty(LIBDIR) {
     LIBDIR = /usr/lib
 }
 target.path = $${LIBDIR}
-
-equals(QT_MAJOR_VERSION, 4): headers.path = /usr/include/buteosyncfw
-equals(QT_MAJOR_VERSION, 5): headers.path = /usr/include/buteosyncfw5
-
-sources.path = /usr/include/buteosyncfw5/
+headers.path = /usr/include/buteosyncfw5/
+sources.path = $$headers.path
 
 sources.files = pluginmgr/plugin_main.cpp \
                 pluginmgr/PluginServiceObj.cpp \

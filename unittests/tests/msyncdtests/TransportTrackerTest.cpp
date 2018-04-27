@@ -102,11 +102,8 @@ void TransportTrackerTest :: testStateChanged()
 
     // change BT state and verify
     bool btCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     iTransportTracker->onBtStateChanged("Powered", QDBusVariant(QVariant(!btCurrentState)));
-#else
-    iTransportTracker->onBtStateChanged(!btCurrentState);
-#endif
+
     QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT), !btCurrentState);
     QCOMPARE(connectivityStateSpy.count(), 1);
     QCOMPARE(connectivityStateSpy.first().at(0).value<Sync::ConnectivityType>(), Sync::CONNECTIVITY_BT);
