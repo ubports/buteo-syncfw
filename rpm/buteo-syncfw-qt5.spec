@@ -98,7 +98,7 @@ Group: Development/Libraries
 
 
 %build
-%qmake5 -recursive CONFIG+=usb-moded DEFINES+=USE_KEEPALIVE
+%qmake5 -recursive "VERSION=%{version}" CONFIG+=usb-moded DEFINES+=USE_KEEPALIVE
 make %{_smp_mflags}
 make doc %{_smp_mflags}
 
