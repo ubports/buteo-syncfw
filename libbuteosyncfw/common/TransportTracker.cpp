@@ -65,7 +65,6 @@ TransportTracker::TransportTracker(QObject *aParent) :
 #endif
 
     // BT
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     // Set the bluetooth state
     iTransportStates[Sync::CONNECTIVITY_BT] = btConnectivityStatus();
     if (!iSystemBus.connect("org.bluez",
@@ -77,12 +76,6 @@ TransportTracker::TransportTracker(QObject *aParent) :
     {
         LOG_WARNING("Unable to connect to system bus for org.bluez.Adapter");
     }
-
-#else
-    iTransportStates[Sync::CONNECTIVITY_BT] = iDeviceInfo.currentBluetoothPowerState();
-    QObject::connect(&iDeviceInfo, SIGNAL(bluetoothStateChanged(bool)), this, SLOT(onBtStateChanged(bool)));
-    LOG_DEBUG("Current bluetooth power state"<<iDeviceInfo.currentBluetoothPowerState());
-#endif
 
     // Internet
     // @todo: enable when internet state is reported correctly.
@@ -123,17 +116,6 @@ void TransportTracker::onUsbStateChanged(bool aConnected)
     updateState(Sync::CONNECTIVITY_USB, aConnected);
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-void TransportTracker::onBtStateChanged(bool aState)
-{
-    FUNCTION_CALL_TRACE;
-
-    Q_UNUSED(aState);
-    bool btPowered = iDeviceInfo.currentBluetoothPowerState();
-    LOG_DEBUG("BT power state" << btPowered);
-    updateState(Sync::CONNECTIVITY_BT, btPowered);
-}
-#else
 void TransportTracker::onBtStateChanged(QString aKey, QDBusVariant aValue)
 {
     FUNCTION_CALL_TRACE;
@@ -145,7 +127,6 @@ void TransportTracker::onBtStateChanged(QString aKey, QDBusVariant aValue)
         updateState(Sync::CONNECTIVITY_BT, btPowered);
     }
 }
-#endif
 
 void TransportTracker::onInternetStateChanged(bool aConnected, Sync::InternetConnectionType aType)
 {

@@ -1,9 +1,9 @@
 Name: buteo-syncfw-qt5
-Version: 0.8.13
+Version: 0.8.14
 Release: 1
 Summary: Synchronization backend
 Group: System/Libraries
-URL: https://github.com/nemomobile/buteo-syncfw
+URL: https://git.merproject.org/mer-core/buteo-syncfw/
 License: LGPLv2.1
 Source0: %{name}-%{version}.tar.gz
 BuildRequires: doxygen, fdupes
@@ -98,7 +98,7 @@ Group: Development/Libraries
 
 
 %build
-%qmake5 -recursive CONFIG+=usb-moded DEFINES+=USE_KEEPALIVE
+%qmake5 -recursive "VERSION=%{version}" CONFIG+=usb-moded DEFINES+=USE_KEEPALIVE
 make %{_smp_mflags}
 make doc %{_smp_mflags}
 

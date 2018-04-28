@@ -30,9 +30,6 @@
 #include <QMutex>
 #include <QDBusVariant>
 #include <QDBusConnection>
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include <QtSystemInfo/QSystemDeviceInfo>
-#endif
 
 namespace Buteo {
 
@@ -94,11 +91,7 @@ private slots:
 
         void onUsbStateChanged(bool aConnected);
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    void onBtStateChanged(bool aState);
-#else
     void onBtStateChanged(QString aKey, QDBusVariant aValue);
-#endif
 
     void onInternetStateChanged(bool aConnected, Sync::InternetConnectionType aType);
 
@@ -107,10 +100,6 @@ private:
     QMap<Sync::ConnectivityType, bool> iTransportStates;
 
     USBModedProxy *iUSBProxy;
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QtMobility::QSystemDeviceInfo iDeviceInfo;
-#endif
 
     NetworkManager *iInternet;
     QDBusConnection iSystemBus;
