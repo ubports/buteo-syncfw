@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export DPKG_GENSYMBOLS_CHECK_LEVEL=4
+
+override_dh_auto_configure:
+	dh_auto_configure -- LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH) DEFINES+=USE_ACCOUNTSHELPER_LISTENER
+
+override_dh_auto_install:
+	dh_auto_install
+
+	# remove tests
+	rm -rf debian/tmp/opt
+	rm -rf debian/tmp/usr/share/accounts/services/testsync-ovi.service
+
+%:
+	dh $@ --fail-missing
+

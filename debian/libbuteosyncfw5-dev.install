@@ -1,0 +1,4 @@
+usr/include/buteosyncfw5/*
+usr/lib/*/*.prl
+usr/lib/*/lib*.so
+usr/lib/*/pkgconfig/*.pc
