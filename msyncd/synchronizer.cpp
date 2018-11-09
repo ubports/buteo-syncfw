@@ -334,10 +334,14 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
          }
 
          LOG_DEBUG("Marking" << aProfileName << "sync as NOTPOSSIBLE due to connectivity status");
-         iSyncScheduler->syncStatusChanged(aProfileName,
-                                           Sync::SYNC_NOTPOSSIBLE,
-                                           QLatin1String("No internet connectivity or connectivity type restricted for sync"),
-                                           Buteo::SyncResults::OFFLINE_MODE);
+         if (iSyncScheduler)
+         {
+             // can be null if in backup/restore state.
+             iSyncScheduler->syncStatusChanged(aProfileName,
+                                              Sync::SYNC_NOTPOSSIBLE,
+                                              QLatin1String("No internet connectivity or connectivity type restricted for sync"),
+                                              Buteo::SyncResults::OFFLINE_MODE);
+         }
     }
     return true;
 }
@@ -673,7 +677,11 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
                 QDateTime nextRetryInterval = iProfileManager.getNextRetryInterval(session->profile());
                 if(nextRetryInterval.isValid())
                 {
-                    iSyncScheduler->addProfileForSyncRetry(session->profile(), nextRetryInterval);
+                    if (iSyncScheduler)
+                    {
+                        // can be null if in backup/restore state.
+                        iSyncScheduler->addProfileForSyncRetry(session->profile(), nextRetryInterval);
+                    }
                 }
                 else
                 {
@@ -884,7 +892,7 @@ bool Synchronizer::cleanupProfile(const QString &aProfileId)
             }
         }
 
-        if (profile->syncType() == SyncProfile::SYNC_SCHEDULED) {
+        if (profile->syncType() == SyncProfile::SYNC_SCHEDULED && iSyncScheduler) {
             iSyncScheduler->removeProfile(aProfileId);
         }
 
@@ -1638,7 +1646,11 @@ void Synchronizer::slotSyncStatus(QString aProfileName, int aStatus, QString aMe
                     break;
             }
         }
-        iSyncScheduler->syncStatusChanged(aProfileName, aStatus, aMessage, aMoreDetails);
+        if (iSyncScheduler)
+        {
+            // can be null if in backup/restore state.
+            iSyncScheduler->syncStatusChanged(aProfileName, aStatus, aMessage, aMoreDetails);
+        }
         delete profile;
     }
 }
