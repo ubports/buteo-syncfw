@@ -19,11 +19,13 @@ BuildRequires: pkgconfig(libiphb)
 BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: pkgconfig(keepalive)
 BuildRequires: pkgconfig(gio-2.0)
+BuildRequires: pkgconfig(mce-qt5) >= 1.1.0
 BuildRequires: oneshot
 BuildRequires: doxygen
 Requires: mapplauncherd-qt5
 Requires: oneshot
 Requires: glib2
+Requires: libmce-qt5 >= 1.1.0
 %{_oneshot_requires_post}
 
 %description
