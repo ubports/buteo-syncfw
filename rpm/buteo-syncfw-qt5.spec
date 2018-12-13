@@ -63,9 +63,9 @@ Obsoletes: buteo-syncfw-msyncd < %{version}
 
 %files msyncd
 %defattr(-,root,root,-)
-%config %{_libdir}/systemd/user/*.service
+%{_libdir}/systemd/user/*.service
 %{_libdir}/systemd/user/user-session.target.wants/*.service
-%config %{_sysconfdir}/syncwidget/*
+%{_sysconfdir}/syncwidget/*
 %{_bindir}/msyncd
 %{_datadir}/glib-2.0/schemas/*
 
