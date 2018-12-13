@@ -19,11 +19,13 @@ BuildRequires: pkgconfig(libiphb)
 BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: pkgconfig(keepalive)
 BuildRequires: pkgconfig(gio-2.0)
+BuildRequires: pkgconfig(mce-qt5) >= 1.1.0
 BuildRequires: oneshot
 BuildRequires: doxygen
 Requires: mapplauncherd-qt5
 Requires: oneshot
 Requires: glib2
+Requires: libmce-qt5 >= 1.1.0
 %{_oneshot_requires_post}
 
 %description
@@ -63,9 +65,9 @@ Obsoletes: buteo-syncfw-msyncd < %{version}
 
 %files msyncd
 %defattr(-,root,root,-)
-%config %{_libdir}/systemd/user/*.service
+%{_libdir}/systemd/user/*.service
 %{_libdir}/systemd/user/user-session.target.wants/*.service
-%config %{_sysconfdir}/syncwidget/*
+%{_sysconfdir}/syncwidget/*
 %{_bindir}/msyncd
 %{_datadir}/glib-2.0/schemas/*
 

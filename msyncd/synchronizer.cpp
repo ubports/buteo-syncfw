@@ -42,7 +42,8 @@
 #include "LogMacros.h"
 #include "BtHelper.h"
 
-#include <QBatteryInfo>
+#include <qmcebatterystatus.h>
+#include <qmcepowersavemode.h>
 #include <QtDebug>
 #include <fcntl.h>
 #include <termios.h>
@@ -56,14 +57,17 @@ static const QString BT_PROPERTIES_NAME = "Name";
 class Buteo::BatteryInfo
 {
 public:
-    QBatteryInfo iBatteryInfo;
-
     bool isLowPower() {
-        QBatteryInfo::LevelStatus batteryStat;
-        batteryStat = iBatteryInfo.levelStatus();
-        return (batteryStat == QBatteryInfo::LevelEmpty) ||
-                (batteryStat == QBatteryInfo::LevelLow);
+        return (iBatteryStatus.valid() &&
+                iBatteryStatus.status() <= QMceBatteryStatus::Low);
     }
+    bool inPowerSaveMode() {
+        return (iPowerSaveMode.valid() &&
+                iPowerSaveMode.active());
+    }
+private:
+    QMcePowerSaveMode iPowerSaveMode;
+    QMceBatteryStatus iBatteryStatus;
 };
 
 Synchronizer::Synchronizer( QCoreApplication* aApplication )
@@ -475,9 +479,15 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     }
     else if( aScheduled && iBatteryInfo->isLowPower() )
     {
-        LOG_DEBUG( "Low power, scheduled sync aborted" );
+        LOG_WARNING( "Low power, scheduled sync for profile" << aProfileName << "aborted" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Low battery", Buteo::SyncResults::LOW_BATTERY_POWER);
+    }
+    else if( aScheduled && iBatteryInfo->inPowerSaveMode() )
+    {
+        LOG_WARNING( "Power save mode active, scheduled sync for profile" << aProfileName << "aborted" );
+        session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::POWER_SAVING_MODE);
+        emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Power Save Mode active", Buteo::SyncResults::POWER_SAVING_MODE);
     }
     else if (!session->reserveStorages(&iStorageBooker))
     {
