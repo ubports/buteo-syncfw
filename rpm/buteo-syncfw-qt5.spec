@@ -68,7 +68,7 @@ Obsoletes: buteo-syncfw-msyncd < %{version}
 %defattr(-,root,root,-)
 %{_libdir}/systemd/user/*.service
 %{_libdir}/systemd/user/user-session.target.wants/*.service
-%{_sysconfdir}/syncwidget/*
+%{_sysconfdir}/syncwidget
 %{_bindir}/msyncd
 %{_datadir}/mapplauncherd/privileges.d/*
 %{_datadir}/glib-2.0/schemas/*
@@ -82,7 +82,7 @@ Group: Documentation
 
 %files doc
 %defattr(-,root,root,-)
-%{_docdir}/buteo-syncfw-doc/*
+%{_docdir}/buteo-syncfw-doc
 
 %package tests
 Summary: Tests for %{name}
@@ -93,7 +93,7 @@ Group: Development/Libraries
 
 %files tests
 %defattr(-,root,root,-)
-/opt/tests/buteo-syncfw/*
+/opt/tests/buteo-syncfw
 %{_datadir}/accounts/services/*.service
 
 
