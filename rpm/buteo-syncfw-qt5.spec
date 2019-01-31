@@ -6,6 +6,7 @@ Group: System/Libraries
 URL: https://git.merproject.org/mer-core/buteo-syncfw/
 License: LGPLv2.1
 Source0: %{name}-%{version}.tar.gz
+Source1: %{name}.privileges
 BuildRequires: doxygen, fdupes
 BuildRequires: pkgconfig(Qt5Core)
 BuildRequires: pkgconfig(Qt5DBus)
@@ -67,8 +68,9 @@ Obsoletes: buteo-syncfw-msyncd < %{version}
 %defattr(-,root,root,-)
 %{_libdir}/systemd/user/*.service
 %{_libdir}/systemd/user/user-session.target.wants/*.service
-%{_sysconfdir}/syncwidget/*
+%{_sysconfdir}/syncwidget
 %{_bindir}/msyncd
+%{_datadir}/mapplauncherd/privileges.d/*
 %{_datadir}/glib-2.0/schemas/*
 
 %package doc
@@ -80,7 +82,7 @@ Group: Documentation
 
 %files doc
 %defattr(-,root,root,-)
-%{_docdir}/buteo-syncfw-doc/*
+%{_docdir}/buteo-syncfw-doc
 
 %package tests
 Summary: Tests for %{name}
@@ -91,7 +93,7 @@ Group: Development/Libraries
 
 %files tests
 %defattr(-,root,root,-)
-/opt/tests/buteo-syncfw/*
+/opt/tests/buteo-syncfw
 %{_datadir}/accounts/services/*.service
 
 
@@ -114,6 +116,9 @@ ln -s ../msyncd.service %{buildroot}%{_libdir}/systemd/user/user-session.target.
 
 mkdir -p %{buildroot}/%{_oneshotdir}
 install -D -m 755 oneshot/msyncd-storage-perm %{buildroot}/%{_oneshotdir}
+
+mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
+install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
 
 %post
 /sbin/ldconfig
