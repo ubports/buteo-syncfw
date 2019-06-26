@@ -31,6 +31,9 @@
 
 namespace Sync {
 
+#ifdef __GNUC__
+static const QString syncCacheDir() __attribute__ ((unused));
+#endif
 static const QString syncCacheDir()
 {
     return QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + QDir::separator() + "msyncd";
