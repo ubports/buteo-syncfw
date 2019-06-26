@@ -26,17 +26,18 @@
 
 #include <QMetaType>
 #include <QDir>
+#include <QStandardPaths>
 #include <QtNetwork/QNetworkConfiguration>
 
 namespace Sync {
 
-#ifdef __GNUC__
-static const QString syncCacheDir() __attribute__ ((unused));
-#endif
 static const QString syncCacheDir()
 {
-    const QString HOME_PATH = (::getenv("XDG_CACHE_HOME") == NULL) ? QDir::homePath() + QDir::separator() + ".cache" : ::getenv("XDG_CACHE_HOME");
-    return HOME_PATH + QDir::separator() + "msyncd";
+    return QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + QDir::separator() + "msyncd";
+}
+static const QString syncSyncDir()
+{
+    return syncCacheDir() + QDir::separator() + "sync";
 }
 
 enum SyncStatus {

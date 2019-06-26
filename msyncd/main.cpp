@@ -22,15 +22,21 @@
  */
 
 #include <QCoreApplication>
+#include <QStandardPaths>
 #include <QtDebug>
 #include <QDateTime>
 
 #include <dbus/dbus.h>
+#include <sys/types.h>
+#include <grp.h>
+#include <pwd.h>
+#include <unistd.h>
 
 #include "LogMacros.h"
 #include "Logger.h"
 #include "synchronizer.h"
 #include "SyncSigHandler.h"
+#include "SyncCommonDefs.h"
 
 Q_DECL_EXPORT int main( int argc, char* argv[] )
 {
@@ -59,6 +65,35 @@ Q_DECL_EXPORT int main( int argc, char* argv[] )
         delete synchronizer;
         synchronizer = 0;
         return -1;
+    }
+
+    QString genericCache = QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation);
+    QFile::Permissions permissions(QFile::ExeOwner | QFile::ExeGroup | QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::WriteGroup);
+
+    // Make sure we have the .cache directory
+    QDir homeDir(genericCache);
+    if (homeDir.mkpath(genericCache)) {
+        uid_t uid = getuid();
+        struct passwd *pwd;
+        struct group *grp;
+        // assumes that correct groupname is same as username (e.g. nemo:nemo)
+        pwd = getpwuid(uid);
+        if (pwd != NULL) {
+            grp = getgrnam(pwd->pw_name);
+            if (grp != NULL) {
+                gid_t gid = grp->gr_gid;
+                int ret = chown(genericCache.toLatin1().data(), uid, gid);
+                Q_UNUSED(ret);
+            }
+        }
+        QFile::setPermissions(genericCache, permissions);
+    }
+
+    // Make sure we have the msyncd/sync directory
+    QDir syncDir(Sync::syncSyncDir());
+    if (syncDir.mkpath(Sync::syncSyncDir())) {
+        QFile::setPermissions(Sync::syncCacheDir(), permissions);
+        QFile::setPermissions(Sync::syncSyncDir(), permissions);
     }
 
     //Note:- Since we can't call Qt functions from Unix signal handlers.

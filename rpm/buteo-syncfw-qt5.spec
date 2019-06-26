@@ -21,13 +21,10 @@ BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: pkgconfig(keepalive)
 BuildRequires: pkgconfig(gio-2.0)
 BuildRequires: pkgconfig(mce-qt5) >= 1.1.0
-BuildRequires: oneshot
 BuildRequires: doxygen
 Requires: mapplauncherd-qt5
-Requires: oneshot
 Requires: glib2
 Requires: libmce-qt5 >= 1.1.0
-%{_oneshot_requires_post}
 
 %description
 %{summary}.
@@ -35,7 +32,6 @@ Requires: libmce-qt5 >= 1.1.0
 %files
 %defattr(-,root,root,-)
 %{_libdir}/*.so.*
-%{_oneshotdir}/msyncd-storage-perm
 
 %package devel
 Summary: Development files for %{name}
@@ -114,15 +110,11 @@ chmod +x %{buildroot}/opt/tests/buteo-syncfw/*.pl %{buildroot}/opt/tests/buteo-s
 mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
 ln -s ../msyncd.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
 
-mkdir -p %{buildroot}/%{_oneshotdir}
-install -D -m 755 oneshot/msyncd-storage-perm %{buildroot}/%{_oneshotdir}
-
 mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
 
 %post
 /sbin/ldconfig
-%{_bindir}/add-oneshot msyncd-storage-perm
 if [ "$1" -ge 1 ]; then
     systemctl-user daemon-reload || true
     systemctl-user try-restart msyncd.service || true
