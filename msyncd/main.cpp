@@ -89,11 +89,13 @@ Q_DECL_EXPORT int main( int argc, char* argv[] )
         QFile::setPermissions(genericCache, permissions);
     }
 
+    QString msyncCacheSyncDir = Sync::syncCacheDir() + QDir::separator() + "sync";
+
     // Make sure we have the msyncd/sync directory
-    QDir syncDir(Sync::syncSyncDir());
-    if (syncDir.mkpath(Sync::syncSyncDir())) {
+    QDir syncDir(msyncCacheSyncDir);
+    if (syncDir.mkpath(msyncCacheSyncDir)) {
         QFile::setPermissions(Sync::syncCacheDir(), permissions);
-        QFile::setPermissions(Sync::syncSyncDir(), permissions);
+        QFile::setPermissions(msyncCacheSyncDir, permissions);
     }
 
     //Note:- Since we can't call Qt functions from Unix signal handlers.

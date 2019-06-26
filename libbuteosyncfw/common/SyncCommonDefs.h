@@ -35,10 +35,6 @@ static const QString syncCacheDir()
 {
     return QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + QDir::separator() + "msyncd";
 }
-static const QString syncSyncDir()
-{
-    return syncCacheDir() + QDir::separator() + "sync";
-}
 
 enum SyncStatus {
     SYNC_QUEUED = 0,
