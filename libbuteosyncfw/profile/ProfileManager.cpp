@@ -148,7 +148,7 @@ Profile *ProfileManagerPrivate::load(const QString &aName, const QString &aType)
         }
     }
     else {
-        LOG_WARNING("Failed to load profile:" << aName);
+        LOG_DEBUG("Failed to load profile:" << aName);
     }
 
     return profile;
