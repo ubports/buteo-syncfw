@@ -1,10 +1,10 @@
-Name: buteo-syncfw-qt5
+Name:    buteo-syncfw-qt5
 Version: 0.8.16
 Release: 1
 Summary: Synchronization backend
-Group: System/Libraries
-URL: https://git.merproject.org/mer-core/buteo-syncfw/
-License: LGPLv2.1
+Group:   System/Libraries
+URL:     https://git.sailfishos.org/mer-core/buteo-syncfw/
+License: LGPLv2
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}.privileges
 BuildRequires: doxygen, fdupes
