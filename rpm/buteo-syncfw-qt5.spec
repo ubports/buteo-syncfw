@@ -68,6 +68,8 @@ Obsoletes: buteo-syncfw-msyncd < %{version}
 %{_bindir}/msyncd
 %{_datadir}/mapplauncherd/privileges.d/*
 %{_datadir}/glib-2.0/schemas/*
+%dir %{_libdir}/buteo-plugins-qt5
+%dir %{_libdir}/buteo-plugins-qt5/oopp
 
 %package doc
 Summary: Documentation for %{name}
@@ -112,6 +114,7 @@ ln -s ../msyncd.service %{buildroot}%{_libdir}/systemd/user/user-session.target.
 
 mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
+mkdir -p %{buildroot}%{_libdir}/buteo-plugins-qt5/oopp
 
 %post
 /sbin/ldconfig
