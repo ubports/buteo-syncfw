@@ -316,8 +316,29 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
     bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType());
     if(accept)
     {
-        LOG_DEBUG("Scheduled sync of" << aProfileName << "accepted with current connectivity status.");
-        startSync(aProfileName, true);
+        /* Ensure that current time is compatible with sync schedule.
+           The Background process may have started a sync in a period
+           where sync is disabled due to delayed interval wake up. */
+        SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+        bool wrongTime = (profile && !profile->syncSchedule().isSyncScheduled(QDateTime::currentDateTime()));
+        delete profile;
+        if (wrongTime)
+        {
+            LOG_DEBUG("Woken up of" << aProfileName << "in a disabled period, not starting sync.");
+            if (iSyncScheduler)
+            {
+                // can be null if in backup/restore state.
+                iSyncScheduler->syncStatusChanged(aProfileName,
+                                                  Sync::SYNC_NOTPOSSIBLE,
+                                                  QLatin1String("Sync cancelled due to wrong wake up"),
+                                                  Buteo::SyncResults::ABORTED);
+            }
+        }
+        else
+        {
+            LOG_DEBUG("Scheduled sync of" << aProfileName << "accepted with current connectivity status.");
+            startSync(aProfileName, true);
+        }
     }
     else
     {

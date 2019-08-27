@@ -487,6 +487,28 @@ QDateTime SyncSchedule::nextRushSwitchTime(const QDateTime &aFromTime) const
     }
 }
 
+bool SyncSchedule::isSyncScheduled(const QDateTime &aDateTime) const
+{
+    // Simple case, aDateTime is the defined sync time.
+    if (d_ptr->iTime.isValid() && !d_ptr->iDays.isEmpty()) {
+        /* Todo: this is to simple implementation for the case where
+           sync time is close to midnight and the day has changed
+           already when fired. */
+        if (!d_ptr->iDays.contains(aDateTime.date().dayOfWeek())) {
+            return false;
+        }
+        /* Keep a 10 minutes margin to ensure that delayed
+           syncs by more prioritary sync in progress are still
+           considered as valid sync times. */
+        return (aDateTime.time() < d_ptr->iTime.addSecs(5 * 60)
+                && aDateTime.time() > d_ptr->iTime.addSecs(-5 * 60));
+    }
+    /* Sync schedule is defined by intervals and / or rush, check that
+       schedule or rush is enabled for the current aDateTime. */
+    return ((rushEnabled() && d_ptr->iRushInterval > 0 && d_ptr->isRush(aDateTime))
+            || (scheduleEnabled() && d_ptr->iInterval > 0));
+}
+
 
 DaySet SyncSchedulePrivate::parseDays(const QString &aDays) const
 {

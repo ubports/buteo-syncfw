@@ -257,6 +257,13 @@ public:
      */
     QDateTime nextRushSwitchTime(const QDateTime& aFromTime) const;
 
+    /*! \brief Returns true if aDateTime is within a scheduled period.
+     *
+     * \param aDateTime a give date time.
+     * \return true if at aDateTime, the synchronization is possible.
+     */
+    bool isSyncScheduled(const QDateTime &aDateTime) const;
+
 private:
 
     SyncSchedulePrivate* d_ptr;
