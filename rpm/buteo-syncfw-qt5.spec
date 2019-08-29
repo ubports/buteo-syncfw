@@ -9,13 +9,13 @@ Source0: %{name}-%{version}.tar.gz
 Source1: %{name}.privileges
 BuildRequires: doxygen, fdupes
 BuildRequires: pkgconfig(Qt5Core)
+BuildRequires: pkgconfig(Qt5Network)
 BuildRequires: pkgconfig(Qt5DBus)
 BuildRequires: pkgconfig(Qt5Sql)
 BuildRequires: pkgconfig(Qt5Test)
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(accounts-qt5) >= 1.13
 BuildRequires: pkgconfig(libsignon-qt5)
-BuildRequires: pkgconfig(Qt5SystemInfo)
 BuildRequires: pkgconfig(libiphb)
 BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: pkgconfig(keepalive)

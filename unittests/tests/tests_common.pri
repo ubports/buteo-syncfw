@@ -16,7 +16,7 @@ QT -= gui
 
 CONFIG += link_pkgconfig link_prl
 
-PKGCONFIG += dbus-1 Qt5SystemInfo
+PKGCONFIG += dbus-1
 
 LIBS += -lgcov
 
