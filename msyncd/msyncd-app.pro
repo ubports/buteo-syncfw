@@ -18,7 +18,7 @@ INCLUDEPATH += . \
     ../libbuteosyncfw/profile
 
 
-PKGCONFIG += dbus-1 libsignon-qt5 accounts-qt5 Qt5SystemInfo
+PKGCONFIG += dbus-1 libsignon-qt5 accounts-qt5
 LIBS += -lbuteosyncfw5
 packagesExist(qt5-boostable) {
     DEFINES += HAS_BOOSTER
