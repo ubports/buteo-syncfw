@@ -38,6 +38,8 @@ private slots:
     void testProperties();
 
     void testNextSyncTime();
+
+    void testIsSyncScheduled();
 };
 
 }

@@ -215,4 +215,56 @@ void SyncScheduleTest::testNextSyncTime()
     QCOMPARE(next.time(), s.rushBegin());
 }
 
+void SyncScheduleTest::testIsSyncScheduled()
+{
+    SyncSchedule s;
+
+    // Exact time.
+    QTime exact(15, 0, 0, 0);
+    s.setTime(exact);
+    QVERIFY(!s.isSyncScheduled(QDateTime(QDate(2019, 8, 27), QTime(15, 0, 0, 0))));
+    DaySet days;
+    days.insert(Qt::Wednesday);
+    days.insert(Qt::Monday);
+    s.setDays(days);
+    // This is a Tuesday.
+    QVERIFY(!s.isSyncScheduled(QDateTime(QDate(2019, 8, 27), QTime(15, 0, 0, 0))));
+    // These are valid within 10 seconds margin
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 28), QTime(15, 0, 0, 0))));
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 28), QTime(15, 0, 4, 0))));
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 28), QTime(14, 59, 56, 0))));
+    // These are invalid
+    QVERIFY(!s.isSyncScheduled(QDateTime(QDate(2019, 8, 28), QTime(15, 0, 5, 0))));
+    QVERIFY(!s.isSyncScheduled(QDateTime(QDate(2019, 8, 28), QTime(14, 59, 55, 0))));
+
+    // Simply enabled, no rush.
+    s.setTime(QTime());
+    s.setInterval(3600);
+    s.setScheduleEnabled(true);
+    // Any time, any day should match
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 25), QTime(15, 0, 0, 0))));
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 28), QTime(5, 0, 0, 0))));
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 29), QTime(21, 0, 0, 0))));
+
+    // Rush enabled, in rush time.
+    DaySet rushDays;
+    rushDays.insert(Qt::Tuesday);
+    rushDays.insert(Qt::Wednesday);
+    s.setRushDays(rushDays);
+    s.setRushEnabled(true);
+    s.setRushTime(QTime(8, 0, 0, 0), QTime(16, 0, 0, 0));
+    s.setRushInterval(300);
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 27), QTime(15, 0, 0, 0))));
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 28), QTime(9, 0, 0, 0))));
+
+    // Rush enabled, not in rush time.
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 27), QTime(17, 0, 0, 0))));
+    QVERIFY(s.isSyncScheduled(QDateTime(QDate(2019, 8, 29), QTime(9, 0, 0, 0))));
+
+    // Rush enabled, not in rush time, schedule disabled.
+    s.setScheduleEnabled(false);
+    QVERIFY(!s.isSyncScheduled(QDateTime(QDate(2019, 8, 27), QTime(17, 0, 0, 0))));
+    QVERIFY(!s.isSyncScheduled(QDateTime(QDate(2019, 8, 29), QTime(9, 0, 0, 0))));
+}
+
 QTEST_MAIN(Buteo::SyncScheduleTest)
