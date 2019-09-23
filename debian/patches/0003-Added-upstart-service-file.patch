@@ -19,7 +19,7 @@ index 0000000..3ceced3
 +description "address-book-service"
 +author "Bill Filler <bill.filler@canonical.com>"
 +
-+start on started unity8-dash
++start on started unity8
 +stop on runlevel [06]
 +
 +# give some time to nm be ready
