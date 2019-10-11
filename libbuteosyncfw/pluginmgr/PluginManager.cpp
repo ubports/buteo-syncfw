@@ -40,10 +40,36 @@
 
 #include "LogMacros.h"
 
+namespace {
+// Location filters of plugin maps
+const QString STORAGEMAP_LOCATION = "-storage.so";
+const QString CLIENTMAP_LOCATION = "-client.so";
+const QString SERVERMAP_LOCATION = "-server.so";
+const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
+
+// OOP plugins binary name suffix
+const QString OOP_CLIENT_SUFFIX = "-client";
+const QString OOP_SERVER_SUFFIX = "-server";
+
+// Default directory from which to look for plugins
+const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/";
+
+// The name of the function which is used to create a plugin
+const QString CREATE_FUNCTION = "createPlugin";
+
+// The name of the function which is used to destroy a plugin
+const QString DESTROY_FUNCTION = "destroyPlugin";
+}
+
 using namespace Buteo;
 
+PluginManager::PluginManager()
+    : PluginManager(DEFAULT_PLUGIN_PATH)
+{
+}
+
 PluginManager::PluginManager( const QString &aPluginPath )
- : iPluginPath( aPluginPath )
+    : iPluginPath( aPluginPath )
 {
     FUNCTION_CALL_TRACE;
     

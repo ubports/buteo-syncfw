@@ -43,26 +43,6 @@ class ClientPluginTest;
 class ServerPluginTest;
 class StoragePluginTest;
 
-// Location filters of plugin maps
-const QString STORAGEMAP_LOCATION = "-storage.so";
-const QString CLIENTMAP_LOCATION = "-client.so";
-const QString SERVERMAP_LOCATION = "-server.so";
-const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
-
-// OOP plugins binary name suffix
-const QString OOP_CLIENT_SUFFIX = "-client";
-const QString OOP_SERVER_SUFFIX = "-server";
-
-// Default directory from which to look for plugins
-const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/";
-const QString DEFAULT_OOP_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/oopp";
-
-// The name of the function which is used to create a plugin
-const QString CREATE_FUNCTION = "createPlugin";
-
-// The name of the function which is used to destroy a plugin
-const QString DESTROY_FUNCTION = "destroyPlugin";
-
 typedef ClientPlugin* (*FUNC_CREATE_CLIENT)( const QString&,
                                              const SyncProfile&,
                                              PluginCbInterface* );
@@ -89,11 +69,12 @@ class PluginManager : public QObject
     Q_OBJECT
 
 public:
+    PluginManager();
     /*! \brief Constructor
      *
      * @param aPluginPath Path where plugins are stored
      */
-    PluginManager( const QString &aPluginPath = DEFAULT_PLUGIN_PATH );
+    PluginManager( const QString &aPluginPath );
 
     /*! \brief Destructor
      *
