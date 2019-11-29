@@ -274,7 +274,7 @@ void SyncSessionTest :: testOnSuccess()
 void SyncSessionTest :: testOnError()
 {
     const QString MESSAGE = "testMessage";
-    int errorCode = 4;
+    SyncResults::MinorCode errorCode = SyncResults::PLUGIN_ERROR;
 
     iSyncSession->setPluginRunner(iSyncSessionPluginRunnerTest, true);
     iSyncSession->onError("sampleProfile", MESSAGE, errorCode);
@@ -317,12 +317,10 @@ void SyncSessionTest :: testOnDone()
     iSyncSession->onDone();
     QCOMPARE(sampleSpy.count(), 1);
 
-    int errorCode = 1;
-
     iSyncSession->onSuccess("testProfile", "testMessage");
     QCOMPARE(sampleSpy.count(), 2);
 
-    iSyncSession->onError("testProfile", "testMessage", errorCode);
+    iSyncSession->onError("testProfile", "testMessage", SyncResults::PLUGIN_ERROR);
     QCOMPARE(sampleSpy.count(), 3);
 }
 

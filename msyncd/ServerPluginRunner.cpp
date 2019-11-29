@@ -94,8 +94,7 @@ bool ServerPluginRunner::init()
                                              int)),
             this, SLOT(onTransferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &, int)));
 
-    connect(iPlugin, SIGNAL(error(const QString &, const QString &, int)),
-            this, SLOT(onError(const QString &, const QString &, int)));
+    connect(iPlugin, &ServerPlugin::error, this, &ServerPluginRunner::onError);
 
     connect(iPlugin, SIGNAL(success(const QString &, const QString &)),
             this, SLOT(onSuccess(const QString &, const QString &)));
@@ -108,8 +107,7 @@ bool ServerPluginRunner::init()
 
     // Connect signals from the thread.
 
-    connect(iThread, SIGNAL(initError(const QString &, const QString &, int)),
-            this, SLOT(onError(const QString &, const QString &, int)));
+    connect(iThread, &ServerThread::initError, this, &ServerPluginRunner::onError);
 
     connect(iThread, SIGNAL(finished()), this, SLOT(onThreadExit()));
 
@@ -221,7 +219,7 @@ void ServerPluginRunner::onTransferProgress(const QString &aProfileName,
 }
 
 void ServerPluginRunner::onError(const QString &aProfileName,
-                                 const QString &aMessage, int aErrorCode)
+                                 const QString &aMessage, SyncResults::MinorCode aErrorCode)
 {
     FUNCTION_CALL_TRACE;
 

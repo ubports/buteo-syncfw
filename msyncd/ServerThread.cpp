@@ -104,13 +104,13 @@ void ServerThread::run()
 
     if (!iServerPlugin->init()) {
         LOG_WARNING( "Could not initialize server plugin:" << iServerPlugin->getPluginName() );
-        emit initError(iServerPlugin->getProfileName(), "", 0);
+        emit initError(iServerPlugin->getProfileName(), "", SyncResults::PLUGIN_ERROR);
         return;
     }
 
     if (!iServerPlugin->startListen()) {
         LOG_WARNING( "Could not start server plugin:" << iServerPlugin->getPluginName() );
-        emit initError(iServerPlugin->getProfileName(), "", 0);
+        emit initError(iServerPlugin->getProfileName(), "", SyncResults::PLUGIN_ERROR);
         return;
     }
 

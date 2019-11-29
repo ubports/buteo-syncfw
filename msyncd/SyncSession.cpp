@@ -35,7 +35,7 @@ SyncSession::SyncSession(SyncProfile *aProfile, QObject *aParent)
         iProfile(aProfile),
         iPluginRunner(0),
         iStatus(Sync::SYNC_ERROR),
-        iErrorCode(0),
+        iErrorCode(SyncResults::NO_ERROR),
         iPluginRunnerOwned(false),
         iScheduled(false),
         iAborted(false),
@@ -95,8 +95,7 @@ void SyncSession::setPluginRunner(PluginRunner *aPluginRunner,
                                                        Sync::TransferDatabase, Sync::TransferType, const QString &, int)),
                 this, SLOT(onTransferProgress(const QString &, Sync::TransferDatabase,
                                               Sync::TransferType, const QString &, int)));
-        connect(iPluginRunner, SIGNAL(error(const QString &, const QString &, int)),
-                this, SLOT(onError(const QString &, const QString &, int)));
+        connect(iPluginRunner, &PluginRunner::error, this, &SyncSession::onError);
         connect(iPluginRunner, SIGNAL(success(const QString &, const QString &)),
                 this, SLOT(onSuccess(const QString &, const QString &)));
         connect(iPluginRunner, SIGNAL(storageAccquired(const QString &)),
@@ -269,7 +268,7 @@ bool SyncSession::isScheduled() const
 void SyncSession::onSuccess(const QString &aProfileName, const QString &aMessage)
 {
     FUNCTION_CALL_TRACE;
-    iErrorCode = 0;
+    iErrorCode = SyncResults::NO_ERROR;
 
     Q_UNUSED(aProfileName);
 
@@ -289,7 +288,7 @@ void SyncSession::onSuccess(const QString &aProfileName, const QString &aMessage
 }
 
 void SyncSession::onError(const QString &aProfileName, const QString &aMessage,
-                          int aErrorCode)
+                          SyncResults::MinorCode aErrorCode)
 {
     FUNCTION_CALL_TRACE;
 
@@ -358,7 +357,7 @@ void SyncSession::onDone()
 
     if (!iFinished) {
         LOG_WARNING("Plug-in terminated unexpectedly:" << pluginName);
-        emit finished(profileName(), Sync::SYNC_ERROR, iMessage, 0);
+        emit finished(profileName(), Sync::SYNC_ERROR, iMessage, SyncResults::NO_ERROR);
     }
 }
 
@@ -378,7 +377,7 @@ void SyncSession::updateResults(const SyncResults &aResults)
     iResults.setTargetId(aResults.getTargetId());
 }
 
-void SyncSession::setFailureResult(int aMajorCode, int aMinorCode)
+void SyncSession::setFailureResult(SyncResults::MajorCode aMajorCode, SyncResults::MinorCode aMinorCode)
 {
     FUNCTION_CALL_TRACE;
 

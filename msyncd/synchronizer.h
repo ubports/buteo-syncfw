@@ -255,7 +255,8 @@ private slots:
                             const QString &aMimeType, int aCommittedItems);
 
     void onSessionFinished(const QString &aProfileName,
-                           Sync::SyncStatus aStatus, const QString &aMessage, int aErrorCode);
+                           Sync::SyncStatus aStatus, const QString &aMessage,
+                           SyncResults::MinorCode aErrorCode);
 
     void onStorageAccquired(const QString &aProfileName, const QString &aMimeType);
 

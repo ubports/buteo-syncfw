@@ -45,11 +45,8 @@ public:
     //! Sync time.
     QDateTime iTime;
 
-    //! Sync major code.
-    int iMajorCode;
-
-    //! Sync minor reason.
-    int iMinorCode;
+    SyncResults::MajorCode iMajorCode;
+    SyncResults::MinorCode iMinorCode;
 
     //! Sync target id
     QString iTargetId;
@@ -61,8 +58,8 @@ public:
 
 SyncResultsPrivate::SyncResultsPrivate()
     :   iTime(QDateTime::currentDateTime()),
-        iMajorCode(0),
-        iMinorCode(0),
+        iMajorCode(SyncResults::SYNC_RESULT_SUCCESS),
+        iMinorCode(SyncResults::NO_ERROR),
         iScheduled(false)
 {
 }
@@ -92,7 +89,7 @@ SyncResults::SyncResults(const SyncResults &aSource)
 {
 }
 
-SyncResults::SyncResults(QDateTime aTime, int aMajorCode, int aMinorCode)
+SyncResults::SyncResults(QDateTime aTime, SyncResults::MajorCode aMajorCode, SyncResults::MinorCode aMinorCode)
     :   d_ptr(new SyncResultsPrivate())
 {
     d_ptr->iTime = aTime;
@@ -104,8 +101,8 @@ SyncResults::SyncResults(const QDomElement &aRoot)
     :   d_ptr(new SyncResultsPrivate())
 {
     d_ptr->iTime = QDateTime::fromString(aRoot.attribute(ATTR_TIME), Qt::ISODate);
-    d_ptr->iMajorCode = aRoot.attribute(ATTR_MAJOR_CODE).toInt();
-    d_ptr->iMinorCode = aRoot.attribute(ATTR_MINOR_CODE).toInt();
+    d_ptr->iMajorCode = static_cast<SyncResults::MajorCode>(aRoot.attribute(ATTR_MAJOR_CODE).toInt());
+    d_ptr->iMinorCode = static_cast<SyncResults::MinorCode>(aRoot.attribute(ATTR_MINOR_CODE).toInt());
     d_ptr->iScheduled = (aRoot.attribute(KEY_SYNC_SCHEDULED) == BOOLEAN_TRUE);
 
     QDomElement target = aRoot.firstChildElement(TAG_TARGET_RESULTS);
@@ -176,23 +173,23 @@ QDateTime SyncResults::syncTime() const
     return d_ptr->iTime;
 }
 
-int SyncResults::majorCode() const
+SyncResults::MajorCode SyncResults::majorCode() const
 {
     return d_ptr->iMajorCode;
 }
 
-void SyncResults::setMajorCode(int aMajorCode)
+void SyncResults::setMajorCode(SyncResults::MajorCode aMajorCode)
 {
     FUNCTION_CALL_TRACE;
     d_ptr->iMajorCode = aMajorCode;
 }
 
-int SyncResults::minorCode() const
+SyncResults::MinorCode SyncResults::minorCode() const
 {
     return d_ptr->iMinorCode;
 }
 
-void SyncResults::setMinorCode(int aMinorCode)
+void SyncResults::setMinorCode(SyncResults::MinorCode aMinorCode)
 {
     FUNCTION_CALL_TRACE;
     d_ptr->iMinorCode = aMinorCode;

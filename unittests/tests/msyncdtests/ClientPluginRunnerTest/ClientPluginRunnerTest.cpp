@@ -72,7 +72,7 @@ void ClientPluginRunnerTest::testCpluginRunnerConstructor()
     //test syncResults()
     current = QDateTime::currentDateTime();
     syncRes = iClientPrunner->syncResults();
-    QCOMPARE(syncRes.majorCode(), 0);
+    QCOMPARE(syncRes.majorCode(), SyncResults::SYNC_RESULT_SUCCESS);
     QCOMPARE(syncRes.isScheduled(), false);
     dateTime = syncRes.syncTime() >= current;
     QVERIFY(dateTime);
@@ -118,7 +118,7 @@ void ClientPluginRunnerTest::testSignals()
 
     QSignalSpy errorSignal(iClientPrunner, SIGNAL(error(const QString &,
                                                         const QString &, int)));
-    iClientPrunner->onError(PROFILE, "Message", 0);
+    iClientPrunner->onError(PROFILE, "Message", SyncResults::PLUGIN_ERROR);
     QCOMPARE(errorSignal.count(), 1);
 
     QSignalSpy transferSignal(iClientPrunner,

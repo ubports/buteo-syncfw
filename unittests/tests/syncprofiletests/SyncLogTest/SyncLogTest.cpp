@@ -86,15 +86,15 @@ void SyncLogTest::testLog()
     // Add new results.
     SyncResults newResults;
     newResults.setMajorCode(Buteo::SyncResults::SYNC_RESULT_CANCELLED);
-    QCOMPARE(newResults.majorCode(), 2);
+    QCOMPARE(newResults.majorCode(), SyncResults::SYNC_RESULT_CANCELLED);
     QCOMPARE(newResults < *log2.lastResults(), false);
     newResults.addTargetResults(TargetResults("hcontacts", ItemCounts(2, 3, 4),
                                               ItemCounts(5, 6, 7)));
     log2.addResults(newResults);
     QVERIFY(log2.lastResults() != 0);
-    QCOMPARE(log2.lastResults()->majorCode(), 2);
+    QCOMPARE(log2.lastResults()->majorCode(), SyncResults::SYNC_RESULT_CANCELLED);
     QCOMPARE(log2.allResults().size(), 3);
-    QCOMPARE(log2.allResults().at(0)->majorCode(), 1);
+    QCOMPARE(log2.allResults().at(0)->majorCode(), SyncResults::SYNC_RESULT_FAILED);
     QVERIFY(log2.lastSuccessfulResults() != 0);
     QCOMPARE(log2.lastSuccessfulResults()->syncTime(), successTime);
 

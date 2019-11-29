@@ -525,7 +525,7 @@ void ProfileManagerTest::testLog()
         QVERIFY(loadedLog != 0);
         QCOMPARE(loadedLog->profileName(), OVI_CALENDAR);
         QVERIFY(p->lastResults() != 0);
-        QCOMPARE(p->lastResults()->majorCode(), 1);
+        QCOMPARE(p->lastResults()->majorCode(), SyncResults::SYNC_RESULT_FAILED);
         QList<TargetResults> targetResults = p->lastResults()->targetResults();
         QCOMPARE(targetResults.size(), 1);
         QCOMPARE(targetResults[0].targetName(), QString("hcalendar"));

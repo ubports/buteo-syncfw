@@ -134,7 +134,7 @@ signals:
                           const QString &aMimeType, int aCommittedItems);
 
     //! @see SyncPluginBase::error
-    void error(const QString &aProfileName, const QString &aMessage, int aErrorCode);
+    void error(const QString &aProfileName, const QString &aMessage, SyncResults::MinorCode aErrorCode);
 
     //! @see SyncPluginBase::success
     void success(const QString &aProfileName, const QString &aMessage);

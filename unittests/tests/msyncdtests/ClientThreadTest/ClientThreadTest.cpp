@@ -122,7 +122,7 @@ void ClientThreadTest::testGetSyncResults()
 
     QCOMPARE(iClientThread->iRunning, false);
     syncRes = iClientThread->getSyncResults();
-    QCOMPARE(syncRes.majorCode(), 0);
+    QCOMPARE(syncRes.majorCode(), SyncResults::SYNC_RESULT_SUCCESS);
     QCOMPARE(syncRes.isScheduled(), false);
 
     dateTime = syncRes.syncTime() >= current;

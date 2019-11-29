@@ -211,7 +211,7 @@ void OOPServerPlugin::onError(QString aProfileName, QString aMessage, int aError
 {
     if (!iDone) {
         iDone = true;
-        emit error(aProfileName, aMessage, aErrorCode);
+        emit error(aProfileName, aMessage, static_cast<SyncResults::MinorCode>(aErrorCode));
     }
 }
 

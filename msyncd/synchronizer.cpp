@@ -544,10 +544,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
     connect(aSession, SIGNAL(syncProgressDetail(const QString &, int)),
             this, SLOT(onSyncProgressDetail(const QString &, int)));
 
-    connect(aSession, SIGNAL(finished(const QString &, Sync::SyncStatus,
-                                      const QString &, int)),
-            this, SLOT(onSessionFinished(const QString &, Sync::SyncStatus,
-                                         const QString &, int)));
+    connect(aSession, &SyncSession::finished, this, &Synchronizer::onSessionFinished);
 
     if (aSession->start()) {
         // Get the DBUS interface for sync-UI.
@@ -583,7 +580,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
 }
 
 void Synchronizer::onSessionFinished(const QString &aProfileName,
-                                     Sync::SyncStatus aStatus, const QString &aMessage, int aErrorCode)
+                                     Sync::SyncStatus aStatus, const QString &aMessage, SyncResults::MinorCode aErrorCode)
 {
     FUNCTION_CALL_TRACE;
 
