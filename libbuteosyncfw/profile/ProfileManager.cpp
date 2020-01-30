@@ -737,7 +737,13 @@ QString ProfileManager::updateProfile(const Profile &aProfile)
 {
     FUNCTION_CALL_TRACE;
 
-    // We must have a profile exiting before updating it...
+    // Don't save invalid profiles.
+    if (aProfile.name().isEmpty() || aProfile.type().isEmpty()) {
+        LOG_WARNING("Malformed profile, missing name or type.");
+        return QString();
+    }
+
+    // We must have a profile existing before updating it...
 
     bool exists = d_ptr->profileExists(aProfile.name(),aProfile.type());
 
