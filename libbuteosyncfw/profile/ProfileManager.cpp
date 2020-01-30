@@ -725,9 +725,12 @@ Profile* ProfileManager::profileFromXml(const QString &aProfileAsXml)
     Profile *profile = NULL;
     if(!aProfileAsXml.isEmpty()) {
         QDomDocument doc;
-        if(doc.setContent(aProfileAsXml,true)) {
+        QString error;
+        if (doc.setContent(aProfileAsXml, true, &error)) {
             ProfileFactory pf;
             profile = pf.createProfile(doc.documentElement());
+        } else {
+            LOG_WARNING("Cannot parse profile: " + error);
         }
     }
     return profile;
