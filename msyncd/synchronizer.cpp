@@ -482,7 +482,8 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
 
     session->setScheduled(aScheduled);
 
-    if (clientProfileActive(profile->clientProfile()->name())) {
+    if (profile->clientProfile()
+        && clientProfileActive(profile->clientProfile()->name())) {
         LOG_DEBUG( "Sync request of the same type in progress, adding request to the sync queue" );
         iSyncQueue.enqueue(session);
         emit syncStatus(aProfileName, Sync::SYNC_QUEUED, "", 0);
