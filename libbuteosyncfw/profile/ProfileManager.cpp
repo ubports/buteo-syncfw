@@ -725,9 +725,12 @@ Profile* ProfileManager::profileFromXml(const QString &aProfileAsXml)
     Profile *profile = NULL;
     if(!aProfileAsXml.isEmpty()) {
         QDomDocument doc;
-        if(doc.setContent(aProfileAsXml,true)) {
+        QString error;
+        if (doc.setContent(aProfileAsXml, true, &error)) {
             ProfileFactory pf;
             profile = pf.createProfile(doc.documentElement());
+        } else {
+            LOG_WARNING("Cannot parse profile: " + error);
         }
     }
     return profile;
@@ -737,7 +740,13 @@ QString ProfileManager::updateProfile(const Profile &aProfile)
 {
     FUNCTION_CALL_TRACE;
 
-    // We must have a profile exiting before updating it...
+    // Don't save invalid profiles.
+    if (aProfile.name().isEmpty() || aProfile.type().isEmpty()) {
+        LOG_WARNING("Malformed profile, missing name or type.");
+        return QString();
+    }
+
+    // We must have a profile existing before updating it...
 
     bool exists = d_ptr->profileExists(aProfile.name(),aProfile.type());
 
