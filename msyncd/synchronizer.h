@@ -2,7 +2,8 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd
+ * Copyright (C) 2014-2019 Jolla Ltd.
+ * Copyright (C) 2020 Open Mobile Platform LLC.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -395,7 +396,7 @@ private:
      *
      * @param aType the connection type;
      */
-    bool acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const;
+    bool acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType, SyncProfile *profile) const;
 
     /*! \brief Checks the status of external sync for a given profile, when the status
      * changes(or aQuery param is set to true) or the profile is added for the first time 'syncedExternallyStatus' dbus signal

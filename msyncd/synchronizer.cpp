@@ -313,7 +313,7 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
     // All scheduled syncs are online syncs
     // Add this to the waiting online syncs and it will be started when we
     // receive a session connection status from the NetworkManager
-    bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType());
+    bool accept = acceptScheduledSync(iNetworkManager->isOnline(), iNetworkManager->connectionType(), profile);
     if(accept)
     {
         /* Ensure that current time is compatible with sync schedule.
@@ -855,7 +855,7 @@ void Synchronizer::cleanupSession(SyncSession *aSession, Sync::SyncStatus aStatu
         QString profileName = aSession->profileName();
         if (!profileName.isEmpty())
         {
-            LOG_DEBUG("aStatus"<<aStatus);
+            LOG_DEBUG("Clean up session for profile" << profileName);
             SyncProfile *profile = aSession->profile();
             if ((profile->lastResults()==0) && (aStatus == Sync::SYNC_DONE)) {
                 iProfileManager.saveRemoteTargetId(*profile, aSession->results().getTargetId());
@@ -2019,16 +2019,20 @@ void Synchronizer::onNetworkStateChanged(bool aState, Sync::InternetConnectionTy
 {
     FUNCTION_CALL_TRACE;
     LOG_DEBUG("Network state changed: OnLine:" << aState << " connection type:" <<  type);
-    if (acceptScheduledSync(aState, type))
-    {
-        LOG_DEBUG("Restart sync for profiles that need network");
+
+    if (aState) {
+        LOG_DEBUG("Restart sync for profiles that need network, checking profiles:" << iWaitingOnlineSyncs);
         QStringList profiles(iWaitingOnlineSyncs);
-        iWaitingOnlineSyncs.clear();
         foreach(QString profileName, profiles)
         {
-            // start sync now, we do not need to call 'startScheduledSync' since that function
-            // only checks for internet connection
-            startSync(profileName, true);
+            SyncProfile *profile = iProfileManager.syncProfile(profileName);
+            if (acceptScheduledSync(aState, type, profile)) {
+                // start sync now, we do not need to call 'startScheduledSync' since that function
+                // only checks for internet connection
+                iWaitingOnlineSyncs.removeOne(profileName);
+                startSync(profileName, true);
+            }
+            delete profile;
         }
     }
     else if (!aState)
@@ -2183,17 +2187,30 @@ void Synchronizer::removeExternalSyncStatus(const SyncProfile *aProfile)
     }
 }
 
-bool Synchronizer::acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const
+bool Synchronizer::acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType, SyncProfile *aSyncProfile) const
 {
-    static QList<Sync::InternetConnectionType> allowedTypes;
-    if (allowedTypes.isEmpty())
-    {
-        allowedTypes << Sync::INTERNET_CONNECTION_WLAN
-                     << Sync::INTERNET_CONNECTION_ETHERNET;
+    if (!aSyncProfile || !aConnected) {
+        return false;
     }
 
-    return (aConnected && (g_settings_get_boolean(iSettings, "allow-scheduled-sync-over-cellular") ||
-                           allowedTypes.contains(aType)));
+    QList<Sync::InternetConnectionType> allowedTypes = aSyncProfile->internetConnectionTypes();
+    if (!allowedTypes.isEmpty()) {
+        return allowedTypes.contains(aType);
+    }
+
+    // If no allowed types are specified, fallback to the old default settings.
+    if (aType == Sync::INTERNET_CONNECTION_WLAN
+            || aType == Sync::INTERNET_CONNECTION_ETHERNET) {
+        return true;
+    }
+    if (g_settings_get_boolean(iSettings, "allow-scheduled-sync-over-cellular")
+            && aType != Sync::INTERNET_CONNECTION_UNKNOWN
+            && aType != Sync::INTERNET_CONNECTION_BLUETOOTH) {
+        // Assume type is cellular if it is not unknown/bluetooth.
+        return true;
+    }
+
+    return false;
 }
 
 void Synchronizer::isSyncedExternally(unsigned int aAccountId, const QString aClientProfileName)

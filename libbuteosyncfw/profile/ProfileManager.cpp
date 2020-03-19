@@ -156,14 +156,11 @@ Profile *ProfileManagerPrivate::load(const QString &aName, const QString &aType)
 
 SyncLog *ProfileManagerPrivate::loadLog(const QString &aProfileName)
 {
-
-
     QString fileName = iPrimaryPath + QDir::separator() + Profile::TYPE_SYNC + QDir::separator() +
             LOG_DIRECTORY + QDir::separator() + aProfileName + LOG_EXT + FORMAT_EXT;
 
     if (!QFile::exists(fileName))
     {
-        LOG_DEBUG("No sync log found for profile:" << aProfileName);
         return 0;
     } // no else
 
@@ -356,13 +353,12 @@ Profile *ProfileManager::profile(const QString &aName, const QString &aType)
 
 SyncProfile *ProfileManager::syncProfile(const QString &aName)
 {
-    LOG_DEBUG("ProfileManager::syncProfile(" << aName << ")");
+    FUNCTION_CALL_TRACE;
+
     Profile *p = profile(aName, Profile::TYPE_SYNC);
     SyncProfile *syncProfile = 0;
     if (p != 0 && p->type() == Profile::TYPE_SYNC)
     {
-        LOG_DEBUG("found a valid sync profile with the given name:" << aName);
-
         // RTTI is not allowed, use static_cast. Should be safe, because
         // type is verified.
         syncProfile = static_cast<SyncProfile*>(p);

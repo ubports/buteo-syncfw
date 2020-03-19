@@ -2,7 +2,8 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd
+ * Copyright (C) 2014-2019 Jolla Ltd.
+ * Copyright (C) 2020 Open Mobile Platform LLC.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -28,7 +29,7 @@
 #include "Profile.h"
 #include "SyncLog.h"
 #include "SyncSchedule.h"
-
+#include "SyncCommonDefs.h"
 
 namespace Buteo {
 
@@ -268,6 +269,20 @@ public:
      * \param aSchedule New schedule.
      */
     void setSyncSchedule(const SyncSchedule &aSchedule);
+
+    /*! \brief Gets allowed connection types.
+     *
+     * \return List of allowed connection types.
+     */
+    QList<Sync::InternetConnectionType> internetConnectionTypes() const;
+
+    /*! \brief Sets the internet connection types on which this profile can be synced.
+     *
+     * If empty, the default settings are used.
+     *
+     * \param aTypes The allowed internet connection types.
+     */
+    void setInternetConnectionTypes(const QList<Sync::InternetConnectionType> &aTypes);
 
     /*! \brief Get the first service sub-profile.
      *

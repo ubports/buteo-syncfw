@@ -346,6 +346,30 @@ void SyncProfile::setSyncSchedule(const SyncSchedule &aSchedule)
     d_ptr->iSchedule = aSchedule;
 }
 
+QList<Sync::InternetConnectionType> SyncProfile::internetConnectionTypes() const
+{
+    QSet<Sync::InternetConnectionType> types;
+    const QStringList typeStrings = key(KEY_INTERNET_CONNECTION_TYPES).split(',');
+    foreach (QString typeString, typeStrings) {
+        bool ok = false;
+        int typeInt = typeString.toInt(&ok);
+        if (!ok || typeInt < Sync::INTERNET_CONNECTION_UNKNOWN || typeInt > Sync::INTERNET_CONNECTION_LTE) {
+            continue;
+        }
+        types.insert(Sync::InternetConnectionType(typeInt));
+    }
+    return types.toList();
+}
+
+void SyncProfile::setInternetConnectionTypes(const QList<Sync::InternetConnectionType> &aTypes)
+{
+    QStringList typeStrings;
+    foreach (Sync::InternetConnectionType type, aTypes) {
+        typeStrings.append(QString::number(int(type)));
+    }
+    setKey(KEY_INTERNET_CONNECTION_TYPES, typeStrings.join(','));
+}
+
 QStringList SyncProfile::storageBackendNames() const
 {
     QStringList enabledStorageBackends;
