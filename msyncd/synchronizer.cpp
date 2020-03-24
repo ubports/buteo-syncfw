@@ -2,7 +2,8 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2016 Jolla Ltd.
+ * Copyright (C) 2014-2019 Jolla Ltd.
+ * Copyright (C) 2020 Open Mobile Platform LLC.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -310,6 +311,8 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
 {
     FUNCTION_CALL_TRACE;
 
+    SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
+
     // All scheduled syncs are online syncs
     // Add this to the waiting online syncs and it will be started when we
     // receive a session connection status from the NetworkManager
@@ -319,9 +322,8 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
         /* Ensure that current time is compatible with sync schedule.
            The Background process may have started a sync in a period
            where sync is disabled due to delayed interval wake up. */
-        SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
-        bool wrongTime = (profile && !profile->syncSchedule().isSyncScheduled(QDateTime::currentDateTime()));
-        delete profile;
+        bool wrongTime = (profile && !profile->syncSchedule().isSyncScheduled(QDateTime::currentDateTime(),
+                                                                              profile->lastSuccessfulSyncTime()));
         if (wrongTime)
         {
             LOG_DEBUG("Woken up of" << aProfileName << "in a disabled period, not starting sync.");
@@ -368,6 +370,7 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
                                               Buteo::SyncResults::OFFLINE_MODE);
          }
     }
+    delete profile;
     return true;
 }
 

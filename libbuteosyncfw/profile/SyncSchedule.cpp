@@ -2,7 +2,8 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd
+ * Copyright (C) 2014-2019 Jolla Ltd.
+ * Copyright (C) 2020 Open Mobile Platform LLC.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -24,9 +25,11 @@
 #include "SyncSchedule.h"
 #include "SyncSchedule_p.h"
 #include "ProfileEngineDefs.h"
+#include "SyncCommonDefs.h"
 #include "LogMacros.h"
 #include <QDomDocument>
 #include <QStringList>
+#include <limits.h>
 
 using namespace Buteo;
 
@@ -285,6 +288,8 @@ bool SyncSchedule::inExternalSyncRushPeriod(const QDateTime &aDateTime) const
 
 QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const                                 
 {
+    FUNCTION_CALL_TRACE;
+
     QDateTime nextSync;
     QDateTime scheduleConfiguredTime = d_ptr->iScheduleConfiguredTime;
     QDateTime now = QDateTime::currentDateTime();
@@ -305,10 +310,11 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         } // no else
         d_ptr->adjustDate(nextSync, d_ptr->iDays);
     }
-    else if (d_ptr->iInterval > 0)
+    else if (d_ptr->iInterval > 0 && d_ptr->iEnabled)
     {
         // Sync time is defined in terms of interval (for ex. every 15 minutes)
     	LOG_DEBUG("Sync interval defined as" << d_ptr->iInterval);
+
         // Last sync time is not available/valid (Could happen if the device
         // is shut down for an extended period before the first sync can be
         // performed). Hence use the time the
@@ -327,18 +333,47 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
            LOG_DEBUG("Reference is not valid returning current date time");
            return QDateTime::currentDateTime();
         }
-        int numberOfIntervals = 0;
-        if(0 != d_ptr->iInterval && d_ptr->iEnabled)
-        {
-            int secs = reference.secsTo(now) + 1;
-            numberOfIntervals = secs/(d_ptr->iInterval * 60);
-            if(secs % (d_ptr->iInterval * 60))
-            {
-                numberOfIntervals++;
+
+        if (d_ptr->iInterval == Sync::SYNC_INTERVAL_MONTHLY) {
+            nextSync.setDate(reference.date().addMonths(1));
+            nextSync.setTime(d_ptr->iTime);
+
+            if (QDateTime::currentDateTime().secsTo(nextSync) < 0) {
+                LOG_DEBUG("Named interval is in the past, so sync now");
+                // The next sync time has passed, so schedule it to happen shortly.
+                return QDateTime::currentDateTime();
             }
-            LOG_DEBUG("numberOfInterval:"<<numberOfIntervals<<"interval time"<<d_ptr->iInterval);
+        } else if (d_ptr->iInterval == Sync::SYNC_INTERVAL_FIRST_DAY_OF_MONTH
+                   || d_ptr->iInterval == Sync::SYNC_INTERVAL_LAST_DAY_OF_MONTH) {
+            QDate date = reference.date();
+            date.setDate(date.year(), date.month(),
+                         d_ptr->iInterval == Sync::SYNC_INTERVAL_FIRST_DAY_OF_MONTH ? 1 : date.daysInMonth());
+            nextSync.setDate(date);
+            nextSync.setTime(d_ptr->iTime);
+            if (now.secsTo(nextSync) < 0) {
+                LOG_DEBUG("Named interval to" << nextSync
+                          << "is in the past, so use date for next month instead");
+                // The next sync time has passed, so schedule it in the month following the
+                // current date.
+                while (nextSync < now) {
+                    nextSync = nextSync.addMonths(1);
+                }
+            }
+
+        } else {
+            int numberOfIntervals = 0;
+            if(0 != d_ptr->iInterval)
+            {
+                int secs = reference.secsTo(now) + 1;
+                numberOfIntervals = secs/(d_ptr->iInterval * 60);
+                if(secs % (d_ptr->iInterval * 60))
+                {
+                    numberOfIntervals++;
+                }
+                LOG_DEBUG("numberOfInterval:"<<numberOfIntervals<<"interval time"<<d_ptr->iInterval);
+            }
+            nextSync = reference.addSecs(numberOfIntervals * d_ptr->iInterval * 60);
         }
-        nextSync = d_ptr->iEnabled ? reference.addSecs(numberOfIntervals * d_ptr->iInterval * 60) : QDateTime();
     }
 
     LOG_DEBUG("next non rush hour sync is at:: " << nextSync);
@@ -487,28 +522,70 @@ QDateTime SyncSchedule::nextRushSwitchTime(const QDateTime &aFromTime) const
     }
 }
 
-bool SyncSchedule::isSyncScheduled(const QDateTime &aDateTime) const
+bool SyncSchedule::isSyncScheduled(const QDateTime &aActualDateTime, const QDateTime &aPreviousSyncTime) const
 {
+    LOG_DEBUG("Check if sync is scheduled against" << aActualDateTime.toString());
+
     // Simple case, aDateTime is the defined sync time.
     if (d_ptr->iTime.isValid() && !d_ptr->iDays.isEmpty()) {
         /* Todo: this is to simple implementation for the case where
            sync time is close to midnight and the day has changed
            already when fired. */
-        if (!d_ptr->iDays.contains(aDateTime.date().dayOfWeek())) {
+        if (!d_ptr->iDays.contains(aActualDateTime.date().dayOfWeek())) {
             return false;
         }
+
         /* Keep a 10 minutes margin to ensure that delayed
            syncs by more prioritary sync in progress are still
            considered as valid sync times. */
-        return (aDateTime.time() < d_ptr->iTime.addSecs(5 * 60)
-                && aDateTime.time() > d_ptr->iTime.addSecs(-5 * 60));
+        return (aActualDateTime.time() < d_ptr->iTime.addSecs(5 * 60)
+                && aActualDateTime.time() > d_ptr->iTime.addSecs(-5 * 60));
     }
-    /* Sync schedule is defined by intervals and / or rush, check that
-       schedule or rush is enabled for the current aDateTime. */
-    return ((rushEnabled() && d_ptr->iRushInterval > 0 && d_ptr->isRush(aDateTime))
-            || (scheduleEnabled() && d_ptr->iInterval > 0));
-}
 
+    // If sync schedule is defined by rush, check that rush is enabled for aActualDateTime
+    if (rushEnabled() && d_ptr->iRushInterval > 0 && d_ptr->isRush(aActualDateTime)) {
+        return true;
+    }
+
+    if (!scheduleEnabled() || !d_ptr->iInterval) {
+        LOG_DEBUG("Scheduled by interval: schedule is disabled or not syncing by interval");
+        return false;
+    }
+
+    QDateTime reference = (aPreviousSyncTime.isValid()) ? aPreviousSyncTime : d_ptr->iScheduleConfiguredTime;
+    if (!reference.isValid()) {
+        LOG_DEBUG("Schedule has no reference past date, sync now");
+        return true;
+    }
+
+    qint64 longInterval = 0;
+    if (d_ptr->iInterval == Sync::SYNC_INTERVAL_MONTHLY) {
+        QDateTime nextSync = reference.addMonths(1);
+        nextSync.setTime(d_ptr->iTime);
+        longInterval = reference.secsTo(nextSync) / 60;
+    } else if (d_ptr->iInterval == Sync::SYNC_INTERVAL_FIRST_DAY_OF_MONTH) {
+        // Calculate interval to the first day of the month after the previous sync.
+        QDate date = reference.date().addMonths(1);
+        date.setDate(date.year(), date.month(), 1);
+        QDateTime nextSync(date, d_ptr->iTime);
+        longInterval = reference.secsTo(nextSync) / 60;
+    } else if (d_ptr->iInterval == Sync::SYNC_INTERVAL_LAST_DAY_OF_MONTH) {
+        // Calculate interval to the last day of the month after the previous sync.
+        QDate date = reference.date();
+        if (reference.date() == aActualDateTime.date()) {
+            // Already synced on the last day, so calculate to the next month instead.
+            date = date.addMonths(1);
+        }
+        QDateTime nextSync(date, d_ptr->iTime);
+        longInterval = reference.secsTo(nextSync) / 60;
+    }
+
+    unsigned interval = longInterval > 0
+            ? (longInterval > UINT_MAX ? UINT_MAX : static_cast<unsigned int>(longInterval))
+            : d_ptr->iInterval;
+
+    return reference.secsTo(aActualDateTime) > ((interval - 10) * 60);
+}
 
 DaySet SyncSchedulePrivate::parseDays(const QString &aDays) const
 {
