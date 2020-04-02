@@ -168,11 +168,13 @@ bool Synchronizer::initialize()
 
     startServers();
 
+    // For Backup/restore handling
+    iSyncBackup =  new SyncBackup();
+
     // Initialize scheduler
     initializeScheduler();
 
-    // For Backup/restore handling
-    iSyncBackup =  new SyncBackup();
+    // Connect backup signals after the scheduler has been initialized
     connect(iSyncBackup, SIGNAL(startBackup()),this, SLOT(backupStarts()));
     connect(iSyncBackup, SIGNAL(backupDone()),this, SLOT(backupFinished()));
     connect(iSyncBackup, SIGNAL(startRestore()),this, SLOT(restoreStarts()));
@@ -1750,6 +1752,14 @@ void Synchronizer::backupRestoreStarts ()
     delete iSyncScheduler;
     iSyncScheduler = 0;
 
+    // Request all external syncs to stop, relying on externalSyncStatus() to
+    // act appropriately because (getBackUpRestoreState() == true)
+    QMap<QString, bool>::iterator syncStatus;
+    for (syncStatus = iExternalSyncProfileStatus.begin();
+         syncStatus != iExternalSyncProfileStatus.end(); ++syncStatus) {
+        const QString &profileName = syncStatus.key();
+        externalSyncStatus(profileName, false);
+    }
 }
 
 void Synchronizer::backupRestoreFinished()
@@ -2131,8 +2141,16 @@ void Synchronizer::externalSyncStatus(const SyncProfile* aProfile, bool aQuery)
     if (accountId) {
         const QString &profileName = aProfile->name();
         const QString &clientProfile = aProfile->clientProfile()->name();
+
+        // All external syncs are stopped while a backup or restore is running
+        if (getBackUpRestoreState()) {
+            if (iExternalSyncProfileStatus.value(profileName) || aQuery) {
+                LOG_DEBUG("Sync externally status suspended during backup for profile:" << profileName);
+                iExternalSyncProfileStatus.insert(profileName, false);
+                emit syncedExternallyStatus(accountId, clientProfile, false);
+            }
         // Account in set to sync externally, buteo will let external process handle the syncs in this case
-        if (aProfile->syncExternallyEnabled()) {
+        } else if (aProfile->syncExternallyEnabled()) {
             if (!iExternalSyncProfileStatus.value(profileName)) {
                 LOG_DEBUG("Sync externally status changed from false to true for profile:" << profileName);
                 iExternalSyncProfileStatus.insert(profileName, true);
@@ -2182,7 +2200,7 @@ void Synchronizer::removeExternalSyncStatus(const SyncProfile *aProfile)
         if (iExternalSyncProfileStatus.contains(profileName)) {
             // if profile was set to sync externally emit the change state signal
             if (iExternalSyncProfileStatus.value(profileName)) {
-                emit syncedExternallyStatus(accountId, aProfile->clientProfile()->name(),false);
+                emit syncedExternallyStatus(accountId, aProfile->clientProfile()->name(), false);
             }
             iExternalSyncProfileStatus.remove(profileName);
             LOG_DEBUG("Removing sync externally status for profile:" << profileName);

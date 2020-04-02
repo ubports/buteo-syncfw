@@ -83,13 +83,13 @@ SyncBackup::~SyncBackup()
 
 void SyncBackup::backupServiceUnregistered(const QString  &serviceName) 
 {
-	FUNCTION_CALL_TRACE;
-	Q_UNUSED (serviceName);
-	if (iBackupRestore) {
-	// Should not happen ; backup framework exitted abruptly
-		emit restoreDone();
-	}
-	iBackupRestore = false;
+    FUNCTION_CALL_TRACE;
+    Q_UNUSED (serviceName);
+    if (iBackupRestore) {
+        // Should not happen ; backup framework exited abruptly
+        iBackupRestore = false;
+        emit restoreDone();
+    }
 }
 
 uchar SyncBackup::sendDelayReply (const QDBusMessage &message)
