@@ -2,7 +2,8 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd
+ * Copyright (C) 2014-2019 Jolla Ltd.
+ * Copyright (C) 2020 Open Mobile Platform LLC.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -103,6 +104,7 @@ const QString KEY_STORAGE_UPDATED("storage_updated");
 const QString KEY_HTTP_PROXY_HOST("http_proxy_host");
 const QString KEY_HTTP_PROXY_PORT("http_proxy_port");
 const QString KEY_PROFILE_ID("profile_id");
+const QString KEY_INTERNET_CONNECTION_TYPES("internet_connection_types");
 
 const QString BOOLEAN_TRUE("true");
 const QString BOOLEAN_FALSE("false");

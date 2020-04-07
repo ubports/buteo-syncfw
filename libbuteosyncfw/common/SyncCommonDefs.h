@@ -100,6 +100,20 @@ enum InternetConnectionType {
     INTERNET_CONNECTION_LTE = QNetworkConfiguration::BearerLTE
 };
 
+// These are values that can be used for the SyncSchedule::interval, to specify sync intervals
+// that should be specially handled (instead of treating them as minute intervals). This allows
+// special intervals to be handled without additional SyncSchedule attributes.
+enum ExtendedSyncInterval : unsigned int {
+    // Sync is scheduled one month after the last successful sync.
+    SYNC_INTERVAL_MONTHLY = 365 * 24 * 60 * 2,   // Start the named interval values at an unlikely minute-based interval ((365 * 24 * 60 * 2) = 1051200 minutes = 2 years)
+
+    // Sync is scheduled on the first day of each month.
+    SYNC_INTERVAL_FIRST_DAY_OF_MONTH,
+
+    // Sync is scheduled on the last day of each month.
+    SYNC_INTERVAL_LAST_DAY_OF_MONTH
+};
+
 } // namespace Sync
 
 Q_DECLARE_METATYPE( Sync::SyncStatus );
