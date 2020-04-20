@@ -276,6 +276,7 @@ void SyncSession::setScheduled(bool aScheduled)
     FUNCTION_CALL_TRACE;
 
     iScheduled = aScheduled;
+    iResults.setScheduled(iScheduled);
 }
 
 bool SyncSession::isScheduled() const
