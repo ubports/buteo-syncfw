@@ -62,7 +62,7 @@ public:
     */
     void sendReply (uchar aResult);
 
-signals :
+signals:
 
 public slots:
 	//  From backup framework ...
