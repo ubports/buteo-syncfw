@@ -2,12 +2,12 @@ Name:    buteo-syncfw-qt5
 Version: 0.9.7
 Release: 1
 Summary: Synchronization backend
-Group:   System/Libraries
 URL:     https://git.sailfishos.org/mer-core/buteo-syncfw/
 License: LGPLv2
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}.privileges
-BuildRequires: doxygen, fdupes
+BuildRequires: doxygen
+BuildRequires: fdupes
 BuildRequires: pkgconfig(Qt5Core)
 BuildRequires: pkgconfig(Qt5Network)
 BuildRequires: pkgconfig(Qt5DBus)
@@ -21,7 +21,7 @@ BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: pkgconfig(keepalive)
 BuildRequires: pkgconfig(gio-2.0)
 BuildRequires: pkgconfig(mce-qt5) >= 1.1.0
-BuildRequires: doxygen
+BuildRequires: systemd
 Requires: mapplauncherd-qt5
 Requires: glib2
 Requires: libmce-qt5 >= 1.1.0
@@ -35,7 +35,6 @@ Requires: libmce-qt5 >= 1.1.0
 
 %package devel
 Summary: Development files for %{name}
-Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 
 %description devel
@@ -50,7 +49,6 @@ Requires: %{name} = %{version}-%{release}
 
 %package msyncd
 Summary: Buteo sync daemon
-Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
 Requires: systemd
 Requires: systemd-user-session-targets
@@ -62,8 +60,8 @@ Obsoletes: buteo-syncfw-msyncd < %{version}
 
 %files msyncd
 %defattr(-,root,root,-)
-%{_libdir}/systemd/user/*.service
-%{_libdir}/systemd/user/user-session.target.wants/*.service
+%{_userunitdir}/*.service
+%{_userunitdir}/user-session.target.wants/*.service
 %{_sysconfdir}/syncwidget
 %{_bindir}/msyncd
 %{_datadir}/mapplauncherd/privileges.d/*
@@ -73,7 +71,6 @@ Obsoletes: buteo-syncfw-msyncd < %{version}
 
 %package doc
 Summary: Documentation for %{name}
-Group: Documentation
 
 %description doc
 %{summary}.
@@ -84,7 +81,6 @@ Group: Documentation
 
 %package tests
 Summary: Tests for %{name}
-Group: Development/Libraries
 
 %description tests
 %{summary}.
@@ -109,8 +105,8 @@ make doc %{_smp_mflags}
 make INSTALL_ROOT=%{buildroot} install
 chmod +x %{buildroot}/opt/tests/buteo-syncfw/*.pl %{buildroot}/opt/tests/buteo-syncfw/*.sh
 %fdupes %{buildroot}/opt/tests/buteo-syncfw/
-mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
-ln -s ../msyncd.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
+mkdir -p %{buildroot}%{_userunitdir}/user-session.target.wants
+ln -s ../msyncd.service %{buildroot}%{_userunitdir}/user-session.target.wants/
 
 mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
