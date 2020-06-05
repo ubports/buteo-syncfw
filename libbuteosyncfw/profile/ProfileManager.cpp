@@ -1119,7 +1119,7 @@ bool ProfileManagerPrivate::parseFile(const QString &aPath, QDomDocument &aDoc)
     }
     else
     {
-        LOG_WARNING("Profile file not found:" << aPath);
+        LOG_DEBUG("Profile file not found:" << aPath);
     }
 
 
