@@ -64,6 +64,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
     }
 #endif
 
+#if HAVE_BLUEZ_4
     // BT
     // Set the bluetooth state
     iTransportStates[Sync::CONNECTIVITY_BT] = btConnectivityStatus();
@@ -76,6 +77,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
     {
         LOG_WARNING("Unable to connect to system bus for org.bluez.Adapter");
     }
+#endif
 
     // Internet
     // @todo: enable when internet state is reported correctly.
@@ -160,6 +162,7 @@ void TransportTracker::updateState(Sync::ConnectivityType aType,
 
 bool TransportTracker::btConnectivityStatus()
 {
+#if HAVE_BLUEZ_4
     FUNCTION_CALL_TRACE;
 
     bool btOn = false;
@@ -211,4 +214,7 @@ bool TransportTracker::btConnectivityStatus()
         }
     }
     return btOn;
+#else
+    return false;
+#endif
 }

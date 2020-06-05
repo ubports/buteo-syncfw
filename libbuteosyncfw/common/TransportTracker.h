@@ -89,7 +89,7 @@ signals:
 
 private slots:
 
-        void onUsbStateChanged(bool aConnected);
+    void onUsbStateChanged(bool aConnected);
 
     void onBtStateChanged(QString aKey, QDBusVariant aValue);
 
