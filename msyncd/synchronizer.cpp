@@ -465,7 +465,7 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     }
     else if(false == profile->isEnabled())
     {
-        LOG_WARNING("Profile is disabled, not stating sync");
+        LOG_WARNING("Profile is disabled, not starting sync");
         SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
         iProfileManager.saveSyncResults(aProfileName, syncResults);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error" , Buteo::SyncResults::INTERNAL_ERROR);
