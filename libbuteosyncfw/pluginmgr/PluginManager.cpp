@@ -51,9 +51,6 @@ const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
 const QString OOP_CLIENT_SUFFIX = "-client";
 const QString OOP_SERVER_SUFFIX = "-server";
 
-// Default directory from which to look for plugins
-const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/";
-
 // The name of the function which is used to create a plugin
 const QString CREATE_FUNCTION = "createPlugin";
 
@@ -64,7 +61,7 @@ const QString DESTROY_FUNCTION = "destroyPlugin";
 using namespace Buteo;
 
 PluginManager::PluginManager()
-    : PluginManager(DEFAULT_PLUGIN_PATH)
+    : PluginManager(QStringLiteral(DEFAULT_PLUGIN_PATH))
 {
 }
 
