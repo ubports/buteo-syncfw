@@ -16,6 +16,8 @@ CONFIG += dll \
 
 #DEFINES += BUTEO_ENABLE_DEBUG
 
+DEFINES += DEFAULT_PLUGIN_PATH=\"\\\"$$[QT_INSTALL_LIBS]/buteo-plugins-qt5\\\"\"
+
 # Input
 HEADERS += common/Logger.h \
            common/LogMacros.h \
@@ -98,10 +100,7 @@ QMAKE_CLEAN += $(OBJECTS_DIR)/moc_*
 QMAKE_CLEAN += lib$${TARGET}.prl pkgconfig/*
 
 # install
-isEmpty(LIBDIR) {
-    LIBDIR = /usr/lib
-}
-target.path = $${LIBDIR}
+target.path = $$[QT_INSTALL_LIBS]
 headers.path = /usr/include/buteosyncfw5/
 sources.path = $$headers.path
 
