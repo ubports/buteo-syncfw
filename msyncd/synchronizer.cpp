@@ -2221,7 +2221,7 @@ bool Synchronizer::acceptScheduledSync(bool aConnected, Sync::InternetConnection
     }
 
     QList<Sync::InternetConnectionType> allowedTypes = aSyncProfile->internetConnectionTypes();
-    if (!allowedTypes.isEmpty()) {
+    if (aType != Sync::INTERNET_CONNECTION_UNKNOWN && !allowedTypes.isEmpty()) {
         return allowedTypes.contains(aType);
     }
 
