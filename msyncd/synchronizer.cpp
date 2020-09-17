@@ -340,7 +340,7 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
         }
         else
         {
-            LOG_DEBUG("Scheduled sync of" << aProfileName << "accepted with current connectivity status.");
+            LOG_DEBUG("Scheduled sync of" << aProfileName << "accepted with current connection type" << iNetworkManager->connectionType());
             startSync(aProfileName, true);
         }
     }
@@ -350,7 +350,7 @@ bool Synchronizer::startScheduledSync(QString aProfileName)
          if (iNetworkManager->isOnline())
          {
              // see acceptScheduledSync() for the determination of whether the connection type is allowed for sync operations.
-             LOG_INFO("Connection is of disallowed type (e.g. mobile data). The sync will be postponed until an allowed connection is available.");
+             LOG_INFO("Connection" << iNetworkManager->connectionType() << "is of disallowed type. The sync will be postponed until an allowed connection is available.");
          }
          else
          {
@@ -2210,7 +2210,13 @@ void Synchronizer::removeExternalSyncStatus(const SyncProfile *aProfile)
 
 bool Synchronizer::acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType, SyncProfile *aSyncProfile) const
 {
-    if (!aSyncProfile || !aConnected) {
+    if (!aConnected) {
+        LOG_WARNING("Scheduled sync refused, not connected");
+        return false;
+    }
+
+    if (!aSyncProfile) {
+        LOG_WARNING("Scheduled sync refused, invalid sync profile");
         return false;
     }
 
@@ -2224,13 +2230,12 @@ bool Synchronizer::acceptScheduledSync(bool aConnected, Sync::InternetConnection
             || aType == Sync::INTERNET_CONNECTION_ETHERNET) {
         return true;
     }
-    if (g_settings_get_boolean(iSettings, "allow-scheduled-sync-over-cellular")
-            && aType != Sync::INTERNET_CONNECTION_UNKNOWN
-            && aType != Sync::INTERNET_CONNECTION_BLUETOOTH) {
-        // Assume type is cellular if it is not unknown/bluetooth.
+    if (g_settings_get_boolean(iSettings, "allow-scheduled-sync-over-cellular")) {
+        LOG_INFO("Allowing sync for cellular/other connection type:" << aType);
         return true;
     }
 
+    LOG_WARNING("Scheduled sync refused, profile disallows current connection type:" << aType);
     return false;
 }
 

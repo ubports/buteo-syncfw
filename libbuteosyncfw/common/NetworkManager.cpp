@@ -28,6 +28,27 @@
 #include "NetworkManager.h"
 #include "LogMacros.h"
 
+namespace {
+    Sync::InternetConnectionType convertNetworkConnectionType(QNetworkConfiguration::BearerType connectionType)
+    {
+        switch (connectionType) {
+            case QNetworkConfiguration::BearerEthernet:  return Sync::INTERNET_CONNECTION_ETHERNET;
+            case QNetworkConfiguration::BearerWLAN:      return Sync::INTERNET_CONNECTION_WLAN;
+            case QNetworkConfiguration::Bearer2G:        return Sync::INTERNET_CONNECTION_2G;
+            case QNetworkConfiguration::BearerCDMA2000:  return Sync::INTERNET_CONNECTION_CDMA2000;
+            case QNetworkConfiguration::BearerWCDMA:     return Sync::INTERNET_CONNECTION_WCDMA;
+            case QNetworkConfiguration::BearerHSPA:      return Sync::INTERNET_CONNECTION_HSPA;
+            case QNetworkConfiguration::BearerBluetooth: return Sync::INTERNET_CONNECTION_BLUETOOTH;
+            case QNetworkConfiguration::BearerWiMAX:     return Sync::INTERNET_CONNECTION_WIMAX;
+            case QNetworkConfiguration::BearerEVDO:      return Sync::INTERNET_CONNECTION_EVDO;
+            case QNetworkConfiguration::BearerLTE:       return Sync::INTERNET_CONNECTION_LTE;
+            case QNetworkConfiguration::Bearer3G:        return Sync::INTERNET_CONNECTION_3G;
+            case QNetworkConfiguration::Bearer4G:        return Sync::INTERNET_CONNECTION_4G;
+            default:                                     return Sync::INTERNET_CONNECTION_UNKNOWN;
+        }
+    }
+}
+
 using namespace Buteo;
 
 int NetworkManager::m_refCount = 0;
@@ -185,12 +206,13 @@ void NetworkManager::idleRefresh()
             }
         }
     }
-    LOG_INFO("New network state:" << isOnline << " New type: " << bearerTypeName << "(" << connectionType << ")");
-    if ((isOnline != m_isOnline) ||
-        ((Sync::InternetConnectionType)connectionType != m_connectionType))
+
+    const Sync::InternetConnectionType convertedConnectionType = convertNetworkConnectionType(connectionType);
+    LOG_INFO("New network state:" << isOnline << " New type: " << bearerTypeName << "(" << convertedConnectionType << ")");
+    if (isOnline != m_isOnline || convertedConnectionType != m_connectionType)
     {
         m_isOnline = isOnline;
-        m_connectionType = (Sync::InternetConnectionType) connectionType;
+        m_connectionType = convertedConnectionType;
         emit statusChanged(m_isOnline, m_connectionType);
     }
 }
