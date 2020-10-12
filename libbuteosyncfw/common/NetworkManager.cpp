@@ -199,7 +199,8 @@ void NetworkManager::idleRefresh()
         bearerTypeName = activeConfigs.first().bearerTypeName();
         foreach(const QNetworkConfiguration &conf, activeConfigs)
         {
-            if (conf.bearerType() < connectionType)
+            if (conf.bearerType() != QNetworkConfiguration::BearerUnknown
+                    && (conf.bearerType() < connectionType || connectionType == QNetworkConfiguration::BearerUnknown))
             {
                 connectionType = conf.bearerType();
                 bearerTypeName = conf.bearerTypeName();
