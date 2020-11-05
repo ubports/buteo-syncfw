@@ -286,7 +286,7 @@ bool SyncSchedule::inExternalSyncRushPeriod(const QDateTime &aDateTime) const
     return false;
 }
 
-QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const                                 
+QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
 {
     FUNCTION_CALL_TRACE;
 
@@ -361,17 +361,10 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
             }
 
         } else {
-            int numberOfIntervals = 0;
-            if(0 != d_ptr->iInterval)
-            {
-                int secs = reference.secsTo(now) + 1;
-                numberOfIntervals = secs/(d_ptr->iInterval * 60);
-                if(secs % (d_ptr->iInterval * 60))
-                {
-                    numberOfIntervals++;
-                }
-                LOG_DEBUG("numberOfInterval:"<<numberOfIntervals<<"interval time"<<d_ptr->iInterval);
-            }
+            const int secs = reference.secsTo(now) + 1;
+            const int numberOfIntervals = (secs/(d_ptr->iInterval * 60))
+                                        + (((secs % (d_ptr->iInterval * 60)) != 0) ? 1 : 0);
+            LOG_DEBUG("numberOfInterval:"<<numberOfIntervals<<"interval time"<<d_ptr->iInterval);
             nextSync = reference.addSecs(numberOfIntervals * d_ptr->iInterval * 60);
         }
     }
@@ -580,11 +573,12 @@ bool SyncSchedule::isSyncScheduled(const QDateTime &aActualDateTime, const QDate
         longInterval = reference.secsTo(nextSync) / 60;
     }
 
-    unsigned interval = longInterval > 0
+    const unsigned int interval = longInterval > 0
             ? (longInterval > UINT_MAX ? UINT_MAX : static_cast<unsigned int>(longInterval))
             : d_ptr->iInterval;
 
-    return reference.secsTo(aActualDateTime) > ((interval - 10) * 60);
+    // avoid wrap-around: don't subtract from unsigned interval
+    return reference.secsTo(aActualDateTime) > (interval * 60);
 }
 
 DaySet SyncSchedulePrivate::parseDays(const QString &aDays) const

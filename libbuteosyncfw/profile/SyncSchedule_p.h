@@ -87,7 +87,7 @@ public:
     QDateTime iScheduleConfiguredTime;
 
     //! Time interval
-    unsigned iInterval;
+    unsigned int iInterval;
 
     bool iEnabled;
 
@@ -103,7 +103,7 @@ public:
     QTime iRushEnd;
 
     //! Rush Hour Time interval
-    unsigned iRushInterval;
+    unsigned int iRushInterval;
 
     //! Indicates if Rush Hour is Enabled
     bool iRushEnabled;
