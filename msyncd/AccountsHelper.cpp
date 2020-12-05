@@ -44,7 +44,7 @@ AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent
     QObject::connect(iAccountManager, SIGNAL(accountUpdated(Accounts::AccountId)),
                      this, SLOT(slotAccountUpdated(Accounts::AccountId)));
 
-    // load accounts after return from contructor, to allow connection with class singals
+    // load accounts after return from contructor, to allow connection with class signals
     // that can be fired by 'registerAccountListeners' function
     QTimer::singleShot(0, this, SLOT(registerAccountListeners()));
 }
@@ -106,6 +106,7 @@ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
         emit removeProfile(profile->name());
         delete profile;
     }
+#ifdef USE_ACCOUNTSHELPER_SCHEDULER_WATCHER
     // remove corresponding watch from the Map
     QMap<Accounts::Watch*, Accounts::AccountId>::iterator i = iAcctWatchMap.begin();
     while (i != iAcctWatchMap.end()) {
@@ -115,87 +116,64 @@ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
         } else
             ++i;
     }
+#endif
 }
 
-void AccountsHelper::slotAccountEnabledChanged(const QString &serviceName, bool enabled)
+static Accounts::Service serviceForProfile(Accounts::Account *account,
+                                           const SyncProfile *profile)
 {
-    FUNCTION_CALL_TRACE;
-    // Get the sender account
-    Accounts::Account *changedAccount = qobject_cast<Accounts::Account*>(this->sender());
-    if(0 != changedAccount)
-    {
-        LOG_DEBUG("Received account enabled changed signal" << serviceName << enabled << changedAccount->displayName());
-        if(serviceName == ACCOUNTS_GLOBAL_SERVICE || serviceName.isEmpty())
-        {
-            LOG_DEBUG("Entire account state changed to " << enabled << changedAccount->displayName());
-            // Entire account disabled/enabled
-            QList<SyncProfile*> profiles = getProfilesByAccountId(changedAccount->id());
-            foreach(SyncProfile *profile, profiles)
-            {
-                // Check if the status really changed here
-                // saving the account can trigger the emition of enabledChanged()
-                if (profile->isEnabled() != enabled)
-                {
-                    LOG_DEBUG("Changing profile enabled" << profile->name() << enabled);
-                    if(enabled)
-                    {
-                        // The service pointer must not be deleted here. It is
-                        // cached by the Account manager object
-                        Accounts::Service service = iAccountManager->service(profile->name());
-                        changedAccount->selectService(service);
-                        bool serviceEnabled = changedAccount->enabled();
-                        changedAccount->selectService();
-                        addSetting(changedAccount->id(), KEY_PROFILE_ID, QVariant(profile->name()));
-                        LOG_DEBUG("Enabled status for service ::" << profile->name() << serviceEnabled);
-                        if(serviceEnabled)
-                        {
-                            profile->setEnabled(changedAccount->enabled());
-                            iProfileManager.updateProfile(*profile);
-                            emit scheduleUpdated(profile->name());
-                        }
-                    }
-                    else
-                    {
-                        // Unconditionally, set the profile as disabled
-                        profile->setEnabled(enabled);
-                        iProfileManager.updateProfile(*profile);
-                        emit removeScheduledSync(profile->name());
-                    }
-                }
-                delete profile;
+    const Accounts::ServiceList services = account->services();
+    for (const Accounts::Service &service : services) {
+        account->selectService(service);
+        // Look for profile naming using a template defined in the account service.
+        const QStringList names = account->value(QStringLiteral("sync_profile_templates")).toStringList();
+        for (const QString &name : names) {
+            if (profile->name() == name + "-" + QString::number(account->id())) {
+                return service;
             }
         }
-        else
-        {
-            // If the account is in disabled state that will take precedence over the changed value
-            // since those signals can come later
-            if (!changedAccount->enabled()) {
-                LOG_DEBUG("Account in disabled state, profile will be also set as disabled " << changedAccount->displayName());
-                enabled = false;
-            }
-            // A service in the account is enabled/disabled
-            QList<SyncProfile*> profiles = getProfilesByAccountId(changedAccount->id());
-            foreach(SyncProfile *profile, profiles)
-            {
-                // See if the service name matches
-                if(serviceName == profile->key(REMOTE_SERVICE_NAME))
-                {
-                    // Check if the status really changed here
-                    // saving the account can trigger the emition of enabledChanged()
-                    if (profile->isEnabled() != enabled) {
-                        profile->setEnabled(enabled);
-                        iProfileManager.updateProfile(*profile);
-                        if (enabled) {
-                            emit scheduleUpdated(profile->name());
-                        } else {
-                            emit removeScheduledSync(profile->name());
-                        }
-                    }
-                }
-                delete profile;
-            }
+        // Earlier possible matching was using service name as profile name.
+        // This was abandonned later to avoid profile name clashing with
+        // identical services for different accounts.
+        if (profile->name() == service.name()) {
+            return service;
         }
+        // Add here other possible matcher schemes.
     }
+    return Accounts::Service();
+}
+
+void AccountsHelper::syncEnableWithAccount(Accounts::Account *account)
+{
+    account->selectService();
+    // Always use the current enabled value since signals may be emitted with delays.
+    bool enabled = account->enabled();
+    const QList<SyncProfile*> profiles = getProfilesByAccountId(account->id());
+    for (SyncProfile *profile : profiles) {
+        LOG_DEBUG("Changing profile enabled" << profile->name() << enabled);
+        if (enabled) {
+            // Global is enabled, checking by service if any.
+            bool serviceEnabled = true;
+            Accounts::Service service = serviceForProfile(account, profile);
+            if (service.isValid()) {
+                account->selectService(service);
+                serviceEnabled = account->enabled();
+            }
+            LOG_DEBUG("Enabled status for service ::" << profile->name() << serviceEnabled);
+            if (profile->isEnabled() != serviceEnabled) {
+                profile->setEnabled(serviceEnabled);
+                iProfileManager.updateProfile(*profile);
+                emit scheduleUpdated(profile->name());
+            }
+        } else if (profile->isEnabled()) {
+            // Global is false, unconditionally disable
+            profile->setEnabled(false);
+            iProfileManager.updateProfile(*profile);
+            emit removeScheduledSync(profile->name());
+        }
+        delete profile;
+    }
+    account->selectService();
 }
 
 void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew)
@@ -378,9 +356,6 @@ void AccountsHelper::slotSchedulerSettingsChanged(const char *aKey)
 
 void AccountsHelper::registerAccountListener(Accounts::AccountId id)
 {
-#ifndef USE_ACCOUNTSHELPER_LISTENER
-    LOG_DEBUG("AccountsHelper::registerAccountListener() is disabled!  Not listening to change signals for account:" << id);
-#else
     FUNCTION_CALL_TRACE;
 
     Accounts::Account *account = iAccountManager->account(id);
@@ -388,12 +363,17 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
         return;
     }
     iAccountList.append(account);
-    // Callback for account enabled/disabled
-    QObject::connect(account,
-                     SIGNAL(enabledChanged(const QString&, bool)),
-                     SLOT(slotAccountEnabledChanged(const QString&, bool)),
-                     Qt::UniqueConnection);
+    // Initialisation and callback for account enabled/disabled
+    syncEnableWithAccount(account);
+    QObject::connect(account, &Accounts::Account::enabledChanged,
+                     [this, account] (const QString &serviceName, bool enabled) {
+                         LOG_DEBUG("Received account enabled changed signal" << serviceName << enabled << account->displayName());
+                         syncEnableWithAccount(account);
+                     });
 
+#ifndef USE_ACCOUNTSHELPER_SCHEDULER_WATCHER
+    LOG_DEBUG("AccountsHelper::registerAccountListener() is disabled!  Not listening to scheduler change signals for account:" << id);
+#else
     // Account SyncOnChange
     QList<SyncProfile*> profiles = getProfilesByAccountId(id);
     foreach(SyncProfile *profile, profiles)
