@@ -416,20 +416,6 @@ QString AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
     return profileName;
 }
 
-void AccountsHelper::addSetting(Accounts::AccountId id, QString key, QVariant value) {
-    FUNCTION_CALL_TRACE;
-
-    LOG_DEBUG("Account Id " << id << "   Key = " << key << "  Value = " << value);
-    Accounts::Account* account = iAccountManager->account(id);
-    if (account != NULL) {
-        account->setValue(key, value);
-        bool success = account->syncAndBlock();
-        if (!success) {
-            LOG_WARNING("Could not save settings to Account : Reason = " << iAccountManager->lastError().message());
-        }
-    }
-}
-
 void AccountsHelper::registerAccountListeners()
 {
     FUNCTION_CALL_TRACE;

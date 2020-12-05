@@ -118,8 +118,6 @@ private:
 
     void setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew = false);
 
-    void addSetting(Accounts::AccountId id, QString key, QVariant value);
-
     void registerAccountListener(Accounts::AccountId id);
 
     Accounts::Manager *iAccountManager;
