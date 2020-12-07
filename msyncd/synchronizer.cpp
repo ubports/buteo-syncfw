@@ -402,7 +402,10 @@ bool Synchronizer::saveSyncResults(QString aProfileId, QString aSyncResults)
 
 QString Synchronizer::createSyncProfileForAccount(uint aAccountId)
 {
-    return iAccounts->createProfileForAccount(aAccountId);
+    iAccounts->createProfileForAccount(aAccountId);
+    // There could be profiles created for every service. There is no
+    // point to give back a profile name.
+    return QString();
 }
 
 bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)

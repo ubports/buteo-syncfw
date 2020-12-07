@@ -58,59 +58,41 @@ AccountsHelper::~AccountsHelper()
     // their parent, aka, the manager
 }
 
-QString AccountsHelper::createProfileForAccount(Accounts::AccountId id)
+void AccountsHelper::createProfileForAccount(Accounts::AccountId id)
 {
     FUNCTION_CALL_TRACE;
-    QString profileName;
     Accounts::Account *newAccount = iAccountManager->account(id);
-    bool profileFoundAndCreated = false;
 
     if(0 != newAccount)
     {
         registerAccountListener(id);
-        Accounts::ServiceList serviceList = newAccount->services();
-        foreach(Accounts::Service service, serviceList)
+        bool profileFoundAndCreated = false;
+        const Accounts::ServiceList serviceList = newAccount->services();
+        for(const Accounts::Service &service : serviceList)
         {
             // Look for a sync profile that matches the service name (template)
             LOG_DEBUG("Looking for sync profile::" << service.name());
-            SyncProfile *syncProfile = iProfileManager.syncProfile(service.name());
-            LOG_DEBUG("Found profile::" << service.name());
-            if(0 != syncProfile &&
-                    (true == syncProfile->boolKey(KEY_USE_ACCOUNTS, false))
-                    )
-            {
-                profileName = addAccountIfNotExists(newAccount, service, syncProfile);
-                profileFoundAndCreated = true;
-            }
-            if(0 != syncProfile)
-            {
-                delete syncProfile;
-                syncProfile = 0;
-            }
+            bool serviceEnabled = newAccount->enabledServices().contains(service);
+            profileFoundAndCreated =
+                addProfileForAccount(newAccount, service.name(), serviceEnabled)
+                || profileFoundAndCreated;
         }
 
-        if (profileFoundAndCreated == false)
+        // Fetch the key "remote_service_name" from the account settings and
+        // use it to create a profile
+        QString serviceName = newAccount->valueAsString(REMOTE_SERVICE_NAME);
+        if (profileFoundAndCreated == false && !serviceName.isEmpty())
         {
-            // Fetch the key "remote_service_name" from the account settings and
-            // use it to create a profile
-            QString profileName = newAccount->valueAsString(REMOTE_SERVICE_NAME);
-            LOG_DEBUG("Profile name from account setting:" << profileName);
-
-            SyncProfile *syncProfile = iProfileManager.syncProfile( profileName );
-            if (syncProfile)
-            {
-                if (syncProfile->boolKey (KEY_USE_ACCOUNTS, false) == true)
-                    createProfileForAccount (newAccount, profileName, syncProfile);
-
-                profileName = syncProfile->name();
-                delete syncProfile;
+            LOG_DEBUG("Profile name from account setting:" << serviceName);
+            const QString profileName = serviceName + "-" + QString::number(newAccount->id());
+            if (addProfileForAccount(newAccount, serviceName, true, profileName)) {
+                newAccount->setValue(KEY_PROFILE_ID, profileName);
+                newAccount->syncAndBlock();
             }
         }
     } else {
         LOG_DEBUG("Account not found:" << id);
     }
-
-    return profileName;
 }
 
 void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
@@ -310,59 +292,26 @@ QList<SyncProfile*> AccountsHelper::getProfilesByAccountId(Accounts::AccountId i
     return iProfileManager.getSyncProfilesByData(filters);
 }
 
-void AccountsHelper::createProfileForAccount(Accounts::Account *account,
-                                             const QString profileName,
-                                             const SyncProfile *baseProfile)
+bool AccountsHelper::addProfileForAccount(Accounts::Account *account,
+                                          const QString &serviceName,
+                                          bool serviceEnabled,
+                                          const QString &label)
 {
     FUNCTION_CALL_TRACE;
 
-    LOG_DEBUG("Creating new profile by cloning base profile");
-
-    // Create a new sync profile with username
-    SyncProfile *newProfile = baseProfile->clone();
-    newProfile->setName(profileName + "-" + QString::number(account->id()));
-    newProfile->setKey(KEY_DISPLAY_NAME, profileName + "-" + account->displayName());
-    newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
-    // Check if account is enabled
-    if (account->enabled())
-        newProfile->setEnabled(true);   // Set profile as enabled
-
-    setSyncSchedule (newProfile, account->id(), true);
-
-    // Save the newly created profile
-    iProfileManager.updateProfile(*newProfile);
-
-    account->setValue(KEY_PROFILE_ID, newProfile->name());
-    account->syncAndBlock();
-
-    emit scheduleUpdated(newProfile->name());
-    if(newProfile->isSOCProfile())
-    {
-        emit enableSOC(newProfile->name());
-    }
-    delete newProfile;
-}
-
-QString AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
-                                              Accounts::Service service,
-                                              const SyncProfile *baseProfile)
-{
-    FUNCTION_CALL_TRACE;
-
-    Profile *serviceProfile = iProfileManager.profile(service.name(), Profile::TYPE_SYNC);
-    if (!serviceProfile) {
+    SyncProfile *serviceProfile = iProfileManager.syncProfile(serviceName);
+    if (!serviceProfile || (false == serviceProfile->boolKey(KEY_USE_ACCOUNTS, false))) {
         LOG_DEBUG ("!!!! Service not supported !!!!");
-        return QString();
+        return false;
     }
 
-    QString profileName ;
-    if (!service.name().isEmpty()) {
+    QString profileName = label;
+    if (profileName.isEmpty()) {
         QStringList keys;
-        keys << QString::number(account->id()) << service.name();
+        keys << QString::number(account->id()) << serviceName;
         serviceProfile->setName(keys);
         profileName = serviceProfile->name();
     }
-    delete serviceProfile;
 
     SyncProfile *profile = iProfileManager.syncProfile(profileName);
 
@@ -370,37 +319,19 @@ QString AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
 
     if(0 == profile)
     {
-        LOG_DEBUG("New profile creating with clone of base profile");
+        LOG_DEBUG("Creating new profile by cloning base profile");
 
         // Create a new sync profile with username
-        SyncProfile *newProfile = baseProfile->clone();
-        newProfile->setName(profileName);
-        newProfile->setKey(KEY_DISPLAY_NAME, service.name() + "-" + account->displayName());
-        // Add the account ID to the profile
-        newProfile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
-        // Check if service is enabled
-        LOG_DEBUG("Service:: " << service.displayName() <<
-                  "enabled status::" << (account->enabled() && account->enabledServices().contains(service)));
-        // Set profile as enabled
-        newProfile->setEnabled(account->enabled() &&
-                               account->enabledServices().contains(service));
-        setSyncSchedule (newProfile, account->id(), true);
+        profile = serviceProfile->clone();
+        profile->setName(profileName);
+        profile->setKey(KEY_DISPLAY_NAME, account->displayName());
+        profile->setKey(KEY_ACCOUNT_ID, QString::number(account->id()));
 
-        // Save the newly created profile
-        iProfileManager.updateProfile(*newProfile);
-
-        emit scheduleUpdated(newProfile->name());
-        if(newProfile->isSOCProfile())
-        {
-            emit enableSOC(newProfile->name());
-        }
-        delete newProfile;
+        setSyncSchedule(profile, account->id(), true);
     }
-    else if(true == profile->boolKey(KEY_USE_ACCOUNTS, false))
+    if(profile && (true == profile->boolKey(KEY_USE_ACCOUNTS, false)))
     {
-        LOG_DEBUG("Profile already exist enable it");
-        // Set profile as enabled
-        profile->setEnabled(true);
+        profile->setEnabled(account->enabled() && serviceEnabled);
         iProfileManager.updateProfile(*profile);
         emit scheduleUpdated(profile->name());
         if(profile->isSOCProfile())
@@ -408,12 +339,10 @@ QString AccountsHelper::addAccountIfNotExists(Accounts::Account *account,
             emit enableSOC(profile->name());
         }
     }
-    if(0 != profile)
-    {
-        delete profile;
-    }
+    delete profile;
+    delete serviceProfile;
 
-    return profileName;
+    return true;
 }
 
 void AccountsHelper::registerAccountListeners()

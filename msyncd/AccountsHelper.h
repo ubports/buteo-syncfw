@@ -68,12 +68,11 @@ public:
 
 public Q_SLOTS:
 
-    /*! \brief This method is used to create a profile for a specified
+    /*! \brief This method is used to create profiles for a specified
      * account
      * \param id Accounts Id
-     * \return A string with the new profile name
      */
-    QString createProfileForAccount(Accounts::AccountId id);
+    void createProfileForAccount(Accounts::AccountId id);
 
     /*! \brief slot for Accounts::Manager accountRemoved signal
      *
@@ -108,13 +107,10 @@ private Q_SLOTS:
     void registerAccountListeners();
 
 private:
-    void createProfileForAccount(Accounts::Account* account,
-                                 const QString profileName,
-                                 const SyncProfile* baseProfile);
-
-    QString addAccountIfNotExists(Accounts::Account *account,
-                                  Accounts::Service service,
-                                  const SyncProfile *baseProfile);
+    bool addProfileForAccount(Accounts::Account *account,
+                              const QString &serviceName,
+                              bool serviceEnabled,
+                              const QString &label = QString());
 
     void setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew = false);
 
