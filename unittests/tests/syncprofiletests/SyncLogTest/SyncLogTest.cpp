@@ -157,5 +157,145 @@ void SyncLogTest::testAddResults()
     
 }
 
+#define FAILURE_MESSAGE "Database error: UID not unique"
+#define FAILURE_SERVER "No resource at URI"
+static const QString DETAILS_XML =
+    "<synclog name=\"caldav-sync\" >"
+        "<syncresults majorcode=\"1\" time=\"2020-08-13T12:06:57\">"
+            "<target name=\"123456-789\">"
+                "<local added=\"2\" deleted=\"3\" modified=\"4\">"
+                    "<addedItem uid=\"123-4\" />"
+                    "<addedItem uid=\"123-5\" />"
+                    "<addedItem uid=\"123-6\" status=\"FaIleD\"><![CDATA["
+                    FAILURE_MESSAGE
+                    "]]></addedItem>"
+                    "<deletedItem uid=\"123-7\" />"
+                    "<modifiedItem uid=\"123-8\" />"
+                    "<modifiedItem uid=\"123-9\" />"
+                "</local>"
+                "<remote added=\"5\" deleted=\"6\" modified=\"7\">"
+                    "<addedItem uid=\"456-1\" />"
+                    "<deletedItem uid=\"456-2\" />"
+                    "<modifiedItem uid=\"456-3\" />"
+                    "<modifiedItem uid=\"456-7\" status=\"failed\"><![CDATA["
+                    FAILURE_SERVER
+                    "]]></modifiedItem>"
+                "</remote>"
+            "</target>"
+        "</syncresults>"
+    "</synclog>";
+void SyncLogTest::testDetailsFromXML()
+{
+    QDomDocument doc;
+    QVERIFY(doc.setContent(DETAILS_XML, false));
+    SyncLog log(doc.documentElement());
+    QCOMPARE(log.allResults().length(), 1);
+
+    const SyncResults *result = log.lastResults();
+    QVERIFY(result);
+    QCOMPARE(result->targetResults().length(), 1);
+
+    TargetResults target = result->targetResults().first();
+    QCOMPARE(target.localDetails(TargetResults::ITEM_ADDED,
+                                 TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("123-4") << QLatin1String("123-5"));
+    QCOMPARE(target.localDetails(TargetResults::ITEM_ADDED,
+                                 TargetResults::ITEM_OPERATION_FAILED),
+             QList<QString>() << QLatin1String("123-6"));
+    QCOMPARE(target.localMessage(QLatin1String("123-6")),
+             QLatin1String(FAILURE_MESSAGE));
+    QCOMPARE(target.localDetails(TargetResults::ITEM_DELETED,
+                                 TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("123-7"));
+    QVERIFY(target.localDetails(TargetResults::ITEM_DELETED,
+                                TargetResults::ITEM_OPERATION_FAILED).isEmpty());
+    QCOMPARE(target.localDetails(TargetResults::ITEM_MODIFIED,
+                                 TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("123-8") << QLatin1String("123-9"));
+    QVERIFY(target.localDetails(TargetResults::ITEM_MODIFIED,
+                                TargetResults::ITEM_OPERATION_FAILED).isEmpty());
+
+    QCOMPARE(target.remoteDetails(TargetResults::ITEM_ADDED,
+                                  TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("456-1"));
+    QVERIFY(target.remoteDetails(TargetResults::ITEM_ADDED,
+                                 TargetResults::ITEM_OPERATION_FAILED).isEmpty());
+    QCOMPARE(target.remoteDetails(TargetResults::ITEM_DELETED,
+                                  TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("456-2"));
+    QVERIFY(target.remoteDetails(TargetResults::ITEM_DELETED,
+                                 TargetResults::ITEM_OPERATION_FAILED).isEmpty());
+    QCOMPARE(target.remoteDetails(TargetResults::ITEM_MODIFIED,
+                                  TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("456-3"));
+    QCOMPARE(target.remoteDetails(TargetResults::ITEM_MODIFIED,
+                                  TargetResults::ITEM_OPERATION_FAILED),
+             QList<QString>() << QLatin1String("456-7"));
+    QCOMPARE(target.remoteMessage(QLatin1String("456-7")),
+             QLatin1String(FAILURE_SERVER));
+}
+
+void SyncLogTest::testAddDetails()
+{
+    TargetResults result(QLatin1String("Test target"));
+
+    result.addLocalDetails(QLatin1String("123456-7"), TargetResults::ITEM_ADDED);
+    result.addLocalDetails(QLatin1String("123456-8"), TargetResults::ITEM_ADDED);
+    result.addLocalDetails(QLatin1String("123456-9"), TargetResults::ITEM_MODIFIED);
+    result.addLocalDetails(QLatin1String("123456-10"), TargetResults::ITEM_DELETED);
+    result.addLocalDetails(QLatin1String("123456-11"), TargetResults::ITEM_ADDED,
+                           TargetResults::ITEM_OPERATION_FAILED,
+                           QLatin1String(FAILURE_MESSAGE));
+    QCOMPARE(result.localItems().added, (unsigned)2);
+    QCOMPARE(result.localItems().deleted, (unsigned)1);
+    QCOMPARE(result.localItems().modified, (unsigned)1);
+    QCOMPARE(result.localDetails(TargetResults::ITEM_ADDED,
+                                 TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("123456-7") << QLatin1String("123456-8"));
+    QCOMPARE(result.localDetails(TargetResults::ITEM_ADDED,
+                                 TargetResults::ITEM_OPERATION_FAILED),
+             QList<QString>() << QLatin1String("123456-11"));
+    QCOMPARE(result.localMessage(QLatin1String("123456-11")),
+             QLatin1String(FAILURE_MESSAGE));
+    QCOMPARE(result.localDetails(TargetResults::ITEM_DELETED,
+                                 TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("123456-10"));
+    QVERIFY(result.localDetails(TargetResults::ITEM_DELETED,
+                                TargetResults::ITEM_OPERATION_FAILED).isEmpty());
+    QCOMPARE(result.localDetails(TargetResults::ITEM_MODIFIED,
+                                 TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("123456-9"));
+    QVERIFY(result.localDetails(TargetResults::ITEM_MODIFIED,
+                                TargetResults::ITEM_OPERATION_FAILED).isEmpty());
+
+    result.addRemoteDetails(QLatin1String("147258-7"), TargetResults::ITEM_ADDED);
+    result.addRemoteDetails(QLatin1String("147258-8"), TargetResults::ITEM_ADDED);
+    result.addRemoteDetails(QLatin1String("147258-9"), TargetResults::ITEM_MODIFIED);
+    result.addRemoteDetails(QLatin1String("147258-10"), TargetResults::ITEM_DELETED);
+    result.addRemoteDetails(QLatin1String("147258-11"), TargetResults::ITEM_ADDED,
+                            TargetResults::ITEM_OPERATION_FAILED,
+                            QLatin1String(FAILURE_SERVER));
+    QCOMPARE(result.remoteItems().added, (unsigned)2);
+    QCOMPARE(result.remoteItems().deleted, (unsigned)1);
+    QCOMPARE(result.remoteItems().modified, (unsigned)1);
+    QCOMPARE(result.remoteDetails(TargetResults::ITEM_ADDED,
+                                  TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("147258-7") << QLatin1String("147258-8"));
+    QCOMPARE(result.remoteDetails(TargetResults::ITEM_ADDED,
+                                  TargetResults::ITEM_OPERATION_FAILED),
+             QList<QString>() << QLatin1String("147258-11"));
+    QCOMPARE(result.remoteMessage(QLatin1String("147258-11")),
+             QLatin1String(FAILURE_SERVER));
+    QCOMPARE(result.remoteDetails(TargetResults::ITEM_DELETED,
+                                  TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("147258-10"));
+    QVERIFY(result.remoteDetails(TargetResults::ITEM_DELETED,
+                                 TargetResults::ITEM_OPERATION_FAILED).isEmpty());
+    QCOMPARE(result.remoteDetails(TargetResults::ITEM_MODIFIED,
+                                  TargetResults::ITEM_OPERATION_SUCCEEDED),
+             QList<QString>() << QLatin1String("147258-9"));
+    QVERIFY(result.remoteDetails(TargetResults::ITEM_MODIFIED,
+                                 TargetResults::ITEM_OPERATION_FAILED).isEmpty());
+}
 
 QTEST_MAIN(Buteo::SyncLogTest)

@@ -35,6 +35,8 @@ private slots:
 
     void testLog();
     void testAddResults();
+    void testAddDetails();
+    void testDetailsFromXML();
 
 };
 
