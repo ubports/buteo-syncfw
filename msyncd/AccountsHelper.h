@@ -80,12 +80,6 @@ public Q_SLOTS:
      */
     void slotAccountRemoved(Accounts::AccountId id);
 
-    /*! \brief slot for Accounts::Manager displayNameChanged signal
-     * *
-     * \param id of the accounts
-     */
-    void slotAccountUpdated(Accounts::AccountId id);
-
     void slotSchedulerSettingsChanged(const char *aKey);
 Q_SIGNALS:
 

@@ -36,16 +36,15 @@ AccountsHelper::AccountsHelper(ProfileManager &aProfileManager, QObject *aParent
     :   QObject(aParent), iProfileManager(aProfileManager)
 {
     iAccountManager = new Accounts::Manager(this);
-    // Connect to signal for account creation, deletion, and modification
+    // Connect to signal for account creation and deletion.
     QObject::connect(iAccountManager, SIGNAL(accountCreated(Accounts::AccountId)),
                      this, SLOT(createProfileForAccount(Accounts::AccountId)));
     QObject::connect(iAccountManager, SIGNAL(accountRemoved(Accounts::AccountId)),
                      this, SLOT(slotAccountRemoved(Accounts::AccountId)));
-    QObject::connect(iAccountManager, SIGNAL(accountUpdated(Accounts::AccountId)),
-                     this, SLOT(slotAccountUpdated(Accounts::AccountId)));
 
     // load accounts after return from contructor, to allow connection with class signals
     // that can be fired by 'registerAccountListeners' function
+    // Handle account modifications with a listener per account.
     QTimer::singleShot(0, this, SLOT(registerAccountListeners()));
 }
 
@@ -237,25 +236,6 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
         account->endGroup();
         syncProfile->setSyncSchedule (syncSchedule);
     }
-}
-
-void AccountsHelper::slotAccountUpdated(Accounts::AccountId id)
-{
-#if 0 // Not required for scheduler settings; they will be handled by slotSchedulerSettingsChanged
-    FUNCTION_CALL_TRACE;
-    QList<SyncProfile*> syncProfiles = getProfilesByAccountId(id);
-    foreach(SyncProfile *syncProfile, syncProfiles)
-    {
-        if (syncProfile) {
-            setSyncSchedule(syncProfile, id);
-            iProfileManager.updateProfile(*syncProfile);
-            emit scheduleUpdated(syncProfile->name());
-            delete syncProfile;
-        }
-    }
-#else
-    Q_UNUSED(id);
-#endif
 }
 
 QList<SyncProfile*> AccountsHelper::getProfilesByAccountId(Accounts::AccountId id)
