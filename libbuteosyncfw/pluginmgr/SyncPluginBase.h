@@ -44,7 +44,7 @@ class PluginCbInterface;
  */
 class SyncPluginBase : public QObject
 {
-	Q_OBJECT;
+	Q_OBJECT
 
 public:
 	/*! \brief Constructor

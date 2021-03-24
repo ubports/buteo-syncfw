@@ -35,7 +35,7 @@ class ServerPlugin;
  */
 class ServerThread : public QThread
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
 
     /*! \brief Constructor

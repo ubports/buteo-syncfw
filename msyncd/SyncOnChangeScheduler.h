@@ -14,7 +14,7 @@ class SyncProfile;
 
 class SyncOnChangeScheduler : public SyncScheduler
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     /*! \brief constructor

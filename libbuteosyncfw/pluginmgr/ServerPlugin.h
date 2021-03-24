@@ -35,7 +35,7 @@ namespace Buteo {
  */
 class ServerPlugin : public SyncPluginBase
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
 
