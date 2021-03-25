@@ -16,6 +16,7 @@ INCLUDEPATH += . \
     ../libbuteosyncfw/pluginmgr \
     ../libbuteosyncfw/common \
     ../libbuteosyncfw/profile
+PRE_TARGETDEPS += libmsyncd.a
 
 
 PKGCONFIG += dbus-1 libsignon-qt5 accounts-qt5
