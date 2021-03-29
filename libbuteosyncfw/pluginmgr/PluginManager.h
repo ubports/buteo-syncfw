@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd.
+ * Copyright (C) 2014-2021 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -28,6 +28,10 @@
 #include <QMap>
 #include <QReadWriteLock>
 #include <QProcess>
+#include <QPointer>
+
+class QPluginLoader;
+class QProcess;
 
 namespace Buteo {
 
@@ -42,22 +46,6 @@ class Profile;
 class ClientPluginTest;
 class ServerPluginTest;
 class StoragePluginTest;
-
-typedef ClientPlugin* (*FUNC_CREATE_CLIENT)( const QString&,
-                                             const SyncProfile&,
-                                             PluginCbInterface* );
-typedef void (*FUNC_DESTROY_CLIENT)( ClientPlugin* );
-
-typedef ServerPlugin* (*FUNC_CREATE_SERVER)( const QString&,
-                                             const Profile&,
-                                             PluginCbInterface* );
-typedef void (*FUNC_DESTROY_SERVER)( ServerPlugin* );
-
-typedef StoragePlugin* (*FUNC_CREATE_STORAGE)(const QString&);
-typedef void (*FUNC_DESTROY_STORAGE)(StoragePlugin*);
-
-typedef StorageChangeNotifierPlugin* (*FUNC_CREATE_STORAGECHANGENOTIFIER)(const QString&);
-typedef void (*FUNC_DESTROY_STORAGECHANGENOTIFIER)(StorageChangeNotifierPlugin*);
 
 /*! \brief Manages plugins
  *
@@ -147,33 +135,29 @@ protected slots:
 
 private:
 
-    struct DllInfo
+    class DllInfo
     {
-        QString iPath;
-        void*   iHandle;
-        int     iRefCount;
+    public:
+        void cleanUp();
 
-        DllInfo() : iHandle( NULL ), iRefCount( 0 ) { }
+        QString iPath;
+        QProcess *iHandle = nullptr;
+        QPluginLoader *iPluginLoader = nullptr;
+        QPointer<QObject> iLoadedPlugin;
+        int iRefCount = 0;
     };
 
+    void loadPluginMaps(const QString &pluginDirPath, const QString &aFilter, QMap<QString, QString>& aTargetMap );
 
-    void loadPluginMaps( const QString aFilter, QMap<QString, QString>& aTargetMap );
-
-    void loadOOPPluginMaps( const QString aFilter, QMap<QString, QString>& aTargetMap );
-
-    void* loadDll( const QString& aPath );
-
-    void* getDllHandle( const QString& aPath );
-
-    void unloadDll( const QString& aPath );
-
-    static bool killProcess( const QString& aPath );
-
-    QProcess* startOOPPlugin( const QString& aPath,
-                              const QString& aPluginName,
-                              const QString& aProfileName );
+    QProcess* startOOPPlugin( const QString& aPluginName, const QString& aProfileName, const QString& aPluginFilePath);
 
     void stopOOPPlugin( const QString& aPath );
+
+    void addLoadedPlugin(const QString &libraryName,
+                         QPluginLoader *pluginLoader,
+                         QObject *plugin);
+    QObject *acquireLoadedPlugin(const QString &libraryName);
+    void unloadPlugin(const QString &libraryName);
 
     QString                 iPluginPath;
 

@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2013 - 2021 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -23,16 +24,6 @@
 #include "DummyStorage.h"
 
 using namespace Buteo;
-
-extern "C" StoragePlugin* createPlugin( const QString& aPluginName )
-{
-    return new DummyStorage( aPluginName );
-}
-
-extern "C" void destroyPlugin( StoragePlugin* aStorage )
-{
-    delete aStorage;
-}
 
 
 DummyStorage::DummyStorage( const QString& aPluginName )
@@ -106,7 +97,7 @@ StorageItem* DummyStorage::getItem( const QString& /*aItemId*/ )
     return NULL;
 }
 
-QList<StorageItem*> DummyStorage::getItems(const QStringList& aItemIdList )
+QList<StorageItem*> DummyStorage::getItems(const QStringList& /*aItemIdList*/ )
 {
     QList<StorageItem*> items;
     return items;
@@ -159,3 +150,10 @@ QList<StoragePlugin::OperationStatus> DummyStorage::deleteItems( const QList<QSt
 
     return statuses;
 }
+
+
+StoragePlugin* DummyStorageLoader::createPlugin( const QString& aPluginName )
+{
+    return new DummyStorage( aPluginName );
+}
+

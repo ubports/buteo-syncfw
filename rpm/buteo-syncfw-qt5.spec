@@ -1,5 +1,5 @@
 Name:    buteo-syncfw-qt5
-Version: 0.9.17
+Version: 0.10.0
 Release: 1
 Summary: Synchronization backend
 URL:     https://git.sailfishos.org/mer-core/buteo-syncfw/
@@ -31,7 +31,8 @@ Requires: libmce-qt5 >= 1.1.0
 
 %files
 %defattr(-,root,root,-)
-%{_libdir}/*.so.*
+%{_libdir}/libbuteosyncfw5.so.*
+%{_libexecdir}/buteo-oopp-runner
 
 %package devel
 Summary: Development files for %{name}

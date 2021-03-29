@@ -33,9 +33,12 @@ HEADERS += common/Logger.h \
            pluginmgr/PluginManager.h \
            pluginmgr/ServerPlugin.h \
            pluginmgr/StorageChangeNotifierPlugin.h \
+           pluginmgr/StorageChangeNotifierPluginLoader.h \
            pluginmgr/StorageItem.h \
            pluginmgr/StoragePlugin.h \
+           pluginmgr/StoragePluginLoader.h \
            pluginmgr/SyncPluginBase.h \
+           pluginmgr/SyncPluginLoader.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
@@ -66,6 +69,7 @@ SOURCES += common/Logger.cpp \
            pluginmgr/StorageItem.cpp \
            pluginmgr/StoragePlugin.cpp \
            pluginmgr/SyncPluginBase.cpp \
+           pluginmgr/SyncPluginLoader.cpp \
            profile/BtHelper.cpp \
            profile/Profile.cpp \
            profile/ProfileFactory.cpp \
@@ -102,12 +106,6 @@ QMAKE_CLEAN += lib$${TARGET}.prl pkgconfig/*
 # install
 target.path = $$[QT_INSTALL_LIBS]
 headers.path = /usr/include/buteosyncfw5/
-sources.path = $$headers.path
-
-sources.files = pluginmgr/plugin_main.cpp \
-                pluginmgr/PluginServiceObj.cpp \
-                pluginmgr/ButeoPluginIfaceAdaptor.cpp \
-                pluginmgr/PluginCbImpl.cpp
 
 headers.files = common/Logger.h \
            common/LogMacros.h \
@@ -123,13 +121,13 @@ headers.files = common/Logger.h \
            pluginmgr/PluginManager.h \
            pluginmgr/ServerPlugin.h \
            pluginmgr/StorageChangeNotifierPlugin.h \
+           pluginmgr/StorageChangeNotifierPluginLoader.h \
            pluginmgr/StorageItem.h \
            pluginmgr/StoragePlugin.h \
+           pluginmgr/StoragePluginLoader.h \
            pluginmgr/SyncPluginBase.h \
-           pluginmgr/PluginServiceObj.h \
-           pluginmgr/ButeoPluginIfaceAdaptor.h \
+           pluginmgr/SyncPluginLoader.h \
            pluginmgr/ButeoPluginIface.h \
-           pluginmgr/PluginCbImpl.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
@@ -145,7 +143,7 @@ headers.files = common/Logger.h \
            profile/SyncSchedule_p.h \
            profile/TargetResults.h
 
-INSTALLS += target headers sources
+INSTALLS += target headers
 
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 QMAKE_PKGCONFIG_LIBDIR  = $$target.path
