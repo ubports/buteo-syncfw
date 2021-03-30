@@ -145,11 +145,7 @@ headers.files = common/Logger.h \
            profile/SyncSchedule_p.h \
            profile/TargetResults.h
 
-utility.path = /opt/tests/buteo-syncfw
-utility.files = ../bin/*.pl \
-    ../bin/*.sh
-
-INSTALLS += target headers utility sources
+INSTALLS += target headers sources
 
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 QMAKE_PKGCONFIG_LIBDIR  = $$target.path
