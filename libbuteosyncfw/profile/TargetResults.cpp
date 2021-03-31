@@ -316,7 +316,9 @@ QList<QString> TargetResults::localDetails(Buteo::TargetResults::ItemOperation a
         return ItemDetails::filterStatus(d_ptr->iLocalDeletions, aStatus);
     case ITEM_MODIFIED:
         return ItemDetails::filterStatus(d_ptr->iLocalModifications, aStatus);
-    };
+    }
+
+    return QList<QString>();
 }
 
 QString TargetResults::localMessage(const QString &aUid) const

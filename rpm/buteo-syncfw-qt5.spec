@@ -103,7 +103,6 @@ make doc %{_smp_mflags}
 
 %install
 make INSTALL_ROOT=%{buildroot} install
-chmod +x %{buildroot}/opt/tests/buteo-syncfw/*.pl %{buildroot}/opt/tests/buteo-syncfw/*.sh
 %fdupes %{buildroot}/opt/tests/buteo-syncfw/
 mkdir -p %{buildroot}%{_userunitdir}/user-session.target.wants
 ln -s ../msyncd.service %{buildroot}%{_userunitdir}/user-session.target.wants/
