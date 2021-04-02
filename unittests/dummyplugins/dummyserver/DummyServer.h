@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2013 - 2021 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -24,10 +25,13 @@
 #define DUMMYSERVER_H
 
 #include "ServerPlugin.h"
+#include "SyncPluginLoader.h"
+
 namespace Buteo {
     
 class DummyServer : public ServerPlugin
 {
+    Q_OBJECT
 
 public:
 
@@ -57,11 +61,17 @@ public slots:
                                            bool aState );
 };
 
-extern "C" DummyServer* createPlugin( const QString& aPluginName,
-                                      const Profile& aProfile,
-                                      PluginCbInterface *aCbInterface );
+class DummyServerLoader : public Buteo::SyncPluginLoader
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.buteo.msyncd.test.DummyServerLoader")
+    Q_INTERFACES(Buteo::SyncPluginLoader)
 
-extern "C" void destroyPlugin( DummyServer *aServer );
+public:
+    ServerPlugin* createServerPlugin( const QString& aPluginName,
+                                      const Buteo::Profile& aProfile,
+                                      Buteo::PluginCbInterface* aCbInterface ) override;
+};
 
 }
 

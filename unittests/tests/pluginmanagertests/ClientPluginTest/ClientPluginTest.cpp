@@ -27,18 +27,13 @@
 #include "PluginManager.h"
 #include "SyncProfile.h"
 
+#define TEST_PLUGIN_PATH "/opt/tests/buteo-syncfw"
+
 using namespace Buteo;
 
 void ClientPluginTest::testCreateDestroy()
 {
-    QDir dir = QDir(QCoreApplication::applicationDirPath() + "/..");
-    QString path = dir.absolutePath();
-    if (dir.cd("../dummyplugins/dummyclient"))
-    {
-        path = dir.absolutePath();
-    } // no else
-
-    PluginManager pluginManager( path );
+    PluginManager pluginManager( TEST_PLUGIN_PATH );
 
     SyncProfile profile( "dummyprofile" );
     ClientPlugin* client1 = pluginManager.createClient( "hdummy", profile, this );
@@ -56,7 +51,6 @@ void ClientPluginTest::testCreateDestroy()
 
     pluginManager.destroyClient( client2 );
 
-    QEXPECT_FAIL("", "According to a comment in PluginManager.cpp: KLUDGE: Due to NB #169065, crashes are seen in QMetaType if we unload DLLs. Hence commenting", Continue);
     QVERIFY( pluginManager.iLoadedDlls.count() == 0 );
 }
 

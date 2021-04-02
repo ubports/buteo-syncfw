@@ -1,9 +1,7 @@
 /*
  * This file is part of buteo-syncfw package
  *
- * Copyright (C) 2014 Jolla Ltd.
- *
- * Contact: Valerio Valerio <valerio.valerio@jolla.com>
+ * Copyright (C) 2021 Jolla Ltd.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -21,21 +19,16 @@
  *
  */
 
-#ifndef UNITTEST_H
-#define UNITTEST_H
+#include "SyncPluginLoader.h"
 
-#include <QtGlobal>
+using namespace Buteo;
 
-/*!
- * \brief A dirty hack to allow modified behavior during unit test execution.
- *
- * If you are writing a unit test, \c include(msyncd/unittest.pri) in your
- * project file.
- */
-#define SYNCFW_UNIT_TESTS_RUNTIME Q_UNLIKELY(__SYNCFW_UNIT_TESTS_RUNTIME)
+ClientPlugin* SyncPluginLoader::createClientPlugin(const QString&, const SyncProfile&, PluginCbInterface*)
+{
+    return nullptr;
+}
 
-/*! \cond __false */
-extern bool __SYNCFW_UNIT_TESTS_RUNTIME;
-/*! \endcond __false */
-
-#endif // UNITTEST_H
+ServerPlugin* SyncPluginLoader::createServerPlugin(const QString&, const Profile&, PluginCbInterface*)
+{
+    return nullptr;
+}

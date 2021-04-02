@@ -23,7 +23,7 @@
 #ifndef STORAGEPLUGIN_H_89943984899843
 #define STORAGEPLUGIN_H_89943984899843
 
-#include <QString>
+#include <QObject>
 #include <QMap>
 #include <QList>
 #include <QDateTime>
@@ -35,8 +35,9 @@ class StorageItem;
 /*! \brief Base class for storage plugins
  *
  */
-class StoragePlugin
+class StoragePlugin : public QObject
 {
+    Q_OBJECT
 
 public:
 

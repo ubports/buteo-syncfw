@@ -36,7 +36,7 @@ class PluginCbInterface;
  */
 class ClientPlugin : public SyncPluginBase
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
 

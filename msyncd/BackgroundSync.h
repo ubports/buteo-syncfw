@@ -1,7 +1,7 @@
 /*
  * This file is part of buteo-syncfw package
  *
- * Copyright (C) 2014 Jolla Ltd
+ * Copyright (C) 2014 Jolla Ltd.
  *
  * Contact: Valerio Valerio <valerio.valerio@jolla.com>
  *

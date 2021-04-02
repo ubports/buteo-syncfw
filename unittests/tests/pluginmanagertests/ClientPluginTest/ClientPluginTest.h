@@ -32,7 +32,7 @@ namespace Buteo {
 
 class ClientPluginTest : public QObject, public PluginCbInterface
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     virtual bool requestStorage(const QString &/*aStorageName*/,

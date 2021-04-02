@@ -26,6 +26,8 @@
 #include <QtTest/QtTest>
 #include <QSignalSpy>
 
+#define TEST_PLUGIN_PATH "/opt/tests/buteo-syncfw"
+
 using namespace Buteo;
 
 void ServerPluginRunnerTest::initTestCase()
@@ -37,14 +39,7 @@ void ServerPluginRunnerTest::initTestCase()
 
     iServerActivator = new ServerActivator(*iProfileManager, *iTransportTracker);
 
-    QDir dir = QDir(QCoreApplication::applicationDirPath() + "/..");
-    QString path = dir.absolutePath();
-    if (dir.cd("../dummyplugins/dummyserver"))
-    {
-        path = dir.absolutePath();
-    } // no else
-
-    iPluginManager = new PluginManager(path) ;
+    iPluginManager = new PluginManager(TEST_PLUGIN_PATH) ;
 
     // TODO: need to update with valid PluginCbInterface pointer
     iServerPluginRunner = new ServerPluginRunner("hdummy", iProfile, iPluginManager,

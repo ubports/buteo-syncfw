@@ -39,7 +39,7 @@ class ClientPlugin;
  */
 class ClientThread : public QThread
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
 
     /*! \brief Constructor

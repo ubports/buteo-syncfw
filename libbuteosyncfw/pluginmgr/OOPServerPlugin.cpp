@@ -1,7 +1,7 @@
 /*
 * This file is part of buteo-sync-plugins package
 *
-* Copyright (C) 2013 Jolla Ltd. and/or its subsidiary(-ies).
+* Copyright (C) 2013 Jolla Ltd.
 *
 * Author: Sateesh Kavuri <sateesh.kavuri@gmail.com>
 *

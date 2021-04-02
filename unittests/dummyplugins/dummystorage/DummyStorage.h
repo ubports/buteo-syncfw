@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2013 - 2021 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -24,6 +25,7 @@
 #define DUMMYSTORAGE_H
 
 #include "StoragePlugin.h"
+#include "StoragePluginLoader.h"
 
 namespace Buteo {
     
@@ -76,9 +78,15 @@ public:
 };
 
 
-extern "C" StoragePlugin* createPlugin( const QString& aPluginName );
+class DummyStorageLoader : public Buteo::StoragePluginLoader
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.buteo.msyncd.test.DummyStorageLoader")
+    Q_INTERFACES(Buteo::StoragePluginLoader)
 
-extern "C" void destroyPlugin( StoragePlugin* aStorage );
+public:
+    StoragePlugin* createPlugin( const QString& aPluginName );
+};
 
 }
 

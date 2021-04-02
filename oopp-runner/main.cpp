@@ -1,7 +1,7 @@
 /*
 * This file is part of buteo-sync-plugins package
 *
-* Copyright (C) 2013-2015 Jolla Ltd. and/or its subsidiary(-ies).
+* Copyright (C) 2013 - 2021 Jolla Ltd.
 *
 * Author: Sateesh Kavuri <sateesh.kavuri@gmail.com>
 *
@@ -37,18 +37,18 @@ int main( int argc, char** argv )
     // One way to pass the arguments is via cmdline, the other way is
     // to use the method setPluginParams() dbus method. But setting
     // cmdline arguments is probably cleaner
-    if( (argc != 3) || (argv[1] == NULL) || (argv[2] == NULL) )
+    QStringList args = app.arguments();
+
+    if( args.length() < 4 )
     {
-        LOG_FATAL( "Plugin name and profile name are not obtained from cmdline" );
+        LOG_FATAL( "Plugin name, profile name and plugin path not obtained from cmdline" );
     }
-    QString pluginName = QString( argv[1] );
-    QString profileName = QString( argv[2] );
 
-#ifndef CLASSNAME
-    LOG_FATAL( "CLASSNAME value not defined in project file" );
-#endif
+    const QString pluginName = args.value(1);
+    const QString profileName = args.value(2);
+    const QString pluginFilePath = args.value(3);
 
-    PluginServiceObj *serviceObj = new PluginServiceObj( profileName, pluginName );
+    PluginServiceObj *serviceObj = new PluginServiceObj( pluginName, profileName, pluginFilePath );
     if( !serviceObj ) {
         LOG_FATAL( "Unable to create the service adaptor object" );
     }

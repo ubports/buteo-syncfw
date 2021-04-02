@@ -46,7 +46,7 @@ namespace Buteo {
  */
 class ServerActivator : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
 
