@@ -2,6 +2,7 @@ TEMPLATE = app
 TARGET = buteo-oopp-runner
 
 QT += dbus
+QT -= gui
 
 INCLUDEPATH += $$PWD \
     ../libbuteosyncfw/pluginmgr \
