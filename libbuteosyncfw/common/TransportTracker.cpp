@@ -78,15 +78,11 @@ TransportTracker::TransportTracker(QObject *aParent) :
     // Internet
     // @todo: enable when internet state is reported correctly.
     iInternet = new NetworkManager(this);
-    if (iInternet != 0) {
-        iTransportStates[Sync::CONNECTIVITY_INTERNET] =
+    iTransportStates[Sync::CONNECTIVITY_INTERNET] =
             iInternet->isOnline();
-        connect(iInternet,
-                SIGNAL(statusChanged(bool, Sync::InternetConnectionType)),
-                SLOT(onInternetStateChanged(bool, Sync::InternetConnectionType)) /*, Qt::QueuedConnection*/);
-    } else {
-        LOG_WARNING("Failed to listen for Internet state changes");
-    }
+    connect(iInternet,
+            SIGNAL(statusChanged(bool, Sync::InternetConnectionType)),
+            SLOT(onInternetStateChanged(bool, Sync::InternetConnectionType)) /*, Qt::QueuedConnection*/);
 }
 
 TransportTracker::~TransportTracker()

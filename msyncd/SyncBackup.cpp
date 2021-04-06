@@ -43,10 +43,6 @@ SyncBackup::SyncBackup() :
     FUNCTION_CALL_TRACE;
 
     iAdaptor = new SyncBackupAdaptor(this);
-    if (!iAdaptor) {
-        LOG_CRITICAL("Failed to initialize adaptor");
-        Q_ASSERT(false);
-    }
 
     QDBusConnection dbus = QDBusConnection::sessionBus();
 
@@ -58,10 +54,6 @@ SyncBackup::SyncBackup() :
     }
 
     iWatchService = new QDBusServiceWatcher (BACKUP_SERVICE_NAME, dbus, QDBusServiceWatcher::WatchForUnregistration);
-    if (!iWatchService) {
-        LOG_CRITICAL("Failed to initialize watch service : backup");
-        Q_ASSERT(false);
-    }
 
     connect(iWatchService, SIGNAL(serviceUnregistered(const QString &)),
             this, SLOT(backupServiceUnregistered(const QString &)));

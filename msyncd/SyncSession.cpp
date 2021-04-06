@@ -127,7 +127,6 @@ bool SyncSession::start()
 
     if ((iProfile->destinationType() == SyncProfile::DESTINATION_TYPE_ONLINE) && !iScheduled) {
         iNetworkManager = new NetworkManager(this);
-        Q_ASSERT(iNetworkManager);
         connect(iNetworkManager, SIGNAL(connectionSuccess()),
                 SLOT(onNetworkSessionOpened()), Qt::QueuedConnection);
         connect(iNetworkManager, SIGNAL(connectionError()),

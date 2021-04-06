@@ -135,17 +135,14 @@ bool Synchronizer::initialize()
             this, SLOT(slotProfileChanged(QString, int, QString)), Qt::QueuedConnection);
 
     iNetworkManager = new NetworkManager(this);
-    Q_ASSERT(iNetworkManager);
 
     iTransportTracker = new TransportTracker(this);
 
-    if (iTransportTracker != 0) {
-        iServerActivator = new ServerActivator(iProfileManager,
-                                               *iTransportTracker, this);
-        connect(iTransportTracker,
-                SIGNAL(networkStateChanged(bool, Sync::InternetConnectionType)),
-                SLOT(onNetworkStateChanged(bool, Sync::InternetConnectionType)));
-    }
+    iServerActivator = new ServerActivator(iProfileManager,
+                                           *iTransportTracker, this);
+    connect(iTransportTracker,
+            SIGNAL(networkStateChanged(bool, Sync::InternetConnectionType)),
+            SLOT(onNetworkStateChanged(bool, Sync::InternetConnectionType)));
 
     // Initialize account manager.
     iAccounts = new AccountsHelper(iProfileManager, this); // Deleted with parent.
@@ -439,17 +436,6 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     }
 
     SyncSession *session = new SyncSession(profile, this);
-    if (session == 0) {
-        LOG_WARNING( "Failed to create sync session object" );
-        delete profile;
-        profile = 0;
-        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED,
-                                Buteo::SyncResults::INTERNAL_ERROR);
-        iProfileManager.saveSyncResults(aProfileName, syncResults);
-        emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
-        return false;
-    }
-
     session->setScheduled(aScheduled);
 
     if (profile->clientProfile()
@@ -539,7 +525,7 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
         clientProfile->name(), aSession->profile(), &iPluginManager, this,
         this);
     aSession->setPluginRunner(pluginRunner, true);
-    if (pluginRunner == 0 || !pluginRunner->init()) {
+    if (!pluginRunner->init()) {
         LOG_WARNING( "Failed to initialize client plug-in runner" );
         return false;
     }
@@ -573,15 +559,13 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
             if (iSyncUIInterface == NULL) {
                 LOG_DEBUG( "iSyncUIInterface is Null" );
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                                                      "com.nokia.MApplicationIf", QDBusConnection::sessionBus() );
-                Q_ASSERT(iSyncUIInterface);
+                                                      "com.nokia.MApplicationIf", QDBusConnection::sessionBus());
             } else if (!iSyncUIInterface->isValid()) {
                 LOG_DEBUG( "iSyncUIInterface is not valid" );
                 delete iSyncUIInterface;
                 iSyncUIInterface = NULL;
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                                                      "com.nokia.MApplicationIf", QDBusConnection::sessionBus() );
-                Q_ASSERT(iSyncUIInterface);
+                                                      "com.nokia.MApplicationIf", QDBusConnection::sessionBus());
             }
             //calling launch with argument list
             QStringList list;
@@ -849,7 +833,7 @@ bool Synchronizer::cleanupProfile(const QString &aProfileId)
                                                   iServerActivator, this);
         }
 
-        if (pluginRunner == 0 || !pluginRunner->init()) {
+        if (!pluginRunner->init()) {
             LOG_WARNING( "Failed to initialize client plug-in runner" );
             delete profile;
             return status;
@@ -1191,12 +1175,6 @@ void Synchronizer::startServer(const QString &aProfileName)
 
     ServerPluginRunner *pluginRunner = new ServerPluginRunner(aProfileName,
                                                               serverProfile, &iPluginManager, this, iServerActivator, this);
-    if (pluginRunner == 0) {
-        LOG_CRITICAL("Failed to create plug-in runner");
-        delete serverProfile;
-        serverProfile = 0;
-        return;
-    }
 
     // Relay connectivity state change signal to plug-in runner.
     connect(iTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)),
@@ -1325,15 +1303,13 @@ void Synchronizer::onNewSession(const QString &aDestination)
             if (iSyncUIInterface == NULL) {
                 LOG_DEBUG( "iSyncUIInterface is NULL" );
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                                                      "com.nokia.MApplicationIf", QDBusConnection::sessionBus() );
-                Q_ASSERT(iSyncUIInterface);
+                                                      "com.nokia.MApplicationIf", QDBusConnection::sessionBus());
             } else if (!iSyncUIInterface->isValid()) {
                 LOG_DEBUG( "iSyncUIInterface is not Valid()" );
                 delete iSyncUIInterface;
                 iSyncUIInterface = NULL;
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
-                                                      "com.nokia.MApplicationIf", QDBusConnection::sessionBus() );
-                Q_ASSERT(iSyncUIInterface);
+                                                      "com.nokia.MApplicationIf", QDBusConnection::sessionBus());
 
             }
             //calling launch with argument list
@@ -1345,54 +1321,48 @@ void Synchronizer::onNewSession(const QString &aDestination)
         }
 
         SyncSession *session = new SyncSession(profile, this);
-        if (session != 0) {
-            LOG_DEBUG("Disable sync on change");
-            //As sync is ongoing, disable sync on change for now, we can query later if
-            //there are changes.
-            if (iSOCEnabled) {
-                iSyncOnChange.disableNext();
-            }
+        LOG_DEBUG("Disable sync on change");
+        //As sync is ongoing, disable sync on change for now, we can query later if
+        //there are changes.
+        if (iSOCEnabled) {
+            iSyncOnChange.disableNext();
+        }
 
-            session->setProfileCreated(createNewProfile);
-            // disable all storages
-            // @todo : Can we remove hardcoding of the storageNames ???
-            QMap<QString, bool> storageMap;
-            storageMap["hcontacts"] = 0;
-            storageMap["hcalendar"] = 0;
-            storageMap["hnotes"] = 0;
+        session->setProfileCreated(createNewProfile);
+        // disable all storages
+        // @todo : Can we remove hardcoding of the storageNames ???
+        QMap<QString, bool> storageMap;
+        storageMap["hcontacts"] = 0;
+        storageMap["hcalendar"] = 0;
+        storageMap["hnotes"] = 0;
 #ifdef BM_SYNC
-            storageMap["hbookmarks"] = 0;
+        storageMap["hbookmarks"] = 0;
 #endif
 #ifdef SMS_SYNC
-            storageMap["hsms"] = 0;
+        storageMap["hsms"] = 0;
 #endif
 
-            session->setStorageMap(storageMap);
+        session->setStorageMap(storageMap);
 
-            iActiveSessions.insert(profile->name(), session);
+        iActiveSessions.insert(profile->name(), session);
 
-            // Connect signals from sync session.
-            connect(session, SIGNAL(transferProgress(const QString &,
-                                                     Sync::TransferDatabase, Sync::TransferType, const QString &, int)),
-                    this, SLOT(onTransferProgress(const QString &,
-                                                  Sync::TransferDatabase, Sync::TransferType, const QString &, int)));
-            connect(session, SIGNAL(storageAccquired(const QString &, const QString &)),
-                    this, SLOT(onStorageAccquired(const QString &, const QString &)));
-            connect(session, SIGNAL(finished(const QString &, Sync::SyncStatus,
-                                             const QString &, int)),
-                    this, SLOT(onSessionFinished(const QString &, Sync::SyncStatus,
-                                                 const QString &, int)));
-            connect(session, SIGNAL(syncProgressDetail(const QString &, int)),
-                    this, SLOT(onSyncProgressDetail(const QString &, int)));
+        // Connect signals from sync session.
+        connect(session, SIGNAL(transferProgress(const QString &,
+                                                 Sync::TransferDatabase, Sync::TransferType, const QString &, int)),
+                this, SLOT(onTransferProgress(const QString &,
+                                              Sync::TransferDatabase, Sync::TransferType, const QString &, int)));
+        connect(session, SIGNAL(storageAccquired(const QString &, const QString &)),
+                this, SLOT(onStorageAccquired(const QString &, const QString &)));
+        connect(session, SIGNAL(finished(const QString &, Sync::SyncStatus,
+                                         const QString &, int)),
+                this, SLOT(onSessionFinished(const QString &, Sync::SyncStatus,
+                                             const QString &, int)));
+        connect(session, SIGNAL(syncProgressDetail(const QString &, int)),
+                this, SLOT(onSyncProgressDetail(const QString &, int)));
 
-            // Associate plug-in runner with the new session.
-            session->setPluginRunner(pluginRunner, false);
-            emit syncStatus(profile->name(), Sync::SYNC_STARTED, "", 0);
-        } else {
-            delete profile;
-            profile = 0;
-            LOG_CRITICAL("Failed to create session object");
-        }
+        // Associate plug-in runner with the new session.
+        session->setPluginRunner(pluginRunner, false);
+        emit syncStatus(profile->name(), Sync::SYNC_STARTED, "", 0);
     } else {
         LOG_WARNING("Could not resolve server, session object not created");
     }

@@ -74,7 +74,6 @@ NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
 {
     FUNCTION_CALL_TRACE;
     m_networkConfigManager = new QNetworkConfigurationManager();
-    Q_ASSERT(m_networkConfigManager);
 
     // check for network status and configuration change (switch wifi, ethernet, mobile) a
     connect(m_networkConfigManager,
@@ -152,8 +151,6 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
         QNetworkConfiguration netConfig = m_networkConfigManager->defaultConfiguration();
         m_networkSession = new QNetworkSession(netConfig);
         m_errorEmitted = false;
-
-        Q_ASSERT(m_networkSession);
 
         connect(m_networkSession, SIGNAL(error(QNetworkSession::SessionError)),
                 SLOT(slotSessionError(QNetworkSession::SessionError)));

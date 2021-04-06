@@ -53,13 +53,12 @@ SyncScheduler::SyncScheduler(QObject *aParent)
 
     // Create the alarm inventory object
     iAlarmInventory = new SyncAlarmInventory();
-    if (iAlarmInventory) {
-        connect(iAlarmInventory, SIGNAL(triggerAlarm(int)),
-                this, SLOT(doAlarmActions(int)));
-        if (!iAlarmInventory->init()) {
-            LOG_WARNING("AlarmInventory Init Failed");
-        }
+    connect(iAlarmInventory, SIGNAL(triggerAlarm(int)),
+            this, SLOT(doAlarmActions(int)));
+    if (!iAlarmInventory->init()) {
+        LOG_WARNING("AlarmInventory Init Failed");
     }
+
 #endif
 }
 

@@ -42,37 +42,37 @@ SyncClientInterfacePrivate::SyncClientInterfacePrivate(SyncClientInterface *aPar
     FUNCTION_CALL_TRACE;
     iSyncDaemon = new SyncDaemonProxy(SYNC_DBUS_SERVICE, SYNC_DBUS_OBJECT,
                                       QDBusConnection::sessionBus(), this);
-    if (iSyncDaemon) {
-        connect(iSyncDaemon, SIGNAL(signalProfileChanged(QString, int, QString)),
-                this, SLOT(slotProfileChanged(QString, int, QString)));
 
-        connect(iSyncDaemon, SIGNAL(resultsAvailable(QString, QString)), this,
-                SLOT(resultsAvailable(QString, QString)));
+    connect(iSyncDaemon, SIGNAL(signalProfileChanged(QString, int, QString)),
+            this, SLOT(slotProfileChanged(QString, int, QString)));
 
-        connect(this, SIGNAL(profileChanged(QString, int, QString)),
-                iParent, SIGNAL(profileChanged(QString, int, QString)));
+    connect(iSyncDaemon, SIGNAL(resultsAvailable(QString, QString)), this,
+            SLOT(resultsAvailable(QString, QString)));
 
-        connect(this, SIGNAL(resultsAvailable(QString, Buteo::SyncResults)),
-                iParent, SIGNAL(resultsAvailable(QString, Buteo::SyncResults)));
+    connect(this, SIGNAL(profileChanged(QString, int, QString)),
+            iParent, SIGNAL(profileChanged(QString, int, QString)));
 
-        connect (iSyncDaemon, SIGNAL(syncStatus(QString, int, QString, int)),
-                 iParent, SIGNAL(syncStatus(QString, int, QString, int)));
+    connect(this, SIGNAL(resultsAvailable(QString, Buteo::SyncResults)),
+            iParent, SIGNAL(resultsAvailable(QString, Buteo::SyncResults)));
 
-        connect(iSyncDaemon, SIGNAL(transferProgress(QString, int, int, QString, int)),
-                iParent, SIGNAL(transferProgress(QString, int, int, QString, int)));
+    connect (iSyncDaemon, SIGNAL(syncStatus(QString, int, QString, int)),
+             iParent, SIGNAL(syncStatus(QString, int, QString, int)));
 
-        connect(iSyncDaemon, SIGNAL(backupInProgress()),
-                iParent, SIGNAL(backupInProgress()));
+    connect(iSyncDaemon, SIGNAL(transferProgress(QString, int, int, QString, int)),
+            iParent, SIGNAL(transferProgress(QString, int, int, QString, int)));
 
-        connect(iSyncDaemon, SIGNAL(backupDone()),
-                iParent, SIGNAL(backupDone()));
+    connect(iSyncDaemon, SIGNAL(backupInProgress()),
+            iParent, SIGNAL(backupInProgress()));
 
-        connect(iSyncDaemon, SIGNAL(restoreInProgress()),
-                iParent, SIGNAL(restoreInProgress()));
+    connect(iSyncDaemon, SIGNAL(backupDone()),
+            iParent, SIGNAL(backupDone()));
 
-        connect(iSyncDaemon, SIGNAL(restoreDone()),
-                iParent, SIGNAL(restoreDone()));
-    }
+    connect(iSyncDaemon, SIGNAL(restoreInProgress()),
+            iParent, SIGNAL(restoreInProgress()));
+
+    connect(iSyncDaemon, SIGNAL(restoreDone()),
+            iParent, SIGNAL(restoreDone()));
+
     qRegisterMetaType<Buteo::Profile>("Buteo::Profile");
     qRegisterMetaType<Buteo::SyncResults>("Buteo::SyncResults");
 }

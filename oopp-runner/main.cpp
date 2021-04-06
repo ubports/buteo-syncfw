@@ -48,9 +48,6 @@ int main(int argc, char **argv)
     const QString pluginFilePath = args.value(3);
 
     PluginServiceObj *serviceObj = new PluginServiceObj(pluginName, profileName, pluginFilePath);
-    if (!serviceObj) {
-        LOG_FATAL("Unable to create the service adaptor object" );
-    }
 
     new ButeoPluginIfaceAdaptor(serviceObj);
 

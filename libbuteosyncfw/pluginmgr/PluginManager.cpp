@@ -264,15 +264,7 @@ ClientPlugin *PluginManager::createClient(const QString &aPluginName,
         }
 
         // Create the client plugin interface to talk to the process
-        OOPClientPlugin *plugin = new OOPClientPlugin(aPluginName, aProfile, aCbInterface, *process);
-        if (plugin) {
-            return plugin;
-        } else {
-            LOG_CRITICAL( "Could not create plugin instance" );
-            // Stop the process plugin
-            stopOOPPlugin(libraryName);
-            return NULL;
-        }
+        return new OOPClientPlugin(aPluginName, aProfile, aCbInterface, *process);
     }
 
     return NULL;
@@ -351,17 +343,10 @@ ServerPlugin *PluginManager::createServer(const QString &aPluginName,
             return NULL;
         }
 
-        OOPServerPlugin *plugin = new OOPServerPlugin(aPluginName,
-                                                      aProfile,
-                                                      aCbInterface,
-                                                      *process);
-        if (plugin) {
-            return plugin;
-        } else {
-            LOG_CRITICAL( "Could not start server plugin" );
-            stopOOPPlugin(libraryName);
-            return NULL;
-        }
+        return new OOPServerPlugin(aPluginName,
+                                   aProfile,
+                                   aCbInterface,
+                                   *process);
     }
 
     return NULL;

@@ -80,10 +80,6 @@ bool ServerPluginRunner::init()
     }
 
     iThread = new ServerThread();
-    if (iThread == 0) {
-        LOG_WARNING("Failed to create server thread");
-        return false;
-    }
 
     // Pass connectivity state change signal to the plug-in.
     connect(this, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)),

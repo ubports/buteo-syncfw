@@ -77,14 +77,9 @@ bool SyncAlarmInventory::init()
 
     // Create the iTimer object
     iTimer = new QTimer(this);
-    if (iTimer) {
-        connect(iTimer, SIGNAL(timeout()), this, SLOT(timerTriggered()));
-        currentAlarm = 0;
-        return true;
-    } else {
-        LOG_WARNING("Failed to create a QTimer");
-        return false;
-    }
+    connect(iTimer, SIGNAL(timeout()), this, SLOT(timerTriggered()));
+    currentAlarm = 0;
+    return true;
 }
 
 SyncAlarmInventory::~SyncAlarmInventory()
