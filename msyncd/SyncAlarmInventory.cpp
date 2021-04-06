@@ -90,11 +90,8 @@ SyncAlarmInventory::~SyncAlarmInventory()
     iDbHandle = QSqlDatabase();
     QSqlDatabase::removeDatabase(iConnectionName);
 
-    if (iTimer) {
-        iTimer->stop();
-        delete iTimer;
-        iTimer = 0;
-    }
+    delete iTimer;
+    iTimer = 0;
 }
 
 int SyncAlarmInventory::addAlarm(QDateTime alarmDate)

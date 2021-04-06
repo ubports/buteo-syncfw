@@ -83,10 +83,8 @@ OOPClientPlugin::OOPClientPlugin(const QString &aPluginName,
 
 OOPClientPlugin::~OOPClientPlugin()
 {
-    if (iOopPluginIface) {
-        delete iOopPluginIface;
-        iOopPluginIface = 0;
-    }
+    delete iOopPluginIface;
+    iOopPluginIface = 0;
 }
 
 bool OOPClientPlugin::init()

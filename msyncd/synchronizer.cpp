@@ -97,11 +97,8 @@ Synchronizer::Synchronizer(QCoreApplication *aApplication)
 Synchronizer::~Synchronizer()
 {
     FUNCTION_CALL_TRACE;
-    //Clearing syncUiinterface
-    if (iSyncUIInterface) {
-        delete iSyncUIInterface;
-        iSyncUIInterface = NULL;
-    }
+    delete iSyncUIInterface;
+    iSyncUIInterface = NULL;
     g_object_unref(iSettings);
     delete iBatteryInfo;
 }

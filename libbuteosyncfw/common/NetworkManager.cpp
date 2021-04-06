@@ -118,14 +118,10 @@ NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
 NetworkManager::~NetworkManager()
 {
     FUNCTION_CALL_TRACE;
-    if (m_networkSession) {
-        delete m_networkSession;
-        m_networkSession = 0;
-    }
-    if (m_networkConfigManager) {
-        delete m_networkConfigManager;
-        m_networkConfigManager = 0;
-    }
+    delete m_networkSession;
+    m_networkSession = 0;
+    delete m_networkConfigManager;
+    m_networkConfigManager = 0;
 }
 
 bool NetworkManager::isOnline()

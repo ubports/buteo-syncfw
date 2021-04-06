@@ -111,10 +111,8 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     delete synchronizer;
     synchronizer = 0;
 
-    if (sigHandler) {
-        delete sigHandler;
-        sigHandler = 0;
-    }
+    delete sigHandler;
+    sigHandler = 0;
 
     LOG_DEBUG("Stopping logger");
 

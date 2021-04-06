@@ -47,10 +47,8 @@ PluginServiceObj::PluginServiceObj(const QString &aPluginName,
 
 PluginServiceObj::~PluginServiceObj()
 {
-    if (iPlugin) {
-        delete iPlugin;
-        iPlugin = nullptr;
-    }
+    delete iPlugin;
+    iPlugin = nullptr;
 
     delete iPluginCb;
 }

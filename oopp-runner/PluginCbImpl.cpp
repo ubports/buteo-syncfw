@@ -40,11 +40,8 @@ PluginCbImpl::PluginCbImpl()
 PluginCbImpl::~PluginCbImpl()
 {
     FUNCTION_CALL_TRACE;
-
-    if (imsyncIface) {
-        delete imsyncIface;
-        imsyncIface = 0;
-    }
+    delete imsyncIface;
+    imsyncIface = 0;
 }
 
 bool PluginCbImpl::requestStorage(const QString &aStorageName,

@@ -70,10 +70,8 @@ SyncScheduler::~SyncScheduler()
     iBackgroundActivity->removeAll();
 #else
     removeAllAlarms();
-    if (iAlarmInventory) {
-        delete iAlarmInventory;
-        iAlarmInventory = 0;
-    }
+    delete iAlarmInventory;
+    iAlarmInventory = 0;
 #endif
 }
 

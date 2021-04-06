@@ -64,14 +64,10 @@ SyncSigHandler::SyncSigHandler(QObject *aParent, const char */*aName*/)
 SyncSigHandler::~SyncSigHandler()
 {
     FUNCTION_CALL_TRACE;
-    if (iSigHup) {
-        delete iSigHup;
-        iSigHup = 0;
-    }
-    if (iSigTerm) {
-        delete iSigTerm;
-        iSigTerm = 0;
-    }
+    delete iSigHup;
+    iSigHup = 0;
+    delete iSigTerm;
+    iSigTerm = 0;
 }
 
 // Linux signal handler.

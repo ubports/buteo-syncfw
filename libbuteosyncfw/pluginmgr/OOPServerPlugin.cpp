@@ -81,11 +81,8 @@ OOPServerPlugin::OOPServerPlugin(const QString &aPluginName,
 OOPServerPlugin::~OOPServerPlugin()
 {
     FUNCTION_CALL_TRACE;
-
-    if (iOopPluginIface) {
-        delete iOopPluginIface;
-        iOopPluginIface = 0;
-    }
+    delete iOopPluginIface;
+    iOopPluginIface = 0;
 }
 
 bool OOPServerPlugin::init()

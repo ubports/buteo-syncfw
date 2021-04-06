@@ -55,10 +55,8 @@ ClientPluginRunner::~ClientPluginRunner()
         iPlugin = 0;
     }
 
-    if (iThread != 0) {
-        delete iThread;
-        iThread = 0;
-    }
+    delete iThread;
+    iThread = 0;
 }
 
 bool ClientPluginRunner::init()
