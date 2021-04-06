@@ -193,7 +193,7 @@ private: // data
     QMap<QString, int> iSyncScheduleProfiles;
 
     /// Alarm factory object
-    SyncAlarmInventory      *iAlarmInventory;
+    SyncAlarmInventory *iAlarmInventory;
 
     /// IP Heartbeat management object
     IPHeartBeat *iIPHeartBeatMan;

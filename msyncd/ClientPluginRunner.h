@@ -101,11 +101,8 @@ private slots:
     void pluginTimeout();
 
 private:
-
     SyncProfile *iProfile;
-
     ClientPlugin *iPlugin;
-
     ClientThread *iThread;
 
 #ifdef SYNCFW_UNIT_TESTS

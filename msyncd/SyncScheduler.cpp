@@ -54,8 +54,8 @@ SyncScheduler::SyncScheduler(QObject *aParent)
     // Create the alarm inventory object
     iAlarmInventory = new SyncAlarmInventory();
     if (iAlarmInventory) {
-        connect ( iAlarmInventory, SIGNAL(triggerAlarm(int)),
-                  this, SLOT(doAlarmActions(int)) );
+        connect(iAlarmInventory, SIGNAL(triggerAlarm(int)),
+                this, SLOT(doAlarmActions(int)));
         if (!iAlarmInventory->init()) {
             LOG_WARNING("AlarmInventory Init Failed");
         }
@@ -293,7 +293,7 @@ void SyncScheduler::removeAlarmEvent(int aAlarmEventID)
 {
     FUNCTION_CALL_TRACE;
 
-    bool err = iAlarmInventory->removeAlarm( aAlarmEventID );
+    bool err = iAlarmInventory->removeAlarm(aAlarmEventID);
 
     if (err < false) {
         LOG_WARNING("No alarm found for ID " << aAlarmEventID);

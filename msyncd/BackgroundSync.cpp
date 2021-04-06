@@ -83,7 +83,7 @@ bool BackgroundSync::set(const QString &aProfName, int seconds)
 {
     FUNCTION_CALL_TRACE;
 
-    if ( aProfName.isEmpty())
+    if (aProfName.isEmpty())
         return false;
 
     if (iScheduledSyncs.contains(aProfName) == true) {

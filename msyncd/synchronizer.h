@@ -101,7 +101,7 @@ public:
     virtual void destroyStorage(StoragePlugin *aStorage);
 
     /// \see PluginCbInterface::isConnectivityAvailable
-    virtual bool isConnectivityAvailable( Sync::ConnectivityType aType );
+    virtual bool isConnectivityAvailable(Sync::ConnectivityType aType);
 
     /// \see PluginCbInterface::getSyncProfileByRemoteAddress
     virtual Profile *getSyncProfileByRemoteAddress(const QString &aAddress);
@@ -250,12 +250,12 @@ private slots:
      */
     void onStorageReleased();
 
-    void onTransferProgress( const QString &aProfileName,
-                             Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-                             const QString &aMimeType, int aCommittedItems );
+    void onTransferProgress(const QString &aProfileName,
+                            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                            const QString &aMimeType, int aCommittedItems);
 
-    void onSessionFinished( const QString &aProfileName,
-                            Sync::SyncStatus aStatus, const QString &aMessage, int aErrorCode );
+    void onSessionFinished(const QString &aProfileName,
+                           Sync::SyncStatus aStatus, const QString &aMessage, int aErrorCode);
 
     void onStorageAccquired(const QString &aProfileName, const QString &aMimeType);
 
@@ -351,18 +351,18 @@ private:
      *
      * @param resume, if true resume servers instead of starting them
      */
-    void startServers( bool resume = false );
+    void startServers(bool resume = false);
 
     /*! \brief Stop all server plug-ins
      *
      * @param suspend, if true suspend servers instead of stopping them
      */
-    void stopServers( bool suspend = false );
+    void stopServers(bool suspend = false);
 
     /*! \brief Helper function when backup/restore starts.
      *
      */
-    void backupRestoreStarts ();
+    void backupRestoreStarts();
 
     /*! \brief Helper function when backup/restore is done.
      *
@@ -374,7 +374,7 @@ private:
      */
     void initializeScheduler();
 
-    bool isBackupRestoreInProgress ();
+    bool isBackupRestoreInProgress();
 
     /*! \brief Requests for a cleanup from the plugin for the given profileId
      *

@@ -196,7 +196,7 @@ signals:
      * @param aProfileName Name of the profile used by the session
      * @param aMimeType Mimetype of the storage accquired.
      */
-    void storageAccquired (const QString &aProfileName, const QString &aMimeType) ;
+    void storageAccquired(const QString &aProfileName, const QString &aMimeType);
 
     /*! \brief Signal sent when the session has finished
      *
@@ -243,43 +243,26 @@ private slots:
     void onNetworkSessionError();
 
 private:
-
     SyncProfile *iProfile;
-
     PluginRunner *iPluginRunner;
-
     SyncResults iResults;
-
     Sync::SyncStatus iStatus;
-
     int iErrorCode;
-
     bool iPluginRunnerOwned;
-
     bool iScheduled;
-
     bool iAborted;
-
     bool iStarted;
-
     bool iFinished;
-
     bool iCreateProfile;
-
     QString iMessage;
-
-    QString iRemoteId ;
-
+    QString iRemoteId;
     StorageBooker *iStorageBooker;
-
     QMap<QString, bool> iStorageMap;
-
     NetworkManager *iNetworkManager;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class SyncSessionTest;
 #endif
-
 };
 
 }

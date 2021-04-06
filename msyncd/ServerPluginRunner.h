@@ -110,11 +110,8 @@ private:
     void onSessionDone();
 
     Profile *iProfile;
-
     ServerPlugin *iPlugin;
-
     ServerThread *iThread;
-
     ServerActivator *iServerActivator;
 
 #ifdef SYNCFW_UNIT_TESTS

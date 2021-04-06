@@ -51,7 +51,7 @@ public:
      * @param aDbFile Path to database to use as persistent storage
      * @return True on success, otherwise false
      */
-    bool init( const QString &aDbFile );
+    bool init(const QString &aDbFile);
 
     /*! \brief Uninitializes backend
      *
@@ -65,7 +65,7 @@ public:
      * @param aCreationTimes Creation times of the items
      * @return True on success, otherwise false
      */
-    bool getSnapshot( QList<QString> &aItems, QList<QDateTime> &aCreationTimes ) const;
+    bool getSnapshot(QList<QString> &aItems, QList<QDateTime> &aCreationTimes) const;
 
     /*! \brief Store a snapshot of item id's persistently
      *
@@ -73,7 +73,7 @@ public:
      * @param aCreationTimes Creation times of the items
      * @return True on success, otherwise false
      */
-    bool setSnapshot( const QList<QString> &aItems, const QList<QDateTime> &aCreationTimes );
+    bool setSnapshot(const QList<QString> &aItems, const QList<QDateTime> &aCreationTimes);
 
     /*! \brief Adds a deleted item to backend
      *
@@ -81,7 +81,7 @@ public:
      * @param aCreationTime Time when item was initially created
      * @param aDeleteTime Time of deletion
      */
-    void addDeletedItem( const QString &aItem, const QDateTime &aCreationTime, const QDateTime &aDeleteTime );
+    void addDeletedItem(const QString &aItem, const QDateTime &aCreationTime, const QDateTime &aDeleteTime);
 
     /*! \brief Adds deleted items to backend
      *
@@ -89,8 +89,8 @@ public:
      * @param aCreationTimes Times when the items were initially created
      * @param aDeleteTimes Times of deletion
      */
-    void addDeletedItems( const QList<QString> &aItems, const QList<QDateTime> &aCreationTimes,
-                          const QList<QDateTime> &aDeleteTimes );
+    void addDeletedItems(const QList<QString> &aItems, const QList<QDateTime> &aCreationTimes,
+                         const QList<QDateTime> &aDeleteTimes);
 
     /*! \brief Returns the deleted items after given time
      *
@@ -98,7 +98,7 @@ public:
      * @param aTime Items deleted after this time are considered deleted
      * @return True on success, otherwise false
      */
-    bool getDeletedItems( QList<QString> &aItems, const QDateTime &aTime );
+    bool getDeletedItems(QList<QString> &aItems, const QDateTime &aTime);
 
 protected:
 
@@ -116,9 +116,8 @@ protected:
 
 private:
 
-    QSqlDatabase    iDb;                ///< Database handle
-    QString         iConnectionName;    ///< Database connection ID string
-
+    QSqlDatabase iDb;           ///< Database handle
+    QString iConnectionName;    ///< Database connection ID string
 };
 
 }

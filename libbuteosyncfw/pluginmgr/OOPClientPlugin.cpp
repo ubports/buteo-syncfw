@@ -31,8 +31,8 @@ using namespace Buteo;
 OOPClientPlugin::OOPClientPlugin(const QString &aPluginName,
                                  const SyncProfile &aProfile,
                                  PluginCbInterface *aCbInterface,
-                                 QProcess &aProcess ) :
-    ClientPlugin( aPluginName, aProfile, aCbInterface ), iDone( false )
+                                 QProcess &aProcess)
+    : ClientPlugin(aPluginName, aProfile, aCbInterface), iDone(false)
 {
     FUNCTION_CALL_TRACE;
 
@@ -50,10 +50,9 @@ OOPClientPlugin::OOPClientPlugin(const QString &aPluginName,
                           .arg(profileName);
 
     // Initialise dbus for client
-    iOopPluginIface = new ButeoPluginIface( servicePath,
-                                            DBUS_SERVICE_OBJ_PATH,
-                                            QDBusConnection::sessionBus()
-                                          );
+    iOopPluginIface = new ButeoPluginIface(servicePath,
+                                           DBUS_SERVICE_OBJ_PATH,
+                                           QDBusConnection::sessionBus());
     iOopPluginIface->setTimeout(60000); // one minute.
 
     // Chain the signals received over dbus
@@ -84,7 +83,7 @@ OOPClientPlugin::OOPClientPlugin(const QString &aPluginName,
 
 OOPClientPlugin::~OOPClientPlugin()
 {
-    if ( iOopPluginIface ) {
+    if (iOopPluginIface) {
         delete iOopPluginIface;
         iOopPluginIface = 0;
     }
@@ -95,7 +94,7 @@ bool OOPClientPlugin::init()
     FUNCTION_CALL_TRACE;
     QDBusPendingReply<bool> reply = iOopPluginIface->init();
     reply.waitForFinished();
-    if ( !reply.isValid() ) {
+    if (!reply.isValid()) {
         LOG_WARNING( "Invalid reply for init from plugin" );
         return false;
     }
@@ -109,7 +108,7 @@ bool OOPClientPlugin::uninit()
 
     QDBusPendingReply<bool> reply = iOopPluginIface->uninit();
     reply.waitForFinished();
-    if ( !reply.isValid() ) {
+    if (!reply.isValid()) {
         LOG_WARNING( "Invalid reply for uninit from plugin" );
         return false;
     }
@@ -123,7 +122,7 @@ bool OOPClientPlugin::startSync()
 
     QDBusPendingReply<bool> reply = iOopPluginIface->startSync();
     reply.waitForFinished();
-    if ( !reply.isValid() ) {
+    if (!reply.isValid()) {
         LOG_WARNING( "Invalid reply for startSync from plugin" );
         return false;
     }
@@ -131,13 +130,13 @@ bool OOPClientPlugin::startSync()
     return reply.value();
 }
 
-void OOPClientPlugin::abortSync( Sync::SyncStatus aStatus )
+void OOPClientPlugin::abortSync(Sync::SyncStatus aStatus)
 {
     FUNCTION_CALL_TRACE;
 
-    QDBusPendingReply<void> reply = iOopPluginIface->abortSync( (uchar)aStatus );
+    QDBusPendingReply<void> reply = iOopPluginIface->abortSync((uchar) aStatus);
     reply.waitForFinished();
-    if ( !reply.isValid() )
+    if (!reply.isValid())
         LOG_WARNING( "Invalid reply for abortSync from plugin" );
 }
 
@@ -147,7 +146,7 @@ bool OOPClientPlugin::cleanUp()
 
     QDBusPendingReply<bool> reply = iOopPluginIface->cleanUp();
     reply.waitForFinished();
-    if ( !reply.isValid() ) {
+    if (!reply.isValid()) {
         LOG_WARNING( "Invalid reply for cleanUp from plugin" );
         return false;
     }
@@ -159,20 +158,20 @@ SyncResults OOPClientPlugin::getSyncResults() const
 {
     FUNCTION_CALL_TRACE;
 
-    SyncResults errorSyncResult( QDateTime::currentDateTime(),
-                                 SyncResults::SYNC_RESULT_INVALID,
-                                 SyncResults::SYNC_RESULT_INVALID );
+    SyncResults errorSyncResult(QDateTime::currentDateTime(),
+                                SyncResults::SYNC_RESULT_INVALID,
+                                SyncResults::SYNC_RESULT_INVALID);
     QDBusPendingReply<QString> reply = iOopPluginIface->getSyncResults();
     reply.waitForFinished();
-    if ( !reply.isValid() ) {
+    if (!reply.isValid()) {
         LOG_WARNING( "Invalid reply for getSyncResults from plugin" );
         return errorSyncResult;
     }
 
     QString resultAsXml = reply.value();
     QDomDocument doc;
-    if ( doc.setContent(resultAsXml, true) ) {
-        SyncResults syncResult( doc.documentElement() );
+    if (doc.setContent(resultAsXml, true)) {
+        SyncResults syncResult(doc.documentElement());
         return syncResult;
     } else {
         LOG_CRITICAL( "Invalid sync results returned from plugin" );
@@ -180,46 +179,45 @@ SyncResults OOPClientPlugin::getSyncResults() const
     }
 }
 
-void OOPClientPlugin::connectivityStateChanged( Sync::ConnectivityType aType,
-                                                bool aState )
+void OOPClientPlugin::connectivityStateChanged(Sync::ConnectivityType aType, bool aState)
 {
     FUNCTION_CALL_TRACE;
 
-    QDBusPendingReply<void> reply = iOopPluginIface->connectivityStateChanged( aType, aState );
+    QDBusPendingReply<void> reply = iOopPluginIface->connectivityStateChanged(aType, aState);
     reply.waitForFinished();
-    if ( !reply.isValid() )
+    if (!reply.isValid())
         LOG_WARNING( "Invalid reply for connectivityStateChanged from plugin" );
 }
 
-void OOPClientPlugin::onProcessError( QProcess::ProcessError error )
+void OOPClientPlugin::onProcessError(QProcess::ProcessError error)
 {
-    if ( !iDone ) {
-        onError( iProfile.name(),
-                 "Plugin process error:" + QString::number(error),
-                 SyncResults::PLUGIN_ERROR );
+    if (!iDone) {
+        onError(iProfile.name(),
+                "Plugin process error:" + QString::number(error),
+                SyncResults::PLUGIN_ERROR);
     }
 }
 
-void OOPClientPlugin::onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus )
+void OOPClientPlugin::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    if ( !iDone ) {
-        if ( (exitCode != 0) || (exitStatus != QProcess::NormalExit) ) {
-            onError( iProfile.name(),
-                     "Plugin process exited with error code " +
-                     QString::number(exitCode) + " and status " +
-                     QString::number(exitStatus),
-                     SyncResults::PLUGIN_ERROR );
+    if (!iDone) {
+        if ((exitCode != 0) || (exitStatus != QProcess::NormalExit)) {
+            onError(iProfile.name(),
+                    "Plugin process exited with error code " +
+                    QString::number(exitCode) + " and status " +
+                    QString::number(exitStatus),
+                    SyncResults::PLUGIN_ERROR);
         } else {
-            onError( iProfile.name(),
-                     "Plugin process exited unexpectedly",
-                     SyncResults::PLUGIN_ERROR );
+            onError(iProfile.name(),
+                    "Plugin process exited unexpectedly",
+                    SyncResults::PLUGIN_ERROR);
         }
     }
 }
 
 void OOPClientPlugin::onError(QString aProfileName, QString aMessage, int aErrorCode)
 {
-    if ( !iDone ) {
+    if (!iDone) {
         iDone = true;
         emit error(aProfileName, aMessage, aErrorCode);
     }
@@ -227,7 +225,7 @@ void OOPClientPlugin::onError(QString aProfileName, QString aMessage, int aError
 
 void OOPClientPlugin::onSuccess(QString aProfileName, QString aMessage)
 {
-    if ( !iDone ) {
+    if (!iDone) {
         iDone = true;
         emit success(aProfileName, aMessage);
     }

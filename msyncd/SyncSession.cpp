@@ -308,7 +308,7 @@ void SyncSession::onError(const QString &aProfileName, const QString &aMessage,
     emit finished(profileName(), iStatus, iMessage, iErrorCode);
 }
 
-Sync::SyncStatus SyncSession::mapToSyncStatusError( int aErrorCode )
+Sync::SyncStatus SyncSession::mapToSyncStatusError(int aErrorCode)
 {
     Sync::SyncStatus status;
     SyncResults::MinorCode code = static_cast<SyncResults::MinorCode>(aErrorCode);

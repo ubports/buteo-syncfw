@@ -51,7 +51,7 @@ public:
     virtual void destroyStorage(StoragePlugin *aStorage);
 
     /// \see PluginCbInterface::isConnectivityAvailable
-    virtual bool isConnectivityAvailable( Sync::ConnectivityType aType );
+    virtual bool isConnectivityAvailable(Sync::ConnectivityType aType);
 
     /// \see PluginCbInterface::getSyncProfileByRemoteAddress
     virtual Profile *getSyncProfileByRemoteAddress(const QString &aAddress);

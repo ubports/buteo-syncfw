@@ -137,7 +137,7 @@ SyncProfile::SyncProfile(const QDomElement &aRoot)
         while (!timeElement.isNull()) {
             bool ok = false;
             int parsedTime = timeElement.attribute(ATTR_VALUE, "-1").toUInt(&ok);
-            if ( ok && parsedTime > 0 ) {
+            if (ok && parsedTime > 0) {
                 d_ptr->iSyncRetriesInfo.addInterval(parsedTime);
             }
             timeElement = timeElement.nextSiblingElement(TAG_ATTEMPT_DELAY);

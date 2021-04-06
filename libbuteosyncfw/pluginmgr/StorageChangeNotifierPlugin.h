@@ -24,7 +24,7 @@ public:
 
     /*! \brief destructor
      */
-    virtual ~StorageChangeNotifierPlugin() {};
+    virtual ~StorageChangeNotifierPlugin() {}
 
     /*! \brief the name should be a well-known name
      * which buteo sync-fw knows about as a storage that

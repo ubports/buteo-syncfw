@@ -79,28 +79,28 @@ signals:
 
 private:
     /* Deletes the alarm from DB */
-    bool deleteAlarmFromDb( int alarmName );
+    bool deleteAlarmFromDb(int alarmName);
 
     /* Method to add an alarm to the database */
-    int addAlarmToDb( QDateTime timeStamp );
+    int addAlarmToDb(QDateTime timeStamp);
 
     /* Method to fetch the database handle */
-    QSqlDatabase  *getDbHandle();
+    QSqlDatabase *getDbHandle();
 
     /* Timer object to keep tracke of alarm timers */
-    QTimer        *iTimer;
+    QTimer *iTimer;
 
     /* Current alarm that is under work */
-    int            currentAlarm;
+    int currentAlarm;
 
     /* Number of times that the alarm triggers */
-    int            triggerCount;
+    int triggerCount;
 
     /* Database handle */
-    QSqlDatabase   iDbHandle;
+    QSqlDatabase iDbHandle;
 
     /* Database connection name */
-    QString        iConnectionName;
+    QString iConnectionName;
 
 private slots:
     /*! Slot used whenever the timer object expires */

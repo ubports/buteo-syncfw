@@ -157,7 +157,7 @@ void PluginServiceObj::abortSync(uchar aStatus)
         LOG_WARNING( "PluginServiceObj::abortSync(): called on uninitialized plugin" );
         return;
     }
-    iPlugin->abortSync( static_cast<Sync::SyncStatus>(aStatus) );
+    iPlugin->abortSync(static_cast<Sync::SyncStatus>(aStatus));
 }
 
 bool PluginServiceObj::cleanUp()
@@ -183,7 +183,7 @@ void PluginServiceObj::connectivityStateChanged(int aType, bool aState)
         LOG_WARNING( "PluginServiceObj::connectivityStateChanged(): called on uninitialized plugin" );
         return;
     }
-    iPlugin->connectivityStateChanged( static_cast<Sync::ConnectivityType>(aType), aState );
+    iPlugin->connectivityStateChanged(static_cast<Sync::ConnectivityType>(aType), aState);
 }
 
 QString PluginServiceObj::getSyncResults()

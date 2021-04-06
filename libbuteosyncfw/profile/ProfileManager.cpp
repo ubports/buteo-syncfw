@@ -913,7 +913,7 @@ bool ProfileManager::saveLog(const SyncLog &aLog)
     return true;
 }
 
-void ProfileManager::saveRemoteTargetId(Profile &aProfile, const QString &aTargetId )
+void ProfileManager::saveRemoteTargetId(Profile &aProfile, const QString &aTargetId)
 {
     FUNCTION_CALL_TRACE;
 

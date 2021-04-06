@@ -46,9 +46,9 @@ public:
      * @param aProfile Sync profile for the client
      * @param aCbInterface Pointer to the callback interface
      */
-    ClientPlugin( const QString &aPluginName,
-                  const SyncProfile &aProfile,
-                  PluginCbInterface *aCbInterface );
+    ClientPlugin(const QString &aPluginName,
+                 const SyncProfile &aProfile,
+                 PluginCbInterface *aCbInterface);
 
     /*! \brief Destructor
      *
@@ -71,12 +71,8 @@ public:
     }
 
 protected:
-
     //! Sync Profile Object that the plugin is currently operating on
     SyncProfile iProfile;
-
-private:
-
 };
 
 }

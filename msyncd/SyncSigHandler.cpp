@@ -59,7 +59,6 @@ SyncSigHandler::SyncSigHandler(QObject *aParent, const char */*aName*/)
 
     iSigTerm = new QSocketNotifier(iSigTermFd[1], QSocketNotifier::Read, this);
     connect(iSigTerm, SIGNAL(activated(int)), this, SLOT(handleSigTerm()));
-
 }
 
 SyncSigHandler::~SyncSigHandler()

@@ -329,12 +329,12 @@ QString Profile::toString() const
 bool Profile::isValid() const
 {
     // Profile name and type must be set.
-    if (d_ptr->iName.isEmpty() ) {
+    if (d_ptr->iName.isEmpty()) {
         LOG_DEBUG( "Error: Profile name is empty" );
         return false;
     }
 
-    if (d_ptr->iType.isEmpty() ) {
+    if (d_ptr->iType.isEmpty()) {
         LOG_DEBUG( "Error: Profile type is empty" );
         return false;
     }
@@ -344,7 +344,7 @@ bool Profile::isValid() const
     QList<const ProfileField *> fields = allFields();
     foreach (const ProfileField *f, fields) {
         QStringList values = keyValues(f->name());
-        if (values.isEmpty() ) {
+        if (values.isEmpty()) {
             LOG_DEBUG( "Error: Cannot find value for field" << f->name() <<
                        "for profile" << d_ptr->iName );
             return false;

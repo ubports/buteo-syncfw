@@ -282,7 +282,7 @@ signals:
      * \param aCommittedItems No. of items committed for this operation
      */
     void transferProgress(QString aProfileId, int aTransferDatabase,
-                          int aTransferType, QString aMimeType, int aCommittedItems );
+                          int aTransferType, QString aMimeType, int aCommittedItems);
 
 private:
 

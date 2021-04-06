@@ -66,18 +66,18 @@ QString BtHelper::getDefaultAdapterPath()
 {
     LOG_DEBUG ("getDefaultAdapterPath");
 
-    QDBusInterface managerInterface( BT::BLUEZ_DEST, "/",
-                                     BT::BLUEZ_MANAGER_INTERFACE,
-                                     QDBusConnection::systemBus() );
+    QDBusInterface managerInterface(BT::BLUEZ_DEST, "/",
+                                    BT::BLUEZ_MANAGER_INTERFACE,
+                                    QDBusConnection::systemBus());
 
-    if ( !managerInterface.isValid() ) {
+    if (!managerInterface.isValid()) {
         LOG_DEBUG ("Manager interface is invalid");
         return QString();
     }
 
     QDBusReply<QDBusObjectPath> pathReply = managerInterface.call(BT::GET_DEFAULT_ADAPTER);
 
-    if ( !pathReply.isValid() ) {
+    if (!pathReply.isValid()) {
         LOG_DEBUG ("Not able to get the adapter path");
         return QString();
     }
@@ -92,15 +92,15 @@ QString BtHelper::getDevicePath(QString &defaultAdapterPath)
     }
 
     QDBusInterface adapterInterface(BT::BLUEZ_DEST, defaultAdapterPath,
-                                    BT::BLUEZ_ADAPTER_INTERFACE, QDBusConnection::systemBus() );
-    if ( !adapterInterface.isValid() ) {
+                                    BT::BLUEZ_ADAPTER_INTERFACE, QDBusConnection::systemBus());
+    if (!adapterInterface.isValid()) {
         LOG_DEBUG ( "Adapter interface is invalid");
         return QString();
     }
 
-    QDBusReply<QDBusObjectPath> pathReply = adapterInterface.call(BT::FIND_DEVICE, m_deviceAddress );
+    QDBusReply<QDBusObjectPath> pathReply = adapterInterface.call(BT::FIND_DEVICE, m_deviceAddress);
 
-    if ( !pathReply.isValid() ) {
+    if (!pathReply.isValid()) {
         LOG_DEBUG ( "Not able to find the BT device");
         return QString();
     }
@@ -121,8 +121,8 @@ bool BtHelper::getServiceRecords(QList<QString> &servicesList)
 
     QDBusInterface deviceInterface(BT::BLUEZ_DEST, devicePath,
                                    BT::BLUEZ_DEVICE_INTERFACE,
-                                   QDBusConnection::systemBus() );
-    if ( deviceInterface.isValid() == false ) {
+                                   QDBusConnection::systemBus());
+    if (deviceInterface.isValid() == false) {
         LOG_DEBUG ("Device interface is not valid");
         return false;
     }
@@ -152,8 +152,8 @@ QMap<QString, QVariant> BtHelper::getDeviceProperties()
 
     QDBusInterface deviceInterface(BT::BLUEZ_DEST, devicePath,
                                    BT::BLUEZ_DEVICE_INTERFACE,
-                                   QDBusConnection::systemBus() );
-    if ( deviceInterface.isValid() == false ) {
+                                   QDBusConnection::systemBus());
+    if (deviceInterface.isValid() == false) {
         LOG_DEBUG ("Device interface is not valid");
         return mapVal;
     }

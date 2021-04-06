@@ -63,7 +63,6 @@ public:
 
     /*! \brief Returns the type of connection used by the device.
      *
-
      * @return Sync::InternetConnectionType the type of connection.
      */
     Sync::InternetConnectionType connectionType() const;
@@ -82,38 +81,35 @@ public:
     void connectSession(bool connectInBackground = false);
 
     /*! \brief Disconnects an open session
-     *
      */
     void disconnectSession();
+
 signals:
-    /*! \brief This signal is emitted when the device's online status
-     * changes
+    /*! \brief This signal is emitted when the device's online status changes
      *
      * @param aConnected If true, the device is online
      */
     void statusChanged(bool aConnected, Sync::InternetConnectionType aType);
 
-    /*! \brief This signal is emitted when a network session gets
-     * connected
-     *
+    /*! \brief This signal is emitted when a network session gets connected
      */
     void connectionSuccess();
 
-    /*! \brief This signal is emitted when opening a network session
-     * fails
-     *
+    /*! \brief This signal is emitted when opening a network session fails
      */
     void connectionError();
+
 private:
-    QNetworkConfigurationManager    *m_networkConfigManager;    // QT network configuration manager
-    QNetworkSession                 *m_networkSession;          // QT network session
-    static bool                     m_isSessionActive;          // Flag to indicate if a network session is active
-    bool                            m_isOnline;                 // Flag to indicate if the device is online
-    static int                      m_refCount;                 // Reference counter for number of open connections
-    bool                            m_errorEmitted;             // Network error emited flag
-    QTimer                          *m_sessionTimer;
-    Sync::InternetConnectionType    m_connectionType;
-    QTimer                          m_idleRefreshTimer;
+    static bool m_isSessionActive;
+    static int m_refCount; // Reference counter for number of open connections
+
+    QNetworkConfigurationManager *m_networkConfigManager;
+    QNetworkSession *m_networkSession;
+    bool m_isOnline;
+    bool m_errorEmitted;
+    QTimer *m_sessionTimer;
+    Sync::InternetConnectionType m_connectionType;
+    QTimer  m_idleRefreshTimer;
 
 private slots:
     void slotSessionState(QNetworkSession::State status);

@@ -147,25 +147,16 @@ private:
 
     static Logger *sInstance;
 
-    QBitArray   iEnabledLevels;
-
-    int         iIndentLevel;
-
-    int         iIndentSize;
-
-    QFile       iFile;
-
+    QBitArray iEnabledLevels;
+    int iIndentLevel;
+    int iIndentSize;
+    QFile iFile;
     QTextStream *iFileStream;
-
     QTextStream *iStdOutStream;
-
     QTextStream *iStdErrStream;
-
-    QMutex      iMutex;
-
-    bool        iEnabled;
-
-    int         iLogLevel;
+    QMutex iMutex;
+    bool iEnabled;
+    int iLogLevel;
 };
 
 }

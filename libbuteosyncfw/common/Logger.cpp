@@ -187,7 +187,7 @@ void Logger::write(int aLevel, const char *aMsg)
     QMutexLocker lock(&iMutex);
 
     // Verify that the log message can and should be written.
-    if (aLevel < QtDebugMsg || aLevel > QtFatalMsg ) {
+    if (aLevel < QtDebugMsg || aLevel > QtFatalMsg) {
         return;
     }
 

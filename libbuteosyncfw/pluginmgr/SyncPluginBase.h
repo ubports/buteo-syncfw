@@ -53,9 +53,9 @@ public:
      * @param aProfileName Profile name
      * @param aCbInterface Pointer to the callback interface
      */
-    SyncPluginBase( const QString &aPluginName,
-                    const QString &aProfileName,
-                    PluginCbInterface *aCbInterface );
+    SyncPluginBase(const QString &aPluginName,
+                   const QString &aProfileName,
+                   PluginCbInterface *aCbInterface);
 
     /*! \brief Returns the name of this plugin
      *
@@ -126,8 +126,8 @@ signals:
      * @param aMimeType Mime type of the processed item
      * @param aCommittedItems No. of items committed for this operation
      */
-    void transferProgress( const QString &aProfileName, Sync::TransferDatabase aDatabase,
-                           Sync::TransferType aType, const QString &aMimeType, int aCommittedItems );
+    void transferProgress(const QString &aProfileName, Sync::TransferDatabase aDatabase,
+                          Sync::TransferType aType, const QString &aMimeType, int aCommittedItems);
 
     /*! \brief Emitted when error has occurred in synchronization and it
      *         cannot be continued.
@@ -136,27 +136,27 @@ signals:
      * @param aMessage Message data related to error event
      * @param aErrorCode Error code
      */
-    void error( const QString &aProfileName, const QString &aMessage, int aErrorCode );
+    void error(const QString &aProfileName, const QString &aMessage, int aErrorCode);
 
     /*! \brief Emitted when synchronization has been finished successfully.
      *
      * @param aProfileName Name of the profile being synchronized
      * @param aMessage Message data related to finish event
      */
-    void success( const QString &aProfileName, const QString &aMessage );
+    void success(const QString &aProfileName, const QString &aMessage);
 
     /*! \brief Emitted when a storage is requested and accquired.
      *
      * @param aMimeType Mime type of the processed item
      */
-    void accquiredStorage( const QString &aMimeType );
+    void accquiredStorage(const QString &aMimeType);
 
     /*! \brief Emitted during Sync Progress to indicate the detail of the current ongoing sync
      *
      * @param aProfileName Profile Name
      * @param aProgressDetail Progress in Detail \see Sync::SyncProgressDetail
      */
-    void syncProgressDetail( const QString &aProfileName, int aProgressDetail);
+    void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
 
 public slots:
 
@@ -166,10 +166,9 @@ public slots:
      * @param aType Connectivity domain
      * @param aState True if connectivity domain is now available, otherwise false
      */
-    virtual void connectivityStateChanged( Sync::ConnectivityType aType, bool aState ) = 0;
+    virtual void connectivityStateChanged(Sync::ConnectivityType aType, bool aState) = 0;
 
 protected:
-
     //! Pointer to synchronizer
     PluginCbInterface  *iCbInterface;
 
@@ -183,11 +182,10 @@ protected:
 
     QMap<QString, ReceivedItemDetails> receivedItems;
 
-    ButeoPluginIface     *iOopPluginIface;
+    ButeoPluginIface *iOopPluginIface;
+
 private:
-
     QString iPluginName;
-
     QString iProfileName;
 };
 

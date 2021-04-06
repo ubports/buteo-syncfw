@@ -73,7 +73,7 @@ private:
     QMceBatteryStatus iBatteryStatus;
 };
 
-Synchronizer::Synchronizer( QCoreApplication *aApplication )
+Synchronizer::Synchronizer(QCoreApplication *aApplication)
     :   iNetworkManager(0),
         iSyncScheduler(0),
         iSyncBackup(0),
@@ -467,11 +467,11 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         LOG_WARNING( "Profile is not valid" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error", Buteo::SyncResults::INTERNAL_ERROR);
-    } else if ( aScheduled && iBatteryInfo->isLowPower() ) {
+    } else if (aScheduled && iBatteryInfo->isLowPower()) {
         LOG_WARNING( "Low power, scheduled sync for profile" << aProfileName << "aborted" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::LOW_BATTERY_POWER);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Low battery", Buteo::SyncResults::LOW_BATTERY_POWER);
-    } else if ( aScheduled && iBatteryInfo->inPowerSaveMode() ) {
+    } else if (aScheduled && iBatteryInfo->inPowerSaveMode()) {
         LOG_WARNING( "Power save mode active, scheduled sync for profile" << aProfileName << "aborted" );
         session->setFailureResult(SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::POWER_SAVING_MODE);
         emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Power Save Mode active", Buteo::SyncResults::POWER_SAVING_MODE);
@@ -493,7 +493,7 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
     }
 
     if (!success) {
-        cleanupSession(session, Sync::SYNC_ERROR );
+        cleanupSession(session, Sync::SYNC_ERROR);
     } // no else
 
     return success;
@@ -780,7 +780,7 @@ void Synchronizer::cleanupSession(SyncSession *aSession, Sync::SyncStatus aStatu
             // UI needs to know that Sync Log has been updated.
             emit resultsAvailable(profileName, aSession->results().toString());
 
-            if ( aSession->isScheduled() ) {
+            if (aSession->isScheduled()) {
                 reschedule(profileName);
                 emit signalProfileChanged(profileName, 1, QString());
             } // no else
@@ -824,7 +824,7 @@ bool Synchronizer::cleanupProfile(const QString &aProfileId)
 
         bool client = true ;
         Profile *subProfile = profile->clientProfile(); // client or server
-        if ( !subProfile) {
+        if (!subProfile) {
             LOG_WARNING( "Could not find client sub-profile" );
             subProfile = profile->serverProfile ();
             client = false;
@@ -983,9 +983,9 @@ void Synchronizer::onStorageReleased()
     }
 }
 
-void Synchronizer::onTransferProgress( const QString &aProfileName,
-                                       Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-                                       const QString &aMimeType, int aCommittedItems )
+void Synchronizer::onTransferProgress(const QString &aProfileName,
+                                      Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                                      const QString &aMimeType, int aCommittedItems)
 {
     FUNCTION_CALL_TRACE;
 
@@ -995,12 +995,12 @@ void Synchronizer::onTransferProgress( const QString &aProfileName,
     LOG_DEBUG( "Transfer type:" << aType );
     LOG_DEBUG( "Mime type:" << aMimeType );
 
-    emit transferProgress( aProfileName, aDatabase, aType, aMimeType, aCommittedItems );
+    emit transferProgress(aProfileName, aDatabase, aType, aMimeType, aCommittedItems);
 
 }
 
-void Synchronizer::onStorageAccquired ( const QString &aProfileName,
-                                        const QString &aMimeType )
+void Synchronizer::onStorageAccquired(const QString &aProfileName,
+                                      const QString &aMimeType)
 {
     FUNCTION_CALL_TRACE;
     LOG_DEBUG( "Mime type:" << aMimeType );
@@ -1092,7 +1092,7 @@ void Synchronizer::destroyStorage(StoragePlugin *aStorage)
     iPluginManager.destroyStorage(aStorage);
 }
 
-bool Synchronizer::isConnectivityAvailable( Sync::ConnectivityType aType )
+bool Synchronizer::isConnectivityAvailable(Sync::ConnectivityType aType)
 {
     FUNCTION_CALL_TRACE;
 
@@ -1103,14 +1103,14 @@ bool Synchronizer::isConnectivityAvailable( Sync::ConnectivityType aType )
     }
 }
 
-void Synchronizer::startServers( bool resume )
+void Synchronizer::startServers(bool resume)
 {
     FUNCTION_CALL_TRACE;
 
     LOG_DEBUG( "Starting/Resuming server plug-ins" );
 
     if (iServerActivator != 0) {
-        if ( false == resume ) {
+        if (false == resume) {
             connect(iServerActivator, SIGNAL(serverEnabled(const QString &)),
                     this, SLOT(startServer(const QString &)), Qt::QueuedConnection);
 
@@ -1120,11 +1120,11 @@ void Synchronizer::startServers( bool resume )
 
         QStringList enabledServers = iServerActivator->enabledServers();
         foreach (QString server, enabledServers) {
-            if ( false == resume ) {
+            if (false == resume) {
                 startServer(server);
             } else {
                 ServerPluginRunner *pluginRunner = iServers[server];
-                if ( pluginRunner ) {
+                if (pluginRunner) {
                     pluginRunner->resume();
                 }
             }
@@ -1134,23 +1134,23 @@ void Synchronizer::startServers( bool resume )
     }
 }
 
-void Synchronizer::stopServers( bool suspend )
+void Synchronizer::stopServers(bool suspend)
 {
     FUNCTION_CALL_TRACE;
 
     LOG_DEBUG( "Stopping/Suspending all server plug-ins" );
 
-    if ( false == suspend ) {
+    if (false == suspend) {
         iServerActivator->disconnect();
     }
 
     QStringList activeServers = iServers.keys();
     foreach (QString server, activeServers) {
-        if ( false == suspend ) {
+        if (false == suspend) {
             stopServer(server);
         } else {
             ServerPluginRunner *pluginRunner = iServers[server];
-            if ( pluginRunner ) {
+            if (pluginRunner) {
                 pluginRunner->suspend();
             }
         }
@@ -1170,7 +1170,7 @@ void Synchronizer::startServer(const QString &aProfileName)
         return;
     }
     Profile *serverProfile = iProfileManager.profile(
-                                 aProfileName, Profile::TYPE_SERVER );
+                                 aProfileName, Profile::TYPE_SERVER);
 
     if (!serverProfile) {
         // @todo: for now, do not enforce server plug-ins to have an XML profile
@@ -1179,10 +1179,10 @@ void Synchronizer::startServer(const QString &aProfileName)
         ProfileFactory pf;
         serverProfile = pf.createProfile(aProfileName, Profile::TYPE_SERVER);
     } else {
-        iProfileManager.expand( *serverProfile );
+        iProfileManager.expand(*serverProfile);
     }
 
-    if ( !serverProfile || !serverProfile->isValid() ) {
+    if (!serverProfile || !serverProfile->isValid()) {
         LOG_WARNING( "Profile not found or not valid:"  << aProfileName );
         delete serverProfile;
         serverProfile = 0;
@@ -1219,7 +1219,7 @@ void Synchronizer::startServer(const QString &aProfileName)
 
 }
 
-void Synchronizer::stopServer( const QString &aProfileName )
+void Synchronizer::stopServer(const QString &aProfileName)
 {
     FUNCTION_CALL_TRACE;
 
@@ -1227,7 +1227,7 @@ void Synchronizer::stopServer( const QString &aProfileName )
 
     if (iServers.contains(aProfileName)) {
         ServerPluginRunner *pluginRunner = iServers[aProfileName];
-        if ( pluginRunner ) {
+        if (pluginRunner) {
             pluginRunner->stop();
         }
         LOG_DEBUG("Deleting server");
@@ -1548,7 +1548,7 @@ void Synchronizer::removeScheduledSync(const QString &aProfileName)
     }
 }
 
-bool Synchronizer::isBackupRestoreInProgress ()
+bool Synchronizer::isBackupRestoreInProgress()
 {
     FUNCTION_CALL_TRACE;
 
@@ -1562,7 +1562,7 @@ bool Synchronizer::isBackupRestoreInProgress ()
 
 }
 
-void Synchronizer::backupRestoreStarts ()
+void Synchronizer::backupRestoreStarts()
 {
     LOG_DEBUG ("Synchronizer:backupRestoreStarts:");
 
@@ -1570,7 +1570,7 @@ void Synchronizer::backupRestoreStarts ()
     // No active sessions currently !!
     if (iActiveSessions.size() == 0) {
         LOG_DEBUG ("No active sync sessions ");
-        stopServers( true );
+        stopServers(true);
         iSyncBackup->sendReply(0);
     } else {
         // Stop running sessions
@@ -1598,8 +1598,8 @@ void Synchronizer::backupRestoreStarts ()
 void Synchronizer::backupRestoreFinished()
 {
     LOG_DEBUG ("Synchronizer::backupFinished");
-    iClosing =  false;
-    startServers( true );
+    iClosing = false;
+    startServers(true);
     initializeScheduler();
     iSyncBackup->sendReply(0);
 }

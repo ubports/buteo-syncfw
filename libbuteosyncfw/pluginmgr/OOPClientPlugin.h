@@ -32,23 +32,18 @@ class OOPClientPlugin : public ClientPlugin
     Q_OBJECT
 
 public:
-    OOPClientPlugin( const QString &aPluginName,
-                     const Buteo::SyncProfile &aProfile,
-                     Buteo::PluginCbInterface *aCbInterface,
-                     QProcess &aProcess);
+    OOPClientPlugin(const QString &aPluginName,
+                    const Buteo::SyncProfile &aProfile,
+                    Buteo::PluginCbInterface *aCbInterface,
+                    QProcess &aProcess);
 
     virtual ~OOPClientPlugin();
 
     virtual bool init();
-
     virtual bool uninit();
-
     virtual bool startSync();
-
     virtual void abortSync(Sync::SyncStatus aStatus = Sync::SYNC_ABORTED);
-
     virtual Buteo::SyncResults getSyncResults() const;
-
     virtual bool cleanUp();
 
 public slots:

@@ -86,7 +86,7 @@ public:
      * @param aType Type of connectivity domain
      * @return True if connectivity domain is available, otherwise false
      */
-    virtual bool isConnectivityAvailable( Sync::ConnectivityType aType ) = 0;
+    virtual bool isConnectivityAvailable(Sync::ConnectivityType aType) = 0;
 
     /*! \brief tries to fetch a profile object based on the remote party's
      * address (BT address for eg)

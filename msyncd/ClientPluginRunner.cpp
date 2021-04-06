@@ -125,7 +125,7 @@ bool ClientPluginRunner::start()
     bool rv = false;
     if (iInitialized && iThread != 0) {
         // Set a timer after which the sync session should stop
-        QTimer::singleShot( MAX_PLUGIN_SYNC_TIME, this, SLOT(pluginTimeout()) );
+        QTimer::singleShot(MAX_PLUGIN_SYNC_TIME, this, SLOT(pluginTimeout()));
         rv = iThread->startThread(iPlugin);
         LOG_DEBUG("ClientPluginRunner started thread for plugin:" << iPlugin->getProfileName() << ", returning:" << rv);
     }
@@ -209,7 +209,7 @@ void ClientPluginRunner::onSuccess(const QString &aProfileName,
 
 }
 
-void ClientPluginRunner::onStorageAccquired(const QString &aMimeType )
+void ClientPluginRunner::onStorageAccquired(const QString &aMimeType)
 {
     FUNCTION_CALL_TRACE;
 

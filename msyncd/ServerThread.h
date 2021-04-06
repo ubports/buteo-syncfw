@@ -66,7 +66,7 @@ public:
      *  and must not be deleted while the thread is running.
      * @return True on success, otherwise false
      */
-    bool startThread( ServerPlugin *aServerPlugin );
+    bool startThread( ServerPlugin *aServerPlugin);
 
     /*! \brief Stops server thread
      *
@@ -82,8 +82,8 @@ signals:
      * @param aMessage Message data related to error event
      * @param aErrorCode Error code
      */
-    void initError( const QString &aProfileName, const QString &aMessage,
-                    int aErrorCode);
+    void initError(const QString &aProfileName, const QString &aMessage,
+                   int aErrorCode);
 
 protected:
 
@@ -91,11 +91,8 @@ protected:
     virtual void run();
 
 private:
-
     ServerPlugin *iServerPlugin;
-
     bool iRunning;
-
     mutable QMutex iMutex;
 
 #ifdef SYNCFW_UNIT_TESTS

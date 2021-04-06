@@ -38,16 +38,15 @@ class ServerPlugin : public SyncPluginBase
     Q_OBJECT
 
 public:
-
     /*! \brief Constructor
      *
      * @param aPluginName Name of this plugin
      * @param aProfile Server profile
      * @param aCbInterface Pointer to the callback interface
      */
-    ServerPlugin( const QString &aPluginName,
-                  const Profile &aProfile,
-                  PluginCbInterface *aCbInterface );
+    ServerPlugin(const QString &aPluginName,
+                 const Profile &aProfile,
+                 PluginCbInterface *aCbInterface);
 
     /*! \brief Destructor
      *
@@ -88,7 +87,6 @@ signals:
     void newSession(const QString &aDestination);
 
 protected:
-
     //! Profile Object that the server plugin operates on
     Profile iProfile;
 };

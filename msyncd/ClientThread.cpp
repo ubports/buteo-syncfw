@@ -28,7 +28,7 @@
 using namespace Buteo;
 
 ClientThread::ClientThread()
-    : iClientPlugin( 0 ),
+    : iClientPlugin(0),
       iIdentity(NULL),
       iService(NULL),
       iSession(NULL),
@@ -65,7 +65,7 @@ ClientPlugin *ClientThread::getPlugin() const
     return iClientPlugin;
 }
 
-bool ClientThread::startThread( ClientPlugin *aClientPlugin )
+bool ClientThread::startThread(ClientPlugin *aClientPlugin)
 {
     FUNCTION_CALL_TRACE;
 
@@ -74,7 +74,7 @@ bool ClientThread::startThread( ClientPlugin *aClientPlugin )
 
     {
         QMutexLocker locker(&iMutex);
-        if ( iRunning ) {
+        if (iRunning) {
             return false;
         } else {
             iRunning = true;
@@ -103,7 +103,7 @@ bool ClientThread::startThread( ClientPlugin *aClientPlugin )
         iService->queryIdentities();
     } else {
         // Move to client thread
-        iClientPlugin->moveToThread( this );
+        iClientPlugin->moveToThread(this);
         start();
     }
 
@@ -120,15 +120,15 @@ void ClientThread::run()
 {
     FUNCTION_CALL_TRACE;
 
-    if ( !iClientPlugin->init() ) {
+    if (!iClientPlugin->init()) {
         LOG_WARNING( "Could not initialize client plugin:" << iClientPlugin->getPluginName() );
-        emit initError( getProfileName(), "", 0 );
+        emit initError(getProfileName(), "", 0);
         return;
     }
 
-    if ( !iClientPlugin->startSync() ) {
+    if (!iClientPlugin->startSync()) {
         LOG_WARNING( "Could not start client plugin:" << iClientPlugin->getPluginName() );
-        emit initError( getProfileName(), "", 0 );
+        emit initError(getProfileName(), "", 0);
         return;
     }
 
@@ -139,7 +139,7 @@ void ClientThread::run()
     iClientPlugin->uninit();
 
     // Move back to application thread
-    iClientPlugin->moveToThread( QCoreApplication::instance()->thread() );
+    iClientPlugin->moveToThread(QCoreApplication::instance()->thread());
 
     {
         QMutexLocker locker(&iMutex);
@@ -176,7 +176,7 @@ void ClientThread::identities(const QList<SignOn::IdentityInfo> &identityList)
             return;
         }
     }
-    emit initError( getProfileName(), "credentials not found in SSO", 0 );
+    emit initError(getProfileName(), "credentials not found in SSO", 0);
 }
 
 void ClientThread::identityResponse(const SignOn::SessionData &sessionData)
@@ -190,7 +190,7 @@ void ClientThread::identityResponse(const SignOn::SessionData &sessionData)
     profile.setKey("Password", sessionData.Secret());
 
     // delayed starting of thread
-    iClientPlugin->moveToThread( this );
+    iClientPlugin->moveToThread(this);
     start();
 }
 
@@ -198,6 +198,6 @@ void ClientThread::identityError(SignOn::Error err)
 {
     FUNCTION_CALL_TRACE;
 
-    emit initError( getProfileName(), err.message(), 0 );
+    emit initError(getProfileName(), err.message(), 0);
 }
 

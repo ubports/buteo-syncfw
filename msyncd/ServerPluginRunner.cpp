@@ -244,7 +244,7 @@ void ServerPluginRunner::onSuccess(const QString &aProfileName,
     onSessionDone();
 }
 
-void ServerPluginRunner::onStorageAccquired(const QString &aMimeType )
+void ServerPluginRunner::onStorageAccquired(const QString &aMimeType)
 {
     FUNCTION_CALL_TRACE;
 

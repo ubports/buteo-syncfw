@@ -38,7 +38,7 @@
 #include "SyncSigHandler.h"
 #include "SyncCommonDefs.h"
 
-Q_DECL_EXPORT int main( int argc, char *argv[] )
+Q_DECL_EXPORT int main(int argc, char *argv[])
 {
     // remove this later on if not needed in harmattan,
     // this IS needed for fremantle
@@ -61,7 +61,7 @@ Q_DECL_EXPORT int main( int argc, char *argv[] )
         LOG_FATAL("Failed to create synchronizer");
     }
 
-    if (!synchronizer->initialize() ) {
+    if (!synchronizer->initialize()) {
         delete synchronizer;
         synchronizer = 0;
         return -1;

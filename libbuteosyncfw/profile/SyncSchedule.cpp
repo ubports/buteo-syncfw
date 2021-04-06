@@ -458,7 +458,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
     } // no else
 
     //For safer side checking nextSyncTime should not be behind currentDateTime.
-    if ( QDateTime::currentDateTime().secsTo(nextSync) < 0 ) {
+    if (QDateTime::currentDateTime().secsTo(nextSync) < 0) {
         //If it is the case making it to currentTime.
         LOG_WARNING("Something went wrong in nextSyncTime calculation resetting to current time");
         nextSync = QDateTime::currentDateTime();
