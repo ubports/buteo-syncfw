@@ -33,7 +33,7 @@
 namespace Buteo {
 
 class ClientPlugin;
-    
+
 /*! \brief Thread for client plugins
  *
  */
@@ -62,7 +62,7 @@ public:
      *
      * @return Plugin
      */
-    ClientPlugin* getPlugin() const;
+    ClientPlugin *getPlugin() const;
 
     /*! \brief Starts client thread
      *
@@ -70,7 +70,7 @@ public:
      *  and must not be deleted while the thread is running.
      * @return True on success, otherwise false
      */
-    bool startThread( ClientPlugin* aClientPlugin );
+    bool startThread( ClientPlugin *aClientPlugin );
 
     /*! \brief Stops client thread
      *
@@ -92,7 +92,7 @@ signals:
      * @param aErrorCode Error code
      */
     void initError( const QString &aProfileName, const QString &aMessage,
-        int aErrorCode);
+                    int aErrorCode);
 
 protected:
     /*! \brief overriding method for QThread::run
@@ -101,15 +101,15 @@ protected:
 
 private:
 
-    ClientPlugin*   iClientPlugin;
+    ClientPlugin   *iClientPlugin;
 
     SyncResults iSyncResults;
-    
+
     SignOn::Identity *iIdentity;
     SignOn::AuthService *iService;
     SignOn::AuthSession *iSession;
     QString iProvider;
-    
+
     bool iRunning;
 
     mutable QMutex iMutex;

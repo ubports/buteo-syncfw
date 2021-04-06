@@ -33,7 +33,7 @@
 #include "PluginRunner.h"
 
 namespace Buteo {
-    
+
 class SyncSession;
 class SyncSessionPluginRunnerTest;
 
@@ -84,7 +84,7 @@ public slots:
 
 public:
     SyncSessionPluginRunnerTest(const QString &aPluginName,
-                                 PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf);
+                                PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf);
 
 private:
     PluginRunner *iPluginRunner;

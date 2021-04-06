@@ -30,8 +30,8 @@ using namespace Buteo;
 
 static const QString SCHEDULE_XML =
     "<schedule time=\"12:34:56\" interval=\"30\" days=\"1,2,3,4,5,6\">"
-        "<rush enabled=\"true\" interval=\"15\""
-            "begin=\"08:00:00\" end=\"16:00:00\" days=\"1,4,5\"/>"
+    "<rush enabled=\"true\" interval=\"15\""
+    "begin=\"08:00:00\" end=\"16:00:00\" days=\"1,4,5\"/>"
     "</schedule>";
 
 void SyncScheduleTest::testConstruction()
@@ -115,7 +115,7 @@ void SyncScheduleTest::testProperties()
 void SyncScheduleTest::testNextSyncTime()
 {
     QEXPECT_FAIL("", "Implementation of SyncSchedule has changed so that it _currently_ does not "
-        "allow to use the approach originally used by this test case", Abort);
+                 "allow to use the approach originally used by this test case", Abort);
     QVERIFY(false);
 
     const unsigned INTERVAL = 30;

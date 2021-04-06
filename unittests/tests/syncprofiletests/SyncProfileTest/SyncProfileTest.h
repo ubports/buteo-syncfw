@@ -26,7 +26,7 @@
 #include <QtTest/QtTest>
 
 namespace Buteo {
-    
+
 class SyncProfileTest: public QObject
 {
     Q_OBJECT

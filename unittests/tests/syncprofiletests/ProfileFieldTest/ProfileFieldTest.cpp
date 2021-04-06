@@ -30,9 +30,9 @@ using namespace Buteo;
 
 static const QString FIELD_XML =
     "<field name=\"Notebook Name\" type=\"combo\" default=\"myNotebook\" "
-        "label=\"Notebook\" visible=\"user\" readonly=\"true\">"
-        "<option>myNotebook</option>"
-        "<option>otherNotebook</option>"
+    "label=\"Notebook\" visible=\"user\" readonly=\"true\">"
+    "<option>myNotebook</option>"
+    "<option>otherNotebook</option>"
     "</field>";
 
 void ProfileFieldTest::testField()

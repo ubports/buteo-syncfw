@@ -32,42 +32,42 @@ StorageItem::~StorageItem()
 {
 }
 
-void StorageItem::setId( const QString& aId )
+void StorageItem::setId( const QString &aId )
 {
     iId = aId;
 }
 
-const QString& StorageItem::getId() const
+const QString &StorageItem::getId() const
 {
     return iId;
 }
 
-void StorageItem::setParentId( const QString& aParentId )
+void StorageItem::setParentId( const QString &aParentId )
 {
     iParentId = aParentId;
 }
 
-const QString& StorageItem::getParentId() const
+const QString &StorageItem::getParentId() const
 {
     return iParentId;
 }
 
-void StorageItem::setType( const QString& aType )
+void StorageItem::setType( const QString &aType )
 {
     iType = aType;
 }
 
-const QString& StorageItem::getType() const
+const QString &StorageItem::getType() const
 {
     return iType;
 }
 
-void StorageItem::setVersion( const QString& aVersion )
+void StorageItem::setVersion( const QString &aVersion )
 {
     iVersion = aVersion;
 }
 
-const QString& StorageItem::getVersion() const
+const QString &StorageItem::getVersion() const
 {
     return iVersion;
 }

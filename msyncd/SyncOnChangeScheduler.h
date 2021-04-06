@@ -7,8 +7,7 @@
 
 #include "SyncScheduler.h"
 
-namespace Buteo
-{
+namespace Buteo {
 
 class SyncProfile;
 
@@ -44,7 +43,7 @@ public:
      * @param aProfile pointer to sync profile
      * @return true if SOC could be scheduled, false otherwise
      */
-    bool addProfile(const SyncProfile* aProfile);
+    bool addProfile(const SyncProfile *aProfile);
 
     /*! \brief call this method to disable SOC that has been scheduled
      * for a certain profile
@@ -59,11 +58,11 @@ private Q_SLOTS:
      *
      * @param aProfile sync profile
      */
-    void sync(const SyncProfile* aProfile);
+    void sync(const SyncProfile *aProfile);
 
 private:
     QStringList iSOCProfileNames;
-    QMap<QString, QObject*> iSOCTimers;
+    QMap<QString, QObject *> iSOCTimers;
 };
 
 class SyncOnChangeTimer : public QObject
@@ -73,7 +72,7 @@ class SyncOnChangeTimer : public QObject
 public:
     /*! \brief constructor
      */
-    SyncOnChangeTimer(const SyncProfile* aProfile, const quint32& aTimeout);
+    SyncOnChangeTimer(const SyncProfile *aProfile, const quint32 &aTimeout);
 
     /*! \brief destructor
      */
@@ -88,7 +87,7 @@ Q_SIGNALS:
      *
      * @param aProfile sync profile
      */
-    void timeout(const SyncProfile* aProfile);
+    void timeout(const SyncProfile *aProfile);
 
 private Q_SLOTS:
     /*! \brief slot corresponding to timeout
@@ -96,7 +95,7 @@ private Q_SLOTS:
     void onTimeout();
 
 private:
-    const SyncProfile* iSyncProfile;
+    const SyncProfile *iSyncProfile;
     quint32 iTimeout;
 };
 

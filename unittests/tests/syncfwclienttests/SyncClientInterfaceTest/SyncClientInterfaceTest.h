@@ -33,25 +33,25 @@ class SyncProfile;
 
 class SyncClientInterfaceTest: public QObject
 {
-	Q_OBJECT
-	private slots:
-	void initTestCase();
-	void cleanupTestCase();
+    Q_OBJECT
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
 
-	void testIsValid();
-	void testAddProfile();
+    void testIsValid();
+    void testAddProfile();
 
-	void testStartSync();
-	void testAbortSync();
-	void testGetRunningSyncList();
-	void testSetSyncSchedule();
-	void testUpdateProfile();
-	void testRemoveProfile();
+    void testStartSync();
+    void testAbortSync();
+    void testGetRunningSyncList();
+    void testSetSyncSchedule();
+    void testUpdateProfile();
+    void testRemoveProfile();
 
-	private:
-	Buteo::SyncClientInterface *iInterface;
-	Synchronizer  *iSync;
-	SyncProfile *iProfile;
+private:
+    Buteo::SyncClientInterface *iInterface;
+    Synchronizer  *iSync;
+    SyncProfile *iProfile;
 };
 
 }

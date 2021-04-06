@@ -34,49 +34,49 @@
 #include "Profile.h"
 
 namespace Buteo {
-    
+
 class ServerPluginDerived: public ServerPlugin
 {
-	Q_OBJECT
+    Q_OBJECT
 
-	public:
-	ServerPluginDerived(const QString& aPluginName,
-			    const Profile& aProfile,
-			    PluginCbInterface* aCbInterface);
+public:
+    ServerPluginDerived(const QString &aPluginName,
+                        const Profile &aProfile,
+                        PluginCbInterface *aCbInterface);
 
-	bool startListen();
-	void stopListen();
-	bool init();
-	bool uninit();
-        void suspend();
-        void resume();
-	virtual bool cleanUp();
+    bool startListen();
+    void stopListen();
+    bool init();
+    bool uninit();
+    void suspend();
+    void resume();
+    virtual bool cleanUp();
 
-	bool iTestSignal;
-	
-	public slots:
-	void connectivityStateChanged( Sync::ConnectivityType , bool);
+    bool iTestSignal;
+
+public slots:
+    void connectivityStateChanged( Sync::ConnectivityType, bool);
 };
 
 class ServerThreadTest: public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
-	private slots:	
-	void initTestCase();
-	void cleanupTestCase();
-	void testServerThreadConstructor();
-	void testGetPlugin();	
-	void testGetProfileName();
-	void testThread();
-	void testStopThErrorSignal();
-	
-	private:
-	ServerThread *iServerThread;
-	ServerPluginDerived *iPluginDerived;
-	ServerPlugin *iThreadTestSp;	
-	const Profile *iProfile;
-	bool iThreadreturn;
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
+    void testServerThreadConstructor();
+    void testGetPlugin();
+    void testGetProfileName();
+    void testThread();
+    void testStopThErrorSignal();
+
+private:
+    ServerThread *iServerThread;
+    ServerPluginDerived *iPluginDerived;
+    ServerPlugin *iThreadTestSp;
+    const Profile *iProfile;
+    bool iThreadreturn;
 };
 
 }

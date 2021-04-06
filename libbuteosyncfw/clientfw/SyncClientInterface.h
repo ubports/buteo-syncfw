@@ -48,18 +48,18 @@ class SyncClientInterfacePrivate;
  */
 class SyncClientInterface: public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	/*!
-	 * \brief Constructor
-	 */
-	SyncClientInterface();
+    /*!
+     * \brief Constructor
+     */
+    SyncClientInterface();
 
-	/*!
-	 * \brief Destructor
-	 */
-	~SyncClientInterface();
+    /*!
+     * \brief Destructor
+     */
+    ~SyncClientInterface();
 
     /*!
      * \brief Requests to starts synchronizing using a profile Id
@@ -105,7 +105,7 @@ public:
      *
      * \return status of the operation
      */
-    bool setSyncSchedule(QString &aProfileId,SyncSchedule &aSchedule);
+    bool setSyncSchedule(QString &aProfileId, SyncSchedule &aSchedule);
 
     /*!
      * \brief Save SyncResults to log.xml file.
@@ -113,7 +113,7 @@ public:
      * \param aSyncResults to save in the \code <profileId>.log.xml \endcode
      * \return status of the saveSyncResults
      */
-    bool saveSyncResults(const QString &aProfileId,const Buteo::SyncResults &aSyncResults);
+    bool saveSyncResults(const QString &aProfileId, const Buteo::SyncResults &aSyncResults);
 
     /*!
      * \brief This function should be called when sync profile has to be deleted
@@ -133,8 +133,8 @@ public:
      *
      */
     bool updateProfile(Buteo::SyncProfile &aSyncProfile);
-	
-	/*!
+
+    /*!
     * \brief This function returns true if backup/restore in progress else
     * false.
     */
@@ -142,7 +142,7 @@ public:
 
     /*!
      * \brief Use this function to understand if the creation of dbus connection to msyncd
-     * 		  succeeded or not.
+     *        succeeded or not.
      * \return  - status of the dbus object created for msyncd
      */
     bool isValid();
@@ -170,7 +170,7 @@ public:
      * \return The sync profile as Xml string.
      */
     QString syncProfile(const QString &aProfileId);
-    
+
     /*! \brief Gets a sync profiles which matches the key-value.
      *
      * Loads and merges also all sub-profiles that are referenced from the
@@ -181,7 +181,7 @@ public:
      * \return The sync profiles as Xml string list.
      */
     QStringList syncProfilesByKey(const QString &aKey, const QString &aValue);
-    
+
     /*! \brief Gets a profiles  matching the profile type.
      *
      * \param aType Type of the profile service/storage/sync.
@@ -190,56 +190,56 @@ public:
     QStringList syncProfilesByType(const QString &aType);
 signals:
 
-	/*! \brief Notifies about Backup start.
-	 *
-	 * This signal is sent when the backup framework is backing the sync related
-	 * data
-	 */
-	void backupInProgress ();
+    /*! \brief Notifies about Backup start.
+     *
+     * This signal is sent when the backup framework is backing the sync related
+     * data
+     */
+    void backupInProgress ();
 
-	/*! \brief Notifies about Backup done.
-	 *
-	 * This signal is sent when the backup framework has completed backing the sync related
-	 * data.
-	 */
-	void backupDone();
+    /*! \brief Notifies about Backup done.
+     *
+     * This signal is sent when the backup framework has completed backing the sync related
+     * data.
+     */
+    void backupDone();
 
-	/*! \brief Notifies about Restore start.
-	 *
-	 * This signal is sent when the backup framework is restoring the sync related
-	 * data
-	 */
-	void restoreInProgress();
+    /*! \brief Notifies about Restore start.
+     *
+     * This signal is sent when the backup framework is restoring the sync related
+     * data
+     */
+    void restoreInProgress();
 
-	/*! \brief Notifies about Restore Done.
-	 *
-	 * This signal is sent when the backup framework has restored the sync related
-	 * data
-	 */
-	void restoreDone();
+    /*! \brief Notifies about Restore Done.
+     *
+     * This signal is sent when the backup framework has restored the sync related
+     * data
+     */
+    void restoreDone();
 
-	/*! \brief Notifies about a change in profile.
-	 *
-	 * This signal is sent when the profile data is modified or when a profile
-	 * is added or deleted in msyncd.
-	 * \param aProfileId Id of the changed profile.
-	 * \param aChangeType
-	 *      0 (ADDITION): Profile was added.
-	 *      1 (MODIFICATION): Profile was modified.
-	 *      2 (DELETION): Profile was deleted.
+    /*! \brief Notifies about a change in profile.
+     *
+     * This signal is sent when the profile data is modified or when a profile
+     * is added or deleted in msyncd.
+     * \param aProfileId Id of the changed profile.
+     * \param aChangeType
+     *      0 (ADDITION): Profile was added.
+     *      1 (MODIFICATION): Profile was modified.
+     *      2 (DELETION): Profile was deleted.
      * \param aChangedProfile changed sync profie as XMl string.
-	 *
-	 */
-    void profileChanged(QString aProfileId,int aChangeType, QString aChangedProfile);
+     *
+     */
+    void profileChanged(QString aProfileId, int aChangeType, QString aChangedProfile);
 
-	/*! \brief Notifies about the results of a recent sync for a profile
-	 *
-	 * This signal is sent after the sync has completed for a profile.
-	 * \param aProfileId Id of the changed profile.
-	 * \param aResults -  Results of the sync
-	 *
-	 */
-    void resultsAvailable(QString aProfileId  , Buteo::SyncResults aResults);
+    /*! \brief Notifies about the results of a recent sync for a profile
+     *
+     * This signal is sent after the sync has completed for a profile.
+     * \param aProfileId Id of the changed profile.
+     * \param aResults -  Results of the sync
+     *
+     */
+    void resultsAvailable(QString aProfileId, Buteo::SyncResults aResults);
 
     /*!
      * \brief Notifies about a change in synchronization status.
@@ -282,7 +282,7 @@ signals:
      * \param aCommittedItems No. of items committed for this operation
      */
     void transferProgress(QString aProfileId, int aTransferDatabase,
-                          int aTransferType , QString aMimeType, int aCommittedItems );
+                          int aTransferType, QString aMimeType, int aCommittedItems );
 
 private:
 

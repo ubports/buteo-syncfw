@@ -29,7 +29,7 @@
 #define DBUS_SERVICE_NAME_PREFIX "com.buteo.msyncd.plugin."
 #define DBUS_SERVICE_OBJ_PATH "/"
 
-int main( int argc, char** argv )
+int main( int argc, char **argv )
 {
     QCoreApplication app( argc, argv );
 
@@ -39,8 +39,7 @@ int main( int argc, char** argv )
     // cmdline arguments is probably cleaner
     QStringList args = app.arguments();
 
-    if( args.length() < 4 )
-    {
+    if ( args.length() < 4 ) {
         LOG_FATAL( "Plugin name, profile name and plugin path not obtained from cmdline" );
     }
 
@@ -49,7 +48,7 @@ int main( int argc, char** argv )
     const QString pluginFilePath = args.value(3);
 
     PluginServiceObj *serviceObj = new PluginServiceObj( pluginName, profileName, pluginFilePath );
-    if( !serviceObj ) {
+    if ( !serviceObj ) {
         LOG_FATAL( "Unable to create the service adaptor object" );
     }
 
@@ -59,19 +58,19 @@ int main( int argc, char** argv )
     // as dbus service paths due to being purely numeric.
     int numericIdx = profileName.indexOf(QRegExp("[0123456789]"));
     QString servicePath = numericIdx == 0
-                        ? QString(QLatin1String("%1%2%3"))
-                              .arg(DBUS_SERVICE_NAME_PREFIX)
-                              .arg("profile-")
-                              .arg(profileName)
-                        : QString(QLatin1String("%1%2"))
-                              .arg(DBUS_SERVICE_NAME_PREFIX)
-                              .arg(profileName);
+                          ? QString(QLatin1String("%1%2%3"))
+                          .arg(DBUS_SERVICE_NAME_PREFIX)
+                          .arg("profile-")
+                          .arg(profileName)
+                          : QString(QLatin1String("%1%2"))
+                          .arg(DBUS_SERVICE_NAME_PREFIX)
+                          .arg(profileName);
 
     int retn;
     LOG_DEBUG( "attempting to register dbus service:" << servicePath );
     QDBusConnection connection = QDBusConnection::sessionBus();
-    if( connection.registerObject(DBUS_SERVICE_OBJ_PATH, serviceObj) == true ) {
-        if( connection.registerService( servicePath ) == true ) {
+    if ( connection.registerObject(DBUS_SERVICE_OBJ_PATH, serviceObj) == true ) {
+        if ( connection.registerService( servicePath ) == true ) {
             LOG_DEBUG( "Plugin " << pluginName << " with profile "
                        << profileName << " registered at dbus "
                        << DBUS_SERVICE_NAME_PREFIX + profileName

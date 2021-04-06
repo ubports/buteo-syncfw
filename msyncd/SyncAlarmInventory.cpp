@@ -35,11 +35,11 @@ const QString ALARM_CONNECTION_NAME( "alarms" );
 const int TRIGGER_COUNT = 1;
 
 SyncAlarmInventory::SyncAlarmInventory():
-        iTimer(0),
-        currentAlarm(0),
-        triggerCount(TRIGGER_COUNT)
+    iTimer(0),
+    currentAlarm(0),
+    triggerCount(TRIGGER_COUNT)
 {
-  // empty.explicitly call init
+    // empty.explicitly call init
 }
 
 bool SyncAlarmInventory::init()
@@ -57,19 +57,20 @@ bool SyncAlarmInventory::init()
     iDbHandle.setDatabaseName( path );
 
     if (!iDbHandle.open()) {
-    	LOG_CRITICAL("Failed to OPEN DB. SCHEDULING WILL NOT WORK");
-    	return false;
+        LOG_CRITICAL("Failed to OPEN DB. SCHEDULING WILL NOT WORK");
+        return false;
     } else {
-    	LOG_DEBUG("DB Opened Successfully");
+        LOG_DEBUG("DB Opened Successfully");
     }
 
     // Create the alarms table
-    const QString createTableQuery( "CREATE TABLE IF NOT EXISTS alarms(alarmid INTEGER PRIMARY KEY AUTOINCREMENT, synctime DATETIME)" );
+    const QString
+    createTableQuery( "CREATE TABLE IF NOT EXISTS alarms(alarmid INTEGER PRIMARY KEY AUTOINCREMENT, synctime DATETIME)" );
     QSqlQuery query( createTableQuery, iDbHandle );
     LOG_DEBUG("SQL Query::" << query.lastQuery());
     if ( !query.exec() ) {
-    	LOG_WARNING("Failed to execute the createTableQuery");
-    	return false;
+        LOG_WARNING("Failed to execute the createTableQuery");
+        return false;
     }
 
     // Clear any old alarms that may have lingered
@@ -77,13 +78,13 @@ bool SyncAlarmInventory::init()
 
     // Create the iTimer object
     iTimer = new QTimer(this);
-    if(iTimer) {
-    	connect( iTimer, SIGNAL(timeout()), this, SLOT(timerTriggered()) );
-    	currentAlarm = 0;
-    	return true;
+    if (iTimer) {
+        connect( iTimer, SIGNAL(timeout()), this, SLOT(timerTriggered()) );
+        currentAlarm = 0;
+        return true;
     } else {
-    	LOG_WARNING("Failed to create a QTimer");
-    	return false;
+        LOG_WARNING("Failed to create a QTimer");
+        return false;
     }
 }
 
@@ -94,11 +95,11 @@ SyncAlarmInventory::~SyncAlarmInventory()
     iDbHandle.close();
     iDbHandle = QSqlDatabase();
     QSqlDatabase::removeDatabase( iConnectionName );
-    
+
     if (iTimer) {
         iTimer->stop();
         delete iTimer;
-	    iTimer = 0;
+        iTimer = 0;
     }
 }
 
@@ -108,12 +109,12 @@ int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
 
     // Check if alarmDate < QDateTime::currentDateTime()
     if ( QDateTime::currentDateTime().secsTo(alarmDate) < 0 ) {
-    	LOG_WARNING("alarmDate < QDateTime::currentDateTime()");
+        LOG_WARNING("alarmDate < QDateTime::currentDateTime()");
         //Setting with current date time.
         alarmDate = QDateTime::currentDateTime();
     }
 
-    // Store the alarm 
+    // Store the alarm
     int alarmId = 0;
     if ( (alarmId = addAlarmToDb(alarmDate)) == 0 ) {
         // Note: Even incase of an already existing profile, false is returned by the query
@@ -121,7 +122,7 @@ int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
 
         // If unable to add an alarm to db, set the iTimers
         // for already existing alarms
-    	LOG_WARNING("(alarmId = addAlarmToDb(alarmDate)) == 0");
+        LOG_WARNING("(alarmId = addAlarmToDb(alarmDate)) == 0");
     }
 
     // Select all the alarms from the db sorted by alarm time
@@ -143,17 +144,16 @@ int SyncAlarmInventory::addAlarm( QDateTime alarmDate )
             currentAlarm = newAlarm;
             QDateTime now = QDateTime::currentDateTime();
             int iTimerInterval = 0;
-            if(now < alarmTime)
-            {
+            if (now < alarmTime) {
                 iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
             }
-            LOG_DEBUG("currentAlarm"<<currentAlarm<<"alarmTime"<<alarmTime<<"iTimerInterval"<<iTimerInterval);
+            LOG_DEBUG("currentAlarm" << currentAlarm << "alarmTime" << alarmTime << "iTimerInterval" << iTimerInterval);
             triggerCount = TRIGGER_COUNT;
             iTimer->setInterval( iTimerInterval );
             iTimer->start();
         }
     } else {
-    	LOG_WARNING("Select Query Execution Failed" );
+        LOG_WARNING("Select Query Execution Failed" );
     }
 
     return alarmId;
@@ -163,7 +163,7 @@ bool SyncAlarmInventory::removeAlarm(int alarmId)
 {
     FUNCTION_CALL_TRACE;
 
-    if( alarmId <= 0 ) return false;
+    if ( alarmId <= 0 ) return false;
     deleteAlarmFromDb( alarmId );
     return true;
 }
@@ -174,8 +174,7 @@ void SyncAlarmInventory::removeAllAlarms()
 
     QSqlQuery deleteAllQuery(QString("DELETE FROM alarms"), iDbHandle);
     LOG_DEBUG("SQL Query::" << deleteAllQuery.lastQuery());
-    if(!deleteAllQuery.exec())
-    {
+    if (!deleteAllQuery.exec()) {
         LOG_WARNING("Failed query to delete all alarms");
     }
 }
@@ -189,7 +188,7 @@ void SyncAlarmInventory::timerTriggered()
 
     // Alarm expired. Trigger the alarm and delete it from DB and set the alarm for the next one
     if (triggerCount == 0) {
-    	LOG_DEBUG("Triggering the alarm " << currentAlarm );
+        LOG_DEBUG("Triggering the alarm " << currentAlarm );
         emit triggerAlarm(currentAlarm);
 
         // Delete the alarm from DB
@@ -210,8 +209,7 @@ void SyncAlarmInventory::timerTriggered()
                 // Set the iTimer for the alarm
                 QDateTime now = QDateTime::currentDateTime();
                 int iTimerInterval = 0;
-                if(now < alarmTime)
-                {
+                if (now < alarmTime) {
                     iTimerInterval = (now.secsTo( alarmTime ) / TRIGGER_COUNT) * 1000;  // time interval in millisec
                 }
                 triggerCount = TRIGGER_COUNT;

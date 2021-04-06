@@ -29,7 +29,7 @@
 #include <ProfileManager.h>
 
 namespace Buteo {
-    
+
 class ServerActivatorTest : public QObject
 {
     Q_OBJECT

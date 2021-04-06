@@ -27,7 +27,7 @@
 #include <QtTest/QtTest>
 
 namespace Buteo {
-    
+
 class DeletedItemsIdStorage;
 
 class DeletedItemsIdStorageTest : public QObject
@@ -43,7 +43,7 @@ private slots:
 
 
 private:
-    DeletedItemsIdStorage* iDeletedItems;
+    DeletedItemsIdStorage *iDeletedItems;
 
 };
 

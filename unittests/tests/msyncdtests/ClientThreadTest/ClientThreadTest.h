@@ -32,46 +32,46 @@
 #include "SyncProfile.h"
 
 namespace Buteo {
-    
+
 class ClientPluginDerived: public ClientPlugin
 {
-	Q_OBJECT
+    Q_OBJECT
 
-	public:
-	ClientPluginDerived(const QString& aPluginName,
-                  	    const SyncProfile& aProfile,
-                  	    PluginCbInterface* aCbInterface);
-	bool startSync();
-	bool init();
-	bool uninit();
-	virtual bool cleanUp();
+public:
+    ClientPluginDerived(const QString &aPluginName,
+                        const SyncProfile &aProfile,
+                        PluginCbInterface *aCbInterface);
+    bool startSync();
+    bool init();
+    bool uninit();
+    virtual bool cleanUp();
 
-	bool iTestClSignal;
+    bool iTestClSignal;
 
-	public slots:
-	void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
-	
+public slots:
+    void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
+
 };
 class ClientThreadTest: public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
-	private slots:
-	void initTestCase();
-	void cleanupTestCase();
-	void testClientThreadConstructor();
-	void testGetPlugin();
-	void testGetProfileName();
-	void testClientThread();
-	void testGetSyncResults();
-	void testInitError();
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
+    void testClientThreadConstructor();
+    void testGetPlugin();
+    void testGetProfileName();
+    void testClientThread();
+    void testGetSyncResults();
+    void testInitError();
 
-	private:
-	ClientThread *iClientThread;
-	ClientPluginDerived *iPluginDerived;
-	ClientPlugin *iPlugin;
-	SyncProfile *iSyncProfile;
-	bool iClientThreadRet;
+private:
+    ClientThread *iClientThread;
+    ClientPluginDerived *iPluginDerived;
+    ClientPlugin *iPlugin;
+    SyncProfile *iSyncProfile;
+    bool iClientThreadRet;
 };
 
 }

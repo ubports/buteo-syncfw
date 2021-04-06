@@ -50,7 +50,7 @@ void ProfileFactoryTest::testCreateDirect()
         QVERIFY(p != 0);
         QCOMPARE(p->name(), NAME);
         QCOMPARE(p->type(), type);
-        QVERIFY(dynamic_cast<SyncProfile*>(p.data()) != 0);
+        QVERIFY(dynamic_cast<SyncProfile *>(p.data()) != 0);
     }
 
     {
@@ -59,7 +59,7 @@ void ProfileFactoryTest::testCreateDirect()
         QVERIFY(p != 0);
         QCOMPARE(p->name(), NAME);
         QCOMPARE(p->type(), type);
-        QVERIFY(dynamic_cast<StorageProfile*>(p.data()) != 0);
+        QVERIFY(dynamic_cast<StorageProfile *>(p.data()) != 0);
     }
 }
 
@@ -87,7 +87,7 @@ void ProfileFactoryTest::testCreateFromXml()
         QVERIFY(p != 0);
         QCOMPARE(p->name(), NAME);
         QCOMPARE(p->type(), type);
-        QVERIFY(dynamic_cast<SyncProfile*>(p.data()) != 0);
+        QVERIFY(dynamic_cast<SyncProfile *>(p.data()) != 0);
     }
 
     {
@@ -98,7 +98,7 @@ void ProfileFactoryTest::testCreateFromXml()
         QVERIFY(p != 0);
         QCOMPARE(p->name(), NAME);
         QCOMPARE(p->type(), type);
-        QVERIFY(dynamic_cast<StorageProfile*>(p.data()) != 0);
+        QVERIFY(dynamic_cast<StorageProfile *>(p.data()) != 0);
     }
 
 }

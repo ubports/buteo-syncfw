@@ -45,7 +45,8 @@ static const QString MTP_MODE_NAME("mtp_mode");
  */
 
 USBModedProxy::USBModedProxy(QObject *parent)
-    : QDBusAbstractInterface(USB_MODE_SERVICE, USB_MODE_OBJECT, staticInterfaceName(), QDBusConnection::systemBus(), parent),
+    : QDBusAbstractInterface(USB_MODE_SERVICE, USB_MODE_OBJECT, staticInterfaceName(), QDBusConnection::systemBus(),
+                             parent),
       m_isConnected(false)
 {
     FUNCTION_CALL_TRACE;
@@ -58,9 +59,8 @@ USBModedProxy::~USBModedProxy()
 
 void USBModedProxy::initUsbModeTracking()
 {
-    if(!QObject::connect(this, &USBModedProxy::sig_usb_state_ind,
-                         this, &USBModedProxy::slotModeChanged))
-    {
+    if (!QObject::connect(this, &USBModedProxy::sig_usb_state_ind,
+                          this, &USBModedProxy::slotModeChanged)) {
         LOG_CRITICAL("Failed to connect to USB moded signal! USB notifications will not be available.");
     }
 
@@ -74,12 +74,9 @@ void USBModedProxy::handleUsbModeReply(QDBusPendingCallWatcher *call)
 {
     QDBusPendingReply<QString> reply = *call;
 
-    if(reply.isError())
-    {
+    if (reply.isError()) {
         LOG_WARNING("Call to" << USB_MODE_SERVICE << "failed:" << reply.error());
-    }
-    else
-    {
+    } else {
         slotModeChanged(reply.value());
     }
 
@@ -92,8 +89,7 @@ void USBModedProxy::slotModeChanged(const QString &mode)
 
     bool isConnected = (mode == MTP_MODE_NAME || mode == SYNC_MODE_NAME);
 
-    if(m_isConnected != isConnected)
-    {
+    if (m_isConnected != isConnected) {
         m_isConnected = isConnected;
         emit usbConnection(m_isConnected);
     }

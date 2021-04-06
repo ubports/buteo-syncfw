@@ -32,10 +32,10 @@ class OOPClientPlugin : public ClientPlugin
     Q_OBJECT
 
 public:
-    OOPClientPlugin( const QString& aPluginName,
-                     const Buteo::SyncProfile& aProfile,
-                     Buteo::PluginCbInterface* aCbInterface,
-                     QProcess& aProcess);
+    OOPClientPlugin( const QString &aPluginName,
+                     const Buteo::SyncProfile &aProfile,
+                     Buteo::PluginCbInterface *aCbInterface,
+                     QProcess &aProcess);
 
     virtual ~OOPClientPlugin();
 

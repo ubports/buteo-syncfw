@@ -167,13 +167,13 @@ public:
     void releaseStorages();
 
     //! \brief returns the StorageMap used for this session
-    QMap<QString,bool> getStorageMap();
+    QMap<QString, bool> getStorageMap();
 
     /*! \brief sets the storage map for this session
      *
      * @param aStorageMap - storage map to set
      */
-    void setStorageMap(QMap<QString,bool> &aStorageMap);
+    void setStorageMap(QMap<QString, bool> &aStorageMap);
 
     //! \brief returns the returns the status of the profile creation for this session
     bool isProfileCreated();
@@ -188,15 +188,15 @@ signals:
 
     //! @see SyncPluginBase::transferProgress
     void transferProgress(const QString &aProfileName,
-            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-            const QString &aMimeType, int aCommittedItems);
+                          Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                          const QString &aMimeType, int aCommittedItems);
 
     /*! \brief Signal sent when a storage is accquired
      *
      * @param aProfileName Name of the profile used by the session
      * @param aMimeType Mimetype of the storage accquired.
      */
-    void storageAccquired (const QString &aProfileName , const QString &aMimeType) ;
+    void storageAccquired (const QString &aProfileName, const QString &aMimeType) ;
 
     /*! \brief Signal sent when the session has finished
      *
@@ -206,14 +206,14 @@ signals:
      * @param aErrorCode Error code, if the status is error
      */
     void finished(const QString &aProfileName, Sync::SyncStatus aStatus,
-            const QString &aMessage, int aErrorCode);
+                  const QString &aMessage, int aErrorCode);
 
     /*! \brief Signal sent when the sync is in progress to indicate the detail of the progress
      *
      * @param aProfileName Name of the profile used by the session
      * @param aProgressDetail Detail of the progress.
      */
-    void syncProgressDetail(const QString &aProfileName,int aProgressDetail);
+    void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
 private:
 
     bool tryStart();
@@ -227,12 +227,12 @@ private slots:
     void onError(const QString &aProfileName, const QString &aMessage, int aErrorCode);
 
     void onTransferProgress(const QString &aProfileName,
-            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-            const QString &aMimeType, int aCommittedItems);
+                            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                            const QString &aMimeType, int aCommittedItems);
 
     void onStorageAccquired (const QString &aMimeType);
 
-    void onSyncProgressDetail(const QString &aProfileName,int aProgressDetail);
+    void onSyncProgressDetail(const QString &aProfileName, int aProgressDetail);
 
     void onDone();
 
@@ -242,7 +242,7 @@ private slots:
 
     void onNetworkSessionError();
 
-    private:
+private:
 
     SyncProfile *iProfile;
 
@@ -272,13 +272,13 @@ private slots:
 
     StorageBooker *iStorageBooker;
 
-    QMap<QString , bool> iStorageMap;
+    QMap<QString, bool> iStorageMap;
 
     NetworkManager *iNetworkManager;
 
-    #ifdef SYNCFW_UNIT_TESTS
+#ifdef SYNCFW_UNIT_TESTS
     friend class SyncSessionTest;
-    #endif
+#endif
 
 };
 

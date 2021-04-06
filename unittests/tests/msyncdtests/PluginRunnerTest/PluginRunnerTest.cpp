@@ -30,33 +30,33 @@ const QString PROFILE = "profile";
 
 void PluginRunnerTest::initTestCase()
 {
-	iSProfile = new SyncProfile(PROFILE);
-	iPManager = new PluginManager();
-	iClientPRunner = new ClientPluginRunner(PLUGIN, iSProfile, iPManager, NULL, NULL);
-	iPRunner = iClientPRunner;
+    iSProfile = new SyncProfile(PROFILE);
+    iPManager = new PluginManager();
+    iClientPRunner = new ClientPluginRunner(PLUGIN, iSProfile, iPManager, NULL, NULL);
+    iPRunner = iClientPRunner;
 }
 void PluginRunnerTest::testPluginRunnerConstructor()
 {
-	QCOMPARE(iPRunner->iInitialized, false);
-	QCOMPARE(iPRunner->iPluginMgr, iPManager);
-	QVERIFY(iPRunner->iPluginCbIf == NULL);
-	QCOMPARE(iPRunner->iType, PluginRunner::PLUGIN_CLIENT);
-	QCOMPARE(iPRunner->pluginType(), PluginRunner::PLUGIN_CLIENT);
-	QCOMPARE(iPRunner->pluginName(), PLUGIN);
+    QCOMPARE(iPRunner->iInitialized, false);
+    QCOMPARE(iPRunner->iPluginMgr, iPManager);
+    QVERIFY(iPRunner->iPluginCbIf == NULL);
+    QCOMPARE(iPRunner->iType, PluginRunner::PLUGIN_CLIENT);
+    QCOMPARE(iPRunner->pluginType(), PluginRunner::PLUGIN_CLIENT);
+    QCOMPARE(iPRunner->pluginName(), PLUGIN);
 }
 void PluginRunnerTest::cleanupTestCase()
 {
-	QVERIFY(iPManager != 0);
-	delete iPManager;
-	QVERIFY(iSProfile != 0);
-	delete iSProfile;
-	QVERIFY(iClientPRunner != 0);
-	delete iClientPRunner;
-	
-	iPManager = 0;
-	iSProfile = 0;
-	iClientPRunner = 0;
-	iPRunner = 0;
+    QVERIFY(iPManager != 0);
+    delete iPManager;
+    QVERIFY(iSProfile != 0);
+    delete iSProfile;
+    QVERIFY(iClientPRunner != 0);
+    delete iClientPRunner;
+
+    iPManager = 0;
+    iSProfile = 0;
+    iClientPRunner = 0;
+    iPRunner = 0;
 }
 
 

@@ -35,7 +35,7 @@ int SyncSigHandler::iSigHupFd[2];
 int SyncSigHandler::iSigTermFd[2];
 
 SyncSigHandler::SyncSigHandler(QObject *aParent, const char */*aName*/)
-         : QObject(aParent)
+    : QObject(aParent)
 {
     FUNCTION_CALL_TRACE;
 
@@ -46,11 +46,11 @@ SyncSigHandler::SyncSigHandler(QObject *aParent, const char */*aName*/)
 
     //Adding socketpair to monitor those fd's.
     if (::socketpair(AF_UNIX, SOCK_STREAM, 0, iSigHupFd)) {
-       LOG_CRITICAL("Couldn't create HUP socketpair");
+        LOG_CRITICAL("Couldn't create HUP socketpair");
     }
 
     if (::socketpair(AF_UNIX, SOCK_STREAM, 0, iSigTermFd)) {
-       LOG_CRITICAL("Couldn't create TERM socketpair");
+        LOG_CRITICAL("Couldn't create TERM socketpair");
     }
 
     //SocketNotifier for read those fd's.

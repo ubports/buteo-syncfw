@@ -44,8 +44,7 @@ public:
     /*! \brief Status of operation performed by storage plugin
      *
      */
-    enum OperationStatus
-    {
+    enum OperationStatus {
         STATUS_INVALID_FORMAT = -6,  /*!< Operation failed because data is in invalid format*/
         STATUS_STORAGE_FULL = -5,    /*!< Operation failed because storage is full*/
         STATUS_OBJECT_TOO_BIG = -4,  /*!< Operation failed because object is too big*/
@@ -59,7 +58,7 @@ public:
      *
      * @param aPluginName Name of this storage plugin
      */
-    StoragePlugin( const QString& aPluginName );
+    StoragePlugin( const QString &aPluginName );
 
     /*! \brief Destructor
      *
@@ -70,20 +69,20 @@ public:
      *
      * @return Name of the plugin
      */
-    const QString& getPluginName() const;
+    const QString &getPluginName() const;
 
     /*! \brief Returns the value of the given property
      *
      * @param aProperty Property
      * @return Property value if property found, otherwise empty string
      */
-    QString getProperty( const QString& aProperty ) const;
+    QString getProperty( const QString &aProperty ) const;
 
     /*! \brief Returns the properties set for this plugin
      *
      * @param aProperties Properties that are set
      */
-    void getProperties( QMap<QString, QString>& aProperties ) const;
+    void getProperties( QMap<QString, QString> &aProperties ) const;
 
     /*! \brief Initializes the plugin
     *
@@ -94,7 +93,7 @@ public:
     *
     * @param aProperties Properties that should be set for this plugin
     */
-    virtual bool init( const QMap<QString, QString>& aProperties ) = 0;
+    virtual bool init( const QMap<QString, QString> &aProperties ) = 0;
 
     /*! \brief Uninitializes the plugin
      *
@@ -106,14 +105,14 @@ public:
      * @param aItems Array where to place items
      * @return True on success, otherwise false
      */
-    virtual bool getAllItems( QList<StorageItem*>& aItems ) = 0;
+    virtual bool getAllItems( QList<StorageItem *> &aItems ) = 0;
 
     /*! \brief Returns id's of all known items
      *
      * @param aItems Array where to place item id's
      * @return True on success, otherwise false
      */
-    virtual bool getAllItemIds( QList<QString>& aItems ) = 0;
+    virtual bool getAllItemIds( QList<QString> &aItems ) = 0;
 
     /*! \brief Returns all new items since aTime
      *
@@ -121,7 +120,7 @@ public:
      * @param aTime Items with creation time > aTime are returned
      * @return True on success, otherwise false
      */
-    virtual bool getNewItems( QList<StorageItem*>& aNewItems, const QDateTime& aTime ) = 0;
+    virtual bool getNewItems( QList<StorageItem *> &aNewItems, const QDateTime &aTime ) = 0;
 
     /*! \brief Returns id's of all new items since aTime (creation time > aTime)
      *
@@ -129,7 +128,7 @@ public:
      * @param aTime Items with creation time > aTime are returned
      * @return True on success, otherwise false
      */
-    virtual bool getNewItemIds( QList<QString>& aNewItemIds, const QDateTime& aTime ) = 0;
+    virtual bool getNewItemIds( QList<QString> &aNewItemIds, const QDateTime &aTime ) = 0;
 
     /*! \brief Returns all modified items since aTime
      *
@@ -138,7 +137,7 @@ public:
      *  aTime are returned.
      * @return True on success, otherwise false
      */
-    virtual bool getModifiedItems( QList<StorageItem*>& aModifiedItems, const QDateTime& aTime ) = 0;
+    virtual bool getModifiedItems( QList<StorageItem *> &aModifiedItems, const QDateTime &aTime ) = 0;
 
     /*! \brief Returns id's of all modified items since aTime
      *
@@ -147,7 +146,7 @@ public:
      *  aTime are returned.
      * @return True on success, otherwise false
      */
-    virtual bool getModifiedItemIds( QList<QString>& aModifiedItemIds, const QDateTime& aTime ) = 0;
+    virtual bool getModifiedItemIds( QList<QString> &aModifiedItemIds, const QDateTime &aTime ) = 0;
 
     /*! \brief Returns id's of all deleted items since aTime
      *
@@ -156,7 +155,7 @@ public:
      *  aTime are returned.
      * @return True on success, otherwise false
      */
-    virtual bool getDeletedItemIds( QList<QString>& aDeletedItemIds, const QDateTime& aTime ) = 0;
+    virtual bool getDeletedItemIds( QList<QString> &aDeletedItemIds, const QDateTime &aTime ) = 0;
 
     /*! \brief Generates a new item
      *
@@ -166,21 +165,21 @@ public:
      *
      * @return On success pointer to the item generated, otherwise NULL
      */
-    virtual StorageItem* newItem() = 0;
+    virtual StorageItem *newItem() = 0;
 
     /*! \brief Returns an item based on id
      *
      * @param aItemId Id of the item to return
      * @return On success pointer to the item, otherwise NULL
      */
-    virtual StorageItem* getItem( const QString& aItemId ) = 0;
+    virtual StorageItem *getItem( const QString &aItemId ) = 0;
 
     /*! \brief Returns items based on ids
      *
      * @param aItemIdList List of id's
      * @return List of items
      */
-    virtual QList<StorageItem*> getItems( const QStringList& aItemIdList ) = 0;
+    virtual QList<StorageItem *> getItems( const QStringList &aItemIdList ) = 0;
 
     /*! \brief Adds an item to the storage
      *
@@ -190,7 +189,7 @@ public:
      * @param aItem Item to add
      * @return Operation status code
      */
-    virtual OperationStatus addItem( StorageItem& aItem ) = 0;
+    virtual OperationStatus addItem( StorageItem &aItem ) = 0;
 
     /*! \brief Adds items to the storage
      *
@@ -200,35 +199,35 @@ public:
      * @param aItems Items to add
      * @return Operation status codes
      */
-    virtual QList<OperationStatus> addItems( const QList<StorageItem*>& aItems ) = 0;
+    virtual QList<OperationStatus> addItems( const QList<StorageItem *> &aItems ) = 0;
 
     /*! \brief Modifies an item in the storage
      *
      * @param aItem Item to modify
      * @return Operation status code
      */
-    virtual OperationStatus modifyItem( StorageItem& aItem ) = 0;
+    virtual OperationStatus modifyItem( StorageItem &aItem ) = 0;
 
     /*! \brief Modifies item in the storage
      *
      * @param aItems Items to add
      * @return Operation status codes
      */
-    virtual QList<OperationStatus> modifyItems( const QList<StorageItem*>& aItems ) = 0;
+    virtual QList<OperationStatus> modifyItems( const QList<StorageItem *> &aItems ) = 0;
 
     /*! \brief Deletes an item from the storage
      *
      * @param aItemId Id of the item to be deleted
      * @return Operation status code
      */
-    virtual OperationStatus deleteItem( const QString& aItemId ) = 0;
+    virtual OperationStatus deleteItem( const QString &aItemId ) = 0;
 
     /*! \brief Deletes an item from the storage
      *
      * @param aItemIds Id's of the item to be deleted
      * @return Operation status codes
      */
-    virtual QList<OperationStatus> deleteItems( const QList<QString>& aItemIds ) = 0;
+    virtual QList<OperationStatus> deleteItems( const QList<QString> &aItemIds ) = 0;
 
 protected:
 

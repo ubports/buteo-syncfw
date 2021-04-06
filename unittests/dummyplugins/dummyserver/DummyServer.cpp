@@ -25,10 +25,10 @@
 
 using namespace Buteo;
 
-DummyServer::DummyServer( const QString& aPluginName,
-                          const Profile& aProfile,
+DummyServer::DummyServer( const QString &aPluginName,
+                          const Profile &aProfile,
                           PluginCbInterface *aCbInterface )
- : ServerPlugin( aPluginName, aProfile, aCbInterface )
+    : ServerPlugin( aPluginName, aProfile, aCbInterface )
 {
 
 }
@@ -77,9 +77,9 @@ void DummyServer::connectivityStateChanged( Sync::ConnectivityType /*aType*/,
 }
 
 
-ServerPlugin* DummyServerLoader::createServerPlugin( const QString& aPluginName,
-                                                     const Buteo::Profile& aProfile,
-                                                     Buteo::PluginCbInterface* aCbInterface )
+ServerPlugin *DummyServerLoader::createServerPlugin( const QString &aPluginName,
+                                                     const Buteo::Profile &aProfile,
+                                                     Buteo::PluginCbInterface *aCbInterface )
 {
     return new DummyServer( aPluginName, aProfile, aCbInterface );
 }

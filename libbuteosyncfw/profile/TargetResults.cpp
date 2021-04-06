@@ -39,7 +39,8 @@ struct ItemDetails {
         : uid(aUid), status(aStatus), message(aMessage) {};
     ItemDetails(const QDomElement &aRoot)
         : uid(aRoot.attribute(ATTR_UID))
-        , status(aRoot.attribute(ATTR_STATUS).compare(QLatin1String("failed"), Qt::CaseInsensitive) ? TargetResults::ITEM_OPERATION_SUCCEEDED : TargetResults::ITEM_OPERATION_FAILED)
+        , status(aRoot.attribute(ATTR_STATUS).compare(QLatin1String("failed"),
+                                                      Qt::CaseInsensitive) ? TargetResults::ITEM_OPERATION_SUCCEEDED : TargetResults::ITEM_OPERATION_FAILED)
         , message(aRoot.text())
     {
     };
@@ -86,7 +87,7 @@ struct ItemDetails {
     static bool find(const QList<ItemDetails> &aList, const QString &aUid,
                      QList<ItemDetails>::ConstIterator &it)
     {
-        for(it = aList.constBegin(); it != aList.constEnd(); ++it) {
+        for (it = aList.constBegin(); it != aList.constEnd(); ++it) {
             if (it->uid == aUid) {
                 return true;
             }
@@ -126,26 +127,26 @@ TargetResultsPrivate::TargetResultsPrivate()
 }
 
 TargetResultsPrivate::TargetResultsPrivate(const TargetResultsPrivate &aSource)
-:   iTargetName(aSource.iTargetName),
-    iLocalItems(aSource.iLocalItems),
-    iLocalAdditions(aSource.iLocalAdditions),
-    iLocalDeletions(aSource.iLocalDeletions),
-    iLocalModifications(aSource.iLocalModifications),
-    iRemoteItems(aSource.iRemoteItems),
-    iRemoteAdditions(aSource.iRemoteAdditions),
-    iRemoteDeletions(aSource.iRemoteDeletions),
-    iRemoteModifications(aSource.iRemoteModifications)
+    :   iTargetName(aSource.iTargetName),
+        iLocalItems(aSource.iLocalItems),
+        iLocalAdditions(aSource.iLocalAdditions),
+        iLocalDeletions(aSource.iLocalDeletions),
+        iLocalModifications(aSource.iLocalModifications),
+        iRemoteItems(aSource.iRemoteItems),
+        iRemoteAdditions(aSource.iRemoteAdditions),
+        iRemoteDeletions(aSource.iRemoteDeletions),
+        iRemoteModifications(aSource.iRemoteModifications)
 {
 }
 
 TargetResults::TargetResults(const TargetResults &aSource)
-:   d_ptr(new TargetResultsPrivate(*aSource.d_ptr))
+    :   d_ptr(new TargetResultsPrivate(*aSource.d_ptr))
 {
 }
 
 TargetResults::TargetResults(const QString &aTargetName,
-    ItemCounts aLocalItems, ItemCounts aRemoteItems)
-:   d_ptr(new TargetResultsPrivate())
+                             ItemCounts aLocalItems, ItemCounts aRemoteItems)
+    :   d_ptr(new TargetResultsPrivate())
 {
     d_ptr->iTargetName = aTargetName;
     d_ptr->iLocalItems = aLocalItems;
@@ -153,13 +154,12 @@ TargetResults::TargetResults(const QString &aTargetName,
 }
 
 TargetResults::TargetResults(const QDomElement &aRoot)
-:   d_ptr(new TargetResultsPrivate())
+    :   d_ptr(new TargetResultsPrivate())
 {
     d_ptr->iTargetName = aRoot.attribute(ATTR_NAME);
 
     QDomElement local = aRoot.firstChildElement(TAG_LOCAL);
-    if (!local.isNull())
-    {
+    if (!local.isNull()) {
         d_ptr->iLocalItems.added = local.attribute(ATTR_ADDED).toUInt();
         d_ptr->iLocalItems.deleted = local.attribute(ATTR_DELETED).toUInt();
         d_ptr->iLocalItems.modified = local.attribute(ATTR_MODIFIED).toUInt();
@@ -169,8 +169,7 @@ TargetResults::TargetResults(const QDomElement &aRoot)
     } // no else
 
     QDomElement remote = aRoot.firstChildElement(TAG_REMOTE);
-    if (!remote.isNull())
-    {
+    if (!remote.isNull()) {
         d_ptr->iRemoteItems.added = remote.attribute(ATTR_ADDED).toUInt();
         d_ptr->iRemoteItems.deleted = remote.attribute(ATTR_DELETED).toUInt();
         d_ptr->iRemoteItems.modified = remote.attribute(ATTR_MODIFIED).toUInt();
@@ -186,10 +185,9 @@ TargetResults::~TargetResults()
     d_ptr = 0;
 }
 
-TargetResults& TargetResults::operator=(const TargetResults &aRhs)
+TargetResults &TargetResults::operator=(const TargetResults &aRhs)
 {
-    if (&aRhs != this)
-    {
+    if (&aRhs != this) {
         delete d_ptr;
         d_ptr = new TargetResultsPrivate(*aRhs.d_ptr);
     }

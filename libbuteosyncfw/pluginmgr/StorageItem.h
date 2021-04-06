@@ -29,7 +29,7 @@
 
 
 namespace Buteo {
-    
+
 /*! \brief Class to describe a storable item
  *
  */
@@ -57,43 +57,43 @@ public:
      *
      * @return Id of the item
      */
-    const QString& getId() const;
+    const QString &getId() const;
 
     /*! \brief Sets the id of the parent of this item
      *
      * @param aParentId The id of the parent of item
      */
-    void setParentId( const QString& aParentId );
+    void setParentId( const QString &aParentId );
 
     /*! \brief Returns the id of the parent of this item
      *
      * @return Id of the parent of this item
      */
-    const QString& getParentId() const;
+    const QString &getParentId() const;
 
     /*! \brief Sets the type of this item
      *
      * @param aType Type of this item
      */
-    void setType( const QString& aType );
+    void setType( const QString &aType );
 
     /*! \brief Gets the type of this item
      *
      * @return Type of this item
      */
-    const QString& getType() const;
+    const QString &getType() const;
 
     /*! \brief Sets the version of this item
      *
      * @param aVersion Version of this item
      */
-    void setVersion( const QString& aVersion );
+    void setVersion( const QString &aVersion );
 
     /*! \brief Gets the version of this item
      *
      * @return Version of this item
      */
-    const QString& getVersion() const;
+    const QString &getVersion() const;
 
     /*! \brief Write (part of) the item data
      *
@@ -101,7 +101,7 @@ public:
      * @param aData Data buffer to write. All bytes from buffer are written
      * @return True on success, otherwise false
      */
-    virtual bool write( qint64 aOffset, const QByteArray& aData ) = 0;
+    virtual bool write( qint64 aOffset, const QByteArray &aData ) = 0;
 
     /*! \brief Read (part of) the item data
      *
@@ -110,7 +110,7 @@ public:
      * @param aData Data buffer where to place data
      * @return True on success, otherwise false
      */
-    virtual bool read( qint64 aOffset, qint64 aLength, QByteArray& aData ) const = 0;
+    virtual bool read( qint64 aOffset, qint64 aLength, QByteArray &aData ) const = 0;
 
     /*! \brief Sets the length of the item data
     *

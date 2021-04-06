@@ -29,7 +29,7 @@
 #include <QString>
 
 namespace Buteo {
-    
+
 /*! \brief Base class for server plugins
  *
  */
@@ -45,9 +45,9 @@ public:
      * @param aProfile Server profile
      * @param aCbInterface Pointer to the callback interface
      */
-    ServerPlugin( const QString& aPluginName,
-                  const Profile& aProfile,
-                  PluginCbInterface* aCbInterface );
+    ServerPlugin( const QString &aPluginName,
+                  const Profile &aProfile,
+                  PluginCbInterface *aCbInterface );
 
     /*! \brief Destructor
      *

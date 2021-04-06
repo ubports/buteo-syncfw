@@ -38,7 +38,8 @@
  * Implementation of interface class SyncDaemonProxy
  */
 
-SyncDaemonProxy::SyncDaemonProxy(const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent)
+SyncDaemonProxy::SyncDaemonProxy(const QString &service, const QString &path, const QDBusConnection &connection,
+                                 QObject *parent)
     : QDBusAbstractInterface(service, path, staticInterfaceName(), connection, parent)
 {
 }

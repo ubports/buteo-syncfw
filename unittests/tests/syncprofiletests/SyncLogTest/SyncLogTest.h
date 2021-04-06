@@ -26,7 +26,7 @@
 #include <QtTest/QtTest>
 
 namespace Buteo {
-    
+
 class SyncLogTest: public QObject
 {
     Q_OBJECT

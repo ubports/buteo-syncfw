@@ -24,11 +24,11 @@
 
 using namespace Buteo;
 
-ClientPlugin::ClientPlugin( const QString& aPluginName,
-                            const SyncProfile& aProfile,
+ClientPlugin::ClientPlugin( const QString &aPluginName,
+                            const SyncProfile &aProfile,
                             PluginCbInterface *aCbInterface )
-:   SyncPluginBase( aPluginName, aProfile.name(), aCbInterface ),
-    iProfile( aProfile )
+    :   SyncPluginBase( aPluginName, aProfile.name(), aCbInterface ),
+        iProfile( aProfile )
 {
 }
 

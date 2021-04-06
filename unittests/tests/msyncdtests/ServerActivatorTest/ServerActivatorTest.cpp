@@ -114,10 +114,10 @@ void ServerActivatorTest :: testConnectivityStateChanged()
 {
     // adding a server profile and use USB transport medium
 
-    const QString SERVER_XML=
-            " <profile name=\"usbserver\" type=\"server\" > "
-                " <key name=\"usb_transport\" value=\"true\"/> "
-            " </profile> ";
+    const QString SERVER_XML =
+        " <profile name=\"usbserver\" type=\"server\" > "
+        " <key name=\"usb_transport\" value=\"true\"/> "
+        " </profile> ";
     QDomDocument doc;
 
     QVERIFY(doc.setContent(SERVER_XML, false));
@@ -155,18 +155,18 @@ void ServerActivatorTest :: testTransportsFromProfile()
     QVERIFY(typeReceived.empty() != 0);
 
     // XML profiles creation
-    const QString USB_XML=
-               " <profile name=\"usbserver\" type=\"server\" > "
-                " <key name=\"usb_transport\" value=\"true\"/> "
-               " </profile> ";
-    const QString BT_XML=
-              " <profile name=\"btserver\" type=\"server\" > "
-                " <key name=\"bt_transport\" value=\"true\"/> "
-              " </profile> ";
-    const QString INTERNET_XML=
-              " <profile name=\"internetserver\" type=\"server\" > "
-                " <key name=\"internet_transport\" value=\"true\"/> "
-              " </profile> ";
+    const QString USB_XML =
+        " <profile name=\"usbserver\" type=\"server\" > "
+        " <key name=\"usb_transport\" value=\"true\"/> "
+        " </profile> ";
+    const QString BT_XML =
+        " <profile name=\"btserver\" type=\"server\" > "
+        " <key name=\"bt_transport\" value=\"true\"/> "
+        " </profile> ";
+    const QString INTERNET_XML =
+        " <profile name=\"internetserver\" type=\"server\" > "
+        " <key name=\"internet_transport\" value=\"true\"/> "
+        " </profile> ";
 
 
     // test for USB transport

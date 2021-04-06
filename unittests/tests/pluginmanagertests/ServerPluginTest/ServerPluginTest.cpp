@@ -34,11 +34,11 @@ void ServerPluginTest::testCreateDestroy()
     PluginManager pluginManager( TEST_PLUGIN_PATH );
 
     SyncProfile profile( "dummyprofile" );
-    ServerPlugin* server1 = pluginManager.createServer( "hdummy", profile, this );
+    ServerPlugin *server1 = pluginManager.createServer( "hdummy", profile, this );
     QVERIFY( server1 );
     QVERIFY( pluginManager.iLoadedDlls.count() == 1 );
 
-    ServerPlugin* server2 = pluginManager.createServer( "hdummy", profile, this );
+    ServerPlugin *server2 = pluginManager.createServer( "hdummy", profile, this );
 
     QVERIFY( server2 );
     QVERIFY( pluginManager.iLoadedDlls.count() == 1 );

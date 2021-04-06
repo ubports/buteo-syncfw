@@ -29,7 +29,7 @@
 #include <QMutex>
 
 namespace Buteo {
-    
+
 /*! \brief A helper class for managing storage reservations.
  *
  */
@@ -56,7 +56,7 @@ public:
      * \return Success indicator.
      */
     bool reserveStorage(const QString &aStorageName,
-                         const QString &aClientId = "");
+                        const QString &aClientId = "");
 
     /*! \brief Tries to reserve multiple storages for the given client.
      *
@@ -108,8 +108,7 @@ public:
 
 private:
 
-    struct StorageMapItem
-    {
+    struct StorageMapItem {
         QString iClientId;
         unsigned iRefCount;
 

@@ -64,7 +64,7 @@ public:
      * \return A list of sync profiles. The caller should delete the profiles
      * after use.
      */
-    QList<SyncProfile*> getProfilesByAccountId(Accounts::AccountId id);
+    QList<SyncProfile *> getProfilesByAccountId(Accounts::AccountId id);
 
 public Q_SLOTS:
 
@@ -83,10 +83,10 @@ public Q_SLOTS:
     void slotSchedulerSettingsChanged(const char *aKey);
 Q_SIGNALS:
 
-    void enableSOC(const QString& aProfileName);
-    void scheduleUpdated(const QString& aProfileName);
+    void enableSOC(const QString &aProfileName);
+    void scheduleUpdated(const QString &aProfileName);
     void removeProfile(QString profileId);
-    void removeScheduledSync(const QString& profileId);
+    void removeScheduledSync(const QString &profileId);
 
 private Q_SLOTS:
 
@@ -107,8 +107,8 @@ private:
 
     ProfileManager &iProfileManager;
 
-    QList<Accounts::Account*> iAccountList;
-    QMap <Accounts::Watch*, Accounts::AccountId> iAcctWatchMap;
+    QList<Accounts::Account *> iAccountList;
+    QMap <Accounts::Watch *, Accounts::AccountId> iAcctWatchMap;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class AccountsHelperTest;

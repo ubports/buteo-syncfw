@@ -62,13 +62,11 @@ void AccountsHelper::createProfileForAccount(Accounts::AccountId id)
     FUNCTION_CALL_TRACE;
     Accounts::Account *newAccount = iAccountManager->account(id);
 
-    if(0 != newAccount)
-    {
+    if (0 != newAccount) {
         registerAccountListener(id);
         bool profileFoundAndCreated = false;
         const Accounts::ServiceList serviceList = newAccount->services();
-        for(const Accounts::Service &service : serviceList)
-        {
+        for (const Accounts::Service &service : serviceList) {
             // Look for a sync profile that matches the service name (template)
             LOG_DEBUG("Looking for sync profile::" << service.name());
             bool serviceEnabled = newAccount->enabledServices().contains(service);
@@ -80,8 +78,7 @@ void AccountsHelper::createProfileForAccount(Accounts::AccountId id)
         // Fetch the key "remote_service_name" from the account settings and
         // use it to create a profile
         QString serviceName = newAccount->valueAsString(REMOTE_SERVICE_NAME);
-        if (profileFoundAndCreated == false && !serviceName.isEmpty())
-        {
+        if (profileFoundAndCreated == false && !serviceName.isEmpty()) {
             LOG_DEBUG("Profile name from account setting:" << serviceName);
             const QString profileName = serviceName + "-" + QString::number(newAccount->id());
             if (addProfileForAccount(newAccount, serviceName, true, profileName)) {
@@ -98,16 +95,15 @@ void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)
 {
     FUNCTION_CALL_TRACE;
     // Delete the profile(s) with account ID
-    QList<SyncProfile*> syncProfiles = getProfilesByAccountId(id);
-    foreach(SyncProfile *profile, syncProfiles)
-    {
+    QList<SyncProfile *> syncProfiles = getProfilesByAccountId(id);
+    foreach (SyncProfile *profile, syncProfiles) {
         LOG_DEBUG("Removing profile" << profile->name());
         emit removeProfile(profile->name());
         delete profile;
     }
 #ifdef USE_ACCOUNTSHELPER_SCHEDULER_WATCHER
     // remove corresponding watch from the Map
-    QMap<Accounts::Watch*, Accounts::AccountId>::iterator i = iAcctWatchMap.begin();
+    QMap<Accounts::Watch *, Accounts::AccountId>::iterator i = iAcctWatchMap.begin();
     while (i != iAcctWatchMap.end()) {
         if (i.value() == id) {
             i = iAcctWatchMap.erase(i);
@@ -147,7 +143,7 @@ void AccountsHelper::syncEnableWithAccount(Accounts::Account *account)
     account->selectService();
     // Always use the current enabled value since signals may be emitted with delays.
     bool enabled = account->enabled();
-    const QList<SyncProfile*> profiles = getProfilesByAccountId(account->id());
+    const QList<SyncProfile *> profiles = getProfilesByAccountId(account->id());
     for (SyncProfile *profile : profiles) {
         LOG_DEBUG("Changing profile enabled" << profile->name() << enabled);
         if (enabled) {
@@ -180,21 +176,22 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
     FUNCTION_CALL_TRACE;
     Q_UNUSED (aCreateNew);
     Accounts::Account *account = iAccountManager->account(id);
-    if(0 != account) {
+    if (0 != account) {
         //Sync schedule settings should be global
         account->selectService();
         account->beginGroup("scheduler");
         SyncSchedule syncSchedule;
 
         int peakStart = account->valueAsInt(Buteo::SYNC_SCHEDULE_PEAK_START_TIME_KEY_INT);
-        QTime startTime(peakStart/60 , peakStart%60);
+        QTime startTime(peakStart / 60, peakStart % 60);
 
         int peakEnd = account->valueAsInt(Buteo::SYNC_SCHEDULE_PEAK_END_TIME_KEY_INT);
-        QTime endTime(peakEnd/60 , peakEnd%60);
+        QTime endTime(peakEnd / 60, peakEnd % 60);
         LOG_DEBUG ("Start time:" << startTime << "End Time :" << endTime);
         syncSchedule.setRushTime(startTime, endTime);
 
-        SyncProfile::SyncType syncType = account->valueAsBool (Buteo::SYNC_SCHEDULE_ENABLED_KEY_BOOL) ? SyncProfile::SYNC_SCHEDULED:SyncProfile::SYNC_MANUAL ;
+        SyncProfile::SyncType syncType = account->valueAsBool (Buteo::SYNC_SCHEDULE_ENABLED_KEY_BOOL) ?
+                                         SyncProfile::SYNC_SCHEDULED : SyncProfile::SYNC_MANUAL ;
         syncProfile->setSyncType (syncType);
         LOG_DEBUG ("Sync Type :" << syncType );
 
@@ -205,13 +202,13 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
         LOG_DEBUG ("Sync OFFPEAK :" << account->valueAsBool(Buteo::SYNC_SCHEDULE_OFFPEAK_ENABLED_KEY_BOOL));
 
         int scheduleInterval = 60;
-        if(syncSchedule.scheduleEnabled())
+        if (syncSchedule.scheduleEnabled())
             scheduleInterval = account->valueAsInt(Buteo::SYNC_SCHEDULE_OFFPEAK_SCHEDULE_KEY_INT);
         syncSchedule.setInterval(scheduleInterval);
         LOG_DEBUG ("Sync Interval :" << scheduleInterval);
 
         scheduleInterval = 60;
-        if(syncSchedule.rushEnabled())
+        if (syncSchedule.rushEnabled())
             scheduleInterval = account->valueAsInt (Buteo::SYNC_SCHEDULE_PEAK_SCHEDULE_KEY_INT);
         syncSchedule.setRushInterval(scheduleInterval);
         LOG_DEBUG ("Sync Rush Interval :" << scheduleInterval);
@@ -238,7 +235,7 @@ void AccountsHelper::setSyncSchedule(SyncProfile *syncProfile, Accounts::Account
     }
 }
 
-QList<SyncProfile*> AccountsHelper::getProfilesByAccountId(Accounts::AccountId id)
+QList<SyncProfile *> AccountsHelper::getProfilesByAccountId(Accounts::AccountId id)
 {
     FUNCTION_CALL_TRACE;
     QList<ProfileManager::SearchCriteria> filters;
@@ -273,10 +270,9 @@ bool AccountsHelper::addProfileForAccount(Accounts::Account *account,
 
     SyncProfile *profile = iProfileManager.syncProfile(profileName);
 
-    LOG_DEBUG("profileName:"<<profileName);
+    LOG_DEBUG("profileName:" << profileName);
 
-    if(0 == profile)
-    {
+    if (0 == profile) {
         LOG_DEBUG("Creating new profile by cloning base profile");
 
         // Create a new sync profile with username
@@ -287,13 +283,11 @@ bool AccountsHelper::addProfileForAccount(Accounts::Account *account,
 
         setSyncSchedule(profile, account->id(), true);
     }
-    if(profile && (true == profile->boolKey(KEY_USE_ACCOUNTS, false)))
-    {
+    if (profile && (true == profile->boolKey(KEY_USE_ACCOUNTS, false))) {
         profile->setEnabled(account->enabled() && serviceEnabled);
         iProfileManager.updateProfile(*profile);
         emit scheduleUpdated(profile->name());
-        if(profile->isSOCProfile())
-        {
+        if (profile->isSOCProfile()) {
             emit enableSOC(profile->name());
         }
     }
@@ -308,8 +302,7 @@ void AccountsHelper::registerAccountListeners()
     FUNCTION_CALL_TRACE;
     // Populate all enabled accounts list (so that we can listen to changes)
     QList<Accounts::AccountId> accountIds = iAccountManager->accountList();
-    foreach(Accounts::AccountId id, accountIds)
-    {
+    foreach (Accounts::AccountId id, accountIds) {
         registerAccountListener(id);
     }
 }
@@ -318,12 +311,11 @@ void AccountsHelper::slotSchedulerSettingsChanged(const char *aKey)
 {
     FUNCTION_CALL_TRACE;
     LOG_DEBUG("Key Changed" << QString(aKey));
-    Accounts::Watch *watch = qobject_cast<Accounts::Watch*>(this->sender());
-    if(watch && iAcctWatchMap.contains(watch)) {
+    Accounts::Watch *watch = qobject_cast<Accounts::Watch *>(this->sender());
+    if (watch && iAcctWatchMap.contains(watch)) {
         Accounts::AccountId id = iAcctWatchMap.value(watch);
-        QList<SyncProfile*> syncProfiles = getProfilesByAccountId(id);
-        foreach(SyncProfile *syncProfile, syncProfiles)
-        {
+        QList<SyncProfile *> syncProfiles = getProfilesByAccountId(id);
+        foreach (SyncProfile *syncProfile, syncProfiles) {
             if (syncProfile) {
                 setSyncSchedule(syncProfile, id);
                 iProfileManager.updateProfile(*syncProfile);
@@ -346,20 +338,19 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
     // Initialisation and callback for account enabled/disabled
     syncEnableWithAccount(account);
     QObject::connect(account, &Accounts::Account::enabledChanged,
-                     [this, account] (const QString &serviceName, bool enabled) {
-                         LOG_DEBUG("Received account enabled changed signal" << serviceName << enabled << account->displayName());
-                         syncEnableWithAccount(account);
-                     });
+    [this, account] (const QString & serviceName, bool enabled) {
+        LOG_DEBUG("Received account enabled changed signal" << serviceName << enabled << account->displayName());
+        syncEnableWithAccount(account);
+    });
 
 #ifndef USE_ACCOUNTSHELPER_SCHEDULER_WATCHER
-    LOG_DEBUG("AccountsHelper::registerAccountListener() is disabled!  Not listening to scheduler change signals for account:" << id);
+    LOG_DEBUG("AccountsHelper::registerAccountListener() is disabled!  Not listening to scheduler change signals for account:"
+              << id);
 #else
     // Account SyncOnChange
-    QList<SyncProfile*> profiles = getProfilesByAccountId(id);
-    foreach(SyncProfile *profile, profiles)
-    {
-        if(profile->isSOCProfile())
-        {
+    QList<SyncProfile *> profiles = getProfilesByAccountId(id);
+    foreach (SyncProfile *profile, profiles) {
+        if (profile->isSOCProfile()) {
             emit enableSOC(profile->name());
         }
     }
@@ -368,7 +359,7 @@ void AccountsHelper::registerAccountListener(Accounts::AccountId id)
     LOG_DEBUG("Watching Group :" << account->group());
     Accounts::Watch *watch = account->watchKey();
     account->endGroup();
-    if(!watch){
+    if (!watch) {
         LOG_DEBUG("Failed to add watch for acct with id:" << id);
         return;
     }

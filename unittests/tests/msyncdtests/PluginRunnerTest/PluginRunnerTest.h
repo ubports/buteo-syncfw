@@ -32,21 +32,21 @@
 #include "ClientPluginRunner.h"
 
 namespace Buteo {
-    
+
 class PluginRunnerTest : public QObject
 {
-	Q_OBJECT
-	
-	private slots:
-	void initTestCase();
-	void testPluginRunnerConstructor();
-	void cleanupTestCase();
+    Q_OBJECT
 
-	private:
-	PluginRunner *iPRunner;
-	PluginManager *iPManager;
-	SyncProfile *iSProfile;
-	ClientPluginRunner *iClientPRunner;
+private slots:
+    void initTestCase();
+    void testPluginRunnerConstructor();
+    void cleanupTestCase();
+
+private:
+    PluginRunner *iPRunner;
+    PluginManager *iPManager;
+    SyncProfile *iSProfile;
+    ClientPluginRunner *iClientPRunner;
 };
 
 }

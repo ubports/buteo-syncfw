@@ -29,24 +29,37 @@
 #include "LogMacros.h"
 
 namespace {
-    Sync::InternetConnectionType convertNetworkConnectionType(QNetworkConfiguration::BearerType connectionType)
-    {
-        switch (connectionType) {
-            case QNetworkConfiguration::BearerEthernet:  return Sync::INTERNET_CONNECTION_ETHERNET;
-            case QNetworkConfiguration::BearerWLAN:      return Sync::INTERNET_CONNECTION_WLAN;
-            case QNetworkConfiguration::Bearer2G:        return Sync::INTERNET_CONNECTION_2G;
-            case QNetworkConfiguration::BearerCDMA2000:  return Sync::INTERNET_CONNECTION_CDMA2000;
-            case QNetworkConfiguration::BearerWCDMA:     return Sync::INTERNET_CONNECTION_WCDMA;
-            case QNetworkConfiguration::BearerHSPA:      return Sync::INTERNET_CONNECTION_HSPA;
-            case QNetworkConfiguration::BearerBluetooth: return Sync::INTERNET_CONNECTION_BLUETOOTH;
-            case QNetworkConfiguration::BearerWiMAX:     return Sync::INTERNET_CONNECTION_WIMAX;
-            case QNetworkConfiguration::BearerEVDO:      return Sync::INTERNET_CONNECTION_EVDO;
-            case QNetworkConfiguration::BearerLTE:       return Sync::INTERNET_CONNECTION_LTE;
-            case QNetworkConfiguration::Bearer3G:        return Sync::INTERNET_CONNECTION_3G;
-            case QNetworkConfiguration::Bearer4G:        return Sync::INTERNET_CONNECTION_4G;
-            default:                                     return Sync::INTERNET_CONNECTION_UNKNOWN;
-        }
+Sync::InternetConnectionType convertNetworkConnectionType(QNetworkConfiguration::BearerType connectionType)
+{
+    switch (connectionType) {
+    case QNetworkConfiguration::BearerEthernet:
+        return Sync::INTERNET_CONNECTION_ETHERNET;
+    case QNetworkConfiguration::BearerWLAN:
+        return Sync::INTERNET_CONNECTION_WLAN;
+    case QNetworkConfiguration::Bearer2G:
+        return Sync::INTERNET_CONNECTION_2G;
+    case QNetworkConfiguration::BearerCDMA2000:
+        return Sync::INTERNET_CONNECTION_CDMA2000;
+    case QNetworkConfiguration::BearerWCDMA:
+        return Sync::INTERNET_CONNECTION_WCDMA;
+    case QNetworkConfiguration::BearerHSPA:
+        return Sync::INTERNET_CONNECTION_HSPA;
+    case QNetworkConfiguration::BearerBluetooth:
+        return Sync::INTERNET_CONNECTION_BLUETOOTH;
+    case QNetworkConfiguration::BearerWiMAX:
+        return Sync::INTERNET_CONNECTION_WIMAX;
+    case QNetworkConfiguration::BearerEVDO:
+        return Sync::INTERNET_CONNECTION_EVDO;
+    case QNetworkConfiguration::BearerLTE:
+        return Sync::INTERNET_CONNECTION_LTE;
+    case QNetworkConfiguration::Bearer3G:
+        return Sync::INTERNET_CONNECTION_3G;
+    case QNetworkConfiguration::Bearer4G:
+        return Sync::INTERNET_CONNECTION_4G;
+    default:
+        return Sync::INTERNET_CONNECTION_UNKNOWN;
     }
+}
 }
 
 using namespace Buteo;
@@ -100,19 +113,17 @@ NetworkManager::NetworkManager(QObject *parent /* = 0*/) :
     m_sessionTimer = new QTimer(this);
     m_sessionTimer->setSingleShot(true);
     m_sessionTimer->setInterval(10000);
-    connect(m_sessionTimer,SIGNAL(timeout()),this,SLOT(sessionConnectionTimeout()));
+    connect(m_sessionTimer, SIGNAL(timeout()), this, SLOT(sessionConnectionTimeout()));
 }
 
 NetworkManager::~NetworkManager()
 {
     FUNCTION_CALL_TRACE;
-    if(m_networkSession)
-    {
+    if (m_networkSession) {
         delete m_networkSession;
         m_networkSession = 0;
     }
-    if(m_networkConfigManager)
-    {
+    if (m_networkConfigManager) {
         delete m_networkConfigManager;
         m_networkConfigManager = 0;
     }
@@ -132,15 +143,12 @@ Sync::InternetConnectionType NetworkManager::connectionType() const
 void NetworkManager::connectSession(bool connectInBackground /* = false*/)
 {
     FUNCTION_CALL_TRACE;
-    if(m_isSessionActive)
-    {
+    if (m_isSessionActive) {
         LOG_DEBUG("Network session already active, ignoring connect call");
         m_refCount++;
         emit connectionSuccess();
         return;
-    }
-    else if(!m_networkSession)
-    {
+    } else if (!m_networkSession) {
         QNetworkConfiguration netConfig = m_networkConfigManager->defaultConfiguration();
         m_networkSession = new QNetworkSession(netConfig);
         m_errorEmitted = false;
@@ -154,7 +162,7 @@ void NetworkManager::connectSession(bool connectInBackground /* = false*/)
         connect(m_networkSession, SIGNAL(opened()), SIGNAL(connectionSuccess()));
     }
     m_networkSession->setSessionProperty("ConnectInBackground", connectInBackground);
-    if(!m_networkSession->isOpen()) {
+    if (!m_networkSession->isOpen()) {
         m_networkSession->open();
         // Fail after 10 sec if no network reply is received
         m_sessionTimer->start();
@@ -188,8 +196,7 @@ void NetworkManager::idleRefresh()
     QString bearerTypeName;
 
     bool isOnline = activeConfigs.size() > 0;
-    if (isOnline)
-    {
+    if (isOnline) {
         // FIXME: due this bug lp:#1444162 on nm the QNetworkConfigurationManager
         // returns the wrong default connection.
         // We will consider the connection with the smallest bearer as the
@@ -197,11 +204,9 @@ void NetworkManager::idleRefresh()
         // https://bugs.launchpad.net/ubuntu/+source/network-manager/+bug/1444162
         connectionType = activeConfigs.first().bearerType();
         bearerTypeName = activeConfigs.first().bearerTypeName();
-        foreach(const QNetworkConfiguration &conf, activeConfigs)
-        {
+        foreach (const QNetworkConfiguration &conf, activeConfigs) {
             if (conf.bearerType() != QNetworkConfiguration::BearerUnknown
-                    && (conf.bearerType() < connectionType || connectionType == QNetworkConfiguration::BearerUnknown))
-            {
+                    && (conf.bearerType() < connectionType || connectionType == QNetworkConfiguration::BearerUnknown)) {
                 connectionType = conf.bearerType();
                 bearerTypeName = conf.bearerTypeName();
             }
@@ -210,8 +215,7 @@ void NetworkManager::idleRefresh()
 
     const Sync::InternetConnectionType convertedConnectionType = convertNetworkConnectionType(connectionType);
     LOG_INFO("New network state:" << isOnline << " New type: " << bearerTypeName << "(" << convertedConnectionType << ")");
-    if (isOnline != m_isOnline || convertedConnectionType != m_connectionType)
-    {
+    if (isOnline != m_isOnline || convertedConnectionType != m_connectionType) {
         m_isOnline = isOnline;
         m_connectionType = convertedConnectionType;
         emit statusChanged(m_isOnline, m_connectionType);
@@ -221,12 +225,10 @@ void NetworkManager::idleRefresh()
 void NetworkManager::disconnectSession()
 {
     FUNCTION_CALL_TRACE;
-    if(m_refCount > 0)
-    {
+    if (m_refCount > 0) {
         m_refCount--;
     }
-    if(m_networkSession && 0 == m_refCount)
-    {
+    if (m_networkSession && 0 == m_refCount) {
         if (m_sessionTimer->isActive())
             m_sessionTimer->stop();
 
@@ -239,8 +241,7 @@ void NetworkManager::disconnectSession()
 void NetworkManager::slotSessionState(QNetworkSession::State status)
 {
     FUNCTION_CALL_TRACE;
-    switch(status)
-    {
+    switch (status) {
     case QNetworkSession::Invalid:
         LOG_WARNING("QNetworkSession::Invalid");
         m_isSessionActive = false;
@@ -257,13 +258,10 @@ void NetworkManager::slotSessionState(QNetworkSession::State status)
     case QNetworkSession::Connected:
         LOG_WARNING("QNetworkSession::Connected");
         if (m_networkSession->isOpen() &&
-                m_networkSession->state() == QNetworkSession::Connected)
-        {
+                m_networkSession->state() == QNetworkSession::Connected) {
             m_isSessionActive = true;
             emit connectionSuccess();
-        }
-        else
-        {
+        } else {
             emit connectionError();
         }
         break;
@@ -298,8 +296,7 @@ void NetworkManager::slotSessionError(QNetworkSession::SessionError error)
         m_errorEmitted = true;
     }
 
-    switch(error)
-    {
+    switch (error) {
     case QNetworkSession::UnknownSessionError:
         LOG_WARNING("QNetworkSession::UnknownSessionError");
         emit connectionError();

@@ -203,7 +203,7 @@ void ProfileTest::testFields()
     QCOMPARE(p->type(), TYPE);
 
     // There should be 3 fields.
-    QList<const ProfileField*> allFields = p->allFields();
+    QList<const ProfileField *> allFields = p->allFields();
     QCOMPARE(allFields.size(), 3);
 
     // The last field should be about notebook name.
@@ -260,12 +260,12 @@ void ProfileTest::testSubProfiles()
     QCOMPARE(sub->isEnabled(), true);
     QCOMPARE(sub->key("Notebook Name"), QString("myNotebook"));
 
-    QList<Profile*> allSubProfiles = p->allSubProfiles();
+    QList<Profile *> allSubProfiles = p->allSubProfiles();
     QCOMPARE(allSubProfiles.size(), 3);
 
     // Sub-profile by key value.
     sub = p->subProfileByKeyValue("Notebook Name", "myNotebook",
-        Profile::TYPE_STORAGE, true);
+                                  Profile::TYPE_STORAGE, true);
     QVERIFY(sub != 0);
     QCOMPARE(sub, p->subProfile("hcalendar"));
 }
@@ -350,14 +350,16 @@ void ProfileTest::testXmlConversion()
     // TODO: Compare XML documents in a clever way, then fix the *-expected.xml
     // files which need to be updated after "service" profile-type removal
     // (left empty now)
-    QEXPECT_FAIL("", "The order in which QDomDocument::toString() writes out XML attributes is undefined - cannot simply compare XML strings", Abort);
+    QEXPECT_FAIL("",
+                 "The order in which QDomDocument::toString() writes out XML attributes is undefined - cannot simply compare XML strings",
+                 Abort);
     QVERIFY(false);
 
     QScopedPointer<Profile> p(loadFromXmlFile("hcalendar", Profile::TYPE_STORAGE));
     QVERIFY(p != 0);
     QVERIFY(saveToXmlFile(*p, "hcalendar-output", true, TMP_PROFILE_DIR));
     QCOMPARE(profileFileToString("hcalendar-output", Profile::TYPE_STORAGE, TMP_PROFILE_DIR),
-        profileFileToString("hcalendar-expected", Profile::TYPE_STORAGE, EXPECTED_PROFILE_DIR));
+             profileFileToString("hcalendar-expected", Profile::TYPE_STORAGE, EXPECTED_PROFILE_DIR));
 
     // Merge storage profile to service profile.
     QScopedPointer<Profile> p2(loadFromXmlFile("ovi-calendar", Profile::TYPE_SYNC));
@@ -367,23 +369,22 @@ void ProfileTest::testXmlConversion()
     // Output local profile data only, no merged sub-profile data.
     QVERIFY(saveToXmlFile(*p2, "ovi-calendar-output", true, TMP_PROFILE_DIR));
     QCOMPARE(profileFileToString("ovi-calendar-output", Profile::TYPE_SYNC, TMP_PROFILE_DIR),
-        profileFileToString("ovi-calendar-expected", Profile::TYPE_SYNC, EXPECTED_PROFILE_DIR));
+             profileFileToString("ovi-calendar-expected", Profile::TYPE_SYNC, EXPECTED_PROFILE_DIR));
 
     // Output merged sub-profiles also.
     QVERIFY(saveToXmlFile(*p2, "ovi-calendar-output", false, TMP_PROFILE_DIR));
     QCOMPARE(profileFileToString("ovi-calendar-output", Profile::TYPE_SYNC, TMP_PROFILE_DIR),
-        profileFileToString("ovi-calendar-merged-expected", Profile::TYPE_SYNC, EXPECTED_PROFILE_DIR));
+             profileFileToString("ovi-calendar-merged-expected", Profile::TYPE_SYNC, EXPECTED_PROFILE_DIR));
 }
 
 Profile *ProfileTest::loadFromXmlFile(const QString &aName, const QString &aType,
-        const QString &aProfileDir)
+                                      const QString &aProfileDir)
 {
     QString profileDir = aProfileDir.isEmpty() ? PROFILE_DIR : aProfileDir;
 
     QFile file(profileDir + "/" + aType + "/" + aName + ".xml");
 
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         return 0;
     } // no else
 
@@ -405,22 +406,20 @@ bool ProfileTest::saveToXmlFile(const Profile &aProfile, const QString &aName,
     QDir dir;
     dir.mkpath(profileDir + "/" + aProfile.type());
     QFile file(profileDir + "/" + aProfile.type() + "/" +
-        aName + ".xml");
+               aName + ".xml");
 
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         return false;
     } // no else
 
     QDomDocument doc;
     QDomProcessingInstruction xmlHeading =
         doc.createProcessingInstruction("xml",
-        "version=\"1.0\" encoding=\"UTF-8\"");
+                                        "version=\"1.0\" encoding=\"UTF-8\"");
     doc.appendChild(xmlHeading);
 
     QDomElement root = aProfile.toXml(doc, aLocalOnly);
-    if (root.isNull())
-    {
+    if (root.isNull()) {
         return false;
     } // no else
 
@@ -445,8 +444,7 @@ QString ProfileTest::profileFileToString(const QString &aName,
 
     QFile file(profileDir + "/" + aType + "/" + aName + ".xml");
 
-    if (file.open(QIODevice::ReadOnly))
-    {
+    if (file.open(QIODevice::ReadOnly)) {
         QTextStream outputStream(&file);
         output = outputStream.readAll();
     } // no else

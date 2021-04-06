@@ -27,7 +27,7 @@
 #include <QMap>
 #include <QSocketNotifier>
 extern "C" {
-    #include "iphbd/libiphb.h"
+#include "iphbd/libiphb.h"
 }
 
 namespace Buteo {
@@ -40,10 +40,9 @@ class IPHeartBeat : public QObject
     Q_OBJECT
 
     /// \brief Internal structure to hold profile-iphb stucture-notifier map
-    struct BeatStruct
-    {
+    struct BeatStruct {
         int sockfd;
-        QSocketNotifier* sockNotifier;
+        QSocketNotifier *sockNotifier;
         iphb_t iphbHandle;
     };
 
@@ -66,13 +65,13 @@ public:
      * \param aMaxWaitTime Minimum wait time in seconds.
      * \return Success indicator.
      */
-    bool setHeartBeat(const QString& aProfName, ushort aMinWaitTime, ushort aMaxWaitTime);
+    bool setHeartBeat(const QString &aProfName, ushort aMinWaitTime, ushort aMaxWaitTime);
 
     /*! \brief Removes heart beat waiting for a profile.
      *
      * \param aProfName Name of the profile.
      */
-    void removeWait(const QString& aProfName);
+    void removeWait(const QString &aProfName);
 
     /*! \brief Removes heart beat waiting for all profiles.
      */
@@ -104,7 +103,7 @@ private:
      * \param aProfName name of the profile.
      * \return true if profile name found, otherwise false
      */
-    bool getProfNameFromFd(int aSockFd, QString& aProfName);
+    bool getProfNameFromFd(int aSockFd, QString &aProfName);
 
 
 private:

@@ -30,24 +30,24 @@
 #include "SyncProfile.h"
 
 namespace Buteo {
-    
+
 class ClientPluginRunnerTest: public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
-	private slots:
-	void initTestCase();
-	void cleanupTestCase();
-	void testCpluginRunnerConstructor();
-	void testInit();
-	void testStart();
-	void testSignals();
-	
-	private:
-	ClientPluginRunner *iClientPrunner;
-	SyncProfile *iSprofile;
-	PluginManager *iPluginMgr;
-	PluginCbInterface *iPluginCbIf;
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
+    void testCpluginRunnerConstructor();
+    void testInit();
+    void testStart();
+    void testSignals();
+
+private:
+    ClientPluginRunner *iClientPrunner;
+    SyncProfile *iSprofile;
+    PluginManager *iPluginMgr;
+    PluginCbInterface *iPluginCbIf;
 };
 
 }

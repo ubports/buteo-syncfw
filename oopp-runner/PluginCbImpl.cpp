@@ -41,27 +41,27 @@ PluginCbImpl::~PluginCbImpl()
 {
     FUNCTION_CALL_TRACE;
 
-    if( imsyncIface ) {
+    if ( imsyncIface ) {
         delete imsyncIface;
         imsyncIface = 0;
     }
 }
 
 bool PluginCbImpl::requestStorage(const QString &aStorageName,
-        const SyncPluginBase */*aCaller*/)
+                                  const SyncPluginBase */*aCaller*/)
 {
     FUNCTION_CALL_TRACE;
 
     bool requestResult = false;
 
-    if( imsyncIface ) {
+    if ( imsyncIface ) {
         QStringList storages;
-    	storages << aStorageName;
-    	QDBusReply<bool> gotStorages = imsyncIface->requestStorages(storages);
+        storages << aStorageName;
+        QDBusReply<bool> gotStorages = imsyncIface->requestStorages(storages);
 
-    	if( !gotStorages.isValid() )
-        	LOG_WARNING( "Request for storage " << aStorageName << " failed" );
-    	else
+        if ( !gotStorages.isValid() )
+            LOG_WARNING( "Request for storage " << aStorageName << " failed" );
+        else
             requestResult = gotStorages.value();
     } else {
         LOG_WARNING( "msyncd dbus interface is NULL" );
@@ -71,24 +71,24 @@ bool PluginCbImpl::requestStorage(const QString &aStorageName,
 }
 
 void PluginCbImpl::releaseStorage(const QString &aStorageName,
-        const SyncPluginBase */*aCaller*/)
+                                  const SyncPluginBase */*aCaller*/)
 {
     FUNCTION_CALL_TRACE;
 
-    if( imsyncIface ) {
+    if ( imsyncIface ) {
         QStringList storages;
-    	storages << aStorageName;
-    	imsyncIface->releaseStorages( storages );
+        storages << aStorageName;
+        imsyncIface->releaseStorages( storages );
     } else {
         LOG_WARNING( "msyncd dbus interface is NULL" );
     }
 }
 
-StoragePlugin* PluginCbImpl::createStorage(const QString &aPluginName)
+StoragePlugin *PluginCbImpl::createStorage(const QString &aPluginName)
 {
     FUNCTION_CALL_TRACE;
 
-    StoragePlugin* plugin = NULL;
+    StoragePlugin *plugin = NULL;
     if ( !aPluginName.isEmpty() ) {
         plugin = iPluginManager.createStorage(aPluginName);
     } // no else
@@ -110,13 +110,13 @@ bool PluginCbImpl::isConnectivityAvailable( Sync::ConnectivityType aType )
     return iTransportTracker.isConnectivityAvailable(aType);
 }
 
-Profile* PluginCbImpl::getSyncProfileByRemoteAddress(const QString& aAddress)
+Profile *PluginCbImpl::getSyncProfileByRemoteAddress(const QString &aAddress)
 {
     Q_UNUSED( aAddress );
     return NULL;
 }
 
-QString PluginCbImpl::getValue(const QString& aAddress, const QString& aKey)
+QString PluginCbImpl::getValue(const QString &aAddress, const QString &aKey)
 {
     Q_UNUSED( aAddress );
     Q_UNUSED( aKey );

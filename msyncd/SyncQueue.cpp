@@ -41,23 +41,20 @@ SyncSession *SyncQueue::dequeue()
 
     SyncSession *p = NULL;
 
-    if (!iItems.isEmpty())
-    {
+    if (!iItems.isEmpty()) {
         p = iItems.dequeue();
     } // no else
 
     return p;
 }
 
-SyncSession* SyncQueue::dequeue(const QString &aProfileName)
+SyncSession *SyncQueue::dequeue(const QString &aProfileName)
 {
     FUNCTION_CALL_TRACE;
     SyncSession *ret = 0;
-    QQueue<SyncSession*>::iterator i;
-    for (i = iItems.begin(); i != iItems.end(); ++i)
-    {
-        if ((*i)->profileName() == aProfileName)
-        {
+    QQueue<SyncSession *>::iterator i;
+    for (i = iItems.begin(); i != iItems.end(); ++i) {
+        if ((*i)->profileName() == aProfileName) {
             ret = *i;
             iItems.erase(i);
             break;
@@ -71,8 +68,7 @@ SyncSession *SyncQueue::head()
     FUNCTION_CALL_TRACE;
 
     SyncSession *p = NULL;
-    if (!iItems.isEmpty())
-    {
+    if (!iItems.isEmpty()) {
         p = iItems.head();
     } // no else
 
@@ -97,9 +93,8 @@ bool SyncQueue::contains(const QString &aProfileName) const
 {
     FUNCTION_CALL_TRACE;
 
-    QQueue<SyncSession*>::const_iterator i;
-    for (i = iItems.begin(); i != iItems.end(); ++i)
-    {
+    QQueue<SyncSession *>::const_iterator i;
+    for (i = iItems.begin(); i != iItems.end(); ++i) {
         if ((*i)->profileName() == aProfileName)
             return true;
     }
@@ -136,7 +131,7 @@ void SyncQueue::sort()
     // @todo: Sort queued profiles using some criteria.
 }
 
-const QList<SyncSession*>& SyncQueue::getQueuedSyncSessions() const
+const QList<SyncSession *> &SyncQueue::getQueuedSyncSessions() const
 {
     FUNCTION_CALL_TRACE;
     return iItems;

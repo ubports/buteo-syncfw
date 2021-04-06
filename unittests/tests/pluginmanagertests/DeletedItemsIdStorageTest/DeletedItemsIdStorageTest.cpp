@@ -56,13 +56,13 @@ void DeletedItemsIdStorageTest::testInit()
 {
     bool initResult;
     bool uninitResult;
-    
+
     initResult = iDeletedItems->init(DBFILE);
     QVERIFY(initResult == true);
     uninitResult = iDeletedItems->uninit();
     QVERIFY(uninitResult == true);
 
-    
+
 }
 
 
@@ -87,9 +87,9 @@ void DeletedItemsIdStorageTest::testItemIdStoring()
     QVERIFY(success);
     QVERIFY(itemIdList.size() > 0);
     QVERIFY(itemIdList.first() == itemId);
-    
+
     iDeletedItems->uninit();
-    
+
 }
 
 
@@ -110,14 +110,14 @@ void DeletedItemsIdStorageTest::testSnapshot()
     QList<QDateTime> setCreationTimes;
     setCreationTimes << now << now << now;
     iDeletedItems->setSnapshot(setItemIdList, setCreationTimes);
-    
+
     QList<QString> receivedItemIdList;
     QList<QDateTime> receivedCreationTimes;
     iDeletedItems->getSnapshot(receivedItemIdList, receivedCreationTimes);
 
     QVERIFY(setItemIdList == receivedItemIdList);
     QVERIFY(setCreationTimes == receivedCreationTimes);
-    
+
     iDeletedItems->uninit();
 }
 

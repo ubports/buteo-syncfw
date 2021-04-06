@@ -29,8 +29,8 @@
 // 24 hours
 const int MAX_FREQUENCY = 1440;
 
-BackgroundSync::BackgroundSync(QObject* aParent)
- :  QObject(aParent)
+BackgroundSync::BackgroundSync(QObject *aParent)
+    :  QObject(aParent)
 {
     FUNCTION_CALL_TRACE;
 }
@@ -48,13 +48,13 @@ void BackgroundSync::removeAll()
 
     QStringList profNames;
 
-    QMapIterator<QString,BActivityStruct> iter(iScheduledSyncs);
+    QMapIterator<QString, BActivityStruct> iter(iScheduledSyncs);
     while (iter.hasNext()) {
         iter.next();
         profNames.append(iter.key());
     }
 
-    for(int i=0; i<profNames.size(); i++) {
+    for (int i = 0; i < profNames.size(); i++) {
         remove(profNames[i]);
     }
 
@@ -67,10 +67,10 @@ bool BackgroundSync::remove(const QString &aProfName)
 
     removeSwitch(aProfName);
 
-    if(iScheduledSyncs.contains(aProfName) == false)
+    if (iScheduledSyncs.contains(aProfName) == false)
         return false;
 
-    BActivityStruct& tmp = iScheduledSyncs[aProfName];
+    BActivityStruct &tmp = iScheduledSyncs[aProfName];
 
     tmp.backgroundActivity->stop();
     delete tmp.backgroundActivity;
@@ -83,10 +83,10 @@ bool BackgroundSync::set(const QString &aProfName, int seconds)
 {
     FUNCTION_CALL_TRACE;
 
-    if( aProfName.isEmpty())
+    if ( aProfName.isEmpty())
         return false;
 
-    if(iScheduledSyncs.contains(aProfName) == true) {
+    if (iScheduledSyncs.contains(aProfName) == true) {
         // Can't schedule sync for such long interval removing existent profile if it exists,
         // new background activity will be added below
         if ((seconds / 60 >  MAX_FREQUENCY)) {
@@ -101,7 +101,8 @@ bool BackgroundSync::set(const QString &aProfName, int seconds)
                 newAct.frequency = frequency;
                 newAct.backgroundActivity->setWakeupFrequency(newAct.frequency);
                 newAct.backgroundActivity->wait();
-                LOG_DEBUG("BackgroundSync::set() Rescheduling for" << aProfName << "with frequency" << (seconds / 60) << "minutes, waiting.");
+                LOG_DEBUG("BackgroundSync::set() Rescheduling for" << aProfName << "with frequency" <<
+                          (seconds / 60) << "minutes, waiting.");
                 return true;
             } else {
                 newAct.backgroundActivity->wait();
@@ -114,16 +115,18 @@ bool BackgroundSync::set(const QString &aProfName, int seconds)
     BActivityStruct &newAct = iScheduledSyncs[aProfName];
     newAct.backgroundActivity = new BackgroundActivity(this);
     newAct.id = newAct.backgroundActivity->id();
-    connect(newAct.backgroundActivity,SIGNAL(running()), this, SLOT(onBackgroundSyncStarted()));
+    connect(newAct.backgroundActivity, SIGNAL(running()), this, SLOT(onBackgroundSyncStarted()));
     if (seconds / 60 >  MAX_FREQUENCY) {
         newAct.frequency = BackgroundActivity::Range; // 0
         newAct.backgroundActivity->wait(seconds);
-        LOG_DEBUG("BackgroundSync::set() profile name =" << aProfName << "without a valid frequency, waiting for" << seconds << "seconds.");
+        LOG_DEBUG("BackgroundSync::set() profile name =" << aProfName << "without a valid frequency, waiting for" << seconds <<
+                  "seconds.");
     } else {
         newAct.frequency = frequencyFromSeconds(seconds);
         newAct.backgroundActivity->setWakeupFrequency(newAct.frequency);
         newAct.backgroundActivity->wait();
-        LOG_DEBUG("BackgroundSync::set() profile name =" << aProfName << "with frequency " << (seconds / 60) << "minutes, waiting.");
+        LOG_DEBUG("BackgroundSync::set() profile name =" << aProfName << "with frequency " <<
+                  (seconds / 60) << "minutes, waiting.");
     }
     return true;
 }
@@ -132,7 +135,7 @@ void BackgroundSync::onBackgroundSyncStarted()
 {
     FUNCTION_CALL_TRACE;
 
-    BackgroundActivity *tempAct = static_cast<BackgroundActivity*>(sender());
+    BackgroundActivity *tempAct = static_cast<BackgroundActivity *>(sender());
 
     QString profName = getProfNameFromId(tempAct->id());
 
@@ -156,12 +159,12 @@ QString BackgroundSync::getProfNameFromId(const QString activityId) const
 {
     FUNCTION_CALL_TRACE;
 
-    QMapIterator<QString,BActivityStruct> iter(iScheduledSyncs);
+    QMapIterator<QString, BActivityStruct> iter(iScheduledSyncs);
 
     while (iter.hasNext()) {
         iter.next();
-        const BActivityStruct& tmp = iter.value();
-        if(tmp.id == activityId) {
+        const BActivityStruct &tmp = iter.value();
+        if (tmp.id == activityId) {
             return iter.key();
             break;
         }
@@ -170,7 +173,8 @@ QString BackgroundSync::getProfNameFromId(const QString activityId) const
     return QString();
 }
 
-BackgroundActivity::Frequency BackgroundSync::frequencyFromSeconds(int seconds) {
+BackgroundActivity::Frequency BackgroundSync::frequencyFromSeconds(int seconds)
+{
 
     // Don't allow frequencies smaller than 5 mins.
     // In rare cases is possible that seconds is 0
@@ -207,13 +211,13 @@ void BackgroundSync::removeAllSwitches()
     FUNCTION_CALL_TRACE;
 
     QStringList profNames;
-    QMapIterator<QString,BActivitySwitchStruct> iter(iScheduledSwitch);
+    QMapIterator<QString, BActivitySwitchStruct> iter(iScheduledSwitch);
     while (iter.hasNext()) {
         iter.next();
         profNames.append(iter.key());
     }
 
-    for(int i=0; i<profNames.size(); i++) {
+    for (int i = 0; i < profNames.size(); i++) {
         removeSwitch(profNames[i]);
     }
 }
@@ -222,10 +226,10 @@ bool BackgroundSync::removeSwitch(const QString &aProfName)
 {
     FUNCTION_CALL_TRACE;
 
-    if(iScheduledSwitch.contains(aProfName) == false)
+    if (iScheduledSwitch.contains(aProfName) == false)
         return false;
 
-    BActivitySwitchStruct& tmp = iScheduledSwitch[aProfName];
+    BActivitySwitchStruct &tmp = iScheduledSwitch[aProfName];
 
     tmp.backgroundActivity->stop();
     delete tmp.backgroundActivity;
@@ -238,11 +242,11 @@ bool BackgroundSync::setSwitch(const QString &aProfName, const QDateTime &aSwitc
 {
     FUNCTION_CALL_TRACE;
 
-    if(aProfName.isEmpty())
+    if (aProfName.isEmpty())
         return false;
 
     int switchSecs = QDateTime::currentDateTime().secsTo(aSwitchTime);
-    if(iScheduledSwitch.contains(aProfName) == true) {
+    if (iScheduledSwitch.contains(aProfName) == true) {
         BActivitySwitchStruct &newSwitch = iScheduledSwitch[aProfName];
         if (newSwitch.nextSwitch != aSwitchTime) {
             // If activity's state was already Waiting, the state doesn't change, nothing happens and
@@ -250,19 +254,22 @@ bool BackgroundSync::setSwitch(const QString &aProfName, const QDateTime &aSwitc
             newSwitch.backgroundActivity->stop();
             newSwitch.nextSwitch = aSwitchTime;
             newSwitch.backgroundActivity->wait(switchSecs);
-            LOG_DEBUG("BackgroundSync::setSwitch() Rescheduling switch for" << aProfName << "at" << aSwitchTime.toString() << "(" << switchSecs << "secs ) waiting.");
+            LOG_DEBUG("BackgroundSync::setSwitch() Rescheduling switch for" << aProfName << "at" << aSwitchTime.toString() << "(" <<
+                      switchSecs << "secs ) waiting.");
         } else {
             newSwitch.backgroundActivity->wait(switchSecs);
-            LOG_DEBUG("BackgroundSync::setSwitch() Profile" << aProfName << "already with the same switch timer, at" << aSwitchTime.toString() << "(" << switchSecs << "secs ) waiting.");
+            LOG_DEBUG("BackgroundSync::setSwitch() Profile" << aProfName << "already with the same switch timer, at" <<
+                      aSwitchTime.toString() << "(" << switchSecs << "secs ) waiting.");
         }
     } else {
         BActivitySwitchStruct &newSwitch = iScheduledSwitch[aProfName];
         newSwitch.backgroundActivity = new BackgroundActivity(this);
         newSwitch.id = newSwitch.backgroundActivity->id();
-        connect(newSwitch.backgroundActivity,SIGNAL(running()), this, SLOT(onBackgroundSwitchStarted()));
+        connect(newSwitch.backgroundActivity, SIGNAL(running()), this, SLOT(onBackgroundSwitchStarted()));
         newSwitch.nextSwitch = aSwitchTime;
         newSwitch.backgroundActivity->wait(switchSecs);
-        LOG_DEBUG("BackgroundSync::setSwitch() Set switch for profile name =" << aProfName << "at" << aSwitchTime.toString() << "(" << switchSecs << "secs ) waiting.");
+        LOG_DEBUG("BackgroundSync::setSwitch() Set switch for profile name =" << aProfName << "at" << aSwitchTime.toString() <<
+                  "(" << switchSecs << "secs ) waiting.");
     }
     return true;
 }
@@ -271,7 +278,7 @@ void BackgroundSync::onBackgroundSwitchStarted()
 {
     FUNCTION_CALL_TRACE;
 
-    BackgroundActivity *tempAct = static_cast<BackgroundActivity*>(sender());
+    BackgroundActivity *tempAct = static_cast<BackgroundActivity *>(sender());
 
     QString profName = getProfNameFromSwitchId(tempAct->id());
 
@@ -288,12 +295,12 @@ QString BackgroundSync::getProfNameFromSwitchId(const QString activityId) const
 {
     FUNCTION_CALL_TRACE;
 
-    QMapIterator<QString,BActivitySwitchStruct> iter(iScheduledSwitch);
+    QMapIterator<QString, BActivitySwitchStruct> iter(iScheduledSwitch);
 
     while (iter.hasNext()) {
         iter.next();
-        const BActivitySwitchStruct& tmp = iter.value();
-        if(tmp.id == activityId) {
+        const BActivitySwitchStruct &tmp = iter.value();
+        if (tmp.id == activityId) {
             return iter.key();
             break;
         }

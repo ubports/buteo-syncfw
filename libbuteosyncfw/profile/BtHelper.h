@@ -30,8 +30,7 @@
 
 /*! \brief Strings used for DBus communication with bluetooth daemon are grouped using this structure.
   */
-struct BT
-{
+struct BT {
     /// Destination for Dbus command to bluez
     static const QString BLUEZ_DEST;
     /// Bluez manager interface name
@@ -57,18 +56,18 @@ class BtHelper : public QObject
     Q_OBJECT
 
 private:
-	QString m_deviceAddress;
+    QString m_deviceAddress;
 
 // Private methods
 
     /*! \brief Fetches the default adapter path
       */
-     QString getDefaultAdapterPath();
-    
-     /*! \brief Fetches the device path
-      * \param defaultAdapterPath Default adapter path
-      */
-     QString getDevicePath(QString& defaultAdapterPath);
+    QString getDefaultAdapterPath();
+
+    /*! \brief Fetches the device path
+     * \param defaultAdapterPath Default adapter path
+     */
+    QString getDevicePath(QString &defaultAdapterPath);
     /* \brief Open the serial port and get file descriptor for the port.
        * \return File descriptor if opening port was success, otherwise -1
        */
@@ -77,7 +76,7 @@ public:
       * \param deviceAddess Bluetooth address of remote device
       * \param parent Parent object
       */
-    BtHelper(const QString& deviceAddess, QObject* parent = 0);
+    BtHelper(const QString &deviceAddess, QObject *parent = 0);
 
     /*! \brief Destructor
       */
@@ -86,16 +85,16 @@ public:
     /*! \brief Fetch the bluetooth services supported by remote device.
       * \param servicesList outparam which will be populated with the services.
       */
-     bool getServiceRecords(QList<QString>& servicesList);
+    bool getServiceRecords(QList<QString> &servicesList);
     /*! \brief To find if a specific service is supported by remote device.
-      * \param servicesList List of remote device sdp records 
+      * \param servicesList List of remote device sdp records
       * \param serviceUUID UUID of the service to be connected
       */
-     bool isServiceSupported (const QList<QString>& servicesList, const QString& serviceUUID);
+    bool isServiceSupported (const QList<QString> &servicesList, const QString &serviceUUID);
 
     /*! \brief To find remote device BT properties.
       */
-     QMap<QString, QVariant> getDeviceProperties();
+    QMap<QString, QVariant> getDeviceProperties();
 };
 
 #endif // BTHELPER_H

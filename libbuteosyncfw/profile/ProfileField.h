@@ -33,7 +33,7 @@ class QDomElement;
 namespace Buteo {
 
 class ProfileFieldPrivate;
-    
+
 /*! \brief This class represents a profile field.
  *
  * Profile field is a bunch of information about a setting whose value must
@@ -143,7 +143,7 @@ public:
 
 private:
 
-    ProfileField& operator=(const ProfileField &aRhs);
+    ProfileField &operator=(const ProfileField &aRhs);
 
     ProfileFieldPrivate *d_ptr;
 

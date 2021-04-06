@@ -28,7 +28,7 @@
 
 
 namespace Buteo {
-    
+
 class TransportTrackerTest: public QObject
 {
     Q_OBJECT

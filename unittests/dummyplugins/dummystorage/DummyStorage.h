@@ -28,52 +28,52 @@
 #include "StoragePluginLoader.h"
 
 namespace Buteo {
-    
+
 class DummyStorage : public StoragePlugin
 {
 public:
 
-    DummyStorage( const QString& aPluginName );
+    DummyStorage( const QString &aPluginName );
 
     virtual ~DummyStorage();
 
-    virtual bool init( const QMap<QString, QString>& aProperties );
+    virtual bool init( const QMap<QString, QString> &aProperties );
 
     virtual bool uninit();
 
-    virtual bool getAllItems( QList<StorageItem*>& aItems );
+    virtual bool getAllItems( QList<StorageItem *> &aItems );
 
-    virtual bool getNewItems( QList<StorageItem*>& aNewItems, const QDateTime& aTime );
+    virtual bool getNewItems( QList<StorageItem *> &aNewItems, const QDateTime &aTime );
 
-    virtual bool getModifiedItems( QList<StorageItem*>& aModifiedItems, const QDateTime& aTime );
+    virtual bool getModifiedItems( QList<StorageItem *> &aModifiedItems, const QDateTime &aTime );
 
-    virtual bool getDeletedItems( QList<StorageItem*>& aDeletedItems, const QDateTime& aTime );
+    virtual bool getDeletedItems( QList<StorageItem *> &aDeletedItems, const QDateTime &aTime );
 
-    virtual bool getAllItemIds( QList<QString>& aItems );
+    virtual bool getAllItemIds( QList<QString> &aItems );
 
-    virtual bool getNewItemIds( QList<QString>& aNewItems, const QDateTime& aTime );
+    virtual bool getNewItemIds( QList<QString> &aNewItems, const QDateTime &aTime );
 
-    virtual bool getModifiedItemIds( QList<QString>& aModifiedItems, const QDateTime& aTime );
+    virtual bool getModifiedItemIds( QList<QString> &aModifiedItems, const QDateTime &aTime );
 
-    virtual bool getDeletedItemIds( QList<QString>& aDeletedItems, const QDateTime& aTime );
+    virtual bool getDeletedItemIds( QList<QString> &aDeletedItems, const QDateTime &aTime );
 
-    virtual StorageItem* newItem();
+    virtual StorageItem *newItem();
 
-    virtual StorageItem* getItem( const QString& aItemId );
+    virtual StorageItem *getItem( const QString &aItemId );
 
-    virtual QList<StorageItem*> getItems(const QStringList& aItemIdList );
+    virtual QList<StorageItem *> getItems(const QStringList &aItemIdList );
 
-    virtual OperationStatus addItem( StorageItem& aItem );
+    virtual OperationStatus addItem( StorageItem &aItem );
 
-    virtual QList<OperationStatus> addItems( const QList<StorageItem*>& aItems );
+    virtual QList<OperationStatus> addItems( const QList<StorageItem *> &aItems );
 
-    virtual OperationStatus modifyItem( StorageItem& aItem );
+    virtual OperationStatus modifyItem( StorageItem &aItem );
 
-    virtual QList<OperationStatus> modifyItems( const QList<StorageItem*>& aItems );
+    virtual QList<OperationStatus> modifyItems( const QList<StorageItem *> &aItems );
 
-    virtual OperationStatus deleteItem( const QString& aItemId );
+    virtual OperationStatus deleteItem( const QString &aItemId );
 
-    virtual QList<OperationStatus> deleteItems( const QList<QString>& aItemIds );
+    virtual QList<OperationStatus> deleteItems( const QList<QString> &aItemIds );
 
 };
 
@@ -85,7 +85,7 @@ class DummyStorageLoader : public Buteo::StoragePluginLoader
     Q_INTERFACES(Buteo::StoragePluginLoader)
 
 public:
-    StoragePlugin* createPlugin( const QString& aPluginName );
+    StoragePlugin *createPlugin( const QString &aPluginName );
 };
 
 }

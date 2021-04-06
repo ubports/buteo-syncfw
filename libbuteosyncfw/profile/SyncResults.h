@@ -43,7 +43,7 @@ struct DatabaseResults {
     int     iRemoteItemsDeleted;    /*!<The number of items deleted from the remote database*/
 
     DatabaseResults() : iLocalItemsAdded( 0 ), iLocalItemsModified( 0 ), iLocalItemsDeleted( 0 ),
-                        iRemoteItemsAdded( 0 ), iRemoteItemsModified( 0 ), iRemoteItemsDeleted( 0 ) { }
+        iRemoteItemsAdded( 0 ), iRemoteItemsModified( 0 ), iRemoteItemsDeleted( 0 ) { }
 
 };
 
@@ -142,7 +142,7 @@ public:
      *
      * \param aRhs Source.
      */
-    SyncResults& operator=(const SyncResults &aRhs);
+    SyncResults &operator=(const SyncResults &aRhs);
 
     /*! \brief Exports the sync results to XML.
      *
@@ -206,7 +206,7 @@ public:
      *
      * \param aTargetId The remote device Id.
      */
-    void setTargetId(const QString& aTargetId) ;
+    void setTargetId(const QString &aTargetId) ;
 
     /*! \brief Gets the remote target Id.
      */

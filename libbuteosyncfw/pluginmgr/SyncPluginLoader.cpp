@@ -23,12 +23,12 @@
 
 using namespace Buteo;
 
-ClientPlugin* SyncPluginLoader::createClientPlugin(const QString&, const SyncProfile&, PluginCbInterface*)
+ClientPlugin *SyncPluginLoader::createClientPlugin(const QString &, const SyncProfile &, PluginCbInterface *)
 {
     return nullptr;
 }
 
-ServerPlugin* SyncPluginLoader::createServerPlugin(const QString&, const Profile&, PluginCbInterface*)
+ServerPlugin *SyncPluginLoader::createServerPlugin(const QString &, const Profile &, PluginCbInterface *)
 {
     return nullptr;
 }

@@ -30,8 +30,8 @@ using namespace Buteo;
 
 
 ServerThread::ServerThread()
- :  iServerPlugin( 0 ),
-    iRunning(false)
+    :  iServerPlugin( 0 ),
+       iRunning(false)
 {
     FUNCTION_CALL_TRACE;
 }
@@ -46,15 +46,14 @@ QString ServerThread::getProfileName() const
     FUNCTION_CALL_TRACE;
 
     QString profileName;
-    if (iServerPlugin != 0)
-    {
+    if (iServerPlugin != 0) {
         profileName = iServerPlugin->getProfileName();
     }
 
     return profileName;
 }
 
-ServerPlugin* ServerThread::getPlugin() const
+ServerPlugin *ServerThread::getPlugin() const
 {
     FUNCTION_CALL_TRACE;
 
@@ -62,7 +61,7 @@ ServerPlugin* ServerThread::getPlugin() const
 }
 
 
-bool ServerThread::startThread( ServerPlugin* aServerPlugin )
+bool ServerThread::startThread( ServerPlugin *aServerPlugin )
 {
     FUNCTION_CALL_TRACE;
 
@@ -71,11 +70,9 @@ bool ServerThread::startThread( ServerPlugin* aServerPlugin )
 
     {
         QMutexLocker locker(&iMutex);
-        if( iRunning ) {
+        if ( iRunning ) {
             return false;
-        }
-        else
-        {
+        } else {
             iRunning = true;
         }
     }
@@ -100,19 +97,18 @@ void ServerThread::run()
 {
     FUNCTION_CALL_TRACE;
 
-    if (iServerPlugin == 0)
-    {
+    if (iServerPlugin == 0) {
         LOG_CRITICAL("Server plug-in is NULL");
         return;
     }
 
-    if( !iServerPlugin->init() ) {
+    if ( !iServerPlugin->init() ) {
         LOG_WARNING( "Could not initialize server plugin:" << iServerPlugin->getPluginName() );
         emit initError( iServerPlugin->getProfileName(), "", 0 );
         return;
     }
 
-    if( !iServerPlugin->startListen() ) {
+    if ( !iServerPlugin->startListen() ) {
         LOG_WARNING( "Could not start server plugin:" << iServerPlugin->getPluginName() );
         emit initError( iServerPlugin->getProfileName(), "", 0 );
         return;

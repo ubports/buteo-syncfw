@@ -30,7 +30,9 @@ class ButeoPluginIface: public QDBusAbstractInterface
     Q_OBJECT
 public:
     static inline const char *staticInterfaceName()
-    { return "com.buteo.msyncd.baseplugin"; }
+    {
+        return "com.buteo.msyncd.baseplugin";
+    }
 
 public:
     ButeoPluginIface(const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent = 0);
@@ -112,14 +114,15 @@ Q_SIGNALS: // SIGNALS
     void newSession(const QString &aDestination);
     void success(const QString &aProfileName, const QString &aMessage);
     void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
-    void transferProgress(const QString &aProfileName, Sync::TransferDatabase aDatabase, Sync::TransferType aType, const QString &aMimeType, int aCommittedItems);
+    void transferProgress(const QString &aProfileName, Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                          const QString &aMimeType, int aCommittedItems);
 };
 
 namespace com {
-  namespace buteo {
-    namespace msyncd {
-      typedef ::ButeoPluginIface baseplugin;
-    }
-  }
+namespace buteo {
+namespace msyncd {
+typedef ::ButeoPluginIface baseplugin;
+}
+}
 }
 #endif

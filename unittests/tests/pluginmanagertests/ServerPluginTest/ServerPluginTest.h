@@ -28,7 +28,7 @@
 #include "PluginCbInterface.h"
 
 namespace Buteo {
-    
+
 class ServerPluginTest : public QObject, public PluginCbInterface
 {
     Q_OBJECT
@@ -44,24 +44,30 @@ public:
                                 const SyncPluginBase */*aCaller*/) { }
 
 
-    virtual StoragePlugin* createStorage(const QString &/*aPluginName*/)
+    virtual StoragePlugin *createStorage(const QString &/*aPluginName*/)
     {
         return NULL;
     }
 
     virtual void destroyStorage(StoragePlugin */*aStorage*/) { }
 
-    virtual QString getDeviceIMEI() { return QString( "000000000000000" ); }
+    virtual QString getDeviceIMEI()
+    {
+        return QString( "000000000000000" );
+    }
 
-    virtual bool isConnectivityAvailable( Sync::ConnectivityType /*aType*/ ) { return false; }
+    virtual bool isConnectivityAvailable( Sync::ConnectivityType /*aType*/ )
+    {
+        return false;
+    }
 
-    virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress)
+    virtual Profile *getSyncProfileByRemoteAddress(const QString &aAddress)
     {
         Q_UNUSED(aAddress);
         return 0;
     }
 
-    virtual QString getValue(const QString& aAddress, const QString& aKey)
+    virtual QString getValue(const QString &aAddress, const QString &aKey)
     {
         Q_UNUSED(aAddress);
         Q_UNUSED(aKey);

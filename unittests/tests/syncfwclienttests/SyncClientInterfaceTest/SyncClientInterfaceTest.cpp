@@ -42,12 +42,12 @@ static const QString SYSTEMPROFILE_DIR = "syncprofiletests/testprofiles/system";
 
 void SyncClientInterfaceTest::initTestCase()
 {
-	iSync = new Synchronizer(NULL);
+    iSync = new Synchronizer(NULL);
 
-	iInterface = new SyncClientInterface();
+    iInterface = new SyncClientInterface();
 
-	qRegisterMetaType<Buteo::Profile>("Buteo::Profile");
-	qRegisterMetaType<Buteo::SyncResults>("Buteo::SyncResults");
+    qRegisterMetaType<Buteo::Profile>("Buteo::Profile");
+    qRegisterMetaType<Buteo::SyncResults>("Buteo::SyncResults");
 }
 
 void SyncClientInterfaceTest::cleanupTestCase()
@@ -64,63 +64,63 @@ void SyncClientInterfaceTest::cleanupTestCase()
 
 void SyncClientInterfaceTest::testIsValid()
 {
-	QCOMPARE(iInterface->isValid(),false);
+    QCOMPARE(iInterface->isValid(), false);
 }
 
 void SyncClientInterfaceTest::testStartSync()
 {
-	QString empty("");
-	QCOMPARE(iInterface->startSync(empty),false);
+    QString empty("");
+    QCOMPARE(iInterface->startSync(empty), false);
 
-	QSignalSpy sigStatus(iInterface, SIGNAL(resultsAvailable(QString,Buteo::SyncResults)));
+    QSignalSpy sigStatus(iInterface, SIGNAL(resultsAvailable(QString, Buteo::SyncResults)));
 
-	QString profile("testsync-ovi");
-	QCOMPARE(iInterface->startSync(profile),true);
+    QString profile("testsync-ovi");
+    QCOMPARE(iInterface->startSync(profile), true);
 
-/*	QCOMPARE(sigStatus.count(),1);*/
+    /*  QCOMPARE(sigStatus.count(),1);*/
 }
 
 void SyncClientInterfaceTest::testAbortSync()
 {
-	QString profile("testsync-ovi");
-	iInterface->abortSync(profile);
-	QStringList list = iInterface->getRunningSyncList();
-	sleep(1);
-	QCOMPARE(list.size(),1);
+    QString profile("testsync-ovi");
+    iInterface->abortSync(profile);
+    QStringList list = iInterface->getRunningSyncList();
+    sleep(1);
+    QCOMPARE(list.size(), 1);
 }
 
 void SyncClientInterfaceTest::testGetRunningSyncList()
 {
-	QString profile("testsync-ovi");
-	iInterface->startSync(profile);
-	QStringList list = iInterface->getRunningSyncList();
-	QCOMPARE(list.size(),1);
+    QString profile("testsync-ovi");
+    iInterface->startSync(profile);
+    QStringList list = iInterface->getRunningSyncList();
+    QCOMPARE(list.size(), 1);
 }
 
 void SyncClientInterfaceTest::testSetSyncSchedule()
 {
-	QString profile("testsync-ovi");
-	Buteo::SyncSchedule schedule;
-	QSignalSpy sigProfile(iInterface, SIGNAL(profileChanged(QString,int,QString)));
-	QCOMPARE(iInterface->setSyncSchedule(profile,schedule),true);
+    QString profile("testsync-ovi");
+    Buteo::SyncSchedule schedule;
+    QSignalSpy sigProfile(iInterface, SIGNAL(profileChanged(QString, int, QString)));
+    QCOMPARE(iInterface->setSyncSchedule(profile, schedule), true);
 }
 
 void SyncClientInterfaceTest::testAddProfile()
 {
-	Buteo::SyncProfile profileToAdd("testsync-ovi");
-	QVERIFY(iInterface->updateProfile(profileToAdd));
+    Buteo::SyncProfile profileToAdd("testsync-ovi");
+    QVERIFY(iInterface->updateProfile(profileToAdd));
 }
 
 void SyncClientInterfaceTest::testUpdateProfile()
 {
-	Buteo::SyncProfile profileToChange("testsync-ovi");
-	QVERIFY(iInterface->updateProfile(profileToChange));
+    Buteo::SyncProfile profileToChange("testsync-ovi");
+    QVERIFY(iInterface->updateProfile(profileToChange));
 }
 
 void SyncClientInterfaceTest::testRemoveProfile()
 {
-	QString profileToChange("testsync-ovi");
-	QVERIFY(iInterface->removeProfile(profileToChange));
+    QString profileToChange("testsync-ovi");
+    QVERIFY(iInterface->removeProfile(profileToChange));
 }
 
 QTEST_MAIN(Buteo::SyncClientInterfaceTest)

@@ -31,10 +31,10 @@ class OOPServerPlugin : public ServerPlugin
     Q_OBJECT
 
 public:
-    OOPServerPlugin( const QString& aPluginName,
-                     const Profile& aProfile,
-                     PluginCbInterface* aCbInterface,
-                     QProcess& process );
+    OOPServerPlugin( const QString &aPluginName,
+                     const Profile &aProfile,
+                     PluginCbInterface *aCbInterface,
+                     QProcess &process );
 
     virtual ~OOPServerPlugin();
 

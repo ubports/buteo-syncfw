@@ -27,13 +27,13 @@
 using namespace Buteo;
 
 PluginRunner::PluginRunner(PluginType aPluginType, const QString &aPluginName,
-    PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf, QObject *aParent)
-:   QObject(aParent),
-    iInitialized(false),
-    iPluginMgr(aPluginMgr),
-    iPluginCbIf(aPluginCbIf),
-    iType(aPluginType),
-    iPluginName(aPluginName)
+                           PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf, QObject *aParent)
+    :   QObject(aParent),
+        iInitialized(false),
+        iPluginMgr(aPluginMgr),
+        iPluginCbIf(aPluginCbIf),
+        iType(aPluginType),
+        iPluginName(aPluginName)
 {
     FUNCTION_CALL_TRACE;
 

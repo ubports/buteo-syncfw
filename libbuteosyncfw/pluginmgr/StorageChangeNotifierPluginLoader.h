@@ -34,7 +34,7 @@ class StorageChangeNotifierPluginLoader : public QObject
 {
     Q_OBJECT
 public:
-    virtual StorageChangeNotifierPlugin* createPlugin(const QString& aStorageName) = 0;
+    virtual StorageChangeNotifierPlugin *createPlugin(const QString &aStorageName) = 0;
 };
 
 }

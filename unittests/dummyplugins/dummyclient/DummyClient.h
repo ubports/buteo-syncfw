@@ -34,9 +34,9 @@ class DummyClient : public ClientPlugin
     Q_OBJECT
 public:
 
-    DummyClient( const QString& aPluginName,
-                 const SyncProfile& aProfile,
-                 PluginCbInterface* aCbInterface );
+    DummyClient( const QString &aPluginName,
+                 const SyncProfile &aProfile,
+                 PluginCbInterface *aCbInterface );
 
     ~DummyClient();
 
@@ -67,9 +67,9 @@ class DummyClientLoader : public Buteo::SyncPluginLoader
     Q_INTERFACES(Buteo::SyncPluginLoader)
 
 public:
-    ClientPlugin* createClientPlugin( const QString& aPluginName,
-                                      const Buteo::SyncProfile& aProfile,
-                                      Buteo::PluginCbInterface* aCbInterface ) override;
+    ClientPlugin *createClientPlugin( const QString &aPluginName,
+                                      const Buteo::SyncProfile &aProfile,
+                                      Buteo::PluginCbInterface *aCbInterface ) override;
 };
 
 }

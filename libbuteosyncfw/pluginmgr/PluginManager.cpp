@@ -96,7 +96,7 @@ PluginManager::PluginManager( const QString &aPluginPath )
     : iPluginPath( aPluginPath )
 {
     FUNCTION_CALL_TRACE;
-    
+
     if (!iPluginPath.isEmpty() && !iPluginPath.endsWith('/')) {
         iPluginPath.append('/');
     }
@@ -120,24 +120,24 @@ PluginManager::~PluginManager()
     }
 }
 
-StorageChangeNotifierPlugin* PluginManager::createStorageChangeNotifier( const QString& aStorageName )
+StorageChangeNotifierPlugin *PluginManager::createStorageChangeNotifier( const QString &aStorageName )
 {
     FUNCTION_CALL_TRACE;
 
-    if( ! iStorageChangeNotifierMaps.contains(aStorageName) ) {
+    if ( ! iStorageChangeNotifierMaps.contains(aStorageName) ) {
         LOG_CRITICAL( "Library for the storage change notifier" << aStorageName << "does not exist" );
         return NULL;
     }
 
     QString libraryName = iStorageChangeNotifierMaps.value(aStorageName);
 
-    if (StorageChangeNotifierPlugin *plugin
-            = qobject_cast<StorageChangeNotifierPlugin*>(acquireLoadedPlugin(libraryName))) {
+    if (StorageChangeNotifierPlugin * plugin
+            = qobject_cast<StorageChangeNotifierPlugin *>(acquireLoadedPlugin(libraryName))) {
         return plugin;
     }
 
     QPluginLoader *pluginLoader = new QPluginLoader(libraryName, this);
-    if (StorageChangeNotifierPluginLoader *notifierPluginLoader
+    if (StorageChangeNotifierPluginLoader * notifierPluginLoader
             = qobject_cast<StorageChangeNotifierPluginLoader *>(pluginLoader->instance())) {
         StorageChangeNotifierPlugin *plugin = notifierPluginLoader->createPlugin(aStorageName);
         if (plugin) {
@@ -152,7 +152,7 @@ StorageChangeNotifierPlugin* PluginManager::createStorageChangeNotifier( const Q
     return NULL;
 }
 
-void PluginManager::destroyStorageChangeNotifier( StorageChangeNotifierPlugin* aPlugin )
+void PluginManager::destroyStorageChangeNotifier( StorageChangeNotifierPlugin *aPlugin )
 {
     FUNCTION_CALL_TRACE;
 
@@ -169,24 +169,24 @@ void PluginManager::destroyStorageChangeNotifier( StorageChangeNotifierPlugin* a
     unloadPlugin(iStorageChangeNotifierMaps.value(storageName));
 }
 
-StoragePlugin* PluginManager::createStorage( const QString& aPluginName )
+StoragePlugin *PluginManager::createStorage( const QString &aPluginName )
 {
     FUNCTION_CALL_TRACE;
 
-    if( ! iStorageMaps.contains(aPluginName) ) {
+    if ( ! iStorageMaps.contains(aPluginName) ) {
         LOG_CRITICAL( "Library for the storage" << aPluginName << "does not exist" );
         return NULL;
     }
 
     QString libraryName = iStorageMaps.value(aPluginName);
 
-    if (StoragePlugin *plugin
-            = qobject_cast<StoragePlugin*>(acquireLoadedPlugin(libraryName))) {
+    if (StoragePlugin * plugin
+            = qobject_cast<StoragePlugin *>(acquireLoadedPlugin(libraryName))) {
         return plugin;
     }
 
     QPluginLoader *pluginLoader = new QPluginLoader(libraryName, this);
-    if (StoragePluginLoader *storagePluginLoader
+    if (StoragePluginLoader * storagePluginLoader
             = qobject_cast<StoragePluginLoader *>(pluginLoader->instance())) {
         StoragePlugin *plugin = storagePluginLoader->createPlugin(aPluginName);
         if (plugin) {
@@ -201,7 +201,7 @@ StoragePlugin* PluginManager::createStorage( const QString& aPluginName )
     return NULL;
 }
 
-void PluginManager::destroyStorage( StoragePlugin* aPlugin )
+void PluginManager::destroyStorage( StoragePlugin *aPlugin )
 {
     FUNCTION_CALL_TRACE;
 
@@ -213,19 +213,19 @@ void PluginManager::destroyStorage( StoragePlugin* aPlugin )
     if ( ! iStorageMaps.contains(pluginName)) {
         LOG_CRITICAL( "Library for the storage" << pluginName << "does not exist" );
         return;
-    } 
+    }
 
     unloadPlugin(iStorageMaps.value(pluginName));
 }
 
-ClientPlugin* PluginManager::createClient( const QString& aPluginName,
-                                           const SyncProfile& aProfile,
+ClientPlugin *PluginManager::createClient( const QString &aPluginName,
+                                           const SyncProfile &aProfile,
                                            PluginCbInterface *aCbInterface)
 {
     FUNCTION_CALL_TRACE;
 
-    if( ! iClientMaps.contains(aPluginName) &&
-        ! iOopClientMaps.contains(aPluginName)) {
+    if ( ! iClientMaps.contains(aPluginName) &&
+            ! iOopClientMaps.contains(aPluginName)) {
         LOG_CRITICAL( "Library for the client" << aPluginName << "does not exist" );
         return NULL;
     }
@@ -233,13 +233,13 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
     if ( iClientMaps.contains(aPluginName) ) {
         QString libraryName = iClientMaps.value(aPluginName);
 
-        if (ClientPlugin *plugin
-                = qobject_cast<ClientPlugin*>(acquireLoadedPlugin(libraryName))) {
+        if (ClientPlugin * plugin
+                = qobject_cast<ClientPlugin *>(acquireLoadedPlugin(libraryName))) {
             return plugin;
         }
 
         QPluginLoader *pluginLoader = new QPluginLoader(libraryName, this);
-        if (SyncPluginLoader *syncPluginLoader
+        if (SyncPluginLoader * syncPluginLoader
                 = qobject_cast<SyncPluginLoader *>(pluginLoader->instance())) {
             ClientPlugin *plugin = syncPluginLoader->createClientPlugin(aPluginName, aProfile, aCbInterface);
             if (plugin) {
@@ -256,16 +256,16 @@ ClientPlugin* PluginManager::createClient( const QString& aPluginName,
     } else if ( iOopClientMaps.contains(aPluginName) ) {
         // Start the out of process plugin
         const QString libraryName = iOopClientMaps.value( aPluginName );
-        QProcess* process = startOOPPlugin( aPluginName, aProfile.name(), libraryName );
+        QProcess *process = startOOPPlugin( aPluginName, aProfile.name(), libraryName );
 
-        if( process == NULL ) {
+        if ( process == NULL ) {
             LOG_CRITICAL( "Could not start process" );
             return NULL;
         }
 
         // Create the client plugin interface to talk to the process
-        OOPClientPlugin* plugin = new OOPClientPlugin( aPluginName, aProfile, aCbInterface, *process );
-        if( plugin ) {
+        OOPClientPlugin *plugin = new OOPClientPlugin( aPluginName, aProfile, aCbInterface, *process );
+        if ( plugin ) {
             return plugin;
         } else {
             LOG_CRITICAL( "Could not create plugin instance" );
@@ -288,7 +288,7 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
     QString pluginName = aPlugin->getPluginName();
 
     if ( ! iClientMaps.contains(pluginName) &&
-         ! iOopClientMaps.contains(pluginName)) {
+            ! iOopClientMaps.contains(pluginName)) {
         LOG_CRITICAL( "Library for the client plugin" << pluginName << "does not exist" );
         return;
     }
@@ -297,7 +297,7 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
         unloadPlugin(iClientMaps.value(pluginName));
 
     } else if ( iOopClientMaps.contains(pluginName) ) {
-        // Stop the OOP process        
+        // Stop the OOP process
         LOG_DEBUG( "Stopping the OOP process for " << pluginName);
         QString path = iOopClientMaps.value( pluginName );
         stopOOPPlugin( path );
@@ -305,14 +305,14 @@ void PluginManager::destroyClient( ClientPlugin *aPlugin )
     }
 }
 
-ServerPlugin* PluginManager::createServer( const QString& aPluginName,
-                                           const Profile& aProfile,
+ServerPlugin *PluginManager::createServer( const QString &aPluginName,
+                                           const Profile &aProfile,
                                            PluginCbInterface *aCbInterface )
 {
     FUNCTION_CALL_TRACE;
 
-    if( ! iServerMaps.contains(aPluginName) &&
-        ! iOoPServerMaps.contains(aPluginName) ) {
+    if ( ! iServerMaps.contains(aPluginName) &&
+            ! iOoPServerMaps.contains(aPluginName) ) {
         LOG_CRITICAL( "Library for the server" << aPluginName << "does not exist" );
         return NULL;
     }
@@ -321,13 +321,13 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
         // Load the plugin library
         QString libraryName = iServerMaps.value(aPluginName);
 
-        if (ServerPlugin *plugin
-                = qobject_cast<ServerPlugin*>(acquireLoadedPlugin(libraryName))) {
+        if (ServerPlugin * plugin
+                = qobject_cast<ServerPlugin *>(acquireLoadedPlugin(libraryName))) {
             return plugin;
         }
 
         QPluginLoader *pluginLoader = new QPluginLoader(libraryName, this);
-        if (SyncPluginLoader *syncPluginLoader
+        if (SyncPluginLoader * syncPluginLoader
                 = qobject_cast<SyncPluginLoader *>(pluginLoader->instance())) {
             ServerPlugin *plugin = syncPluginLoader->createServerPlugin(aPluginName, aProfile, aCbInterface);
             if (plugin) {
@@ -344,18 +344,18 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
     } else if ( iOoPServerMaps.contains(aPluginName) ) {
         // Start the Oop process plugin
         const QString libraryName = iOoPServerMaps.value( aPluginName );
-        QProcess* process = startOOPPlugin( aPluginName, aProfile.name(), libraryName );
-    
-        if( process == NULL ) {
+        QProcess *process = startOOPPlugin( aPluginName, aProfile.name(), libraryName );
+
+        if ( process == NULL ) {
             LOG_CRITICAL( "Could not start server plugin process" );
             return NULL;
         }
 
-        OOPServerPlugin* plugin = new OOPServerPlugin( aPluginName,
+        OOPServerPlugin *plugin = new OOPServerPlugin( aPluginName,
                                                        aProfile,
                                                        aCbInterface,
                                                        *process );
-        if( plugin ) {
+        if ( plugin ) {
             return plugin;
         } else {
             LOG_CRITICAL( "Could not start server plugin" );
@@ -370,14 +370,14 @@ ServerPlugin* PluginManager::createServer( const QString& aPluginName,
 void PluginManager::destroyServer( ServerPlugin *aPlugin )
 {
     FUNCTION_CALL_TRACE;
-    
+
     if ( aPlugin == 0 )
         return;
-    
+
     QString pluginName = aPlugin->getPluginName();
 
     if ( ! iServerMaps.contains(pluginName) &&
-         ! iOoPServerMaps.contains(pluginName) ) {
+            ! iOoPServerMaps.contains(pluginName) ) {
         LOG_CRITICAL( "Library for the server plugin" << pluginName << "does not exist" );
         return;
     }
@@ -394,7 +394,8 @@ void PluginManager::destroyServer( ServerPlugin *aPlugin )
     }
 }
 
-void PluginManager::loadPluginMaps(const QString &pluginDirPath, const QString &aFilter, QMap<QString, QString>& aTargetMap)
+void PluginManager::loadPluginMaps(const QString &pluginDirPath, const QString &aFilter,
+                                   QMap<QString, QString> &aTargetMap)
 {
     FUNCTION_CALL_TRACE;
 
@@ -422,8 +423,8 @@ void PluginManager::loadPluginMaps(const QString &pluginDirPath, const QString &
 
 }
 
-QProcess* PluginManager::startOOPPlugin(const QString& aPluginName,
-                                        const QString& aProfileName,
+QProcess *PluginManager::startOOPPlugin(const QString &aPluginName,
+                                        const QString &aProfileName,
                                         const QString &aPluginFilePath)
 {
     FUNCTION_CALL_TRACE;
@@ -448,24 +449,27 @@ QProcess* PluginManager::startOOPPlugin(const QString& aPluginName,
     process->setProcessChannelMode( QProcess::ForwardedChannels );
     process->start( exePath, args );
 
-    const QString clientPluginDBusServiceName(QString(QLatin1String("com.buteo.msyncd.plugin.profile-%1")).arg(aProfileName));
+    const QString clientPluginDBusServiceName(QString(QLatin1String("com.buteo.msyncd.plugin.profile-%1")).arg(
+                                                  aProfileName));
     const QString serverPluginDBusServiceName(QString(QLatin1String("com.buteo.msyncd.plugin.%1")).arg(aProfileName));
     bool pluginHasRegistered = false;
     for (int i = 0; i < 30; i++) { // wait for up to thirty seconds for the process to register with dbus
         QThread::sleep(1);         // sleep for a second to wait for the process to be scheduled, init and register with dbus
-        QDBusReply<bool> clientServiceRegistered = QDBusConnection::sessionBus().interface()->isServiceRegistered(clientPluginDBusServiceName);
+        QDBusReply<bool> clientServiceRegistered = QDBusConnection::sessionBus().interface()->isServiceRegistered(
+                                                       clientPluginDBusServiceName);
         if (clientServiceRegistered.isValid() && clientServiceRegistered.value()) {
             pluginHasRegistered = true;
             break;
         }
-        QDBusReply<bool> serverServiceRegistered = QDBusConnection::sessionBus().interface()->isServiceRegistered(serverPluginDBusServiceName);
+        QDBusReply<bool> serverServiceRegistered = QDBusConnection::sessionBus().interface()->isServiceRegistered(
+                                                       serverPluginDBusServiceName);
         if (serverServiceRegistered.isValid() && serverServiceRegistered.value()) {
             pluginHasRegistered = true;
             break;
         }
     }
 
-    if( process->state() == QProcess::Starting ) {
+    if ( process->state() == QProcess::Starting ) {
         started = process->waitForStarted();
     } else {
         started = process->state() == QProcess::Running;
@@ -485,13 +489,13 @@ QProcess* PluginManager::startOOPPlugin(const QString& aPluginName,
             LOG_DEBUG( "Process " << process->program() << " with pid " << process->pid() <<
                        "was unable to register DBus service: " << clientPluginDBusServiceName << "|" << serverPluginDBusServiceName );
         }
-        connect(process, SIGNAL(finished(int,QProcess::ExitStatus)),
-                this, SLOT(onProcessFinished(int,QProcess::ExitStatus)));
+        connect(process, SIGNAL(finished(int, QProcess::ExitStatus)),
+                this, SLOT(onProcessFinished(int, QProcess::ExitStatus)));
         return process;
 
     } else {
         LOG_CRITICAL("Unable to start process plugin " << aPluginFilePath <<
-                      ". Error " << process->error());
+                     ". Error " << process->error());
         delete process;
         return NULL;
     }
@@ -505,8 +509,8 @@ void PluginManager::stopOOPPlugin( const QString &aPath )
 
     iDllLock.lockForWrite();
 
-    for( int i = 0; i < iLoadedDlls.size(); ++i ) {
-        if( iLoadedDlls[i].iPath == aPath ) {
+    for ( int i = 0; i < iLoadedDlls.size(); ++i ) {
+        if ( iLoadedDlls[i].iPath == aPath ) {
             process = iLoadedDlls[i].iHandle;
             break;
         }
@@ -528,13 +532,13 @@ void PluginManager::onProcessFinished( int exitCode, QProcess::ExitStatus )
 {
     FUNCTION_CALL_TRACE;
 
-    QProcess* process = (QProcess*)sender();
+    QProcess *process = (QProcess *)sender();
     LOG_DEBUG( "Process " << process->program() << " finished with exit code" << exitCode );
 
     iDllLock.lockForWrite();
 
-    for( int i = 0; i < iLoadedDlls.size(); ++i ) {
-        if(iLoadedDlls[i].iHandle == process) {
+    for ( int i = 0; i < iLoadedDlls.size(); ++i ) {
+        if (iLoadedDlls[i].iHandle == process) {
             iLoadedDlls.removeAt( i );
             break;
         }

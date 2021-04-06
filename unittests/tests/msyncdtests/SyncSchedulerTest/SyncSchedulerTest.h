@@ -28,41 +28,42 @@
 #include "SyncProfile.h"
 
 namespace Buteo {
-    
+
 class SyncScheduler;
 
 class SyncSchedulerTest: public QObject
 {
     Q_OBJECT
 
-    private slots:
-    
-        void init();
-        void cleanup();
-        void syncTriggered(QString aProfileName);
-        
-        void testAddRemoveProfile();
-        void testSetNextAlarm();
-        
-    private:
-        
-        SyncScheduler* iSyncScheduler;
-        QString        iSyncProfileName;
+private slots:
+
+    void init();
+    void cleanup();
+    void syncTriggered(QString aProfileName);
+
+    void testAddRemoveProfile();
+    void testSetNextAlarm();
+
+private:
+
+    SyncScheduler *iSyncScheduler;
+    QString        iSyncProfileName;
 };
 
-class SyncProfileStub : public SyncProfile {
-    
+class SyncProfileStub : public SyncProfile
+{
+
 public:
-    SyncProfileStub(const QString& aName) : SyncProfile(aName) {}
+    SyncProfileStub(const QString &aName) : SyncProfile(aName) {}
     ~SyncProfileStub() {}
-    
-    QDateTime nextSyncTime() const 
+
+    QDateTime nextSyncTime() const
     {
         const int HOUR = 3600;
         int syncTime_t = QDateTime::currentDateTime().toTime_t() + HOUR;
         return QDateTime::fromTime_t(syncTime_t);
     }
-    
+
 };
 
 }
