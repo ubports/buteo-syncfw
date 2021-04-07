@@ -35,6 +35,12 @@
 #include "LogMacros.h"
 #include "BtHelper.h"
 
+// implement here in lack of better place. not sure should this even be included in the api
+const QString Sync::syncCacheDir()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + QDir::separator() + "msyncd";
+}
+
 static const QString FORMAT_EXT = ".xml";
 static const QString BACKUP_EXT = ".bak";
 static const QString LOG_EXT = ".log";
