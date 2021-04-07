@@ -46,13 +46,6 @@ class ProfileManager: public QObject
 {
     Q_OBJECT
 public:
-
-    //! Primary profile path where profiles will be searched.
-    static const QString DEFAULT_PRIMARY_PROFILE_PATH;
-
-    //! Secondary profile path where profiles will be searched.
-    static const QString DEFAULT_SECONDARY_PROFILE_PATH;
-
     //! Search criteria for finding profiles.
     struct SearchCriteria {
         //! Enum to identify if a member type exists or not
@@ -117,8 +110,8 @@ public:
      *  not found from the primary path. Useful for having default read-only
      *  profiles.
      */
-    ProfileManager(const QString &aPrimaryPath = DEFAULT_PRIMARY_PROFILE_PATH,
-                   const QString &aSecondaryPath = DEFAULT_SECONDARY_PROFILE_PATH);
+    ProfileManager(const QString &aPrimaryPath = QString(),
+                   const QString &aSecondaryPath = QString());
 
     /*! \brief Destructor.
      */

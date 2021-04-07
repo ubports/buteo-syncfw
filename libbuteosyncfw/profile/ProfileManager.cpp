@@ -35,18 +35,16 @@
 #include "LogMacros.h"
 #include "BtHelper.h"
 
-namespace Buteo {
-
 static const QString FORMAT_EXT = ".xml";
 static const QString BACKUP_EXT = ".bak";
 static const QString LOG_EXT = ".log";
 static const QString LOG_DIRECTORY = "logs";
 static const QString BT_PROFILE_TEMPLATE("bt_template");
 
-const QString ProfileManager::DEFAULT_PRIMARY_PROFILE_PATH =
-    Sync::syncCacheDir();
-const QString ProfileManager::DEFAULT_SECONDARY_PROFILE_PATH =
-    "/etc/buteo/profiles";
+static const QString DEFAULT_PRIMARY_PROFILE_PATH = Sync::syncCacheDir();
+static const QString DEFAULT_SECONDARY_PROFILE_PATH = "/etc/buteo/profiles";
+
+namespace Buteo {
 
 // Private implementation class for ProfileManager.
 class ProfileManagerPrivate
@@ -108,8 +106,8 @@ using namespace Buteo;
 
 ProfileManagerPrivate::ProfileManagerPrivate(const QString &aPrimaryPath,
                                              const QString &aSecondaryPath)
-    :   iPrimaryPath(aPrimaryPath),
-        iSecondaryPath(aSecondaryPath)
+    : iPrimaryPath(aPrimaryPath),
+      iSecondaryPath(aSecondaryPath)
 {
     if (iPrimaryPath.endsWith(QDir::separator())) {
         iPrimaryPath.chop(1);
@@ -291,7 +289,8 @@ ProfileManager::SearchCriteria::SearchCriteria(const SearchCriteria &aSource)
 
 ProfileManager::ProfileManager(const QString &aPrimaryPath,
                                const QString &aSecondaryPath)
-    :   d_ptr(new ProfileManagerPrivate(aPrimaryPath, aSecondaryPath))
+    : d_ptr(new ProfileManagerPrivate(aPrimaryPath.isEmpty() ? DEFAULT_PRIMARY_PROFILE_PATH : aPrimaryPath,
+                                      aSecondaryPath.isEmpty() ? DEFAULT_SECONDARY_PROFILE_PATH : aSecondaryPath))
 {
     FUNCTION_CALL_TRACE;
 }
