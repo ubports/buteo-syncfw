@@ -408,41 +408,23 @@ private:
     void externalSyncStatus(const SyncProfile *aProfile, bool aQuery = false);
 
     QMap<QString, SyncSession *> iActiveSessions;
-
     QMap<QString, bool> iExternalSyncProfileStatus;
-
     QList<QString> iProfilesToRemove;
-
     QMap<QString, ServerPluginRunner *> iServers;
-
     QList<QString> iWaitingOnlineSyncs;
-
     NetworkManager *iNetworkManager;
-
     QMap<QString, int> iCountersStorage;
-
     PluginManager iPluginManager;
-
     ProfileManager iProfileManager;
-
     SyncQueue iSyncQueue;
-
     StorageBooker iStorageBooker;
-
     SyncScheduler *iSyncScheduler;
-
     SyncBackup *iSyncBackup;
-
     TransportTracker *iTransportTracker;
-
     ServerActivator *iServerActivator;
-
     AccountsHelper *iAccounts;
-
     bool iClosing;
-
     SyncOnChange iSyncOnChange;
-
     SyncOnChangeScheduler iSyncOnChangeScheduler;
 
     /*! \brief Save the counter for given profile
@@ -458,9 +440,7 @@ private:
     void restoreProfileCounter(SyncProfile *aProfile);
 
     bool iSOCEnabled;
-
     QString iUUID;
-
     QString iRemoteName;
 
     /*

@@ -166,7 +166,7 @@ TargetResults::TargetResults(const QDomElement &aRoot)
         d_ptr->iLocalAdditions = ItemDetails::fromXml(local, TAG_ADDED_ITEM);
         d_ptr->iLocalDeletions = ItemDetails::fromXml(local, TAG_DELETED_ITEM);
         d_ptr->iLocalModifications = ItemDetails::fromXml(local, TAG_MODIFIED_ITEM);
-    } // no else
+    }
 
     QDomElement remote = aRoot.firstChildElement(TAG_REMOTE);
     if (!remote.isNull()) {
@@ -176,7 +176,7 @@ TargetResults::TargetResults(const QDomElement &aRoot)
         d_ptr->iRemoteAdditions = ItemDetails::fromXml(remote, TAG_ADDED_ITEM);
         d_ptr->iRemoteDeletions = ItemDetails::fromXml(remote, TAG_DELETED_ITEM);
         d_ptr->iRemoteModifications = ItemDetails::fromXml(remote, TAG_MODIFIED_ITEM);
-    } // no else
+    }
 }
 
 TargetResults::~TargetResults()

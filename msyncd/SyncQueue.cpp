@@ -43,7 +43,7 @@ SyncSession *SyncQueue::dequeue()
 
     if (!iItems.isEmpty()) {
         p = iItems.dequeue();
-    } // no else
+    }
 
     return p;
 }
@@ -70,7 +70,7 @@ SyncSession *SyncQueue::head()
     SyncSession *p = nullptr;
     if (!iItems.isEmpty()) {
         p = iItems.head();
-    } // no else
+    }
 
     return p;
 }

@@ -100,8 +100,6 @@ public:
 
     // Secondary path for profiles.
     QString iSecondaryPath;
-
-
 };
 
 }
@@ -113,13 +111,12 @@ ProfileManagerPrivate::ProfileManagerPrivate(const QString &aPrimaryPath,
     :   iPrimaryPath(aPrimaryPath),
         iSecondaryPath(aSecondaryPath)
 {
-
     if (iPrimaryPath.endsWith(QDir::separator())) {
         iPrimaryPath.chop(1);
-    } // no else
+    }
     if (iSecondaryPath.endsWith(QDir::separator())) {
         iSecondaryPath.chop(1);
-    } // no else
+    }
 
     LOG_DEBUG("Primary profile path set to" << iPrimaryPath);
     LOG_DEBUG("Secondary profile path set to" << iSecondaryPath);
@@ -156,14 +153,14 @@ SyncLog *ProfileManagerPrivate::loadLog(const QString &aProfileName)
 
     if (!QFile::exists(fileName)) {
         return 0;
-    } // no else
+    }
 
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
         LOG_WARNING("Failed to open sync log file for reading:"
                     << file.fileName());
         return 0;
-    } // no else
+    }
 
     QDomDocument doc;
     if (!doc.setContent(&file)) {
@@ -171,7 +168,7 @@ SyncLog *ProfileManagerPrivate::loadLog(const QString &aProfileName)
         LOG_WARNING("Failed to parse XML from sync log file:"
                     << file.fileName());
         return 0;
-    } // no else
+    }
     file.close();
 
     return new SyncLog(doc.documentElement());
@@ -331,9 +328,9 @@ SyncProfile *ProfileManager::syncProfile(const QString &aName)
             SyncLog *log = d_ptr->loadLog(aName);
             if (0 == log) {
                 log = new SyncLog(aName);
-            } // no else
+            }
             syncProfile->setLog(log);
-        } // no else
+        }
     } else {
         LOG_DEBUG("did not find a valid sync profile with the given name:" << aName);
         if (p != 0) {
@@ -388,7 +385,7 @@ QList<SyncProfile *> ProfileManager::allSyncProfiles()
         SyncProfile *p = syncProfile(name);
         if (p != 0) {
             profiles.append(p);
-        } // no else
+        }
     }
 
     return profiles;
@@ -454,8 +451,8 @@ QList<SyncProfile *> ProfileManager::getSyncProfilesByData(
                 delete profile;
                 profile = 0;
                 continue; // Not a match, continue with next profile.
-            } // no else
-        } // no else
+            }
+        }
 
         // Match, add profile to the list to be returned.
         matchingProfiles.append(profile);
@@ -861,7 +858,7 @@ void ProfileManager::expand(Profile &aProfile)
                                aProfile.type() );
                 }
                 sub->setLoaded(true);
-            } // no else
+            }
         }
 
         // Load/merge may have created new sub-profile entries. Those need
@@ -888,7 +885,7 @@ bool ProfileManager::saveLog(const SyncLog &aLog)
         LOG_WARNING("Failed to open sync log file for writing:"
                     << file.fileName());
         return false;
-    } // no else
+    }
 
     QDomDocument doc;
     QDomProcessingInstruction xmlHeading =
@@ -900,7 +897,7 @@ bool ProfileManager::saveLog(const SyncLog &aLog)
     if (root.isNull()) {
         LOG_WARNING("Failed to convert sync log to XML");
         return false;
-    } // no else
+    }
 
     doc.appendChild(root);
 

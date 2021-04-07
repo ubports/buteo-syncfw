@@ -128,8 +128,8 @@ bool SyncScheduler::addProfile(const SyncProfile *aProfile)
             profileAdded = true;
             LOG_DEBUG("Sync scheduled: profile =" << aProfile->name() <<
                       "time =" << aProfile->nextSyncTime());
-        } // no else
-    } // no else
+        }
+    }
 
     return profileAdded;
 #endif
