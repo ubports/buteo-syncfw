@@ -32,64 +32,61 @@ PluginCbImpl::PluginCbImpl()
 {
     FUNCTION_CALL_TRACE;
 
-    imsyncIface = new SyncDaemonProxy( "com.meego.msyncd",
-                                       "/synchronizer",
-                                       QDBusConnection::sessionBus());
+    imsyncIface = new SyncDaemonProxy("com.meego.msyncd",
+                                      "/synchronizer",
+                                      QDBusConnection::sessionBus());
 }
 
 PluginCbImpl::~PluginCbImpl()
 {
     FUNCTION_CALL_TRACE;
-
-    if( imsyncIface ) {
-        delete imsyncIface;
-        imsyncIface = 0;
-    }
+    delete imsyncIface;
+    imsyncIface = 0;
 }
 
 bool PluginCbImpl::requestStorage(const QString &aStorageName,
-        const SyncPluginBase */*aCaller*/)
+                                  const SyncPluginBase */*aCaller*/)
 {
     FUNCTION_CALL_TRACE;
 
     bool requestResult = false;
 
-    if( imsyncIface ) {
+    if (imsyncIface) {
         QStringList storages;
-    	storages << aStorageName;
-    	QDBusReply<bool> gotStorages = imsyncIface->requestStorages(storages);
+        storages << aStorageName;
+        QDBusReply<bool> gotStorages = imsyncIface->requestStorages(storages);
 
-    	if( !gotStorages.isValid() )
-        	LOG_WARNING( "Request for storage " << aStorageName << " failed" );
-    	else
+        if (!gotStorages.isValid())
+            LOG_WARNING("Request for storage " << aStorageName << " failed");
+        else
             requestResult = gotStorages.value();
     } else {
-        LOG_WARNING( "msyncd dbus interface is NULL" );
+        LOG_WARNING("msyncd dbus interface is NULL");
     }
 
     return requestResult;
 }
 
 void PluginCbImpl::releaseStorage(const QString &aStorageName,
-        const SyncPluginBase */*aCaller*/)
+                                  const SyncPluginBase */*aCaller*/)
 {
     FUNCTION_CALL_TRACE;
 
-    if( imsyncIface ) {
+    if (imsyncIface) {
         QStringList storages;
-    	storages << aStorageName;
-    	imsyncIface->releaseStorages( storages );
+        storages << aStorageName;
+        imsyncIface->releaseStorages(storages);
     } else {
-        LOG_WARNING( "msyncd dbus interface is NULL" );
+        LOG_WARNING("msyncd dbus interface is NULL");
     }
 }
 
-StoragePlugin* PluginCbImpl::createStorage(const QString &aPluginName)
+StoragePlugin *PluginCbImpl::createStorage(const QString &aPluginName)
 {
     FUNCTION_CALL_TRACE;
 
-    StoragePlugin* plugin = NULL;
-    if ( !aPluginName.isEmpty() ) {
+    StoragePlugin *plugin = nullptr;
+    if (!aPluginName.isEmpty()) {
         plugin = iPluginManager.createStorage(aPluginName);
     } // no else
 
@@ -103,23 +100,23 @@ void PluginCbImpl::destroyStorage(StoragePlugin *aStorage)
     iPluginManager.destroyStorage(aStorage);
 }
 
-bool PluginCbImpl::isConnectivityAvailable( Sync::ConnectivityType aType )
+bool PluginCbImpl::isConnectivityAvailable(Sync::ConnectivityType aType)
 {
     FUNCTION_CALL_TRACE;
 
     return iTransportTracker.isConnectivityAvailable(aType);
 }
 
-Profile* PluginCbImpl::getSyncProfileByRemoteAddress(const QString& aAddress)
+Profile *PluginCbImpl::getSyncProfileByRemoteAddress(const QString &aAddress)
 {
-    Q_UNUSED( aAddress );
-    return NULL;
+    Q_UNUSED(aAddress);
+    return nullptr;
 }
 
-QString PluginCbImpl::getValue(const QString& aAddress, const QString& aKey)
+QString PluginCbImpl::getValue(const QString &aAddress, const QString &aKey)
 {
-    Q_UNUSED( aAddress );
-    Q_UNUSED( aKey );
+    Q_UNUSED(aAddress);
+    Q_UNUSED(aKey);
 
     return "";
 }

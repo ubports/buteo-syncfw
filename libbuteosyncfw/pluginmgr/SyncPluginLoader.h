@@ -39,13 +39,13 @@ class SyncPluginLoader : public QObject
 {
     Q_OBJECT
 public:
-    virtual ClientPlugin* createClientPlugin(const QString& aPluginName,
-                                             const SyncProfile& aProfile,
-                                             PluginCbInterface* aCbInterface);
+    virtual ClientPlugin *createClientPlugin(const QString &aPluginName,
+                                             const SyncProfile &aProfile,
+                                             PluginCbInterface *aCbInterface);
 
-    virtual ServerPlugin* createServerPlugin(const QString& aPluginName,
-                                             const Profile& aProfile,
-                                             PluginCbInterface* aCbInterface);
+    virtual ServerPlugin *createServerPlugin(const QString &aPluginName,
+                                             const Profile &aProfile,
+                                             PluginCbInterface *aCbInterface);
 };
 
 }

@@ -46,7 +46,7 @@ private slots:
     void onBeatTriggered(QString aProfName);
 
 private:
-    IPHeartBeat* iHbeat;
+    IPHeartBeat *iHbeat;
     bool iBeatReceived;
 };
 

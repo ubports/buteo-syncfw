@@ -66,7 +66,8 @@ Q_SIGNALS:
     void newSession(const QString &aDestination);
     void success(const QString &aProfileName, const QString &aMessage);
     void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
-    void transferProgress(const QString &aProfileName, Sync::TransferDatabase aDatabase, Sync::TransferType aType, const QString &aMimeType, int aCommittedItems);
+    void transferProgress(const QString &aProfileName, Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                          const QString &aMimeType, int aCommittedItems);
 
 private:
     SyncPluginBase *initializePlugin();

@@ -32,11 +32,11 @@ static const QString NAME = "hcalendar";
 static const QString TYPE = Profile::TYPE_STORAGE;
 static const QString PROFILE_XML =
     "<profile name=\"hcalendar\" type=\"storage\" >"
-        "<field name=\"Notebook Name\" type=\"combo\" label=\"Notebook\">"
-            "<option>myNotebook</option>"
-            "<option>otherNotebook</option>"
-        "</field>"
-        "<key name=\"Local URI\" value=\"./Calendar\" />"
+    "<field name=\"Notebook Name\" type=\"combo\" label=\"Notebook\">"
+    "<option>myNotebook</option>"
+    "<option>otherNotebook</option>"
+    "</field>"
+    "<key name=\"Local URI\" value=\"./Calendar\" />"
     "</profile>";
 
 void StorageProfileTest::testStorageProfile()

@@ -39,18 +39,16 @@ class BackgroundSync : public QObject
     Q_OBJECT
 
     /// \brief Internal structure to hold profile-background activity stucture-notifier map
-    struct BActivityStruct
-    {
+    struct BActivityStruct {
         QString id;
-        BackgroundActivity* backgroundActivity;
+        BackgroundActivity *backgroundActivity;
         BackgroundActivity::Frequency frequency;
     };
 
-     /// \brief Internal structure to hold profile-background activity switch stucture-notifier map
-    struct BActivitySwitchStruct
-    {
+    /// \brief Internal structure to hold profile-background activity switch stucture-notifier map
+    struct BActivitySwitchStruct {
         QString id;
-        BackgroundActivity* backgroundActivity;
+        BackgroundActivity *backgroundActivity;
         QDateTime nextSwitch;
     };
 
@@ -73,13 +71,13 @@ public:
      * \return Success indicator.
      */
 
-    bool set(const QString& aProfName, int seconds);
+    bool set(const QString &aProfName, int seconds);
 
     /*! \brief Removes background sync for a profile.
      *
      * \param aProfName Name of the profile.
      */
-    bool remove(const QString& aProfName);
+    bool remove(const QString &aProfName);
 
     /*! \brief Removes all background syncs for all profiles.
      */
@@ -94,13 +92,13 @@ public:
      * \param aSwitchTime when the switch will occurs
      * \return Success indicator.
      */
-    bool setSwitch(const QString& aProfName, const QDateTime& aSwitchTime);
+    bool setSwitch(const QString &aProfName, const QDateTime &aSwitchTime);
 
     /*! \brief Removes  a switch(rush/off-rush) for a profile.
      *
      * \param aProfName Name of the profile.
      */
-    bool removeSwitch(const QString& aProfName);
+    bool removeSwitch(const QString &aProfName);
 
 signals:
 
@@ -114,7 +112,7 @@ signals:
      *
      * \param aProfName Name of the profile for which switch timer is triggered.
      */
-    void onBackgroundSwitchRunning(const QString& aProfName);
+    void onBackgroundSwitchRunning(const QString &aProfName);
 
 public slots:
     /*! \brief Called when background sync is completed

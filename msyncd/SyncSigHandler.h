@@ -37,8 +37,8 @@
  *          Unix signal handlers. In this class, we intend to handle both the SIGHUP and SIGTERM signals.
  */
 class SyncSigHandler : public QObject
- {
-     Q_OBJECT
+{
+    Q_OBJECT
 
 public:
     /*! \brief Constructor
@@ -46,44 +46,44 @@ public:
      * @param aParent object
      * @param aName const char
      */
-     SyncSigHandler(QObject *aParent = 0, const char *aName = 0);
+    SyncSigHandler(QObject *aParent = 0, const char *aName = 0);
 
-     /*! \brief Destructor
-      *
-      */
-     ~SyncSigHandler();
+    /*! \brief Destructor
+     *
+     */
+    ~SyncSigHandler();
 
-     // Unix signal handlers.
-     static void hupSignalHandler(int unused);
-     static void termSignalHandler(int unused);
+    // Unix signal handlers.
+    static void hupSignalHandler(int unused);
+    static void termSignalHandler(int unused);
 
 public slots:
-     /*! \brief QT signal handler to handle SIG_HUP
-      *
-      * @return None
-      */
-     void handleSigHup();
+    /*! \brief QT signal handler to handle SIG_HUP
+     *
+     * @return None
+     */
+    void handleSigHup();
 
-     /*! \brief QT signal handler to handle SIG_TERM
-      *
-      * @return None
-      */
-     void handleSigTerm();
+    /*! \brief QT signal handler to handle SIG_TERM
+     *
+     * @return None
+     */
+    void handleSigTerm();
 
 private:
-     //socket pair for each Unix signal to handle
-     static int iSigHupFd[2];
-     static int iSigTermFd[2];
+    //socket pair for each Unix signal to handle
+    static int iSigHupFd[2];
+    static int iSigTermFd[2];
 
-     //QSocketNotifier to monitor the read end of each socket pair,
-     // declare your Unix signal handlers to be static class methods
-     QSocketNotifier *iSigHup;
-     QSocketNotifier *iSigTerm;
+    //QSocketNotifier to monitor the read end of each socket pair,
+    // declare your Unix signal handlers to be static class methods
+    QSocketNotifier *iSigHup;
+    QSocketNotifier *iSigTerm;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class SyncSigHandlerTest;
 #endif
- };
+};
 
 
 #endif // SYNCSIGHANDLER_H

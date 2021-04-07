@@ -28,7 +28,7 @@
 #include <ProfileManager.h>
 
 namespace Buteo {
-    
+
 class AccountsHelperTest: public QObject
 {
     Q_OBJECT

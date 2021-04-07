@@ -53,28 +53,28 @@ class SyncBackupAdaptor: public QDBusAbstractAdaptor
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "com.nokia.backupclient")
     Q_CLASSINFO("D-Bus Introspection", ""
-"  <interface name=\"com.nokia.backupclient\">\n"
-"    <signal name=\"backupDone\"/>\n"
-"    <signal name=\"backupInProgress\"/>\n"
-"    <signal name=\"restoreDone\"/>\n"
-"    <signal name=\"restoreInProgress\"/>\n"
-"    <method name=\"backupStarts\">\n"
-"      <arg direction=\"out\" type=\"y\"/>\n"
-"    </method>\n"
-"    <method name=\"backupFinished\">\n"
-"      <arg direction=\"out\" type=\"y\"/>\n"
-"    </method>\n"
-"    <method name=\"restoreStarts\">\n"
-"      <arg direction=\"out\" type=\"y\"/>\n"
-"    </method>\n"
-"    <method name=\"restoreFinished\">\n"
-"      <arg direction=\"out\" type=\"y\"/>\n"
-"    </method>\n"
-"    <method name=\"getBackUpRestoreState\">\n"
-"      <arg direction=\"out\" type=\"b\"/>\n"
-"    </method>\n"
-"  </interface>\n"
-        "");
+                "  <interface name=\"com.nokia.backupclient\">\n"
+                "    <signal name=\"backupDone\"/>\n"
+                "    <signal name=\"backupInProgress\"/>\n"
+                "    <signal name=\"restoreDone\"/>\n"
+                "    <signal name=\"restoreInProgress\"/>\n"
+                "    <method name=\"backupStarts\">\n"
+                "      <arg direction=\"out\" type=\"y\"/>\n"
+                "    </method>\n"
+                "    <method name=\"backupFinished\">\n"
+                "      <arg direction=\"out\" type=\"y\"/>\n"
+                "    </method>\n"
+                "    <method name=\"restoreStarts\">\n"
+                "      <arg direction=\"out\" type=\"y\"/>\n"
+                "    </method>\n"
+                "    <method name=\"restoreFinished\">\n"
+                "      <arg direction=\"out\" type=\"y\"/>\n"
+                "    </method>\n"
+                "    <method name=\"getBackUpRestoreState\">\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
+                "");
 public:
 
     //! \see SyncBackup::SyncBackup()
@@ -86,10 +86,10 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
 
-	//! \see ~SyncBackup::backupFinished()
+    //! \see ~SyncBackup::backupFinished()
     uchar backupFinished(const QDBusMessage &message);
 
-	//! \see ~SyncBackup::backupStarts()
+    //! \see ~SyncBackup::backupStarts()
     uchar backupStarts(const QDBusMessage &message);
 
     //! \see ~SyncBackup::getBackUpRestoreState()
@@ -103,7 +103,7 @@ public Q_SLOTS: // METHODS
 
 Q_SIGNALS: // SIGNALS
 
-	//! \see ~SyncBackup::backupDone
+    //! \see ~SyncBackup::backupDone
     void backupDone();
 
     //! \see ~SyncBackup::backupInProgress

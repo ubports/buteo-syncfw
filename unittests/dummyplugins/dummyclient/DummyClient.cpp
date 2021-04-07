@@ -25,10 +25,10 @@
 
 using namespace Buteo;
 
-DummyClient::DummyClient( const QString& aPluginName,
-                          const SyncProfile& aProfile,
-                          PluginCbInterface* aCbInterface )
- : ClientPlugin( aPluginName, aProfile, aCbInterface )
+DummyClient::DummyClient( const QString &aPluginName,
+                          const SyncProfile &aProfile,
+                          PluginCbInterface *aCbInterface )
+    : ClientPlugin( aPluginName, aProfile, aCbInterface )
 {
 
 }
@@ -60,7 +60,7 @@ void DummyClient::abortSync()
 
 bool DummyClient::cleanUp()
 {
-	return false;
+    return false;
 }
 
 SyncResults DummyClient::getSyncResults()
@@ -77,9 +77,9 @@ void DummyClient::connectivityStateChanged( Sync::ConnectivityType /*aType*/,
 }
 
 
-ClientPlugin* DummyClientLoader::createClientPlugin( const QString& aPluginName,
-                                                    const Buteo::SyncProfile& aProfile,
-                                                    Buteo::PluginCbInterface* aCbInterface )
+ClientPlugin *DummyClientLoader::createClientPlugin( const QString &aPluginName,
+                                                     const Buteo::SyncProfile &aProfile,
+                                                     Buteo::PluginCbInterface *aCbInterface )
 {
     return new DummyClient( aPluginName, aProfile, aCbInterface );
 }

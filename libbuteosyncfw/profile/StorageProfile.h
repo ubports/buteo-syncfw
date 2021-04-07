@@ -72,7 +72,7 @@ public:
 
 private:
 
-    StorageProfile& operator=(const StorageProfile &aRhs);
+    StorageProfile &operator=(const StorageProfile &aRhs);
 
     StorageProfilePrivate *d_ptr;
 

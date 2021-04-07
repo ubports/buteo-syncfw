@@ -36,48 +36,48 @@ const QString BT::DISCOVERSERVICES = "DiscoverServices";
 const QString BT::GETPROPERTIES = "GetProperties";
 
 
-BtHelper::BtHelper(const QString& deviceAddress,
-                       QObject* parent) : QObject(parent)
+BtHelper::BtHelper(const QString &deviceAddress,
+                   QObject *parent) : QObject(parent)
 {
     m_deviceAddress         = deviceAddress;
 }
 
 BtHelper::~BtHelper()
 {
-  LOG_DEBUG ("");    
+    LOG_DEBUG ("");
 }
 
 
 
-bool BtHelper::isServiceSupported (const QList<QString>& servicesList, const QString& serviceUUID)
+bool BtHelper::isServiceSupported (const QList<QString> &servicesList, const QString &serviceUUID)
 {
-   LOG_DEBUG ("isServiceSupported");
-   foreach (QString service, servicesList) {
-  	//LOG_DEBUG ("Record : "  << service);
-	if (service.contains(serviceUUID)){   
-   		LOG_DEBUG ("Service found " << serviceUUID);
-		return true;
-	}
-   }
-   return false;
+    LOG_DEBUG ("isServiceSupported");
+    foreach (QString service, servicesList) {
+        //LOG_DEBUG ("Record : "  << service);
+        if (service.contains(serviceUUID)) {
+            LOG_DEBUG ("Service found " << serviceUUID);
+            return true;
+        }
+    }
+    return false;
 }
 
 QString BtHelper::getDefaultAdapterPath()
 {
     LOG_DEBUG ("getDefaultAdapterPath");
-    
-    QDBusInterface managerInterface( BT::BLUEZ_DEST, "/",
-                                     BT::BLUEZ_MANAGER_INTERFACE,
-                                     QDBusConnection::systemBus() );
 
-    if( !managerInterface.isValid() ) {
+    QDBusInterface managerInterface(BT::BLUEZ_DEST, "/",
+                                    BT::BLUEZ_MANAGER_INTERFACE,
+                                    QDBusConnection::systemBus());
+
+    if (!managerInterface.isValid()) {
         LOG_DEBUG ("Manager interface is invalid");
         return QString();
     }
 
     QDBusReply<QDBusObjectPath> pathReply = managerInterface.call(BT::GET_DEFAULT_ADAPTER);
 
-    if( !pathReply.isValid() ) {
+    if (!pathReply.isValid()) {
         LOG_DEBUG ("Not able to get the adapter path");
         return QString();
     }
@@ -87,27 +87,27 @@ QString BtHelper::getDefaultAdapterPath()
 QString BtHelper::getDevicePath(QString &defaultAdapterPath)
 {
     if (defaultAdapterPath.isEmpty()) {
-    	LOG_DEBUG ( "Adapter path is empty");
-	return QString();	
-    }	
+        LOG_DEBUG ( "Adapter path is empty");
+        return QString();
+    }
 
     QDBusInterface adapterInterface(BT::BLUEZ_DEST, defaultAdapterPath,
-                                    BT::BLUEZ_ADAPTER_INTERFACE, QDBusConnection::systemBus() );
-    if( !adapterInterface.isValid() ) {
+                                    BT::BLUEZ_ADAPTER_INTERFACE, QDBusConnection::systemBus());
+    if (!adapterInterface.isValid()) {
         LOG_DEBUG ( "Adapter interface is invalid");
         return QString();
     }
 
-    QDBusReply<QDBusObjectPath> pathReply = adapterInterface.call(BT::FIND_DEVICE, m_deviceAddress );
+    QDBusReply<QDBusObjectPath> pathReply = adapterInterface.call(BT::FIND_DEVICE, m_deviceAddress);
 
-    if( !pathReply.isValid() ) {
+    if (!pathReply.isValid()) {
         LOG_DEBUG ( "Not able to find the BT device");
         return QString();
     }
     return pathReply.value().path();
 }
 
-bool BtHelper::getServiceRecords(QList<QString>& servicesList)
+bool BtHelper::getServiceRecords(QList<QString> &servicesList)
 {
     LOG_DEBUG ( "getServiceRecords()");
 
@@ -116,25 +116,25 @@ bool BtHelper::getServiceRecords(QList<QString>& servicesList)
 
     QString devicePath = getDevicePath(defaultAdapterPath);
     if (devicePath.isEmpty())
-	    return false;
+        return false;
     LOG_DEBUG ( "Device path =" << devicePath);
 
     QDBusInterface deviceInterface(BT::BLUEZ_DEST, devicePath,
                                    BT::BLUEZ_DEVICE_INTERFACE,
-                                   QDBusConnection::systemBus() );
-    if( deviceInterface.isValid() == false ) {
+                                   QDBusConnection::systemBus());
+    if (deviceInterface.isValid() == false) {
         LOG_DEBUG ("Device interface is not valid");
         return false;
     }
 
-   QDBusMessage message = deviceInterface.call(BT::DISCOVERSERVICES, QString());
-   QDBusArgument reply = QDBusReply<QDBusArgument>(message).value();
-   QMap<uint, QString> mapVal;
-   reply >> mapVal;  
-   servicesList = mapVal.values();
-   if (servicesList.size() > 0)
-	   return true;
-   return false;
+    QDBusMessage message = deviceInterface.call(BT::DISCOVERSERVICES, QString());
+    QDBusArgument reply = QDBusReply<QDBusArgument>(message).value();
+    QMap<uint, QString> mapVal;
+    reply >> mapVal;
+    servicesList = mapVal.values();
+    if (servicesList.size() > 0)
+        return true;
+    return false;
 }
 
 QMap<QString, QVariant> BtHelper::getDeviceProperties()
@@ -147,19 +147,19 @@ QMap<QString, QVariant> BtHelper::getDeviceProperties()
 
     QString devicePath = getDevicePath(defaultAdapterPath);
     if (devicePath.isEmpty())
-	    return mapVal;
+        return mapVal;
     LOG_DEBUG ( "Device path =" << devicePath);
 
     QDBusInterface deviceInterface(BT::BLUEZ_DEST, devicePath,
                                    BT::BLUEZ_DEVICE_INTERFACE,
-                                   QDBusConnection::systemBus() );
-    if( deviceInterface.isValid() == false ) {
+                                   QDBusConnection::systemBus());
+    if (deviceInterface.isValid() == false) {
         LOG_DEBUG ("Device interface is not valid");
         return mapVal;
     }
 
-   QDBusMessage message = deviceInterface.call(BT::GETPROPERTIES);
-   QDBusArgument reply = QDBusReply<QDBusArgument>(message).value();
-   reply >> mapVal;  
-   return mapVal;
+    QDBusMessage message = deviceInterface.call(BT::GETPROPERTIES);
+    QDBusArgument reply = QDBusReply<QDBusArgument>(message).value();
+    reply >> mapVal;
+    return mapVal;
 }

@@ -78,14 +78,14 @@ public:
      *
      * \param aRhs Source
      */
-    SyncSchedule& operator=(const SyncSchedule &aRhs);
+    SyncSchedule &operator=(const SyncSchedule &aRhs);
 
     /*! \brief Equal to operator.
      *
      * \param aRhs Source
      */
     bool operator==(const SyncSchedule &aRhs);
-    
+
     /*! \brief Exports the sync schedule to XML.
      *
      * \param aDoc Parent document for the created XML elements.
@@ -93,7 +93,7 @@ public:
      */
     QDomElement toXml(QDomDocument &aDoc) const;
 
-	/*! \brief Exports the sync schedule to QString.
+    /*! \brief Exports the sync schedule to QString.
      *
      * \return return the Schedule as xml formatted string
      */
@@ -254,7 +254,7 @@ public:
      * \return Next time to switch rush/off-rush schedule intervals. Null object if schedule is not defined for rush/off-rush
      *  or if the rush and off-rush intervals are the same.
      */
-    QDateTime nextRushSwitchTime(const QDateTime& aFromTime) const;
+    QDateTime nextRushSwitchTime(const QDateTime &aFromTime) const;
 
     /*! \brief Returns true if aDateTime is within a scheduled period.
      *
@@ -266,7 +266,7 @@ public:
 
 private:
 
-    SyncSchedulePrivate* d_ptr;
+    SyncSchedulePrivate *d_ptr;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class SyncScheduleTest;

@@ -30,7 +30,7 @@
 #include "LogMacros.h"
 
 namespace Buteo {
-    
+
 class SyncSigHandlerTest : public QObject
 {
     Q_OBJECT

@@ -38,7 +38,7 @@
 #include "SyncSigHandler.h"
 #include "SyncCommonDefs.h"
 
-Q_DECL_EXPORT int main( int argc, char* argv[] )
+Q_DECL_EXPORT int main(int argc, char *argv[])
 {
     // remove this later on if not needed in harmattan,
     // this IS needed for fremantle
@@ -61,14 +61,15 @@ Q_DECL_EXPORT int main( int argc, char* argv[] )
         LOG_FATAL("Failed to create synchronizer");
     }
 
-    if(!synchronizer->initialize() ) {
+    if (!synchronizer->initialize()) {
         delete synchronizer;
         synchronizer = 0;
         return -1;
     }
 
     QString genericCache = QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation);
-    QFile::Permissions permissions(QFile::ExeOwner | QFile::ExeGroup | QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::WriteGroup);
+    QFile::Permissions permissions(QFile::ExeOwner | QFile::ExeGroup | QFile::ReadOwner | QFile::WriteOwner |
+                                   QFile::ReadGroup | QFile::WriteGroup);
 
     // Make sure we have the .cache directory
     QDir homeDir(genericCache);
@@ -78,9 +79,9 @@ Q_DECL_EXPORT int main( int argc, char* argv[] )
         struct group *grp;
         // assumes that correct groupname is same as username (e.g. nemo:nemo)
         pwd = getpwuid(uid);
-        if (pwd != NULL) {
+        if (pwd != nullptr) {
             grp = getgrnam(pwd->pw_name);
-            if (grp != NULL) {
+            if (grp != nullptr) {
                 gid_t gid = grp->gr_gid;
                 int ret = chown(genericCache.toLatin1().data(), uid, gid);
                 Q_UNUSED(ret);
@@ -110,10 +111,8 @@ Q_DECL_EXPORT int main( int argc, char* argv[] )
     delete synchronizer;
     synchronizer = 0;
 
-    if (sigHandler) {
-        delete sigHandler;
-        sigHandler = 0;
-    }
+    delete sigHandler;
+    sigHandler = 0;
 
     LOG_DEBUG("Stopping logger");
 

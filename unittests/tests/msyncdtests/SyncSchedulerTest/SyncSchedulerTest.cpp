@@ -35,10 +35,9 @@ void SyncSchedulerTest::init()
 
 void SyncSchedulerTest::cleanup()
 {
-    if (iSyncScheduler)
-    {
+    if (iSyncScheduler) {
         delete iSyncScheduler;
-        iSyncScheduler = NULL;
+        iSyncScheduler = nullptr;
     }
 }
 

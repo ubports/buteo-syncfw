@@ -31,12 +31,12 @@ using namespace Buteo;
 static const QString NAME = "ovi-calendar";
 static const QString LOG_XML =
     "<synclog name=\"ovi-calendar\" >"
-        "<syncresults majorcode=\"1\" time=\"2009-09-15T16:33:57\" scheduled=\"true\">"
-            "<target name=\"hcalendar\">"
-                "<local added=\"2\" deleted=\"3\" modified=\"4\" />"
-                "<remote added=\"5\" deleted=\"6\" modified=\"7\" />"
-            "</target>"
-        "</syncresults>"
+    "<syncresults majorcode=\"1\" time=\"2009-09-15T16:33:57\" scheduled=\"true\">"
+    "<target name=\"hcalendar\">"
+    "<local added=\"2\" deleted=\"3\" modified=\"4\" />"
+    "<remote added=\"5\" deleted=\"6\" modified=\"7\" />"
+    "</target>"
+    "</syncresults>"
     "</synclog>";
 
 void SyncLogTest::testLog()
@@ -89,7 +89,7 @@ void SyncLogTest::testLog()
     QCOMPARE(newResults.majorCode(), 2);
     QCOMPARE(newResults < *log2.lastResults(), false);
     newResults.addTargetResults(TargetResults("hcontacts", ItemCounts(2, 3, 4),
-        ItemCounts(5, 6, 7)));
+                                              ItemCounts(5, 6, 7)));
     log2.addResults(newResults);
     QVERIFY(log2.lastResults() != 0);
     QCOMPARE(log2.lastResults()->majorCode(), 2);
@@ -142,47 +142,47 @@ void SyncLogTest::testLog()
 void SyncLogTest::testAddResults()
 {
     const int MAXLOGENTRIES = 5;
-    
+
     SyncLog log(NAME);
     SyncResults newResults;
     newResults.setMajorCode(Buteo::SyncResults::SYNC_RESULT_CANCELLED);
     newResults.addTargetResults(TargetResults("hcontacts", ItemCounts(2, 3, 4),
-                                ItemCounts(5, 6, 7)));
-    
+                                              ItemCounts(5, 6, 7)));
+
     for (int i = 0; i < 7; ++i) {
         log.addResults(newResults);
         QVERIFY(log.allResults().size() <= MAXLOGENTRIES);
     }
-    
-    
+
+
 }
 
 #define FAILURE_MESSAGE "Database error: UID not unique"
 #define FAILURE_SERVER "No resource at URI"
 static const QString DETAILS_XML =
     "<synclog name=\"caldav-sync\" >"
-        "<syncresults majorcode=\"1\" time=\"2020-08-13T12:06:57\">"
-            "<target name=\"123456-789\">"
-                "<local added=\"2\" deleted=\"3\" modified=\"4\">"
-                    "<addedItem uid=\"123-4\" />"
-                    "<addedItem uid=\"123-5\" />"
-                    "<addedItem uid=\"123-6\" status=\"FaIleD\"><![CDATA["
-                    FAILURE_MESSAGE
-                    "]]></addedItem>"
-                    "<deletedItem uid=\"123-7\" />"
-                    "<modifiedItem uid=\"123-8\" />"
-                    "<modifiedItem uid=\"123-9\" />"
-                "</local>"
-                "<remote added=\"5\" deleted=\"6\" modified=\"7\">"
-                    "<addedItem uid=\"456-1\" />"
-                    "<deletedItem uid=\"456-2\" />"
-                    "<modifiedItem uid=\"456-3\" />"
-                    "<modifiedItem uid=\"456-7\" status=\"failed\"><![CDATA["
-                    FAILURE_SERVER
-                    "]]></modifiedItem>"
-                "</remote>"
-            "</target>"
-        "</syncresults>"
+    "<syncresults majorcode=\"1\" time=\"2020-08-13T12:06:57\">"
+    "<target name=\"123456-789\">"
+    "<local added=\"2\" deleted=\"3\" modified=\"4\">"
+    "<addedItem uid=\"123-4\" />"
+    "<addedItem uid=\"123-5\" />"
+    "<addedItem uid=\"123-6\" status=\"FaIleD\"><![CDATA["
+    FAILURE_MESSAGE
+    "]]></addedItem>"
+    "<deletedItem uid=\"123-7\" />"
+    "<modifiedItem uid=\"123-8\" />"
+    "<modifiedItem uid=\"123-9\" />"
+    "</local>"
+    "<remote added=\"5\" deleted=\"6\" modified=\"7\">"
+    "<addedItem uid=\"456-1\" />"
+    "<deletedItem uid=\"456-2\" />"
+    "<modifiedItem uid=\"456-3\" />"
+    "<modifiedItem uid=\"456-7\" status=\"failed\"><![CDATA["
+    FAILURE_SERVER
+    "]]></modifiedItem>"
+    "</remote>"
+    "</target>"
+    "</syncresults>"
     "</synclog>";
 void SyncLogTest::testDetailsFromXML()
 {

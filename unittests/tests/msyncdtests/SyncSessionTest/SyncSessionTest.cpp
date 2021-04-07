@@ -70,7 +70,7 @@ void SyncSessionTest :: cleanup()
 
     // profile name will be deallocated in SyncSession. So, not deallocating
     delete iSyncSession ;
-    iSyncSession = NULL;
+    iSyncSession = nullptr;
 
     delete iSyncSessionPluginRunnerTest;
 }
@@ -100,7 +100,7 @@ void SyncSessionTest :: testPluginRunner()
 
 
 
-    /* set NULL to iPluginRunner and test */
+    /* set nullptr to iPluginRunner and test */
 
     iSyncSession->setPluginRunner(iNullPluginRunner, false);
     QCOMPARE(iSyncSession->iPluginRunnerOwned, false);
@@ -118,7 +118,7 @@ void SyncSessionTest :: testProfile()
 {
     /* testing profile() and profileName()   */
 
-    const QString PROFILENAME ="Profile";
+    const QString PROFILENAME = "Profile";
 
     iSyncSession->iProfile->setName(PROFILENAME);
     SyncProfile *sampleProfile = iSyncSession->profile();
@@ -149,7 +149,7 @@ void SyncSessionTest :: testStartAbortStop()
     iSyncSession->abort();
     QVERIFY(!iSyncSession->iAborted);
 
-    // stop() neither updates nor calls other functions for iPluginRunner NULL value. so, omitting this function for NULL value
+    // stop() neither updates nor calls other functions for iPluginRunner nullptr value. so, omitting this function for nullptr value
 
 
     // testing with iSyncSessionPluginRunnerTest
@@ -206,7 +206,7 @@ void SyncSessionTest :: testScheduled()
 
     iSyncSession->setScheduled(givenScheduledData);
     QCOMPARE(iSyncSession->isScheduled(), givenScheduledData);
-    
+
     givenScheduledData = true;
 
     iSyncSession->setScheduled(givenScheduledData);
@@ -220,8 +220,7 @@ void SyncSessionTest :: testStorages()
     StorageBooker *myTestStorageBooker = new StorageBooker ;
     QString oneStorage;
 
-    foreach (QString storage, iSyncProfile->storageBackendNames())
-    {
+    foreach (QString storage, iSyncProfile->storageBackendNames()) {
         // take one name of storage to check the storage
         oneStorage = storage;
         break;
@@ -231,8 +230,8 @@ void SyncSessionTest :: testStorages()
     bool isSuccess = iSyncSession->reserveStorages(myTestStorageBooker);
     QCOMPARE(iSyncSession->iStorageBooker, myTestStorageBooker);
     QVERIFY(isSuccess);
-    
-    
+
+
     QVERIFY(myTestStorageBooker->isStorageAvailable(oneStorage, iSyncProfile->name()));
 
     //testing releaseStorages()
@@ -240,9 +239,9 @@ void SyncSessionTest :: testStorages()
     iSyncSession->releaseStorages();
     QVERIFY(myTestStorageBooker->isStorageAvailable(oneStorage, iSyncProfile->name()));
 
-    if(myTestStorageBooker) {
+    if (myTestStorageBooker) {
         delete myTestStorageBooker;
-        myTestStorageBooker = NULL;
+        myTestStorageBooker = nullptr;
     }
 }
 
@@ -296,7 +295,8 @@ void SyncSessionTest ::  testOnTransferProgress()
     qRegisterMetaType<Sync::TransferDatabase>("Sync::TransferDatabase");
     qRegisterMetaType<Sync::TransferType>("Sync::TransferType");
 
-    QSignalSpy sampleSpy(iSyncSession, SIGNAL(transferProgress(QString, Sync::TransferDatabase, Sync::TransferType,QString,int)));
+    QSignalSpy sampleSpy(iSyncSession, SIGNAL(transferProgress(QString, Sync::TransferDatabase, Sync::TransferType, QString,
+                                                               int)));
 
     QVERIFY(iSyncSessionPluginRunnerTest);
 
@@ -311,7 +311,7 @@ void SyncSessionTest :: testOnDone()
     // registering unknown metatype
     qRegisterMetaType<Sync::SyncStatus>("Sync::SyncStatus");
 
-    QSignalSpy sampleSpy(iSyncSession, SIGNAL(finished(QString, Sync::SyncStatus,QString, int)));
+    QSignalSpy sampleSpy(iSyncSession, SIGNAL(finished(QString, Sync::SyncStatus, QString, int)));
 
     // call functions that emit finished() signal
     iSyncSession->onDone();
@@ -335,8 +335,8 @@ void SyncSessionTest :: testOnDone()
 
 
 SyncSessionPluginRunnerTest :: SyncSessionPluginRunnerTest(const QString &aPluginName,
-                             PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf)
-         : PluginRunner(PLUGIN_CLIENT, aPluginName, aPluginMgr, aPluginCbIf)
+                                                           PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf)
+    : PluginRunner(PLUGIN_CLIENT, aPluginName, aPluginMgr, aPluginCbIf)
 {
 
 }
@@ -345,17 +345,17 @@ bool SyncSessionPluginRunnerTest :: init()
 {
     /* Checking whether control is coming to PluginRuneer derived class or not */
 
-    if(SyncSessionTest::isValuePassedTrue )
+    if (SyncSessionTest::isValuePassedTrue )
         return true;
     else
-        return false;    
+        return false;
 }
 
 bool SyncSessionPluginRunnerTest :: start()
 {
     /* Checking whether control is coming to PluginRuneer derived class or not */
 
-    if(SyncSessionTest::isValuePassedTrue )
+    if (SyncSessionTest::isValuePassedTrue )
         return true;
     else
         return false;
@@ -385,17 +385,17 @@ SyncResults SyncSessionPluginRunnerTest :: syncResults()
 
 }
 
-SyncPluginBase* SyncSessionPluginRunnerTest :: plugin()
+SyncPluginBase *SyncSessionPluginRunnerTest :: plugin()
 {
-    // This is not being used by SyncSession. returning NULL to supress compile warning
+    // This is not being used by SyncSession. returning nullptr to supress compile warning
 
-    return (SyncPluginBase*)0;
+    return (SyncPluginBase *)0;
 }
 
 bool SyncSessionPluginRunnerTest :: cleanUp()
 {
-	// check the value after returning to the calling function
-	return true;
+    // check the value after returning to the calling function
+    return true;
 }
 
 QTEST_MAIN(Buteo::SyncSessionTest)

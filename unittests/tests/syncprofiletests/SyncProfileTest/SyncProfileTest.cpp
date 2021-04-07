@@ -34,30 +34,30 @@ static const QString NAME = "ovi-calendar";
 static const QString TYPE = Profile::TYPE_SYNC;
 static const QString PROFILE_XML =
     "<profile type=\"sync\" name=\"ovi-calendar\" >"
-        "<key value=\"true\" name=\"enabled\" />"
+    "<key value=\"true\" name=\"enabled\" />"
 
-        "<profile type=\"service\" name=\"ovi.com\" >"
-            "<key value=\"me\" name=\"username\" />"
-        "</profile>"
+    "<profile type=\"service\" name=\"ovi.com\" >"
+    "<key value=\"me\" name=\"username\" />"
+    "</profile>"
 
-        "<profile type=\"client\" name=\"syncml\">"
-        "</profile>"
+    "<profile type=\"client\" name=\"syncml\">"
+    "</profile>"
 
-        "<profile type=\"server\" name=\"syncmlserver\">"
-        "</profile>"
+    "<profile type=\"server\" name=\"syncmlserver\">"
+    "</profile>"
 
-        "<profile type=\"storage\" name=\"hcalendar\" >"
-            "<key value=\"myNotebook\" name=\"Notebook Name\" />"
-            "<key value=\"true\" name=\"enabled\" />"
-            "<key value=\"cal-backend\" name=\"backend\" />"
-        "</profile>"
+    "<profile type=\"storage\" name=\"hcalendar\" >"
+    "<key value=\"myNotebook\" name=\"Notebook Name\" />"
+    "<key value=\"true\" name=\"enabled\" />"
+    "<key value=\"cal-backend\" name=\"backend\" />"
+    "</profile>"
 
-        "<profile type=\"storage\" name=\"hcontacts\" />"
+    "<profile type=\"storage\" name=\"hcontacts\" />"
 
-        "<schedule time=\"12:34:56\" interval=\"30\" days=\"1,2,3,4,5,6\">"
-            "<rush enabled=\"true\" interval=\"15\""
-                "begin=\"08:00:00\" end=\"16:00:00\" days=\"1,4,5\"/>"
-        "</schedule>"
+    "<schedule time=\"12:34:56\" interval=\"30\" days=\"1,2,3,4,5,6\">"
+    "<rush enabled=\"true\" interval=\"15\""
+    "begin=\"08:00:00\" end=\"16:00:00\" days=\"1,4,5\"/>"
+    "</schedule>"
     "</profile>";
 
 void SyncProfileTest::testConstruction()
@@ -101,8 +101,8 @@ void SyncProfileTest::testProperties()
 
     // Change sync type.
     QEXPECT_FAIL("", "Broken since d6d974e (Added functions to enable/disable normal scheduling). "
-            "Not sure how to fix this.test Maybe setSyncType should be just removed from the API",
-            Continue);
+                 "Not sure how to fix this.test Maybe setSyncType should be just removed from the API",
+                 Continue);
     QCOMPARE(p.syncType(), SyncProfile::SYNC_MANUAL);
     p.setSyncType(SyncProfile::SYNC_SCHEDULED);
     QCOMPARE(p.syncType(), SyncProfile::SYNC_SCHEDULED);
@@ -159,7 +159,7 @@ void SyncProfileTest::testResults()
     QDateTime now = QDateTime::currentDateTime();
     SyncResults syncResults(now, 1, 0);
     syncResults.addTargetResults(TargetResults("hcalendar",
-        ItemCounts(1, 2, 3), ItemCounts()));
+                                               ItemCounts(1, 2, 3), ItemCounts()));
     p.addResults(syncResults);
 
     QCOMPARE(p.lastSyncTime(), now);
@@ -193,7 +193,7 @@ void SyncProfileTest::testNextSyncTime()
     s.setInterval(INTERVAL);
     DaySet days;
     days << Qt::Monday << Qt::Tuesday << Qt::Wednesday << Qt::Thursday <<
-        Qt::Friday << Qt::Saturday << Qt::Sunday;
+         Qt::Friday << Qt::Saturday << Qt::Sunday;
     s.setDays(days);
     s.setScheduleEnabled(true);
     p.setSyncSchedule(s);
@@ -212,9 +212,9 @@ void SyncProfileTest::testSubProfiles()
     QVERIFY(client != 0);
     QVERIFY(client->name() == "syncml");
 
-    QList<const Profile*> storages = p.storageProfiles();
+    QList<const Profile *> storages = p.storageProfiles();
     QCOMPARE(storages.size(), 2);
-    QList<Profile*> storages2 = p.storageProfilesNonConst();
+    QList<Profile *> storages2 = p.storageProfilesNonConst();
     QCOMPARE(storages2.size(), 2);
 
     const Profile *server = p.serverProfile();

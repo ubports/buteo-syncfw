@@ -28,7 +28,7 @@ using namespace Buteo;
 void IPHeartBeatTest::initTestCase()
 {
     iHbeat = new IPHeartBeat(this);
-    connect(iHbeat,SIGNAL(onHeartBeat(QString)),this,SLOT(onBeatTriggered(QString)));
+    connect(iHbeat, SIGNAL(onHeartBeat(QString)), this, SLOT(onBeatTriggered(QString)));
 }
 
 void IPHeartBeatTest::cleanupTestCase()
@@ -39,8 +39,8 @@ void IPHeartBeatTest::cleanupTestCase()
 void IPHeartBeatTest::testSetHeartBeat()
 {
     iBeatReceived = false;
-    if(iHbeat->setHeartBeat("someprofile",0,2) == true) {
-        QTest::qWait(1000*3);
+    if (iHbeat->setHeartBeat("someprofile", 0, 2) == true) {
+        QTest::qWait(1000 * 3);
         QVERIFY(iBeatReceived == true);
     } else {
         // If iphbd service is not running setHeartBeat() will fail
@@ -51,7 +51,7 @@ void IPHeartBeatTest::testSetHeartBeat()
 
 void IPHeartBeatTest::testRemoveHeartBeat()
 {
-    iHbeat->setHeartBeat("someprofile",0,20);
+    iHbeat->setHeartBeat("someprofile", 0, 20);
 
     iHbeat->removeWait("someprofile");
 
@@ -60,8 +60,8 @@ void IPHeartBeatTest::testRemoveHeartBeat()
 
 void IPHeartBeatTest::testRemoveAllHeartBeats()
 {
-    iHbeat->setHeartBeat("someprofile",0,20);
-    iHbeat->setHeartBeat("anotherprofile",50,100);
+    iHbeat->setHeartBeat("someprofile", 0, 20);
+    iHbeat->setHeartBeat("anotherprofile", 50, 100);
 
     iHbeat->removeAllWaits();
 

@@ -49,8 +49,7 @@ class SyncProfile : public Profile
 {
 public:
     //! Synchronization types.
-    enum SyncType
-    {
+    enum SyncType {
         //! Synchronization is started manually.
         SYNC_MANUAL,
 
@@ -60,8 +59,7 @@ public:
     };
 
     //! Sync destination type.
-    enum DestinationType
-    {
+    enum DestinationType {
         //! Destination is a device (N95, Harmattan, OviSuite etc.)
         DESTINATION_TYPE_DEVICE,
 
@@ -73,8 +71,7 @@ public:
     };
 
     //! Sync direction for device-to-device syncs.
-    enum SyncDirection
-    {
+    enum SyncDirection {
         //! Two way sync.
         SYNC_DIRECTION_TWO_WAY,
 
@@ -89,8 +86,7 @@ public:
     };
 
     //! Conflict resolution policy for device-to-device syncs.
-    enum ConflictResolutionPolicy
-    {
+    enum ConflictResolutionPolicy {
         //! Prefer local data in conflict situation.
         CR_POLICY_PREFER_LOCAL_CHANGES,
 
@@ -102,8 +98,7 @@ public:
     };
 
     //! Current status enum
-    enum CurrentSyncStatus
-    {
+    enum CurrentSyncStatus {
         //! NOT_SYNCED - no sync has been done for the profile yet
         SYNC_NEVER_HAPPENED,
 
@@ -211,7 +206,7 @@ public:
      * \return Next time to switch rush/off-rush schedule intervals. Null object if schedule is not defined for rush/off-rush
      *  or if the rush and off-rush intervals are the same.
      */
-    QDateTime nextRushSwitchTime(const QDateTime& aFromTime) const;
+    QDateTime nextRushSwitchTime(const QDateTime &aFromTime) const;
 
     /*! \brief Gets the results of the last sync from the sync log.
      *
@@ -324,13 +319,13 @@ public:
      *
      * \return Storage profiles.
      */
-    QList<const Profile*> storageProfiles() const;
+    QList<const Profile *> storageProfiles() const;
 
     /*! \brief Get the storage sub-profiles.
      *
      * \return Storage profiles.
      */
-    QList<Profile*> storageProfilesNonConst();
+    QList<Profile *> storageProfilesNonConst();
 
     /*! \brief Gets sync destination type (device or online).
      *
@@ -344,10 +339,10 @@ public:
      */
     SyncDirection syncDirection() const;
 
-     /*! \brief Sets sync direction.
-     *
-     * \return New sync direction.
-     */
+    /*! \brief Sets sync direction.
+    *
+    * \return New sync direction.
+    */
     void setSyncDirection(SyncDirection aDirection);
 
     /*! \brief Gets conflict resolution policy.
@@ -387,7 +382,7 @@ public:
     QList<quint32> retryIntervals() const;
 
     /*! \brief Gives the current status of the sync as an enum value
-     *  If the current status of ongoing syncs is required, check the 
+     *  If the current status of ongoing syncs is required, check the
      * d-bus API "runningSyncs" which returns the list of currently running
      * sync sessions. The current sync sessions cannot be part of a profiel,
      *
@@ -397,7 +392,7 @@ public:
 
 private:
 
-    SyncProfile& operator=(const SyncProfile &aRhs);
+    SyncProfile &operator=(const SyncProfile &aRhs);
 
     SyncProfilePrivate *d_ptr;
 };

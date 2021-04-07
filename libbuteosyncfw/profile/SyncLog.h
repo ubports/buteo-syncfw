@@ -67,10 +67,10 @@ public:
      */
     ~SyncLog();
 
-     /*! \brief Sets the name of the profile that owns this log.
-     */
-    void setProfileName(const QString& aProfileName);
-    
+    /*! \brief Sets the name of the profile that owns this log.
+    */
+    void setProfileName(const QString &aProfileName);
+
     /*! \brief Gets the name of the profile that owns this log.
      *
      * \return Profile name.
@@ -97,14 +97,14 @@ public:
      * \return List of results. The results are ordered by time so that
      *  the oldest results object is first in the list.
      */
-    QList<const SyncResults*> allResults() const;
+    QList<const SyncResults *> allResults() const;
 
     /*! \brief Gets the last successful results in the sync log.
      *
      * \return The results. NULL if no successful result have already
      * been registered.
      */
-    const SyncResults* lastSuccessfulResults() const;
+    const SyncResults *lastSuccessfulResults() const;
 
     /*! \brief Adds results to the sync log.
      *  Also makes sure that log size doesn't exceed given size limit
@@ -115,7 +115,7 @@ public:
 
 private:
 
-    SyncLog& operator=(const SyncLog &aRhs);
+    SyncLog &operator=(const SyncLog &aRhs);
 
     SyncLogPrivate *d_ptr;
 };

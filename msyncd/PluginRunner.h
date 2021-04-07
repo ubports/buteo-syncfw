@@ -34,7 +34,7 @@ namespace Buteo {
 
 class PluginManager;
 class PluginCbInterface;
-    
+
 /*! \brief Base class for running sync plug-ins.
  *
  * This class hides the details of thread/process handling when sync client
@@ -63,8 +63,8 @@ public:
      * @param aParent Parent object
      */
     PluginRunner(PluginType aPluginType, const QString &aPluginName,
-        PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf,
-        QObject *aParent = 0);
+                 PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf,
+                 QObject *aParent = 0);
 
     /*! \brief Initializes the plug-in runner
      *
@@ -102,8 +102,8 @@ public:
      */
     virtual SyncResults syncResults() = 0;
 
-    
-    /*! \brief Calls the cleanup for the plugin  
+
+    /*! \brief Calls the cleanup for the plugin
      *
      * The plug-in is requested to clean up.
      */
@@ -130,8 +130,8 @@ public:
 signals:
     //! @see SyncPluginBase::transferProgress
     void transferProgress(const QString &aProfileName,
-        Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-        const QString &aMimeType, int aCommittedItems);
+                          Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                          const QString &aMimeType, int aCommittedItems);
 
     //! @see SyncPluginBase::error
     void error(const QString &aProfileName, const QString &aMessage, int aErrorCode);
@@ -143,7 +143,7 @@ signals:
     void storageAccquired (const QString &aMimeType);
 
     //! @see SyncPluginBase::syncProgressDetail
-    void syncProgressDetail(const QString &aProfileName,int aProgressDetail);
+    void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
 
     /*! \brief Signal sent when the plug-in runner has finished
      *
@@ -177,7 +177,7 @@ protected:
 private:
 
 #ifdef SYNCFW_UNIT_TESTS
-	friend class PluginRunnerTest;
+    friend class PluginRunnerTest;
 #endif
 
 };

@@ -27,7 +27,7 @@
 #include "PluginRunner.h"
 
 namespace Buteo {
-    
+
 
 class ServerActivator;
 class ServerPlugin;
@@ -54,8 +54,8 @@ public:
      * @param aParent Parent object
      */
     ServerPluginRunner(const QString &aPluginName, Profile *aProfile,
-        PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf,
-        ServerActivator *aServerActivator, QObject *aParent = 0);
+                       PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf,
+                       ServerActivator *aServerActivator, QObject *aParent = 0);
 
     //! \brief Destructor
     virtual ~ServerPluginRunner();
@@ -77,7 +77,7 @@ public:
 
     //! @see PluginRunner::plugin
     virtual SyncPluginBase *plugin();
-    
+
     //! @see PluginRunner::plugin
     virtual bool cleanUp();
 
@@ -94,8 +94,8 @@ private slots:
     void onNewSession(const QString &aDestination);
 
     void onTransferProgress(const QString &aProfileName,
-        Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-        const QString &aMimeType, int aCommittedItems);
+                            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                            const QString &aMimeType, int aCommittedItems);
 
     void onStorageAccquired(const QString &aMimeType );
     void onError(const QString &aProfileName, const QString &aMessage, int aErrorCode);
@@ -110,11 +110,8 @@ private:
     void onSessionDone();
 
     Profile *iProfile;
-
     ServerPlugin *iPlugin;
-
     ServerThread *iThread;
-
     ServerActivator *iServerActivator;
 
 #ifdef SYNCFW_UNIT_TESTS

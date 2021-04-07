@@ -27,7 +27,7 @@
 #include <QtTest/QtTest>
 
 namespace Buteo {
-    
+
 class ProfileTest: public QObject
 {
     Q_OBJECT
@@ -49,14 +49,14 @@ private slots:
 private:
 
     Profile *loadFromXmlFile(const QString &aName, const QString &aType,
-            const QString &aProfileDir = QString());
+                             const QString &aProfileDir = QString());
 
     bool saveToXmlFile(const Profile &aProfile, const QString &aName,
-            bool aLocalOnly = true,
-            const QString &aProfileDir = QString());
+                       bool aLocalOnly = true,
+                       const QString &aProfileDir = QString());
 
     QString profileFileToString(const QString &aName, const QString &aType,
-            const QString &aProfileDir = QString());
+                                const QString &aProfileDir = QString());
 
 };
 

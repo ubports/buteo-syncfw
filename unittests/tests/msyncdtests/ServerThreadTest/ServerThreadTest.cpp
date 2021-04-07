@@ -33,7 +33,7 @@ QString TYPE = Profile::TYPE_SERVER;
 /* Defining the pure virtual functions of the base classes */
 bool ServerPluginDerived::startListen()
 {
-	return true;
+    return true;
 }
 
 void ServerPluginDerived::stopListen()
@@ -50,94 +50,93 @@ void ServerPluginDerived::resume()
 
 bool ServerPluginDerived::cleanUp()
 {
-	return true;
+    return true;
 }
 
 bool ServerPluginDerived::init()
 {
-	if (iTestSignal == true)
-	{
-		return false;
-	}
-	return true;
+    if (iTestSignal == true) {
+        return false;
+    }
+    return true;
 }
 bool ServerPluginDerived::uninit()
 {
-	return true;
+    return true;
 }
 void ServerPluginDerived::connectivityStateChanged(Sync::ConnectivityType, bool)
 {
 }
 
 /* Constructor of the serverPluginDerived Class */
-ServerPluginDerived::ServerPluginDerived(const QString& aPluginName,
-                                         const Profile& aProfile,
-                                         PluginCbInterface* aCbInterface)
-: ServerPlugin(aPluginName, aProfile, aCbInterface),
-  iTestSignal(false)
+ServerPluginDerived::ServerPluginDerived(const QString &aPluginName,
+                                         const Profile &aProfile,
+                                         PluginCbInterface *aCbInterface)
+    : ServerPlugin(aPluginName, aProfile, aCbInterface),
+      iTestSignal(false)
 {
 }
 
 void ServerThreadTest::initTestCase()
 {
-	iThreadreturn = false;
-	
-	iProfile = new Profile(PFNAME, TYPE);
-	iServerThread = new ServerThread();
-	iPluginDerived = new ServerPluginDerived(PGNAME, *iProfile, NULL);
-	iThreadTestSp = iPluginDerived;
+    iThreadreturn = false;
+
+    iProfile = new Profile(PFNAME, TYPE);
+    iServerThread = new ServerThread();
+    iPluginDerived = new ServerPluginDerived(PGNAME, *iProfile, nullptr);
+    iThreadTestSp = iPluginDerived;
 }
 void ServerThreadTest::cleanupTestCase()
 {
-	QVERIFY(iProfile != 0);
-	delete iProfile;
-	QVERIFY(iPluginDerived != 0);
-	delete iPluginDerived;
-	QVERIFY(iServerThread != 0);
-	delete iServerThread;
-	
-	iProfile = 0;
-	iPluginDerived = 0;
-	iServerThread = 0;
-	iThreadTestSp = 0;
+    QVERIFY(iProfile != 0);
+    delete iProfile;
+    QVERIFY(iPluginDerived != 0);
+    delete iPluginDerived;
+    QVERIFY(iServerThread != 0);
+    delete iServerThread;
+
+    iProfile = 0;
+    iPluginDerived = 0;
+    iServerThread = 0;
+    iThreadTestSp = 0;
 }
 void ServerThreadTest::testServerThreadConstructor()
 {
-	QVERIFY(iServerThread->getPlugin() == NULL);
-	QCOMPARE(iServerThread->iRunning, false);
+    QVERIFY(iServerThread->getPlugin() == nullptr);
+    QCOMPARE(iServerThread->iRunning, false);
 }
 void ServerThreadTest::testGetPlugin()
 {
-	iThreadreturn =iServerThread->startThread(iThreadTestSp);
-	QTest::qWait(20);
-	QCOMPARE(iThreadreturn, true);
-	QCOMPARE(iServerThread->getPlugin(), iThreadTestSp);
+    iThreadreturn = iServerThread->startThread(iThreadTestSp);
+    QTest::qWait(20);
+    QCOMPARE(iThreadreturn, true);
+    QCOMPARE(iServerThread->getPlugin(), iThreadTestSp);
 }
 void ServerThreadTest::testGetProfileName()
 {
-	QCOMPARE(iThreadreturn, true);
-	QCOMPARE(iServerThread->getProfileName(), PFNAME);
+    QCOMPARE(iThreadreturn, true);
+    QCOMPARE(iServerThread->getProfileName(), PFNAME);
 }
 void ServerThreadTest::testThread()
 {
-	//The Thread is already started in testGetPlugin()
-	QCOMPARE(iServerThread->startThread(iThreadTestSp), false);
-	QCOMPARE(iServerThread->iRunning, true);
-	QCOMPARE(iServerThread->getPlugin(), iThreadTestSp);
+    //The Thread is already started in testGetPlugin()
+    QCOMPARE(iServerThread->startThread(iThreadTestSp), false);
+    QCOMPARE(iServerThread->iRunning, true);
+    QCOMPARE(iServerThread->getPlugin(), iThreadTestSp);
 }
 void ServerThreadTest::testStopThErrorSignal()
 {
-	QVERIFY(iServerThread != 0);
-	iServerThread->stopThread();
-	iServerThread->wait(9000);
-	iPluginDerived->iTestSignal = true;
-	
-	//Test for the signal
-	QSignalSpy spy(iServerThread, SIGNAL(initError(const QString &,
-												   const QString &, int)));
-	QCOMPARE(iServerThread->startThread(iThreadTestSp), true);
-	QTest::qWait(20);
-	QCOMPARE(spy.count(), 1);
+    QVERIFY(iServerThread != 0);
+    iServerThread->stopThread();
+    iServerThread->wait(9000);
+    iPluginDerived->iTestSignal = true;
+
+    //Test for the signal
+    QSignalSpy spy(iServerThread, SIGNAL(initError(const QString &,
+                                                   const QString &, int)));
+    QCOMPARE(iServerThread->startThread(iThreadTestSp), true);
+    QTest::qWait(20);
+    QCOMPARE(spy.count(), 1);
 }
 
 QTEST_MAIN(Buteo::ServerThreadTest)

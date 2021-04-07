@@ -26,7 +26,7 @@
 #include <QtTest/QtTest>
 
 namespace Buteo {
-    
+
 class ProfileFactoryTest: public QObject
 {
     Q_OBJECT

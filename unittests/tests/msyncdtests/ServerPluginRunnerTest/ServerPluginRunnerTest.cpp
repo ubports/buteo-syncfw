@@ -43,8 +43,8 @@ void ServerPluginRunnerTest::initTestCase()
 
     // TODO: need to update with valid PluginCbInterface pointer
     iServerPluginRunner = new ServerPluginRunner("hdummy", iProfile, iPluginManager,
-                                  reinterpret_cast<PluginCbInterface*>(this), iServerActivator);
-    
+                                                 reinterpret_cast<PluginCbInterface *>(this), iServerActivator);
+
     /* test init() */
 
     bool initResult = iServerPluginRunner->init();
@@ -86,7 +86,7 @@ void ServerPluginRunnerTest::testStartAbort()
 
     /* test abort() */
 
-    // test plugin pointer for NULL
+    // test plugin pointer for nullptr
     QVERIFY(iServerPluginRunner->plugin());
     iServerPluginRunner->abort();
 
@@ -94,7 +94,7 @@ void ServerPluginRunnerTest::testStartAbort()
 
 void ServerPluginRunnerTest::testSyncResults()
 {
-     // test plugin pointer for NULL
+    // test plugin pointer for nullptr
     QVERIFY(iServerPluginRunner->plugin());
     // we can't set values from ServerPluginRunner. Hence, comparing the default return value
     QCOMPARE(iServerPluginRunner->syncResults().majorCode(), 0);
@@ -110,7 +110,8 @@ void ServerPluginRunnerTest::testSignals()
     // registering metatypes that are not known
     qRegisterMetaType<Sync::TransferDatabase>("Sync::TransferDatabase");
     qRegisterMetaType<Sync::TransferType>("Sync::TransferType");
-    QSignalSpy transferSpy(iServerPluginRunner, SIGNAL(transferProgress(QString, Sync::TransferDatabase, Sync::TransferType, QString, int)));
+    QSignalSpy transferSpy(iServerPluginRunner, SIGNAL(transferProgress(QString, Sync::TransferDatabase, Sync::TransferType,
+                                                                        QString, int)));
 
 
     QVERIFY(iServerPluginRunner->iServerActivator);

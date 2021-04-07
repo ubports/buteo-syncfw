@@ -28,9 +28,9 @@ using namespace Buteo;
 
 static const QString PROFILE_XML =
     "<profile name=\"ovi-sync\" type=\"sync\">"
-        "<profile name=\"ovi\" type=\"service\">"
-        "</profile>"
-        "<key name=\"enabled\" value=\"true\" />"
+    "<profile name=\"ovi\" type=\"service\">"
+    "</profile>"
+    "<key name=\"enabled\" value=\"true\" />"
     "</profile>";
 
 static const QString OVI_PROVIDER = "ovi";
@@ -41,9 +41,9 @@ static const QString SERVICE_SYNC = "Sync";
 static const QString SERVICE_NAME = "testsync-ovi";
 
 AccountsHelperTest::AccountsHelperTest()
-:   QObject(NULL),
-    iManager(SERVICE_SYNC, this),
-    iProfileManager(USERPROFILE_DIR, SYSTEMPROFILE_DIR)
+    :   QObject(nullptr),
+        iManager(SERVICE_SYNC, this),
+        iProfileManager(USERPROFILE_DIR, SYSTEMPROFILE_DIR)
 {
     iAccountsHelper = new AccountsHelper(iProfileManager, 0);
 }
@@ -57,18 +57,17 @@ void AccountsHelperTest::initTestCase()
     iAccount->selectService(service);
     iAccount->setEnabled(true);
     iAccount->selectService();
-    QVERIFY(iAccount != NULL);
+    QVERIFY(iAccount != nullptr);
     iAccount->sync();
 }
 
 void AccountsHelperTest::cleanupTestCase()
 {
-    if (iAccount != NULL)
-    {
+    if (iAccount != nullptr) {
         iAccount->remove();
         iAccount->sync();
         delete iAccount;
-        iAccount = NULL;
+        iAccount = nullptr;
     } // no else
 }
 
@@ -76,7 +75,7 @@ void AccountsHelperTest::testProfileAdded()
 {
     // Ensure that the profile with the username was added correctly
     SyncProfile *syncProfile = iProfileManager.syncProfile(SERVICE_NAME + "-" +
-                                                            iAccount->displayName());
+                                                           iAccount->displayName());
     //QVERIFY(syncProfile != 0);
     Q_UNUSED(syncProfile);
 }

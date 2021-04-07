@@ -45,22 +45,22 @@ public:
                                 const SyncPluginBase *aCaller);
 
     /// \see PluginCbInterface::createStorage
-    virtual StoragePlugin* createStorage(const QString &aPluginName);
+    virtual StoragePlugin *createStorage(const QString &aPluginName);
 
     /// \see PluginCbInterface::destroyStorage
     virtual void destroyStorage(StoragePlugin *aStorage);
 
     /// \see PluginCbInterface::isConnectivityAvailable
-    virtual bool isConnectivityAvailable( Sync::ConnectivityType aType );
+    virtual bool isConnectivityAvailable(Sync::ConnectivityType aType);
 
     /// \see PluginCbInterface::getSyncProfileByRemoteAddress
-    virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress);
+    virtual Profile *getSyncProfileByRemoteAddress(const QString &aAddress);
 
     /// \see PluginCbInterface::getValue
-    virtual QString getValue(const QString& aAddress, const QString& aKey);
+    virtual QString getValue(const QString &aAddress, const QString &aKey);
 
 signals:
-    
+
     //! emitted by releaseStorages call
     void storageReleased();
 
@@ -69,7 +69,7 @@ private:
     SyncDaemonProxy  *imsyncIface;
 
     PluginManager   iPluginManager;
-    
+
     TransportTracker  iTransportTracker;
 };
 

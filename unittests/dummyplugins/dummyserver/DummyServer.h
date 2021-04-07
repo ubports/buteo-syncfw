@@ -28,15 +28,15 @@
 #include "SyncPluginLoader.h"
 
 namespace Buteo {
-    
+
 class DummyServer : public ServerPlugin
 {
     Q_OBJECT
 
 public:
 
-    DummyServer( const QString& aPluginName,
-                 const Profile& aProfile,
+    DummyServer( const QString &aPluginName,
+                 const Profile &aProfile,
                  PluginCbInterface *aCbInterface );
 
     virtual ~DummyServer();
@@ -68,9 +68,9 @@ class DummyServerLoader : public Buteo::SyncPluginLoader
     Q_INTERFACES(Buteo::SyncPluginLoader)
 
 public:
-    ServerPlugin* createServerPlugin( const QString& aPluginName,
-                                      const Buteo::Profile& aProfile,
-                                      Buteo::PluginCbInterface* aCbInterface ) override;
+    ServerPlugin *createServerPlugin( const QString &aPluginName,
+                                      const Buteo::Profile &aProfile,
+                                      Buteo::PluginCbInterface *aCbInterface ) override;
 };
 
 }

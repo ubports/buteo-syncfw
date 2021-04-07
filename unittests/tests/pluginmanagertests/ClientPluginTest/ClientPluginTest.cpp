@@ -36,11 +36,11 @@ void ClientPluginTest::testCreateDestroy()
     PluginManager pluginManager( TEST_PLUGIN_PATH );
 
     SyncProfile profile( "dummyprofile" );
-    ClientPlugin* client1 = pluginManager.createClient( "hdummy", profile, this );
+    ClientPlugin *client1 = pluginManager.createClient( "hdummy", profile, this );
     QVERIFY( client1 );
     QVERIFY( pluginManager.iLoadedDlls.count() == 1 );
 
-    ClientPlugin* client2 = pluginManager.createClient( "hdummy", profile, this );
+    ClientPlugin *client2 = pluginManager.createClient( "hdummy", profile, this );
 
     QVERIFY( client2 );
     QVERIFY( pluginManager.iLoadedDlls.count() == 1 );

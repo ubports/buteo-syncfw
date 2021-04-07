@@ -31,24 +31,24 @@
 #include "SyncSession.h"
 
 namespace Buteo {
-    
+
 class SynchronizerTest: public QObject
 {
-	Q_OBJECT
-	private slots:
-	void initTestCase();
-	void cleanupTestCase();
-	void testSyncConstructor();
-	void testInitialize();
-	void testSync();
-	void testSignals();
-	
-	private:
-	Synchronizer *iSync;
-	SyncSession *iSyncSession;
-	SyncProfile *iProfile;
-	SyncSession *iSyncSessionQ;
-	SyncProfile *iProfileQ;
+    Q_OBJECT
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
+    void testSyncConstructor();
+    void testInitialize();
+    void testSync();
+    void testSignals();
+
+private:
+    Synchronizer *iSync;
+    SyncSession *iSyncSession;
+    SyncProfile *iProfile;
+    SyncSession *iSyncSessionQ;
+    SyncProfile *iProfileQ;
 };
 
 }

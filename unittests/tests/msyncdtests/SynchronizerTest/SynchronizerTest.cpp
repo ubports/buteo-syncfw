@@ -30,119 +30,119 @@ using namespace Buteo;
 
 void SynchronizerTest::initTestCase()
 {
-	iSync = new Synchronizer(NULL);
-	iProfile = new SyncProfile("Profile");
-	iProfileQ = new SyncProfile("Profile1");
-	iSyncSession = new SyncSession(iProfile, NULL);
-	iSyncSessionQ = new SyncSession(iProfileQ, NULL);
+    iSync = new Synchronizer(nullptr);
+    iProfile = new SyncProfile("Profile");
+    iProfileQ = new SyncProfile("Profile1");
+    iSyncSession = new SyncSession(iProfile, nullptr);
+    iSyncSessionQ = new SyncSession(iProfileQ, nullptr);
 }
 void SynchronizerTest::cleanupTestCase()
 {
 
-	iSync->close();
-	
-	QVERIFY(iSyncSession != 0);
-	delete iSyncSession;	
-	QVERIFY(iSyncSessionQ != 0);
-	delete iSyncSessionQ;
+    iSync->close();
+
+    QVERIFY(iSyncSession != 0);
+    delete iSyncSession;
+    QVERIFY(iSyncSessionQ != 0);
+    delete iSyncSessionQ;
 
     QVERIFY(iSync != 0);
     iSync->close();
     delete iSync;
-	
-	iSync = 0;
-	iSyncSession = 0;
-	iSyncSessionQ = 0;
+
+    iSync = 0;
+    iSyncSession = 0;
+    iSyncSessionQ = 0;
 }
 void SynchronizerTest::testSyncConstructor()
 {
-	QVERIFY(iSync->iSyncScheduler == 0);
-	QVERIFY(iSync->iTransportTracker == 0);
-	QVERIFY(iSync->iServerActivator == 0);
-	QVERIFY(iSync->iAccounts == 0);
-	QVERIFY(iSync->iSyncBackup == 0);
-	QCOMPARE(iSync->iClosing, false);
+    QVERIFY(iSync->iSyncScheduler == 0);
+    QVERIFY(iSync->iTransportTracker == 0);
+    QVERIFY(iSync->iServerActivator == 0);
+    QVERIFY(iSync->iAccounts == 0);
+    QVERIFY(iSync->iSyncBackup == 0);
+    QCOMPARE(iSync->iClosing, false);
 }
 void SynchronizerTest::testInitialize()
 {
-	QCOMPARE(iSync->isConnectivityAvailable(Sync::CONNECTIVITY_USB), false);
-	QCOMPARE(iSync->initialize(), true);
-	QVERIFY(iSync->iSyncScheduler != 0);
-	QVERIFY(iSync->iTransportTracker != 0);
-	QVERIFY(iSync->iServerActivator != 0);
-	QVERIFY(iSync->iAccounts != 0);
-	QVERIFY(iSync->iSyncBackup != 0);
+    QCOMPARE(iSync->isConnectivityAvailable(Sync::CONNECTIVITY_USB), false);
+    QCOMPARE(iSync->initialize(), true);
+    QVERIFY(iSync->iSyncScheduler != 0);
+    QVERIFY(iSync->iTransportTracker != 0);
+    QVERIFY(iSync->iServerActivator != 0);
+    QVERIFY(iSync->iAccounts != 0);
+    QVERIFY(iSync->iSyncBackup != 0);
 }
 void SynchronizerTest::testSync()
 {
-	QEXPECT_FAIL("", "This test case is so broken so that I do not find it worth to fix", Abort);
-	// For some notes see comments starting with XXX
-	QVERIFY(false);
+    QEXPECT_FAIL("", "This test case is so broken so that I do not find it worth to fix", Abort);
+    // For some notes see comments starting with XXX
+    QVERIFY(false);
 
-	QString name;
-	QStringList alist;
-	alist << "storage";
-	SyncSession *aSync = 0;
+    QString name;
+    QStringList alist;
+    alist << "storage";
+    SyncSession *aSync = 0;
 
-	QVERIFY(aSync == 0);
-	QVERIFY(iSync->iSyncBackup != 0);
-	QCOMPARE(iSync->startSyncNow(aSync), false);
+    QVERIFY(aSync == 0);
+    QVERIFY(iSync->iSyncBackup != 0);
+    QCOMPARE(iSync->startSyncNow(aSync), false);
 
-	QVERIFY(iSyncSession != 0);
-	QCOMPARE(iSync->startSyncNow(iSyncSession), false);
+    QVERIFY(iSyncSession != 0);
+    QCOMPARE(iSync->startSyncNow(iSyncSession), false);
 
-	QCOMPARE(iSync->startSync("Profile"), false);
-	// XXX broken since 7678242 (Check network connectivity before attempting online sync)
-	QCOMPARE(iSync->startScheduledSync("Profile"), false);
-	iSync->iActiveSessions.insert(iSyncSession->profileName(), iSyncSession);
-	QCOMPARE(iSync->startSync("Profile"), true);
-	QCOMPARE(iSync->startScheduledSync("Profile"), true);
-	QCOMPARE(iSync->runningSyncs().takeFirst(), iSyncSession->profileName());
+    QCOMPARE(iSync->startSync("Profile"), false);
+    // XXX broken since 7678242 (Check network connectivity before attempting online sync)
+    QCOMPARE(iSync->startScheduledSync("Profile"), false);
+    iSync->iActiveSessions.insert(iSyncSession->profileName(), iSyncSession);
+    QCOMPARE(iSync->startSync("Profile"), true);
+    QCOMPARE(iSync->startScheduledSync("Profile"), true);
+    QCOMPARE(iSync->runningSyncs().takeFirst(), iSyncSession->profileName());
 
-	QCOMPARE(iSync->startSync("Profile1"), false);
-	QCOMPARE(iSync->startScheduledSync("Profile1"), false);
-	iSync->iSyncQueue.enqueue(iSyncSessionQ);
-	QSignalSpy sigStatus(iSync, SIGNAL(syncStatus(QString, int, QString, int)));
-	QCOMPARE(iSync->startSync("Profile1"), true);
-	QCOMPARE(sigStatus.count(), 1);
-	
-	QSignalSpy sigStatus1(iSync, SIGNAL(syncStatus(QString, int, QString, int)));
-	QCOMPARE(iSync->startScheduledSync("Profile1"), true);
-	QTRY_COMPARE(sigStatus1.count(), 1);
+    QCOMPARE(iSync->startSync("Profile1"), false);
+    QCOMPARE(iSync->startScheduledSync("Profile1"), false);
+    iSync->iSyncQueue.enqueue(iSyncSessionQ);
+    QSignalSpy sigStatus(iSync, SIGNAL(syncStatus(QString, int, QString, int)));
+    QCOMPARE(iSync->startSync("Profile1"), true);
+    QCOMPARE(sigStatus.count(), 1);
 
-	QCOMPARE(iSync->startSync("S40"), false);
-	QCOMPARE(iSync->requestStorages(alist), true);
+    QSignalSpy sigStatus1(iSync, SIGNAL(syncStatus(QString, int, QString, int)));
+    QCOMPARE(iSync->startScheduledSync("Profile1"), true);
+    QTRY_COMPARE(sigStatus1.count(), 1);
 
-	//test startNextSync()
-	QCOMPARE(iSync->iSyncQueue.isEmpty(), false);
-	QVERIFY(iSync->iSyncQueue.head() != 0);
-	// XXX this->iSyncSession->deleteLater() is be called upon this but iSyncSession is still accessed
-	// later and expected to be valid at cleanupTestCase()
-	QCOMPARE(iSync->startNextSync(), true);
-	QCOMPARE(iSync->iSyncQueue.isEmpty(), true);
-	QCOMPARE(iSync->startNextSync(), false);
+    QCOMPARE(iSync->startSync("S40"), false);
+    QCOMPARE(iSync->requestStorages(alist), true);
 
-	//test abortSync()
-	iSync->iActiveSessions.insert(iSyncSession->profileName(), iSyncSession);
-	QCOMPARE(iSync->iActiveSessions.contains("Profile"), true);
-	iSync->abortSync("Profile");
+    //test startNextSync()
+    QCOMPARE(iSync->iSyncQueue.isEmpty(), false);
+    QVERIFY(iSync->iSyncQueue.head() != 0);
+    // XXX this->iSyncSession->deleteLater() is be called upon this but iSyncSession is still accessed
+    // later and expected to be valid at cleanupTestCase()
+    QCOMPARE(iSync->startNextSync(), true);
+    QCOMPARE(iSync->iSyncQueue.isEmpty(), true);
+    QCOMPARE(iSync->startNextSync(), false);
 
-	//test createStorage(const QString)
-	QCOMPARE(QString("Plugin").isEmpty(), false);
-	QVERIFY(iSync->createStorage("Plugin") == NULL);
+    //test abortSync()
+    iSync->iActiveSessions.insert(iSyncSession->profileName(), iSyncSession);
+    QCOMPARE(iSync->iActiveSessions.contains("Profile"), true);
+    iSync->abortSync("Profile");
 
-	// XXX This leads to memory corruption
-	QCOMPARE(iSync->requestStorage("Storage", reinterpret_cast<SyncPluginBase*>(this)), true);
+    //test createStorage(const QString)
+    QCOMPARE(QString("Plugin").isEmpty(), false);
+    QVERIFY(iSync->createStorage("Plugin") == nullptr);
 
-	//Test startServer(const QString &aProfileName)
-	QVERIFY(iSync->iServerActivator != 0);
-	// XXX Try to use QTRY_COMPARE() here to see the effects mentioned in the above XXX comments
-	QCOMPARE(iSync->iServers.isEmpty(), true);
-	QVERIFY(iSync->iProfileManager.profile("profile", Profile::TYPE_SERVER) == 0);
-	iSync->startServer("profile");
-	QCOMPARE(iSync->iServers.isEmpty(), true);
-	QVERIFY(iSync->iProfileManager.profile("syncml", Profile::TYPE_SERVER) != 0);
-	iSync->startServer("syncml");
+    // XXX This leads to memory corruption
+    QCOMPARE(iSync->requestStorage("Storage", reinterpret_cast<SyncPluginBase *>(this)), true);
+
+    //Test startServer(const QString &aProfileName)
+    QVERIFY(iSync->iServerActivator != 0);
+    // XXX Try to use QTRY_COMPARE() here to see the effects mentioned in the above XXX comments
+    QCOMPARE(iSync->iServers.isEmpty(), true);
+    QVERIFY(iSync->iProfileManager.profile("profile", Profile::TYPE_SERVER) == 0);
+    iSync->startServer("profile");
+    QCOMPARE(iSync->iServers.isEmpty(), true);
+    QVERIFY(iSync->iProfileManager.profile("syncml", Profile::TYPE_SERVER) != 0);
+    iSync->startServer("syncml");
     QCOMPARE(iSync->iServers.isEmpty(), false);
     QTest::qSleep( 100 );
 
@@ -153,102 +153,102 @@ void SynchronizerTest::testSync()
     // plug-in. In the real application this situation does not happen, because
     // event loop is running and deleteLater works normally.
     iSync->iClosing = true;
-	iSync->stopServer("syncml");
+    iSync->stopServer("syncml");
     iSync->iClosing = false;
 
-	QCOMPARE(iSync->iServers.isEmpty(), true);
+    QCOMPARE(iSync->iServers.isEmpty(), true);
 
-	QCOMPARE(iSync->iServerActivator->enabledServers().isEmpty(), true);
+    QCOMPARE(iSync->iServerActivator->enabledServers().isEmpty(), true);
 
-	QVERIFY(iSync->iTransportTracker != 0);
-	iSync->iTransportTracker->updateState(Sync::CONNECTIVITY_USB, true);
+    QVERIFY(iSync->iTransportTracker != 0);
+    iSync->iTransportTracker->updateState(Sync::CONNECTIVITY_USB, true);
 
-	//test startServers()
-	QVERIFY(iSync->iServerActivator != 0);
-	QCOMPARE(iSync->iServerActivator->enabledServers().isEmpty(), false);
-	iSync->startServers();
+    //test startServers()
+    QVERIFY(iSync->iServerActivator != 0);
+    QCOMPARE(iSync->iServerActivator->enabledServers().isEmpty(), false);
+    iSync->startServers();
     QTest::qSleep( 100 );
 
     // Fake that synchronizer is closing, so that server plug-in is deleted
     // immediately.
     iSync->iClosing = true;
-	iSync->stopServers();
+    iSync->stopServers();
     iSync->iClosing = false;
 
-	//test onServerDone()
-	//This is not called in a slot activated by the signal. sender() returns 0
-	QVERIFY(iSync->iProfileManager.profile("syncml", Profile::TYPE_SERVER) != 0);
-	iSync->startServer("syncml");
+    //test onServerDone()
+    //This is not called in a slot activated by the signal. sender() returns 0
+    QVERIFY(iSync->iProfileManager.profile("syncml", Profile::TYPE_SERVER) != 0);
+    iSync->startServer("syncml");
     QTest::qSleep( 100 );
-	QCOMPARE(iSync->iServers.isEmpty(), false);
-	QCOMPARE(iSync->iServers.size(), 1);
-	iSync->onServerDone();
-	QCOMPARE(iSync->iServers.size(), 1);
+    QCOMPARE(iSync->iServers.isEmpty(), false);
+    QCOMPARE(iSync->iServers.size(), 1);
+    iSync->onServerDone();
+    QCOMPARE(iSync->iServers.size(), 1);
 
-	//test onNewSession(const QString &aDestination).
-	//This is not called in a slot activated by the signal. sender() returns 0
-	QCOMPARE(iSync->iActiveSessions.isEmpty(), false);
-	QCOMPARE(iSync->iActiveSessions.size(), 1);
-	iSync->onNewSession("USB");
-	QCOMPARE(iSync->iActiveSessions.size(), 1);
+    //test onNewSession(const QString &aDestination).
+    //This is not called in a slot activated by the signal. sender() returns 0
+    QCOMPARE(iSync->iActiveSessions.isEmpty(), false);
+    QCOMPARE(iSync->iActiveSessions.size(), 1);
+    iSync->onNewSession("USB");
+    QCOMPARE(iSync->iActiveSessions.size(), 1);
 
     /*
-    ServerPluginRunner *plugin = new ServerPluginRunner("Plugin", NULL, NULL, NULL, NULL);
-	QSignalSpy spy(plugin, SIGNAL(newSession(const QString )));
-	plugin->onNewSession("USB");
-	QCOMPARE(spy.count(), 1);
-	QTest::qWait(20);
+    ServerPluginRunner *plugin = new ServerPluginRunner("Plugin", nullptr, nullptr, nullptr, nullptr);
+    QSignalSpy spy(plugin, SIGNAL(newSession(const QString )));
+    plugin->onNewSession("USB");
+    QCOMPARE(spy.count(), 1);
+    QTest::qWait(20);
     QCOMPARE(iSync->iActiveSessions.size(), 1);*/
 
-	QVERIFY(iSync->iSyncScheduler != 0);
-	iSync->reschedule("Profile");
+    QVERIFY(iSync->iSyncScheduler != 0);
+    iSync->reschedule("Profile");
 
-	//test is TransportAvailable(const SyncSession *aSession)
-	QVERIFY(iSyncSession != 0);
-	QVERIFY(iSync->iTransportTracker != 0);
-	QVERIFY(iSyncSession->profile() != 0);
+    //test is TransportAvailable(const SyncSession *aSession)
+    QVERIFY(iSyncSession != 0);
+    QVERIFY(iSync->iTransportTracker != 0);
+    QVERIFY(iSyncSession->profile() != 0);
 }
 void SynchronizerTest::testSignals()
 {
-	QStringList alist;
-	alist << "storage";
+    QStringList alist;
+    alist << "storage";
 
-	QSignalSpy sigStorage(iSync, SIGNAL(storageReleased()));
-	iSync->releaseStorages(alist);
-	QCOMPARE(sigStorage.count(), 1);
-	
-	qRegisterMetaType<Sync::TransferDatabase>("Sync::TransferDatabase");
-	qRegisterMetaType<Sync::TransferType>("Sync::TransferType");
-	QSignalSpy sigTransfer(iSync,
-			       SIGNAL(transferProgress(QString, int, int, QString, int)));
-	
-	iSync->onTransferProgress("Profile", Sync::LOCAL_DATABASE,
-				  Sync::ITEM_ADDED, "Mime", 1);
-	QCOMPARE(sigTransfer.count(), 1);
+    QSignalSpy sigStorage(iSync, SIGNAL(storageReleased()));
+    iSync->releaseStorages(alist);
+    QCOMPARE(sigStorage.count(), 1);
 
-	QSignalSpy sigStorage1(iSync, SIGNAL(storageReleased()));
-	iSync->releaseStorage("Storage", NULL);
-	QCOMPARE(sigStorage1.count(), 1);
+    qRegisterMetaType<Sync::TransferDatabase>("Sync::TransferDatabase");
+    qRegisterMetaType<Sync::TransferType>("Sync::TransferType");
+    QSignalSpy sigTransfer(iSync,
+                           SIGNAL(transferProgress(QString, int, int, QString, int)));
 
-	
-	QSignalSpy sigbackupRestoreStarts(iSync, SIGNAL(backupInProgress()));
-	iSync->backupStarts();
-	QCOMPARE(sigbackupRestoreStarts.count(), 1);
-	
-	QSignalSpy sigbackupDone(iSync, SIGNAL(backupDone()));
-	iSync->backupFinished();
-	QCOMPARE(sigbackupDone.count(), 1);
-	
-	QSignalSpy sigrestoreStarts(iSync, SIGNAL(restoreInProgress()));
-	iSync->restoreStarts();
-	QCOMPARE(sigrestoreStarts.count(), 1);
-	
-	QSignalSpy sigrestoreFinished(iSync, SIGNAL(restoreDone()));
-	iSync->restoreFinished();
-	QCOMPARE(sigrestoreFinished.count(), 1);
-	
-	QSignalSpy sessionStatus(iSync, SIGNAL(syncStatus(QString, int, QString, int)));
-	iSync->onSessionFinished("Profile", Sync::SYNC_DONE, "Msg", 0);
-	QCOMPARE(sessionStatus.count(), 1);
+    iSync->onTransferProgress("Profile", Sync::LOCAL_DATABASE,
+                              Sync::ITEM_ADDED, "Mime", 1);
+    QCOMPARE(sigTransfer.count(), 1);
+
+    QSignalSpy sigStorage1(iSync, SIGNAL(storageReleased()));
+    iSync->releaseStorage("Storage", nullptr);
+    QCOMPARE(sigStorage1.count(), 1);
+
+
+    QSignalSpy sigbackupRestoreStarts(iSync, SIGNAL(backupInProgress()));
+    iSync->backupStarts();
+    QCOMPARE(sigbackupRestoreStarts.count(), 1);
+
+    QSignalSpy sigbackupDone(iSync, SIGNAL(backupDone()));
+    iSync->backupFinished();
+    QCOMPARE(sigbackupDone.count(), 1);
+
+    QSignalSpy sigrestoreStarts(iSync, SIGNAL(restoreInProgress()));
+    iSync->restoreStarts();
+    QCOMPARE(sigrestoreStarts.count(), 1);
+
+    QSignalSpy sigrestoreFinished(iSync, SIGNAL(restoreDone()));
+    iSync->restoreFinished();
+    QCOMPARE(sigrestoreFinished.count(), 1);
+
+    QSignalSpy sessionStatus(iSync, SIGNAL(syncStatus(QString, int, QString, int)));
+    iSync->onSessionFinished("Profile", Sync::SYNC_DONE, "Msg", 0);
+    QCOMPARE(sessionStatus.count(), 1);
 }
 QTEST_MAIN(Buteo::SynchronizerTest)

@@ -28,47 +28,47 @@ using namespace Buteo;
 
 void SyncBackupTest::initTestCase()
 {
-	iBackup = new SyncBackup();
+    iBackup = new SyncBackup();
 }
 
 void SyncBackupTest::cleanupTestCase()
 {
 
-    QVERIFY(iBackup != 0);  
-    delete iBackup;   
+    QVERIFY(iBackup != 0);
+    delete iBackup;
     iBackup = 0;
 }
 
 void SyncBackupTest::testInitialize()
 {
-	QVERIFY(iBackup->iReply == 0);
-	QVERIFY(iBackup->iBackupRestore == 0);
-	QVERIFY(iBackup->iWatchService != 0);
-	QVERIFY(iBackup->iAdaptor != 0);
+    QVERIFY(iBackup->iReply == 0);
+    QVERIFY(iBackup->iBackupRestore == 0);
+    QVERIFY(iBackup->iWatchService != 0);
+    QVERIFY(iBackup->iAdaptor != 0);
 }
 
 void SyncBackupTest::testBackup()
 {
-	QDBusMessage msg;
-	QSignalSpy sigStatus1(iBackup, SIGNAL(startBackup()));
-	QCOMPARE(iBackup->backupStarts(msg), uchar(0));
-	QCOMPARE(sigStatus1.count(), 1);
-	QCOMPARE(iBackup->getBackUpRestoreState(), true); 
-	
-	QSignalSpy sigStatus2(iBackup, SIGNAL(backupDone()));
-	QCOMPARE(iBackup->backupFinished(msg), uchar(0));
-	QCOMPARE(sigStatus2.count(), 1);
-	QCOMPARE(iBackup->getBackUpRestoreState(), false); 
-	
-	QSignalSpy sigStatus3(iBackup, SIGNAL(startRestore()));
-	QCOMPARE(iBackup->restoreStarts(msg), uchar(0));
-	QCOMPARE(sigStatus3.count(), 1);
-	QCOMPARE(iBackup->getBackUpRestoreState(), true); 
+    QDBusMessage msg;
+    QSignalSpy sigStatus1(iBackup, SIGNAL(startBackup()));
+    QCOMPARE(iBackup->backupStarts(msg), uchar(0));
+    QCOMPARE(sigStatus1.count(), 1);
+    QCOMPARE(iBackup->getBackUpRestoreState(), true);
 
-	QSignalSpy  sigStatus4(iBackup, SIGNAL(restoreDone()));
-	QCOMPARE(iBackup->restoreFinished(msg), uchar(0));
-	QCOMPARE(sigStatus4.count(), 1);
-	QCOMPARE(iBackup->getBackUpRestoreState(), false); 
+    QSignalSpy sigStatus2(iBackup, SIGNAL(backupDone()));
+    QCOMPARE(iBackup->backupFinished(msg), uchar(0));
+    QCOMPARE(sigStatus2.count(), 1);
+    QCOMPARE(iBackup->getBackUpRestoreState(), false);
+
+    QSignalSpy sigStatus3(iBackup, SIGNAL(startRestore()));
+    QCOMPARE(iBackup->restoreStarts(msg), uchar(0));
+    QCOMPARE(sigStatus3.count(), 1);
+    QCOMPARE(iBackup->getBackUpRestoreState(), true);
+
+    QSignalSpy  sigStatus4(iBackup, SIGNAL(restoreDone()));
+    QCOMPARE(iBackup->restoreFinished(msg), uchar(0));
+    QCOMPARE(sigStatus4.count(), 1);
+    QCOMPARE(iBackup->getBackUpRestoreState(), false);
 }
 
 QTEST_MAIN(Buteo::SyncBackupTest)

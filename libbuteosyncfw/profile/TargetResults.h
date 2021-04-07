@@ -32,10 +32,10 @@ class QDomElement;
 namespace Buteo {
 
 class TargetResultsPrivate;
-    
+
 //! \brief Container for number of items added, deleted and modified.
 struct ItemCounts {
-	//! No. of Items added
+    //! No. of Items added
     unsigned added;
 
     //! No. of Items deleted
@@ -100,7 +100,7 @@ public:
      *
      * \param aRhs Source.
      */
-    TargetResults& operator=(const TargetResults &aRhs);
+    TargetResults &operator=(const TargetResults &aRhs);
 
     /*! \brief Exports the target results to XML.
      *

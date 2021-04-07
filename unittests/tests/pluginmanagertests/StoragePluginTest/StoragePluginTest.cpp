@@ -32,11 +32,11 @@ void StoragePluginTest::testCreateDestroy()
 {
     PluginManager pluginManager( TEST_PLUGIN_PATH );
 
-    StoragePlugin* storage1 = pluginManager.createStorage( "hdummy" );
+    StoragePlugin *storage1 = pluginManager.createStorage( "hdummy" );
     QVERIFY( storage1 );
     QVERIFY( pluginManager.iLoadedDlls.count() == 1 );
 
-    StoragePlugin* storage2 = pluginManager.createStorage( "hdummy" );
+    StoragePlugin *storage2 = pluginManager.createStorage( "hdummy" );
 
     QVERIFY( storage2 );
     QVERIFY( pluginManager.iLoadedDlls.count() == 1 );

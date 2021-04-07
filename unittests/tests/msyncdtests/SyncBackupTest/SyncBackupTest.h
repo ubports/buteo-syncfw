@@ -30,18 +30,18 @@
 #include "SyncBackup.h"
 
 namespace Buteo {
-    
+
 class SyncBackupTest: public QObject
 {
-	Q_OBJECT
-	private slots:
-	void initTestCase();
-	void cleanupTestCase();
-	void testInitialize();
-	void testBackup();
-	
-	private:
-	SyncBackup *iBackup;
+    Q_OBJECT
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
+    void testInitialize();
+    void testBackup();
+
+private:
+    SyncBackup *iBackup;
 };
 
 }

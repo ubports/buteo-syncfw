@@ -47,10 +47,8 @@ PluginServiceObj::PluginServiceObj(const QString &aPluginName,
 
 PluginServiceObj::~PluginServiceObj()
 {
-    if (iPlugin) {
-        delete iPlugin;
-        iPlugin = nullptr;
-    }
+    delete iPlugin;
+    iPlugin = nullptr;
 
     delete iPluginCb;
 }
@@ -109,7 +107,7 @@ bool PluginServiceObj::init()
         return false;
     }
 
-    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin*>(iPlugin)) {
+    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin *>(iPlugin)) {
         // Server signals
         connect(serverPlugin, &ServerPlugin::newSession,
                 this, &PluginServiceObj::newSession);
@@ -157,7 +155,7 @@ void PluginServiceObj::abortSync(uchar aStatus)
         LOG_WARNING( "PluginServiceObj::abortSync(): called on uninitialized plugin" );
         return;
     }
-    iPlugin->abortSync( static_cast<Sync::SyncStatus>(aStatus) );
+    iPlugin->abortSync(static_cast<Sync::SyncStatus>(aStatus));
 }
 
 bool PluginServiceObj::cleanUp()
@@ -183,7 +181,7 @@ void PluginServiceObj::connectivityStateChanged(int aType, bool aState)
         LOG_WARNING( "PluginServiceObj::connectivityStateChanged(): called on uninitialized plugin" );
         return;
     }
-    iPlugin->connectivityStateChanged( static_cast<Sync::ConnectivityType>(aType), aState );
+    iPlugin->connectivityStateChanged(static_cast<Sync::ConnectivityType>(aType), aState);
 }
 
 QString PluginServiceObj::getSyncResults()
@@ -206,7 +204,7 @@ bool PluginServiceObj::startSync()
         return false;
     }
 
-    if (ClientPlugin *clientPlugin = qobject_cast<ClientPlugin*>(iPlugin)) {
+    if (ClientPlugin *clientPlugin = qobject_cast<ClientPlugin *>(iPlugin)) {
         return clientPlugin->startSync();
     } else {
         LOG_WARNING( "PluginServiceObj::startSync(): client plugin unavailable" );
@@ -223,7 +221,7 @@ void PluginServiceObj::resume()
         return;
     }
 
-    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin*>(iPlugin)) {
+    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin *>(iPlugin)) {
         serverPlugin->resume();
     } else {
         LOG_WARNING( "PluginServiceObj::resume(): server plugin unavailable" );
@@ -239,7 +237,7 @@ bool PluginServiceObj::startListen()
         return false;
     }
 
-    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin*>(iPlugin)) {
+    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin *>(iPlugin)) {
         return serverPlugin->startListen();
     } else {
         LOG_WARNING( "PluginServiceObj::startListen(): server plugin unavailable" );
@@ -256,7 +254,7 @@ void PluginServiceObj::stopListen()
         return;
     }
 
-    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin*>(iPlugin)) {
+    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin *>(iPlugin)) {
         serverPlugin->stopListen();
     } else {
         LOG_WARNING( "PluginServiceObj::stopListen(): server plugin unavailable" );
@@ -272,7 +270,7 @@ void PluginServiceObj::suspend()
         return;
     }
 
-    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin*>(iPlugin)) {
+    if (ServerPlugin *serverPlugin = qobject_cast<ServerPlugin *>(iPlugin)) {
         serverPlugin->suspend();
     } else {
         LOG_WARNING( "PluginServiceObj::suspend(): server plugin unavailable" );

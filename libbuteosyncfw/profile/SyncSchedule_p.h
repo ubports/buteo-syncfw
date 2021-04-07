@@ -28,14 +28,14 @@
 #include <QString>
 
 namespace Buteo {
-    
+
 //! Private implementation class for SyncSchedule.
 class SyncSchedulePrivate
 {
 public:
-	/*! \brief Constructor
-	 *
-	 */
+    /*! \brief Constructor
+     *
+     */
     SyncSchedulePrivate();
 
     /*! \brief Copy Constructor
@@ -91,7 +91,7 @@ public:
 
     bool iEnabled;
 
-    // ============ RUSH HOUR SETTINGS =========== 
+    // ============ RUSH HOUR SETTINGS ===========
 
     //! indicates the schedule for rush hour - days
     DaySet iRushDays;

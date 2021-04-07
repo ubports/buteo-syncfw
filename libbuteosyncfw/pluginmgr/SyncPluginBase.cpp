@@ -25,12 +25,12 @@
 
 using namespace Buteo;
 
-SyncPluginBase::SyncPluginBase( const QString &aPluginName,
-                                const QString &aProfileName,
-                                PluginCbInterface *aCbInterface )
-:   iCbInterface(aCbInterface),
-    iPluginName(aPluginName),
-    iProfileName(aProfileName)
+SyncPluginBase::SyncPluginBase(const QString &aPluginName,
+                               const QString &aProfileName,
+                               PluginCbInterface *aCbInterface)
+    : iCbInterface(aCbInterface),
+      iPluginName(aPluginName),
+      iProfileName(aProfileName)
 {
     // register various metatypes used in DBus arguments
     qRegisterMetaType<Sync::SyncStatus>("Sync::SyncStatus");

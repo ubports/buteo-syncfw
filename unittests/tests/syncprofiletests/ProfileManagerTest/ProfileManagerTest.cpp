@@ -70,7 +70,7 @@ void ProfileManagerTest::testGetProfile()
     QVERIFY(p != 0);
     QCOMPARE(p->name(), HCALENDAR);
     QCOMPARE(p->type(), Profile::TYPE_STORAGE);
-    QVERIFY(dynamic_cast<StorageProfile*>(p.data()) != 0);
+    QVERIFY(dynamic_cast<StorageProfile *>(p.data()) != 0);
 
     // Getting unknown sync profile returns 0.
     QVERIFY(pm.syncProfile("unknown") == 0);
@@ -119,12 +119,11 @@ void ProfileManagerTest::testGetSyncProfile()
     QCOMPARE(sub->key("Local URI"), QString("./Calendar"));
 
     // Get all sync profiles.
-    QList<SyncProfile*> allProfiles = pm.allSyncProfiles();
+    QList<SyncProfile *> allProfiles = pm.allSyncProfiles();
     QVERIFY(!allProfiles.isEmpty());
     QCOMPARE(allProfiles.first()->name(), OVI_CALENDAR);
     QCOMPARE(allProfiles.first()->type(), Profile::TYPE_SYNC);
-    foreach (SyncProfile *p, allProfiles)
-    {
+    foreach (SyncProfile *p, allProfiles) {
         delete p;
     }
     allProfiles.clear();
@@ -133,7 +132,7 @@ void ProfileManagerTest::testGetSyncProfile()
 void ProfileManagerTest::testGetByData()
 {
     ProfileManager pm(USERPROFILE_DIR, USERPROFILE_DIR);
-    QList<SyncProfile*> profiles;
+    QList<SyncProfile *> profiles;
 
     // Get profiles with non-existent key.
     profiles = pm.getSyncProfilesByData("", "", "unknown");
@@ -147,8 +146,7 @@ void ProfileManagerTest::testGetByData()
     profiles = pm.getSyncProfilesByData("", "", "enabled");
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -158,8 +156,7 @@ void ProfileManagerTest::testGetByData()
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->key("enabled"), QString("true"));
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -170,13 +167,13 @@ void ProfileManagerTest::testGetByData()
 
     // Get profiles by sub-profile information, key and value defined, no match.
     profiles = pm.getSyncProfilesByData(HCALENDAR, Profile::TYPE_STORAGE,
-        "Target URI", "unknown");
+                                        "Target URI", "unknown");
     QVERIFY(profiles.isEmpty());
 
     // Get profiles by sub-profile information, sub-profile name not defined,
     // key and value defined, no match.
     profiles = pm.getSyncProfilesByData("", Profile::TYPE_STORAGE,
-        "Target URI", "unknown");
+                                        "Target URI", "unknown");
     QVERIFY(profiles.isEmpty());
 
     // Get profiles by sub-profile information, no key defined.
@@ -184,20 +181,18 @@ void ProfileManagerTest::testGetByData()
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
 
     // Get profiles by sub-profile information, key and value defined.
     profiles = pm.getSyncProfilesByData(HCALENDAR, Profile::TYPE_STORAGE,
-        "Target URI", "./EventTask/Tasks");
+                                        "Target URI", "./EventTask/Tasks");
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -205,12 +200,11 @@ void ProfileManagerTest::testGetByData()
     // Get profiles by sub-profile information, sub-profile name not defined,
     // key and value defined.
     profiles = pm.getSyncProfilesByData("", Profile::TYPE_STORAGE,
-        "Target URI", "./EventTask/Tasks");
+                                        "Target URI", "./EventTask/Tasks");
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -219,7 +213,7 @@ void ProfileManagerTest::testGetByData()
 void ProfileManagerTest::testGetBySingleCriteria()
 {
     ProfileManager pm(USERPROFILE_DIR, USERPROFILE_DIR);
-    QList<SyncProfile*> profiles;
+    QList<SyncProfile *> profiles;
 
     // Get profiles with non-existent key.
     ProfileManager::SearchCriteria criteria;
@@ -248,8 +242,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     profiles = pm.getSyncProfilesByData(criteriaList);
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -264,8 +257,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->key("enabled"), QString("true"));
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -293,8 +285,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -321,8 +312,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     profiles = pm.getSyncProfilesByData(criteriaList);
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -362,8 +352,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -380,8 +369,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -408,8 +396,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     profiles = pm.getSyncProfilesByData(criteriaList);
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -427,8 +414,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -437,7 +423,7 @@ void ProfileManagerTest::testGetBySingleCriteria()
 void ProfileManagerTest::testGetByMultipleCriteria()
 {
     ProfileManager pm(USERPROFILE_DIR, USERPROFILE_DIR);
-    QList<SyncProfile*> profiles;
+    QList<SyncProfile *> profiles;
 
     QList<ProfileManager::SearchCriteria> criteriaList;
 
@@ -466,8 +452,7 @@ void ProfileManagerTest::testGetByMultipleCriteria()
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -490,8 +475,7 @@ void ProfileManagerTest::testGetByMultipleCriteria()
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -500,15 +484,14 @@ void ProfileManagerTest::testGetByMultipleCriteria()
 void ProfileManagerTest::testGetByStorage()
 {
     ProfileManager pm(USERPROFILE_DIR, USERPROFILE_DIR);
-    QList<SyncProfile*> profiles;
+    QList<SyncProfile *> profiles;
 
     // Get profiles by storage.
     profiles = pm.getSyncProfilesByStorage("hcalendar", true);
     QVERIFY(!profiles.isEmpty());
     QVERIFY(profiles[0] != 0);
     QCOMPARE(profiles[0]->name(), OVI_CALENDAR);
-    foreach (SyncProfile *p, profiles)
-    {
+    foreach (SyncProfile *p, profiles) {
         delete p;
     }
     profiles.clear();
@@ -527,7 +510,7 @@ void ProfileManagerTest::testLog()
         QDateTime now = QDateTime::currentDateTime();
         SyncResults syncResults(now, Buteo::SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
         syncResults.addTargetResults(TargetResults("hcalendar",
-            ItemCounts(1, 2, 3), ItemCounts(4, 5, 6)));
+                                                   ItemCounts(1, 2, 3), ItemCounts(4, 5, 6)));
         p->addResults(syncResults);
 
         // Save log.
@@ -557,8 +540,9 @@ void ProfileManagerTest::testLog()
     // Save results through ProfileManager.
     {
         QCOMPARE(QFile::remove(
-                USERPROFILE_DIR + "/sync/logs/" + OVI_CALENDAR + ".log.xml"), true);
-        SyncResults syncResults(QDateTime::currentDateTime(), Buteo::SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
+                     USERPROFILE_DIR + "/sync/logs/" + OVI_CALENDAR + ".log.xml"), true);
+        SyncResults syncResults(QDateTime::currentDateTime(), Buteo::SyncResults::SYNC_RESULT_FAILED,
+                                Buteo::SyncResults::INTERNAL_ERROR);
         syncResults.setMajorCode(Buteo::SyncResults::SYNC_RESULT_SUCCESS);
         pm.saveSyncResults(OVI_CALENDAR, syncResults);
         QScopedPointer<SyncProfile> p(pm.syncProfile(OVI_CALENDAR));
@@ -567,7 +551,7 @@ void ProfileManagerTest::testLog()
         QVERIFY(log != 0);
         QVERIFY(log->lastResults() != 0);
         QVERIFY(log->lastResults()->majorCode() ==
-            Buteo::SyncResults::SYNC_RESULT_SUCCESS);
+                Buteo::SyncResults::SYNC_RESULT_SUCCESS);
     }
 }
 
@@ -606,7 +590,7 @@ void ProfileManagerTest::testHiddenProfiles()
     ProfileManager pm(USERPROFILE_DIR, USERPROFILE_DIR);
 
     // Get number of visible sync profiles.
-    QList<SyncProfile*> profiles = pm.allVisibleSyncProfiles();
+    QList<SyncProfile *> profiles = pm.allVisibleSyncProfiles();
     int num_profiles = profiles.size();
     qDeleteAll(profiles);
     profiles.clear();
@@ -654,8 +638,8 @@ void ProfileManagerTest::testOverrideKey()
 {
     ProfileManager pm(USERPROFILE_DIR, USERPROFILE_DIR);
 
-    QScopedPointer<SyncProfile> p(static_cast<SyncProfile*>(
-        pm.profile(OVI_CALENDAR, Profile::TYPE_SYNC)));
+    QScopedPointer<SyncProfile> p(static_cast<SyncProfile *>(
+                                      pm.profile(OVI_CALENDAR, Profile::TYPE_SYNC)));
     QVERIFY(p != 0);
     Profile *storage = p->subProfile(HCALENDAR, Profile::TYPE_STORAGE);
     QVERIFY(storage != 0);
@@ -673,11 +657,11 @@ void ProfileManagerTest::testOverrideKey()
 
 void ProfileManagerTest::testBackup()
 {
-    ProfileManager pm(USERPROFILE_DIR + '/', SYSTEMPROFILE_DIR + '/'); 
+    ProfileManager pm(USERPROFILE_DIR + '/', SYSTEMPROFILE_DIR + '/');
 
     // Copy to backup.
     QString fileName = USERPROFILE_DIR + '/' + Profile::TYPE_SYNC +
-        '/' + OVI_CALENDAR + ".xml";
+                       '/' + OVI_CALENDAR + ".xml";
     QFile file(fileName);
     QVERIFY(file.copy(fileName + ".bak"));
 

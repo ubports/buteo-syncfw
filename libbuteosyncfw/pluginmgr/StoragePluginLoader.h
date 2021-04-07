@@ -34,7 +34,7 @@ class StoragePluginLoader : public QObject
 {
     Q_OBJECT
 public:
-    virtual StoragePlugin* createPlugin(const QString& aPluginName) = 0;
+    virtual StoragePlugin *createPlugin(const QString &aPluginName) = 0;
 };
 
 }

@@ -33,7 +33,7 @@
 #include "ServerActivator.h"
 
 namespace Buteo {
-    
+
 class ServerPluginRunnerTest : public QObject
 {
     Q_OBJECT

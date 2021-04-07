@@ -60,7 +60,7 @@ uchar SyncBackupAdaptor::backupFinished(const QDBusMessage &message)
 {
     // handle method call com.nokia.backupclient.backupFinished
     uchar out0;
-    QMetaObject::invokeMethod(parent(), "backupFinished", Q_RETURN_ARG(uchar, out0), Q_ARG (QDBusMessage ,message));
+    QMetaObject::invokeMethod(parent(), "backupFinished", Q_RETURN_ARG(uchar, out0), Q_ARG (QDBusMessage, message));
     return out0;
 }
 
@@ -68,7 +68,7 @@ uchar SyncBackupAdaptor::backupStarts(const QDBusMessage &message)
 {
     // handle method call com.nokia.backupclient.backupStarts
     uchar out0;
-    QMetaObject::invokeMethod(parent(), "backupStarts", Q_RETURN_ARG(uchar, out0), Q_ARG (QDBusMessage ,message));
+    QMetaObject::invokeMethod(parent(), "backupStarts", Q_RETURN_ARG(uchar, out0), Q_ARG (QDBusMessage, message));
     return out0;
 }
 
@@ -84,7 +84,7 @@ uchar SyncBackupAdaptor::restoreFinished(const QDBusMessage &message)
 {
     // handle method call com.nokia.backupclient.restoreFinished
     uchar out0;
-    QMetaObject::invokeMethod(parent(), "restoreFinished", Q_RETURN_ARG(uchar, out0), Q_ARG (QDBusMessage ,message));
+    QMetaObject::invokeMethod(parent(), "restoreFinished", Q_RETURN_ARG(uchar, out0), Q_ARG (QDBusMessage, message));
     return out0;
 }
 
@@ -92,7 +92,7 @@ uchar SyncBackupAdaptor::restoreStarts(const QDBusMessage &message)
 {
     // handle method call com.nokia.backupclient.restoreStarts
     uchar out0;
-    QMetaObject::invokeMethod(parent(), "restoreStarts", Q_RETURN_ARG(uchar, out0), Q_ARG (QDBusMessage ,message));
+    QMetaObject::invokeMethod(parent(), "restoreStarts", Q_RETURN_ARG(uchar, out0), Q_ARG (QDBusMessage, message));
     return out0;
 }
 

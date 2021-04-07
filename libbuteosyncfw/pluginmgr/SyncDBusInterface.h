@@ -87,7 +87,7 @@ signals:
      */
 
     void transferProgress(QString aProfileName, int aTransferDatabase,
-                          int aTransferType , QString aMimeType, int aCommittedItems);
+                          int aTransferType, QString aMimeType, int aCommittedItems);
 
     /*! \brief Notifies about a change in profile.
      *
@@ -101,30 +101,30 @@ signals:
      * \param aProfileAsXml Updated Profile Object is sent as xml
      *
      */
-    void signalProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
-    
-   
+    void signalProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml);
+
+
     /*! \brief Notifies about Backup start.
      *
      * This signal is sent when the backup framework is backing the sync related
      * data
      */
     void backupInProgress ();
-    
+
     /*! \brief Notifies about Backup done.
      *
      * This signal is sent when the backup framework has completed backing the sync related
      * data.
      */
     void backupDone();
-    
+
     /*! \brief Notifies about Restore start.
      *
      * This signal is sent when the backup framework is restoring the sync related
      * data
      */
     void restoreInProgress();
-    
+
     /*! \brief Notifies about Restore Done.
      *
      * This signal is sent when the backup framework has restored the sync related
@@ -139,7 +139,7 @@ signals:
      * \param aProfileName Name of the profile for which results are available
      * \param aResultsAsXml results as an xml object
      */
-    void resultsAvailable(QString aProfileName , QString aResultsAsXml);
+    void resultsAvailable(QString aProfileName, QString aResultsAsXml);
 
     /*! \brief Notifies sync status change for a set of account Ids
      *
@@ -158,8 +158,9 @@ signals:
      * Invalid time is returned if there was no last sync.
      * \param aNextSyncTime This is an out parameter. The next sync time.
      */
-    void statusChanged(unsigned int aAccountId, int aNewStatus, int aFailedReason, qlonglong aPrevSyncTime, qlonglong aNextSyncTime);
- 
+    void statusChanged(unsigned int aAccountId, int aNewStatus, int aFailedReason, qlonglong aPrevSyncTime,
+                       qlonglong aNextSyncTime);
+
 public slots:
 
     /*!
@@ -239,16 +240,16 @@ public slots:
      * \return Profile name list.
      */
     virtual QStringList runningSyncs() = 0;
-    
-    
+
+
     /*!
      * \brief This function returns true if backup/restore in progress else
      * false.
      */
     virtual bool  getBackUpRestoreState() = 0;
-	
-	
-	/*!
+
+
+    /*!
      * \brief sets the schedule for a profile
      *
      * This Function helps in setting a schedule to profile
@@ -261,7 +262,7 @@ public slots:
      *
      * \return bool - status of the operation
      */
-    virtual bool setSyncSchedule(QString aProfileId , QString aScheduleAsXml) = 0;
+    virtual bool setSyncSchedule(QString aProfileId, QString aScheduleAsXml) = 0;
 
     /*!
      * \brief Save SyncResults to log.xml file.
@@ -269,7 +270,7 @@ public slots:
      * \param aSyncResults to save in the \code <profileId>.log.xml. \endcode
      * \return status of the saveSyncResults
      */
-    virtual bool saveSyncResults(QString aProfileId,QString aSyncResults) = 0;
+    virtual bool saveSyncResults(QString aProfileId, QString aSyncResults) = 0;
 
     /*! \brief To get lastSyncResult.
      *  \param aProfileId
@@ -294,7 +295,7 @@ public slots:
      * \return The sync profile as Xml string.
      */
     virtual QString syncProfile(const QString &aProfileId) = 0;
-    
+
     /*! \brief Gets a sync profiles matching the key-value.
      *
      * Loads and merges also all sub-profiles that are referenced from the
@@ -305,7 +306,7 @@ public slots:
      * \return The sync profiles as Xml string list.
      */
     virtual QStringList syncProfilesByKey(const QString &aKey, const QString &aValue) = 0;
-    
+
     /*! \brief Gets a profiles  matching the profile type.
      *
      * \param aType Type of the profile service/storage/sync.
@@ -318,13 +319,13 @@ public slots:
      * \param aAccountId The account ID.
      */
     virtual Q_NOREPLY void start(unsigned int aAccountId) = 0;
-    
+
     /*! \brief Stops sync for all profiles matching the given account ID.
      *
      * \param aAccountId The account ID.
      */
     virtual Q_NOREPLY void stop(unsigned int aAccountId) = 0;
-    
+
     /*! \brief Returns the list of account IDs for which sync is ongoing
      *
      * \return The list of account IDs currectly syncing.

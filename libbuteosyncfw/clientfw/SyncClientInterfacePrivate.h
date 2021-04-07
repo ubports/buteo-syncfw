@@ -36,64 +36,64 @@ class SyncResults;
 class SyncClientInterface;
 
 //! Private implementation class for SyncClientInterface.
-class SyncClientInterfacePrivate:public QObject
+class SyncClientInterfacePrivate: public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	/*!\brief Constructor
-	 *
-	 *@param aParent - pointer to the parent object
-	 */
-	SyncClientInterfacePrivate(SyncClientInterface *aParent);
+    /*!\brief Constructor
+     *
+     *@param aParent - pointer to the parent object
+     */
+    SyncClientInterfacePrivate(SyncClientInterface *aParent);
 
-	/*! \brief Destructor
-	 */
-	~SyncClientInterfacePrivate();
+    /*! \brief Destructor
+     */
+    ~SyncClientInterfacePrivate();
 
-	/*! \brief function to start the sync
-	 *
-	 * @param aProfileId - id of the profile to start the sync
-	 */
-	bool startSync(const QString &aProfileId) const;
+    /*! \brief function to start the sync
+     *
+     * @param aProfileId - id of the profile to start the sync
+     */
+    bool startSync(const QString &aProfileId) const;
 
-	/*! \brief function to abort the sync
-	 *
-	 * @param aProfileId - id of the profile to abort the sync
-	 */
-	void abortSync(const QString &aProfileId) const;
+    /*! \brief function to abort the sync
+     *
+     * @param aProfileId - id of the profile to abort the sync
+     */
+    void abortSync(const QString &aProfileId) const;
 
-	/*! \brief function to get Running sync list
-	 *
-	 * @return  - list of running sync profile ids
-	 */
-	QStringList getRunningSyncList();
+    /*! \brief function to get Running sync list
+     *
+     * @return  - list of running sync profile ids
+     */
+    QStringList getRunningSyncList();
 
-	/*! \brief function to remove a profile
-	 *
-	 * @param aProfileId id of the profule to remove to add
-	 */
-	bool removeProfile(QString &aProfileId);
+    /*! \brief function to remove a profile
+     *
+     * @param aProfileId id of the profule to remove to add
+     */
+    bool removeProfile(QString &aProfileId);
 
-	/*! \brief function to update an existing profile
-	 *
-	 * @param aProfile profile object to add
-	 */
-	bool updateProfile(Buteo::SyncProfile &aProfile);
+    /*! \brief function to update an existing profile
+     *
+     * @param aProfile profile object to add
+     */
+    bool updateProfile(Buteo::SyncProfile &aProfile);
 
-	/*! \brief function to add a profile
-	 *
-	 * @return returns the backup restore state.
-	 */
-	bool getBackUpRestoreState();
+    /*! \brief function to add a profile
+     *
+     * @return returns the backup restore state.
+     */
+    bool getBackUpRestoreState();
 
-	/*! \brief function to check if the interface is valid
-	 *
-	 * @return  status of the validity of the interface
-	 */
+    /*! \brief function to check if the interface is valid
+     *
+     * @return  status of the validity of the interface
+     */
     bool isValid();
 
-	/*! \brief this function converts the SyncSchedule object to an xml
-	 *  file of the below format
+    /*! \brief this function converts the SyncSchedule object to an xml
+     *  file of the below format
      * \code
      * <schedule interval="15" days="1,2,3,4,5,6,7" time="">
         <rush begin="08:00:00" enabled="true" interval="5" end="17:00:00" days="1,2,3,4,5"/>
@@ -103,7 +103,7 @@ public:
      * @param aProfileId - profile id
      * @param aSchedule - schedule object
      */
-	bool setSyncSchedule(QString &aProfileId,SyncSchedule &aSchedule);
+    bool setSyncSchedule(QString &aProfileId, SyncSchedule &aSchedule);
 
     /*! \brief this function converts the save the syncResults into
      * log.xml file corresponding to profileName.
@@ -111,7 +111,7 @@ public:
      * <syncresults scheduled="false" majorcode="1" minorcode = "501" time="2010-06-01T06:43:32">
      * \endcode
      */
-    bool saveSyncResults(const QString &aProfileId,const Buteo::SyncResults &aSyncResults);
+    bool saveSyncResults(const QString &aProfileId, const Buteo::SyncResults &aSyncResults);
 
     /*! \brief To get lastSyncResult.
      *  \param aProfileId
@@ -136,7 +136,7 @@ public:
      * \return The sync profile as Xml string.
      */
     QString syncProfile(const QString &aProfileId);
-    
+
     /*! \brief Gets a sync profiles which matches the key-value.
      *
      * Loads and merges also all sub-profiles that are referenced from the
@@ -147,7 +147,7 @@ public:
      * \return The sync profiles as Xml string list.
      */
     QStringList syncProfilesByKey(const QString &aKey, const QString &aValue);
-    
+
     /*! \brief Gets a profiles  matching the profile type.
      *
      * \param aType Type of the profile service/storage/sync.
@@ -157,68 +157,68 @@ public:
 
 public slots:
 
-	/*! \brief this is the slot where we will receive the xml data for profile from msyncd.
-	 * The XML Data received will be of the following format
-	 * \code <?xml version="1.0" encoding="UTF-8"?>
-	 *	<profile type="sync" name="ovi.com-sr1">
-	 *		<key value="1" name="accountid"/>
-	 *		<key value="true" name="active"/>
-	 *		<key value="true" name="enabled"/>
-	 *		<key value="false" name="hidden"/>
-	 *		<key value="true" name="scheduled"/>
-	 *		<key value="true" name="use_accounts"/>
-	 *		<profile type="service" name="ovi.com"/>
-	 *		<profile type="storage" name="hcontacts">
-	 *		<key value="true" name="enabled"/>
-	 *		</profile>
-	 *		<schedule interval="15" days="1,2,3,4,5,6,7" time="">
-	 *		<rush begin="08:00:00" enabled="true" interval="5" end="17:00:00" days="1,2,3,4,5"/>
-	 *		</schedule>
-	 *	</profile>
-	 *	\endcode
-	 * @param 	aProfileId - id of the profile
-	 * @param   aChangeType - change type whether addition , deletion or modification
-	 * @param  aChangedProfileAsXml - changed profile arrives as xml
-	 *
-	 */
-    void slotProfileChanged(QString aProfileId , int aChangeType , QString aChangedProfileAsXml);
+    /*! \brief this is the slot where we will receive the xml data for profile from msyncd.
+     * The XML Data received will be of the following format
+     * \code <?xml version="1.0" encoding="UTF-8"?>
+     *  <profile type="sync" name="ovi.com-sr1">
+     *      <key value="1" name="accountid"/>
+     *      <key value="true" name="active"/>
+     *      <key value="true" name="enabled"/>
+     *      <key value="false" name="hidden"/>
+     *      <key value="true" name="scheduled"/>
+     *      <key value="true" name="use_accounts"/>
+     *      <profile type="service" name="ovi.com"/>
+     *      <profile type="storage" name="hcontacts">
+     *      <key value="true" name="enabled"/>
+     *      </profile>
+     *      <schedule interval="15" days="1,2,3,4,5,6,7" time="">
+     *      <rush begin="08:00:00" enabled="true" interval="5" end="17:00:00" days="1,2,3,4,5"/>
+     *      </schedule>
+     *  </profile>
+     *  \endcode
+     * @param   aProfileId - id of the profile
+     * @param   aChangeType - change type whether addition , deletion or modification
+     * @param  aChangedProfileAsXml - changed profile arrives as xml
+     *
+     */
+    void slotProfileChanged(QString aProfileId, int aChangeType, QString aChangedProfileAsXml);
 
-	/*! \brief this is the slot where we will receive the xml data for results from msyncd
-	 * the xml looks like this
-	 * \code <syncresults scheduled="false" majorcode="0" minorcode = "0" time="2010-06-01T06:43:32">
-	 *	<target name="">
-	 *	 <local modified="0" added="0" deleted="0"/>
-	 *	<remote modified="0" added="4" deleted="0"/>
-	 *	</target>
-	 * </syncresults>
-	 *\endcode
-	 * @param aProfileId - id of the profile
-	 * @param aLastSyncResultAsXml - last sync result as xml
-	 */
-	void resultsAvailable(QString aProfileId , QString aLastSyncResultAsXml);
+    /*! \brief this is the slot where we will receive the xml data for results from msyncd
+     * the xml looks like this
+     * \code <syncresults scheduled="false" majorcode="0" minorcode = "0" time="2010-06-01T06:43:32">
+     *  <target name="">
+     *   <local modified="0" added="0" deleted="0"/>
+     *  <remote modified="0" added="4" deleted="0"/>
+     *  </target>
+     * </syncresults>
+     *\endcode
+     * @param aProfileId - id of the profile
+     * @param aLastSyncResultAsXml - last sync result as xml
+     */
+    void resultsAvailable(QString aProfileId, QString aLastSyncResultAsXml);
 
 signals:
 
-	/*! \brief Signal that gets emitted on receiving profileChanged from msyncd
-	 *
-	 * @param 	aProfileId - id of the profile
-	 * @param   aChangeType - change type whether addition , deletion or modification
+    /*! \brief Signal that gets emitted on receiving profileChanged from msyncd
+     *
+     * @param   aProfileId - id of the profile
+     * @param   aChangeType - change type whether addition , deletion or modification
      * @param  aChangedProfile - changed sync profie as XMl string.
-	 */
-    void profileChanged(QString aProfileId,int aChangeType, QString aChangedProfile);
+     */
+    void profileChanged(QString aProfileId, int aChangeType, QString aChangedProfile);
 
-	/*! \brief Signal that gets emitted on receiving resultsAvailable from msyncd
-	 *
-	 * @param 	aProfileId - id of the profile
-	 * @param   aLastResults - last results as SyncResults Object
-	 */
-	void resultsAvailable(QString aProfileId,Buteo::SyncResults aLastResults);
+    /*! \brief Signal that gets emitted on receiving resultsAvailable from msyncd
+     *
+     * @param   aProfileId - id of the profile
+     * @param   aLastResults - last results as SyncResults Object
+     */
+    void resultsAvailable(QString aProfileId, Buteo::SyncResults aLastResults);
 
 private:
 
-	SyncDaemonProxy *iSyncDaemon;
+    SyncDaemonProxy *iSyncDaemon;
 
-	Buteo::SyncClientInterface *iParent;
+    Buteo::SyncClientInterface *iParent;
 
 };
 

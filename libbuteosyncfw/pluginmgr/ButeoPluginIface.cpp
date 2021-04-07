@@ -15,7 +15,8 @@
  * Implementation of interface class ButeoPluginIface
  */
 
-ButeoPluginIface::ButeoPluginIface(const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent)
+ButeoPluginIface::ButeoPluginIface(const QString &service, const QString &path, const QDBusConnection &connection,
+                                   QObject *parent)
     : QDBusAbstractInterface(service, path, staticInterfaceName(), connection, parent)
 {
 }

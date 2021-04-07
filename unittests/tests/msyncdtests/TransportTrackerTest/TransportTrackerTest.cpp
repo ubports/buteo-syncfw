@@ -89,7 +89,7 @@ void TransportTrackerTest :: testStateChanged()
 {
     qRegisterMetaType<Sync::ConnectivityType>("Sync::ConnectivityType");
     QSignalSpy connectivityStateSpy(iTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)));
-    QSignalSpy networkStateSpy(iTransportTracker, SIGNAL(networkStateChanged(bool,Sync::InternetConnectionType)));
+    QSignalSpy networkStateSpy(iTransportTracker, SIGNAL(networkStateChanged(bool, Sync::InternetConnectionType)));
 
     // change USB state and verify
     bool usbCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_USB);
