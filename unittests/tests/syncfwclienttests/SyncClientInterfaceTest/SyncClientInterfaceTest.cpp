@@ -42,7 +42,7 @@ static const QString SYSTEMPROFILE_DIR = "syncprofiletests/testprofiles/system";
 
 void SyncClientInterfaceTest::initTestCase()
 {
-    iSync = new Synchronizer(NULL);
+    iSync = new Synchronizer(nullptr);
 
     iInterface = new SyncClientInterface();
 

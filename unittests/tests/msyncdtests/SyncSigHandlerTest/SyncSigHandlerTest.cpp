@@ -41,7 +41,7 @@ void SyncSigHandlerTest :: cleanup()
 {
     FUNCTION_CALL_TRACE;
     delete iSigHandler ;
-    iSigHandler = NULL;
+    iSigHandler = nullptr;
 }
 
 

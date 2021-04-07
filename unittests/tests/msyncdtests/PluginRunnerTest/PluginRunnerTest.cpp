@@ -32,14 +32,14 @@ void PluginRunnerTest::initTestCase()
 {
     iSProfile = new SyncProfile(PROFILE);
     iPManager = new PluginManager();
-    iClientPRunner = new ClientPluginRunner(PLUGIN, iSProfile, iPManager, NULL, NULL);
+    iClientPRunner = new ClientPluginRunner(PLUGIN, iSProfile, iPManager, nullptr, nullptr);
     iPRunner = iClientPRunner;
 }
 void PluginRunnerTest::testPluginRunnerConstructor()
 {
     QCOMPARE(iPRunner->iInitialized, false);
     QCOMPARE(iPRunner->iPluginMgr, iPManager);
-    QVERIFY(iPRunner->iPluginCbIf == NULL);
+    QVERIFY(iPRunner->iPluginCbIf == nullptr);
     QCOMPARE(iPRunner->iType, PluginRunner::PLUGIN_CLIENT);
     QCOMPARE(iPRunner->pluginType(), PluginRunner::PLUGIN_CLIENT);
     QCOMPARE(iPRunner->pluginName(), PLUGIN);

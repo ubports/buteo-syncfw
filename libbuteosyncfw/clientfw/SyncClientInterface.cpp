@@ -35,7 +35,7 @@ SyncClientInterface::SyncClientInterface():
 SyncClientInterface::~SyncClientInterface()
 {
     delete d_ptr;
-    d_ptr = NULL;
+    d_ptr = nullptr;
 }
 
 bool SyncClientInterface::startSync(const QString &aProfileId) const

@@ -39,7 +39,7 @@ SyncSession *SyncQueue::dequeue()
 {
     FUNCTION_CALL_TRACE;
 
-    SyncSession *p = NULL;
+    SyncSession *p = nullptr;
 
     if (!iItems.isEmpty()) {
         p = iItems.dequeue();
@@ -67,7 +67,7 @@ SyncSession *SyncQueue::head()
 {
     FUNCTION_CALL_TRACE;
 
-    SyncSession *p = NULL;
+    SyncSession *p = nullptr;
     if (!iItems.isEmpty()) {
         p = iItems.head();
     } // no else

@@ -30,11 +30,11 @@ using namespace Buteo;
 
 void SynchronizerTest::initTestCase()
 {
-    iSync = new Synchronizer(NULL);
+    iSync = new Synchronizer(nullptr);
     iProfile = new SyncProfile("Profile");
     iProfileQ = new SyncProfile("Profile1");
-    iSyncSession = new SyncSession(iProfile, NULL);
-    iSyncSessionQ = new SyncSession(iProfileQ, NULL);
+    iSyncSession = new SyncSession(iProfile, nullptr);
+    iSyncSessionQ = new SyncSession(iProfileQ, nullptr);
 }
 void SynchronizerTest::cleanupTestCase()
 {
@@ -129,7 +129,7 @@ void SynchronizerTest::testSync()
 
     //test createStorage(const QString)
     QCOMPARE(QString("Plugin").isEmpty(), false);
-    QVERIFY(iSync->createStorage("Plugin") == NULL);
+    QVERIFY(iSync->createStorage("Plugin") == nullptr);
 
     // XXX This leads to memory corruption
     QCOMPARE(iSync->requestStorage("Storage", reinterpret_cast<SyncPluginBase *>(this)), true);
@@ -193,7 +193,7 @@ void SynchronizerTest::testSync()
     QCOMPARE(iSync->iActiveSessions.size(), 1);
 
     /*
-    ServerPluginRunner *plugin = new ServerPluginRunner("Plugin", NULL, NULL, NULL, NULL);
+    ServerPluginRunner *plugin = new ServerPluginRunner("Plugin", nullptr, nullptr, nullptr, nullptr);
     QSignalSpy spy(plugin, SIGNAL(newSession(const QString )));
     plugin->onNewSession("USB");
     QCOMPARE(spy.count(), 1);
@@ -227,7 +227,7 @@ void SynchronizerTest::testSignals()
     QCOMPARE(sigTransfer.count(), 1);
 
     QSignalSpy sigStorage1(iSync, SIGNAL(storageReleased()));
-    iSync->releaseStorage("Storage", NULL);
+    iSync->releaseStorage("Storage", nullptr);
     QCOMPARE(sigStorage1.count(), 1);
 
 

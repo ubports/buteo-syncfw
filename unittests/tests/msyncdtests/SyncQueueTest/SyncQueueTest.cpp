@@ -37,8 +37,8 @@ void SyncQueueTest::testQueue()
 
     // Empty queue.
     QCOMPARE(q.isEmpty(), true);
-    QVERIFY(q.head() == NULL);
-    QVERIFY(q.dequeue() == NULL);
+    QVERIFY(q.head() == nullptr);
+    QVERIFY(q.dequeue() == nullptr);
     QCOMPARE(q.contains(NAME1), false);
 
     // Add items.
@@ -58,7 +58,7 @@ void SyncQueueTest::testQueue()
     QCOMPARE(q.head(), &s1);
     QCOMPARE(q.dequeue(), &s1);
     QCOMPARE(q.isEmpty(), true);
-    QVERIFY(q.dequeue() == NULL);
+    QVERIFY(q.dequeue() == nullptr);
 
 }
 

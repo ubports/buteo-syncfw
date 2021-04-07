@@ -70,7 +70,7 @@ void SyncSessionTest :: cleanup()
 
     // profile name will be deallocated in SyncSession. So, not deallocating
     delete iSyncSession ;
-    iSyncSession = NULL;
+    iSyncSession = nullptr;
 
     delete iSyncSessionPluginRunnerTest;
 }
@@ -100,7 +100,7 @@ void SyncSessionTest :: testPluginRunner()
 
 
 
-    /* set NULL to iPluginRunner and test */
+    /* set nullptr to iPluginRunner and test */
 
     iSyncSession->setPluginRunner(iNullPluginRunner, false);
     QCOMPARE(iSyncSession->iPluginRunnerOwned, false);
@@ -149,7 +149,7 @@ void SyncSessionTest :: testStartAbortStop()
     iSyncSession->abort();
     QVERIFY(!iSyncSession->iAborted);
 
-    // stop() neither updates nor calls other functions for iPluginRunner NULL value. so, omitting this function for NULL value
+    // stop() neither updates nor calls other functions for iPluginRunner nullptr value. so, omitting this function for nullptr value
 
 
     // testing with iSyncSessionPluginRunnerTest
@@ -241,7 +241,7 @@ void SyncSessionTest :: testStorages()
 
     if (myTestStorageBooker) {
         delete myTestStorageBooker;
-        myTestStorageBooker = NULL;
+        myTestStorageBooker = nullptr;
     }
 }
 
@@ -387,7 +387,7 @@ SyncResults SyncSessionPluginRunnerTest :: syncResults()
 
 SyncPluginBase *SyncSessionPluginRunnerTest :: plugin()
 {
-    // This is not being used by SyncSession. returning NULL to supress compile warning
+    // This is not being used by SyncSession. returning nullptr to supress compile warning
 
     return (SyncPluginBase *)0;
 }

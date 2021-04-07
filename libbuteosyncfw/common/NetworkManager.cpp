@@ -227,7 +227,7 @@ void NetworkManager::disconnectSession()
 
         m_networkSession->close();
         delete m_networkSession;
-        m_networkSession = NULL;
+        m_networkSession = nullptr;
     }
 }
 

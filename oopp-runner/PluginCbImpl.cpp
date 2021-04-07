@@ -85,7 +85,7 @@ StoragePlugin *PluginCbImpl::createStorage(const QString &aPluginName)
 {
     FUNCTION_CALL_TRACE;
 
-    StoragePlugin *plugin = NULL;
+    StoragePlugin *plugin = nullptr;
     if (!aPluginName.isEmpty()) {
         plugin = iPluginManager.createStorage(aPluginName);
     } // no else
@@ -110,7 +110,7 @@ bool PluginCbImpl::isConnectivityAvailable(Sync::ConnectivityType aType)
 Profile *PluginCbImpl::getSyncProfileByRemoteAddress(const QString &aAddress)
 {
     Q_UNUSED(aAddress);
-    return NULL;
+    return nullptr;
 }
 
 QString PluginCbImpl::getValue(const QString &aAddress, const QString &aKey)

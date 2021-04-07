@@ -34,9 +34,9 @@ void ClientPluginRunnerTest::initTestCase()
 {
     iSprofile = new SyncProfile(PROFILE);
     iPluginMgr = new PluginManager();
-    iPluginCbIf =  new Synchronizer(NULL);
+    iPluginCbIf =  new Synchronizer(nullptr);
     iClientPrunner = new ClientPluginRunner(PLUGIN, iSprofile, iPluginMgr,
-                                            iPluginCbIf, NULL);
+                                            iPluginCbIf, nullptr);
 }
 void ClientPluginRunnerTest::cleanupTestCase()
 {

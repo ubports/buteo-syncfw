@@ -643,7 +643,7 @@ Profile *ProfileManager::profileFromXml(const QString &aProfileAsXml)
 {
     FUNCTION_CALL_TRACE;
 
-    Profile *profile = NULL;
+    Profile *profile = nullptr;
     if (!aProfileAsXml.isEmpty()) {
         QDomDocument doc;
         QString error;
@@ -799,7 +799,7 @@ bool ProfileManager::removeProfile(const QString &aProfileId)
             emit signalProfileChanged(aProfileId, ProfileManager::PROFILE_REMOVED, QString(""));
         }
         delete profile;
-        profile = NULL;
+        profile = nullptr;
     }
     return success;
 }
@@ -992,7 +992,7 @@ bool ProfileManager::setSyncSchedule(QString aProfileId, QString aScheduleAsXml)
             status = true;
         }
         delete profile;
-        profile = NULL;
+        profile = nullptr;
     } else {
         LOG_WARNING("Invalid Profile Supplied");
     }

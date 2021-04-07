@@ -86,7 +86,7 @@ void ServerPluginRunnerTest::testStartAbort()
 
     /* test abort() */
 
-    // test plugin pointer for NULL
+    // test plugin pointer for nullptr
     QVERIFY(iServerPluginRunner->plugin());
     iServerPluginRunner->abort();
 
@@ -94,7 +94,7 @@ void ServerPluginRunnerTest::testStartAbort()
 
 void ServerPluginRunnerTest::testSyncResults()
 {
-    // test plugin pointer for NULL
+    // test plugin pointer for nullptr
     QVERIFY(iServerPluginRunner->plugin());
     // we can't set values from ServerPluginRunner. Hence, comparing the default return value
     QCOMPARE(iServerPluginRunner->syncResults().majorCode(), 0);

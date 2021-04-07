@@ -67,7 +67,7 @@ void ClientThreadTest::initTestCase()
 {
     iClientThread = new ClientThread();
     iSyncProfile = new SyncProfile(PROFILE);
-    iPluginDerived = new ClientPluginDerived(PLUGIN, *iSyncProfile, NULL);
+    iPluginDerived = new ClientPluginDerived(PLUGIN, *iSyncProfile, nullptr);
     iPlugin = iPluginDerived;
     iClientThreadRet = false;
 }
@@ -87,7 +87,7 @@ void ClientThreadTest::cleanupTestCase()
 }
 void ClientThreadTest::testClientThreadConstructor()
 {
-    QVERIFY(iClientThread->getPlugin() == NULL);
+    QVERIFY(iClientThread->getPlugin() == nullptr);
     QCOMPARE(iClientThread->iRunning, false);
 }
 void ClientThreadTest::testGetPlugin()

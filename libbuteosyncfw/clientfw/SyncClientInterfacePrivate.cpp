@@ -81,7 +81,7 @@ SyncClientInterfacePrivate::~SyncClientInterfacePrivate()
 {
     FUNCTION_CALL_TRACE;
     delete iSyncDaemon;
-    iSyncDaemon = NULL;
+    iSyncDaemon = nullptr;
 }
 
 bool SyncClientInterfacePrivate::startSync(const QString &aProfileId) const

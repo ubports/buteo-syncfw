@@ -409,7 +409,7 @@ void SyncSession::releaseStorages()
         iStorageBooker->releaseStorages(iProfile->storageBackendNames());
     }
 
-    // Set storage booker to NULL. This indicates that we don't hold any
+    // Set storage booker to nullptr. This indicates that we don't hold any
     // storage reservations.
     iStorageBooker = 0;
 }

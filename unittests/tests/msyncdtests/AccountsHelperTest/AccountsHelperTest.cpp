@@ -41,7 +41,7 @@ static const QString SERVICE_SYNC = "Sync";
 static const QString SERVICE_NAME = "testsync-ovi";
 
 AccountsHelperTest::AccountsHelperTest()
-    :   QObject(NULL),
+    :   QObject(nullptr),
         iManager(SERVICE_SYNC, this),
         iProfileManager(USERPROFILE_DIR, SYSTEMPROFILE_DIR)
 {
@@ -57,17 +57,17 @@ void AccountsHelperTest::initTestCase()
     iAccount->selectService(service);
     iAccount->setEnabled(true);
     iAccount->selectService();
-    QVERIFY(iAccount != NULL);
+    QVERIFY(iAccount != nullptr);
     iAccount->sync();
 }
 
 void AccountsHelperTest::cleanupTestCase()
 {
-    if (iAccount != NULL) {
+    if (iAccount != nullptr) {
         iAccount->remove();
         iAccount->sync();
         delete iAccount;
-        iAccount = NULL;
+        iAccount = nullptr;
     } // no else
 }
 

@@ -79,9 +79,9 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
         struct group *grp;
         // assumes that correct groupname is same as username (e.g. nemo:nemo)
         pwd = getpwuid(uid);
-        if (pwd != NULL) {
+        if (pwd != nullptr) {
             grp = getgrnam(pwd->pw_name);
-            if (grp != NULL) {
+            if (grp != nullptr) {
                 gid_t gid = grp->gr_gid;
                 int ret = chown(genericCache.toLatin1().data(), uid, gid);
                 Q_UNUSED(ret);

@@ -89,12 +89,12 @@ bool DummyStorage::getDeletedItemIds( QList<QString> & /*aDeletedItems*/, const 
 
 StorageItem *DummyStorage::newItem()
 {
-    return NULL;
+    return nullptr;
 }
 
 StorageItem *DummyStorage::getItem( const QString & /*aItemId*/ )
 {
-    return NULL;
+    return nullptr;
 }
 
 QList<StorageItem *> DummyStorage::getItems(const QStringList & /*aItemIdList*/ )

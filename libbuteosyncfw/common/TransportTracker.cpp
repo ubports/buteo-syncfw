@@ -52,7 +52,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
     if (!iUSBProxy->isValid()) {
         LOG_CRITICAL("Failed to connect to USB moded D-Bus interface");
         delete iUSBProxy;
-        iUSBProxy = NULL;
+        iUSBProxy = nullptr;
     } else {
         QObject::connect(iUSBProxy, SIGNAL(usbConnection(bool)), this,
                          SLOT(onUsbStateChanged(bool)));

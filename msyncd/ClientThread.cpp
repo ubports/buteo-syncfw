@@ -29,9 +29,9 @@ using namespace Buteo;
 
 ClientThread::ClientThread()
     : iClientPlugin(0),
-      iIdentity(NULL),
-      iService(NULL),
-      iSession(NULL),
+      iIdentity(nullptr),
+      iService(nullptr),
+      iSession(nullptr),
       iRunning(false)
 {
     FUNCTION_CALL_TRACE;

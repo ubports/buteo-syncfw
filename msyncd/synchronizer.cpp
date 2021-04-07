@@ -82,7 +82,7 @@ Synchronizer::Synchronizer(QCoreApplication *aApplication)
         iAccounts(0),
         iClosing(false),
         iSOCEnabled(false),
-        iSyncUIInterface(NULL),
+        iSyncUIInterface(nullptr),
         iBatteryInfo(new BatteryInfo)
 {
     iSettings = g_settings_new_with_path("com.meego.msyncd", "/com/meego/msyncd/");
@@ -98,7 +98,7 @@ Synchronizer::~Synchronizer()
 {
     FUNCTION_CALL_TRACE;
     delete iSyncUIInterface;
-    iSyncUIInterface = NULL;
+    iSyncUIInterface = nullptr;
     g_object_unref(iSettings);
     delete iBatteryInfo;
 }
@@ -553,14 +553,14 @@ bool Synchronizer::startSyncNow(SyncSession *aSession)
         // Get the DBUS interface for sync-UI.
         LOG_DEBUG( "sync-ui dbus interface is getting called" );
         if (aSession->isScheduled() && !profile->isHidden()) {
-            if (iSyncUIInterface == NULL) {
+            if (iSyncUIInterface == nullptr) {
                 LOG_DEBUG( "iSyncUIInterface is Null" );
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
                                                       "com.nokia.MApplicationIf", QDBusConnection::sessionBus());
             } else if (!iSyncUIInterface->isValid()) {
                 LOG_DEBUG( "iSyncUIInterface is not valid" );
                 delete iSyncUIInterface;
-                iSyncUIInterface = NULL;
+                iSyncUIInterface = nullptr;
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
                                                       "com.nokia.MApplicationIf", QDBusConnection::sessionBus());
             }
@@ -1034,7 +1034,7 @@ StoragePlugin *Synchronizer::createStorage(const QString &aPluginName)
 {
     FUNCTION_CALL_TRACE;
 
-    StoragePlugin *plugin = NULL;
+    StoragePlugin *plugin = nullptr;
     if (!aPluginName.isEmpty()) {
         plugin = iPluginManager.createStorage(aPluginName);
     } // no else
@@ -1297,14 +1297,14 @@ void Synchronizer::onNewSession(const QString &aDestination)
         if (!profile->isHidden()) {
             // Get the DBUS interface for sync-UI.
             LOG_DEBUG( "sync-ui dbus interface is getting called" );
-            if (iSyncUIInterface == NULL) {
-                LOG_DEBUG( "iSyncUIInterface is NULL" );
+            if (iSyncUIInterface == nullptr) {
+                LOG_DEBUG( "iSyncUIInterface is nullptr" );
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
                                                       "com.nokia.MApplicationIf", QDBusConnection::sessionBus());
             } else if (!iSyncUIInterface->isValid()) {
                 LOG_DEBUG( "iSyncUIInterface is not Valid()" );
                 delete iSyncUIInterface;
-                iSyncUIInterface = NULL;
+                iSyncUIInterface = nullptr;
                 iSyncUIInterface = new QDBusInterface("com.nokia.syncui", "/org/maemo/m",
                                                       "com.nokia.MApplicationIf", QDBusConnection::sessionBus());
 
@@ -1453,7 +1453,7 @@ void Synchronizer::reschedule(const QString &aProfileName)
         externalSyncStatus(profile);
         LOG_DEBUG("Reschdule profile" << aProfileName << profile->syncType() << profile->isEnabled());
         delete profile;
-        profile = NULL;
+        profile = nullptr;
     }
 }
 
@@ -1742,7 +1742,7 @@ QStringList Synchronizer::allVisibleSyncProfiles()
             if (profile) {
                 profilesAsXml.append(profile->toString());
                 delete profile;
-                profile = NULL;
+                profile = nullptr;
             }
         }
     }
@@ -1761,7 +1761,7 @@ QString Synchronizer::syncProfile(const QString &aProfileId)
         if (profile) {
             profileAsXml.append(profile->toString());
             delete profile;
-            profile = NULL;
+            profile = nullptr;
         } else {
 
             LOG_DEBUG("No profile found with aProfileId" << aProfileId);

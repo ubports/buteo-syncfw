@@ -35,11 +35,11 @@ using namespace Buteo;
 
 const int Logger::DEFAULT_INDENT_SIZE = 4;
 
-Logger *Logger::sInstance = NULL;
+Logger *Logger::sInstance = nullptr;
 
 Logger *Logger::instance()
 {
-    if (NULL == sInstance) {
+    if (nullptr == sInstance) {
         createInstance();
     }
     return sInstance;
@@ -67,7 +67,7 @@ void Logger::createInstance(const QString &aLogFileName, bool aUseStdOut,
 void Logger::deleteInstance()
 {
     delete sInstance;
-    sInstance = NULL;
+    sInstance = nullptr;
 }
 
 Logger::Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize)

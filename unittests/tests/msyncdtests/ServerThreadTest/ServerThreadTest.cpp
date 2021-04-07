@@ -83,7 +83,7 @@ void ServerThreadTest::initTestCase()
 
     iProfile = new Profile(PFNAME, TYPE);
     iServerThread = new ServerThread();
-    iPluginDerived = new ServerPluginDerived(PGNAME, *iProfile, NULL);
+    iPluginDerived = new ServerPluginDerived(PGNAME, *iProfile, nullptr);
     iThreadTestSp = iPluginDerived;
 }
 void ServerThreadTest::cleanupTestCase()
@@ -102,7 +102,7 @@ void ServerThreadTest::cleanupTestCase()
 }
 void ServerThreadTest::testServerThreadConstructor()
 {
-    QVERIFY(iServerThread->getPlugin() == NULL);
+    QVERIFY(iServerThread->getPlugin() == nullptr);
     QCOMPARE(iServerThread->iRunning, false);
 }
 void ServerThreadTest::testGetPlugin()

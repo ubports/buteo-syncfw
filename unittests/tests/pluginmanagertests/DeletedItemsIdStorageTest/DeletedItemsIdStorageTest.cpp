@@ -46,7 +46,7 @@ void DeletedItemsIdStorageTest::init()
 void DeletedItemsIdStorageTest::cleanup()
 {
     delete iDeletedItems;
-    iDeletedItems = NULL;
+    iDeletedItems = nullptr;
 }
 
 /*!

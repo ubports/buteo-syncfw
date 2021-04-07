@@ -108,7 +108,7 @@ bool IPHeartBeat::setHeartBeat(const QString &aProfName, ushort aMinWaitTime, us
         return true; //returing 'true' - no immediate sync request to be sent.
     }
 
-    iphb_t iphbHandle = iphb_open(NULL);
+    iphb_t iphbHandle = iphb_open(nullptr);
 
     if (iphbHandle == 0) {
         LOG_DEBUG("iphb_open() failed.... No IP heartbeat available");
