@@ -96,7 +96,7 @@ int ServerActivator::addRef(const QString &aServerName, bool emitSignal /*= true
         refCount = ++iServers[aServerName].iRefCount;
         if (emitSignal && (refCount == 1)) {
             emit serverEnabled(aServerName);
-        } // no else
+        }
     } else {
         LOG_WARNING("Unknown server:" << aServerName);
     }
@@ -116,7 +116,7 @@ int ServerActivator::removeRef(const QString &aServerName, bool emitSignal /*= t
             if (emitSignal && data.iRefCount == 0) {
                 emit serverDisabled(aServerName);
             }
-        } // no else
+        }
         refCount = data.iRefCount;
     } else {
         LOG_WARNING("Unknown server:" << aServerName);

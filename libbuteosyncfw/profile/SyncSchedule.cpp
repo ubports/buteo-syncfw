@@ -301,7 +301,7 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
         nextSync.setDate(now.date());
         if (now.time() > d_ptr->iTime) {
             nextSync = nextSync.addDays(1);
-        } // no else
+        }
         d_ptr->adjustDate(nextSync, d_ptr->iDays);
     } else if (d_ptr->iInterval > 0 && d_ptr->iEnabled) {
         // Sync time is defined in terms of interval (for ex. every 15 minutes)
@@ -422,16 +422,16 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
                 nextSyncRush.setTime(d_ptr->iRushBegin);
                 if (nextSyncRush < now) {
                     nextSyncRush = nextSyncRush.addDays(1);
-                } // no else
+                }
                 d_ptr->adjustDate(nextSyncRush, d_ptr->iRushDays);
-            } // no else
+            }
         } else {
             LOG_DEBUG("Current Time is Not Rush");
             nextSyncRush.setTime(d_ptr->iRushBegin);
             nextSyncRush.setDate(now.date());
             if (now.time() > d_ptr->iRushBegin) {
                 nextSyncRush = nextSyncRush.addDays(1);
-            } // no else
+            }
             d_ptr->adjustDate(nextSyncRush, d_ptr->iRushDays);
         }
 
@@ -454,8 +454,8 @@ QDateTime SyncSchedule::nextSyncTime(const QDateTime &aPrevSync) const
                 LOG_DEBUG("Using rush time as the next sync time");
                 nextSync = nextSyncRush;
             }
-        } // no else
-    } // no else
+        }
+    }
 
     //For safer side checking nextSyncTime should not be behind currentDateTime.
     if (QDateTime::currentDateTime().secsTo(nextSync) < 0) {
@@ -569,9 +569,9 @@ DaySet SyncSchedulePrivate::parseDays(const QString &aDays) const
             int dayNum = dayStr.toInt(&ok);
             if (ok) {
                 daySet.insert(dayNum);
-            } // no else
+            }
         }
-    } // no else
+    }
 
     return daySet;
 }
@@ -592,7 +592,7 @@ bool SyncSchedulePrivate::adjustDate(QDateTime &aTime, const DaySet &aDays) cons
     if (aDays.isEmpty()) {
         aTime = QDateTime();
         return false;
-    } // no else
+    }
 
     bool newValidDay = false;
     int startDay = aTime.date().dayOfWeek();
@@ -606,7 +606,7 @@ bool SyncSchedulePrivate::adjustDate(QDateTime &aTime, const DaySet &aDays) cons
             newValidDay = false;
             aTime = QDateTime();
             break;
-        } // no else
+        }
     }
 
     return newValidDay;

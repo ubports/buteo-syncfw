@@ -85,7 +85,7 @@ Logger::Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize)
     if (aUseStdOut) {
         // Create a stream for writing log messages to standard output.
         iStdOutStream = new QTextStream(stdout);
-    } // no else
+    }
 
     iStdErrStream = new QTextStream(stderr);
 
@@ -97,8 +97,8 @@ Logger::Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize)
         dir.mkpath(fileInfo.absolutePath());
         if (iFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
             iFileStream = new QTextStream(&iFile);
-        } // no else
-    } // no else
+        }
+    }
 }
 
 Logger::~Logger()
@@ -126,7 +126,7 @@ bool  Logger::setLogLevel(int aLevel)
         }
         enable(iLevels);
         retVal = true;
-    } // no else
+    }
     return retVal;
 }
 
@@ -231,5 +231,5 @@ void Logger::write(int aLevel, const char *aMsg)
     if (QtFatalMsg == aLevel) {
         // Exit on fatal message.
         abort();
-    } // no else
+    }
 }

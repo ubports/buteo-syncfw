@@ -118,8 +118,8 @@ ProfileField::ProfileField(const QDomElement &aRoot)
         if (d_ptr->iType == TYPE_BOOLEAN) {
             d_ptr->iOptions.append(BOOLEAN_TRUE);
             d_ptr->iOptions.append(BOOLEAN_FALSE);
-        } // no else
-    } // no else
+        }
+    }
 }
 
 ProfileField::ProfileField(const ProfileField &aSource)
@@ -192,7 +192,7 @@ QDomElement ProfileField::toXml(QDomDocument &aDoc) const
             e.appendChild(t);
             root.appendChild(e);
         }
-    } // no else
+    }
 
     return root;
 }

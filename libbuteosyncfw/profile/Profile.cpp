@@ -85,7 +85,7 @@ Profile::Profile(const QDomElement &aRoot)
         Profile *subProfile = pf.createProfile(prof);
         if (subProfile != 0) {
             d_ptr->iSubProfiles.append(subProfile);
-        } // no else
+        }
     }
 }
 
@@ -154,7 +154,7 @@ QMap<QString, QString> Profile::allNonStorageKeys() const
     foreach (Profile *p, d_ptr->iSubProfiles) {
         if (p != 0 && p->type() != Profile::TYPE_STORAGE) {
             keys.unite(p->allKeys());
-        } // no else
+        }
     }
 
     keys.unite(allKeys());
@@ -259,7 +259,7 @@ QList<const ProfileField *> Profile::visibleFields() const
                 (f->visible() == ProfileField::VISIBLE_USER &&
                  !d_ptr->iMergedKeys.contains(f->name()))) {
             visibleFields.append(f);
-        } // no else
+        }
     }
 
     return visibleFields;
@@ -300,14 +300,14 @@ QDomElement Profile::toXml(QDomDocument &aDoc, bool aLocalOnly) const
         foreach (field, d_ptr->iMergedFields) {
             root.appendChild(field->toXml(aDoc));
         }
-    } // no else
+    }
 
     // Set sub-profiles.
     foreach (Profile *p, d_ptr->iSubProfiles) {
         if (!p->d_ptr->iMerged || !p->d_ptr->iLocalKeys.isEmpty() ||
                 !p->d_ptr->iLocalFields.isEmpty()) {
             root.appendChild(p->toXml(aDoc, aLocalOnly));
-        } // no else
+        }
     }
 
     return root;
@@ -375,7 +375,7 @@ QStringList Profile::subProfileNames(const QString &aType) const
     foreach (Profile *p, d_ptr->iSubProfiles) {
         if (!checkType || aType == p->type()) {
             names.append(p->name());
-        } // no else
+        }
     }
 
     return names;
@@ -388,7 +388,7 @@ Profile *Profile::subProfile(const QString &aName,
     foreach (Profile *p, d_ptr->iSubProfiles) {
         if (aName == p->name() && (!checkType || aType == p->type())) {
             return p;
-        } // no else
+        }
     }
 
     return 0;
@@ -401,7 +401,7 @@ const Profile *Profile::subProfile(const QString &aName,
     foreach (Profile *p, d_ptr->iSubProfiles) {
         if (aName == p->name() && (!checkType || aType == p->type())) {
             return p;
-        } // no else
+        }
     }
 
     return 0;
@@ -418,7 +418,7 @@ const Profile *Profile::subProfileByKeyValue(const QString &aKey,
                 (aValue.compare(p->key(aKey), Qt::CaseInsensitive) == 0) &&
                 (!aEnabledOnly || p->isEnabled())) {
             return p;
-        } // no else
+        }
     }
 
     return 0;
@@ -449,8 +449,8 @@ void Profile::merge(const Profile &aSource)
         if (target != 0) {
             target->d_ptr->iMerged = true;
             d_ptr->iSubProfiles.append(target);
-        } // no else
-    } // no else
+        }
+    }
 
     if (target != 0) {
         // Merge keys. Allow multiple keys with the same name.
@@ -463,9 +463,9 @@ void Profile::merge(const Profile &aSource)
         foreach (const ProfileField *f, sourceFields) {
             if (0 == target->field(f->name())) {
                 target->d_ptr->iMergedFields.append(new ProfileField(*f));
-            } // no else
+            }
         }
-    } // no else
+    }
 
     // Merge sub-profiles.
     foreach (Profile *p, aSource.d_ptr->iSubProfiles) {

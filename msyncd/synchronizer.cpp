@@ -477,7 +477,7 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
 
     if (!success) {
         cleanupSession(session, Sync::SYNC_ERROR);
-    } // no else
+    }
 
     return success;
 }
@@ -764,8 +764,8 @@ void Synchronizer::cleanupSession(SyncSession *aSession, Sync::SyncStatus aStatu
             if (aSession->isScheduled()) {
                 reschedule(profileName);
                 emit signalProfileChanged(profileName, 1, QString());
-            } // no else
-        } // no else
+            }
+        }
         aSession->setProfileCreated(false);
         aSession->releaseStorages();
         aSession->deleteLater();
@@ -1037,7 +1037,7 @@ StoragePlugin *Synchronizer::createStorage(const QString &aPluginName)
     StoragePlugin *plugin = nullptr;
     if (!aPluginName.isEmpty()) {
         plugin = iPluginManager.createStorage(aPluginName);
-    } // no else
+    }
 
     return plugin;
 }
@@ -1272,7 +1272,7 @@ void Synchronizer::onNewSession(const QString &aDestination)
         } else {
             syncProfiles = iProfileManager.getSyncProfilesByData(
                                QString::null, Profile::TYPE_SYNC, KEY_BT_ADDRESS, aDestination);
-        } // no else
+        }
         if (syncProfiles.isEmpty()) {
             LOG_DEBUG( "No sync profiles found with a matching destination address" );
             // destination a bt address

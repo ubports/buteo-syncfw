@@ -239,7 +239,7 @@ QString SyncSession::profileName() const
     QString name;
     if (iProfile != 0) {
         name = iProfile->name();
-    } // no else
+    }
 
     return name;
 }
@@ -250,7 +250,6 @@ SyncResults SyncSession::results() const
 
     return iResults;
 }
-
 
 void SyncSession::setScheduled(bool aScheduled)
 {

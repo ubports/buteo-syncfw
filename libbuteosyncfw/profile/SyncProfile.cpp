@@ -107,7 +107,7 @@ SyncProfilePrivate::SyncProfilePrivate(const SyncProfilePrivate &aSource)
 {
     if (aSource.iLog != 0) {
         iLog = new SyncLog(*aSource.iLog);
-    } // no else
+    }
     iSyncRetriesInfo = aSource.iSyncRetriesInfo;
 }
 
@@ -130,7 +130,7 @@ SyncProfile::SyncProfile(const QDomElement &aRoot)
     QDomElement schedule = aRoot.firstChildElement(TAG_SCHEDULE);
     if (!schedule.isNull()) {
         d_ptr->iSchedule = SyncSchedule(schedule);
-    } // no else
+    }
     QDomElement retriesElement = aRoot.firstChildElement(TAG_ERROR_ATTEMPTS);
     if (!retriesElement.isNull()) {
         QDomElement timeElement  = retriesElement.firstChildElement(TAG_ATTEMPT_DELAY);
@@ -168,7 +168,7 @@ QDomElement SyncProfile::toXml(QDomDocument &aDoc, bool aLocalOnly) const
     QDomElement schedule = d_ptr->iSchedule.toXml(aDoc);
     if (!schedule.isNull()) {
         root.appendChild(schedule);
-    } // no else
+    }
     if (d_ptr->iSyncRetriesInfo.retries()) {
         QDomElement retries = aDoc.createElement(TAG_ERROR_ATTEMPTS);
         for (quint32 i = 0;  i < d_ptr->iSyncRetriesInfo.retries(); ++i) {
@@ -235,7 +235,7 @@ QDateTime SyncProfile::lastSyncTime() const
 
     if (d_ptr->iLog != 0 && d_ptr->iLog->lastResults() != 0) {
         lastSync = d_ptr->iLog->lastResults()->syncTime();
-    } // no else
+    }
 
     LOG_DEBUG("lastSync:" << lastSync);
     return lastSync;
@@ -299,7 +299,7 @@ void SyncProfile::addResults(const SyncResults &aResults)
 {
     if (0 == d_ptr->iLog) {
         d_ptr->iLog = new SyncLog(name());
-    } // no else
+    }
 
     d_ptr->iLog->addResults(aResults);
 }
@@ -362,7 +362,7 @@ QStringList SyncProfile::storageBackendNames() const
             // Get backend name from the storage profile. If the backend name
             // is not defined, use profile name as the backend name.
             enabledStorageBackends.append(p->key(KEY_BACKEND, p->name()));
-        } // no else
+        }
     }
 
     return enabledStorageBackends;
@@ -387,7 +387,7 @@ const Profile *SyncProfile::serviceProfile() const
         if (p->type() == TYPE_SERVICE)
         {
             return p;
-        } // no else
+        }
     }
 
     return 0;
@@ -401,7 +401,7 @@ Profile *SyncProfile::serviceProfile()
         if (p->type() == TYPE_SERVICE)
         {
             return p;
-        } // no else
+        }
     }
 
     return 0;
@@ -414,7 +414,7 @@ const Profile *SyncProfile::clientProfile() const
     foreach (const Profile *p, subProfiles) {
         if (p->type() == TYPE_CLIENT) {
             return p;
-        } // no else
+        }
     }
 
     return 0;
@@ -426,7 +426,7 @@ Profile *SyncProfile::clientProfile()
     foreach (Profile *p, subProfiles) {
         if (p->type() == TYPE_CLIENT) {
             return p;
-        } // no else
+        }
     }
 
     return 0;
@@ -438,7 +438,7 @@ const Profile *SyncProfile::serverProfile() const
     foreach (const Profile *p, subProfiles) {
         if (p->type() == TYPE_SERVER) {
             return p;
-        } // no else
+        }
     }
 
     return 0;
@@ -450,7 +450,7 @@ Profile *SyncProfile::serverProfile()
     foreach (Profile *p, subProfiles) {
         if (p->type() == TYPE_SERVER) {
             return p;
-        } // no else
+        }
     }
 
     return 0;
@@ -463,7 +463,7 @@ QList<const Profile *> SyncProfile::storageProfiles() const
     foreach (const Profile *p, subProfiles) {
         if (p->type() == TYPE_STORAGE) {
             storages.append(p);
-        } // no else
+        }
     }
 
     return storages;
@@ -476,7 +476,7 @@ QList<Profile *> SyncProfile::storageProfilesNonConst()
     foreach (Profile *p, subProfiles) {
         if (p->type() == TYPE_STORAGE) {
             storages.append(p);
-        } // no else
+        }
     }
 
     return storages;
@@ -491,7 +491,7 @@ SyncProfile::DestinationType SyncProfile::destinationType() const
     //if (service)
     //{
     typeStr = this->key(KEY_DESTINATION_TYPE);
-    //} // no else
+    //}
 
     if (typeStr == VALUE_ONLINE) {
         type = DESTINATION_TYPE_ONLINE;
@@ -512,7 +512,7 @@ SyncProfile::SyncDirection SyncProfile::syncDirection() const
     const Profile *client = clientProfile();
     if (client) {
         dirStr = client->key(KEY_SYNC_DIRECTION);
-    } // no else
+    }
 
     if (dirStr == VALUE_TWO_WAY) {
         dir = SYNC_DIRECTION_TWO_WAY;
@@ -602,7 +602,7 @@ SyncProfile::ConflictResolutionPolicy SyncProfile::conflictResolutionPolicy() co
     const Profile *client = clientProfile();
     if (client) {
         policyStr = client->key(KEY_CONFLICT_RESOLUTION_POLICY);
-    } // no else
+    }
 
     if (policyStr == VALUE_PREFER_REMOTE) {
         policy = CR_POLICY_PREFER_REMOTE_CHANGES;

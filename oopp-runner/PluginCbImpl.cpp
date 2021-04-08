@@ -88,7 +88,7 @@ StoragePlugin *PluginCbImpl::createStorage(const QString &aPluginName)
     StoragePlugin *plugin = nullptr;
     if (!aPluginName.isEmpty()) {
         plugin = iPluginManager.createStorage(aPluginName);
-    } // no else
+    }
 
     return plugin;
 }

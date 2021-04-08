@@ -105,7 +105,7 @@ unsigned StorageBooker::releaseStorage(const QString &aStorageName)
         } else {
             iStorageMap[aStorageName] = item;
         }
-    } // no else
+    }
 
     return remainingRefCount;
 }

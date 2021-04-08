@@ -193,7 +193,7 @@ void SyncLog::addResults(const SyncResults &aResults)
     if (d_ptr->iResults.size() >= MAXLOGENTRIES) {
         // The list is sorted so that the oldest item is in the beginning
         delete d_ptr->iResults.takeFirst();
-    } // no else
+    }
 
     d_ptr->iResults.append(new SyncResults(aResults));
 
