@@ -136,7 +136,7 @@ signals:
      * @param aMessage Message data related to error event
      * @param aErrorCode Error code
      */
-    void error(const QString &aProfileName, const QString &aMessage, int aErrorCode);
+    void error(const QString &aProfileName, const QString &aMessage, SyncResults::MinorCode aErrorCode);
 
     /*! \brief Emitted when synchronization has been finished successfully.
      *

@@ -122,13 +122,13 @@ void ClientThread::run()
 
     if (!iClientPlugin->init()) {
         LOG_WARNING( "Could not initialize client plugin:" << iClientPlugin->getPluginName() );
-        emit initError(getProfileName(), "", 0);
+        emit initError(getProfileName(), "", SyncResults::PLUGIN_ERROR);
         return;
     }
 
     if (!iClientPlugin->startSync()) {
         LOG_WARNING( "Could not start client plugin:" << iClientPlugin->getPluginName() );
-        emit initError(getProfileName(), "", 0);
+        emit initError(getProfileName(), "", SyncResults::PLUGIN_ERROR);
         return;
     }
 
@@ -176,7 +176,7 @@ void ClientThread::identities(const QList<SignOn::IdentityInfo> &identityList)
             return;
         }
     }
-    emit initError(getProfileName(), "credentials not found in SSO", 0);
+    emit initError(getProfileName(), "credentials not found in SSO", SyncResults::AUTHENTICATION_FAILURE);
 }
 
 void ClientThread::identityResponse(const SignOn::SessionData &sessionData)
@@ -198,6 +198,6 @@ void ClientThread::identityError(SignOn::Error err)
 {
     FUNCTION_CALL_TRACE;
 
-    emit initError(getProfileName(), err.message(), 0);
+    emit initError(getProfileName(), err.message(), SyncResults::AUTHENTICATION_FAILURE);
 }
 

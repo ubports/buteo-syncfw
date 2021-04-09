@@ -157,7 +157,7 @@ void SyncProfileTest::testResults()
     p.setLog(new SyncLog(NAME));
     QVERIFY(p.lastSyncTime().isNull());
     QDateTime now = QDateTime::currentDateTime();
-    SyncResults syncResults(now, 1, 0);
+    SyncResults syncResults(now, SyncResults::SYNC_RESULT_FAILED, SyncResults::NO_ERROR);
     syncResults.addTargetResults(TargetResults("hcalendar",
                                                ItemCounts(1, 2, 3), ItemCounts()));
     p.addResults(syncResults);
@@ -166,7 +166,7 @@ void SyncProfileTest::testResults()
     const SyncResults *sr = p.lastResults();
     QVERIFY(sr != 0);
     QCOMPARE(sr->syncTime(), now);
-    QCOMPARE(sr->majorCode(), 1);
+    QCOMPARE(sr->majorCode(), SyncResults::SYNC_RESULT_FAILED);
     QCOMPARE(sr->targetResults().size(), 1);
 
     // 0 log.

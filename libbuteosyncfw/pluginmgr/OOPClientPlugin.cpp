@@ -156,14 +156,12 @@ SyncResults OOPClientPlugin::getSyncResults() const
 {
     FUNCTION_CALL_TRACE;
 
-    SyncResults errorSyncResult(QDateTime::currentDateTime(),
-                                SyncResults::SYNC_RESULT_INVALID,
-                                SyncResults::SYNC_RESULT_INVALID);
     QDBusPendingReply<QString> reply = iOopPluginIface->getSyncResults();
     reply.waitForFinished();
     if (!reply.isValid()) {
         LOG_WARNING( "Invalid reply for getSyncResults from plugin" );
-        return errorSyncResult;
+        return SyncResults(QDateTime::currentDateTime(),
+                           SyncResults::SYNC_RESULT_INVALID, SyncResults::PLUGIN_ERROR);
     }
 
     QString resultAsXml = reply.value();
@@ -173,7 +171,8 @@ SyncResults OOPClientPlugin::getSyncResults() const
         return syncResult;
     } else {
         LOG_CRITICAL( "Invalid sync results returned from plugin" );
-        return errorSyncResult;
+        return SyncResults(QDateTime::currentDateTime(),
+                           SyncResults::SYNC_RESULT_INVALID, SyncResults::NO_ERROR);
     }
 }
 
@@ -217,7 +216,7 @@ void OOPClientPlugin::onError(QString aProfileName, QString aMessage, int aError
 {
     if (!iDone) {
         iDone = true;
-        emit error(aProfileName, aMessage, aErrorCode);
+        emit error(aProfileName, aMessage, static_cast<SyncResults::MinorCode>(aErrorCode));
     }
 }
 

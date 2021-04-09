@@ -97,7 +97,7 @@ void ServerPluginRunnerTest::testSyncResults()
     // test plugin pointer for nullptr
     QVERIFY(iServerPluginRunner->plugin());
     // we can't set values from ServerPluginRunner. Hence, comparing the default return value
-    QCOMPARE(iServerPluginRunner->syncResults().majorCode(), 0);
+    QCOMPARE(iServerPluginRunner->syncResults().majorCode(), SyncResults::SYNC_RESULT_SUCCESS);
 }
 
 void ServerPluginRunnerTest::testSignals()
@@ -121,7 +121,7 @@ void ServerPluginRunnerTest::testSignals()
     iServerPluginRunner->onTransferProgress("profile", Sync::LOCAL_DATABASE, Sync::ITEM_ADDED, "text", 1);
     QCOMPARE(transferSpy.count(), 1);
 
-    iServerPluginRunner->onError("profile", "message", 2);
+    iServerPluginRunner->onError("profile", "message", SyncResults::PLUGIN_ERROR);
     QCOMPARE(errorSpy.count(), 1);
 
     iServerPluginRunner->onSuccess("profile", "message");

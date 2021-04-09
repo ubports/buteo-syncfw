@@ -91,7 +91,8 @@ signals:
      * @param aMessage Message data related to error event
      * @param aErrorCode Error code
      */
-    void initError(const QString &aProfileName, const QString &aMessage, int aErrorCode);
+    void initError(const QString &aProfileName, const QString &aMessage,
+                   SyncResults::MinorCode aErrorCode);
 
 protected:
     /*! \brief overriding method for QThread::run

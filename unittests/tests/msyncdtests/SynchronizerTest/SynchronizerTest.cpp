@@ -248,7 +248,7 @@ void SynchronizerTest::testSignals()
     QCOMPARE(sigrestoreFinished.count(), 1);
 
     QSignalSpy sessionStatus(iSync, SIGNAL(syncStatus(QString, int, QString, int)));
-    iSync->onSessionFinished("Profile", Sync::SYNC_DONE, "Msg", 0);
+    iSync->onSessionFinished("Profile", Sync::SYNC_DONE, "Msg", SyncResults::NO_ERROR);
     QCOMPARE(sessionStatus.count(), 1);
 }
 QTEST_MAIN(Buteo::SynchronizerTest)

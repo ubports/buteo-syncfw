@@ -126,7 +126,7 @@ public:
      * \param aMajorCode Sync result code.
      * \param aMinorCode Sync Failed Reason.
      */
-    SyncResults(QDateTime aTime, int aMajorCode, int aMinorCode);
+    SyncResults(QDateTime aTime, MajorCode aMajorCode, MinorCode aMinorCode);
 
     /*! \brief Constructs sync results from XML.
      *
@@ -181,25 +181,25 @@ public:
      *
      * \return major code.
      */
-    int majorCode() const;
+    MajorCode majorCode() const;
 
     /*! \brief Sets the result code.
      *
      * \param aMajorCode The result code.
      */
-    void setMajorCode(int aMajorCode);
+    void setMajorCode(MajorCode aMajorCode);
 
     /*! \brief Gets the failed reason.
      *
      * \return failed Reason.
      */
-    int minorCode() const;
+    MinorCode minorCode() const;
 
     /*! \brief Sets the failed Reason.
      *
      * \param aMinorCode - minor code or the reason
      */
-    void setMinorCode(int aMinorCode);
+    void setMinorCode(MinorCode aMinorCode);
 
 
     /*! \brief Sets the remote target Id.

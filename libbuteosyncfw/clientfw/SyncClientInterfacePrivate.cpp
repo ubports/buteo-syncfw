@@ -202,10 +202,6 @@ bool SyncClientInterfacePrivate::isValid()
 Buteo::SyncResults SyncClientInterfacePrivate::getLastSyncResult(const QString &aProfileId)
 {
     FUNCTION_CALL_TRACE;
-    // Default construct with invalid values
-    // Using default constructor for QDateTime() creates "null" date.
-    Buteo::SyncResults syncResult(QDateTime(),
-                                  SyncResults::SYNC_RESULT_INVALID, Buteo::SyncResults::SYNC_RESULT_INVALID);
 
     if (iSyncDaemon) {
         QString resultASXmlString = iSyncDaemon->getLastSyncResult(aProfileId);
@@ -218,7 +214,8 @@ Buteo::SyncResults SyncClientInterfacePrivate::getLastSyncResult(const QString &
             LOG_CRITICAL("Invalid Profile Xml Received from msyncd");
         }
     }
-    return syncResult;
+    return SyncResults(QDateTime(),
+                       SyncResults::SYNC_RESULT_INVALID, SyncResults::NO_ERROR);
 }
 
 QList<QString /*profilesAsXml*/> SyncClientInterfacePrivate::allVisibleSyncProfiles()

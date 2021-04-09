@@ -25,6 +25,7 @@
 
 #include <QThread>
 #include <QMutex>
+#include <SyncResults.h>
 
 namespace Buteo {
 
@@ -83,7 +84,7 @@ signals:
      * @param aErrorCode Error code
      */
     void initError(const QString &aProfileName, const QString &aMessage,
-                   int aErrorCode);
+                   SyncResults::MinorCode aErrorCode);
 
 protected:
 

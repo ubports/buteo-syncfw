@@ -148,7 +148,7 @@ public:
      * \param aMajorCode Error code
      * \param aMinorCode failed reason
      */
-    void setFailureResult(int aMajorCode, int aMinorCode);
+    void setFailureResult(SyncResults::MajorCode aMajorCode, SyncResults::MinorCode aMinorCode);
 
     /*! \brief Tries to reserve storages needed by the session
      *
@@ -206,7 +206,7 @@ signals:
      * @param aErrorCode Error code, if the status is error
      */
     void finished(const QString &aProfileName, Sync::SyncStatus aStatus,
-                  const QString &aMessage, int aErrorCode);
+                  const QString &aMessage, SyncResults::MinorCode aErrorCode);
 
     /*! \brief Signal sent when the sync is in progress to indicate the detail of the progress
      *
@@ -224,7 +224,7 @@ private slots:
 
     void onSuccess(const QString &aProfileName, const QString &aMessage);
 
-    void onError(const QString &aProfileName, const QString &aMessage, int aErrorCode);
+    void onError(const QString &aProfileName, const QString &aMessage, SyncResults::MinorCode aErrorCode);
 
     void onTransferProgress(const QString &aProfileName,
                             Sync::TransferDatabase aDatabase, Sync::TransferType aType,
@@ -247,7 +247,7 @@ private:
     PluginRunner *iPluginRunner;
     SyncResults iResults;
     Sync::SyncStatus iStatus;
-    int iErrorCode;
+    SyncResults::MinorCode iErrorCode;
     bool iPluginRunnerOwned;
     bool iScheduled;
     bool iAborted;
