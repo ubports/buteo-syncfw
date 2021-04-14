@@ -311,7 +311,7 @@ void SyncSessionTest :: testOnDone()
     // registering unknown metatype
     qRegisterMetaType<Sync::SyncStatus>("Sync::SyncStatus");
 
-    QSignalSpy sampleSpy(iSyncSession, SIGNAL(finished(QString, Sync::SyncStatus, QString, int)));
+    QSignalSpy sampleSpy(iSyncSession, SIGNAL(finished(QString, Sync::SyncStatus, QString, SyncResults::MinorCode)));
 
     // call functions that emit finished() signal
     iSyncSession->onDone();

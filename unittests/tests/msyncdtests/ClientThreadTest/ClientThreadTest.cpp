@@ -71,6 +71,7 @@ void ClientThreadTest::initTestCase()
     iPlugin = iPluginDerived;
     iClientThreadRet = false;
 }
+
 void ClientThreadTest::cleanupTestCase()
 {
     QVERIFY(iSyncProfile != 0);
@@ -85,11 +86,13 @@ void ClientThreadTest::cleanupTestCase()
     iClientThread = 0;
     iPlugin = 0;
 }
+
 void ClientThreadTest::testClientThreadConstructor()
 {
     QVERIFY(iClientThread->getPlugin() == nullptr);
     QCOMPARE(iClientThread->iRunning, false);
 }
+
 void ClientThreadTest::testGetPlugin()
 {
     iClientThreadRet = iClientThread->startThread(iPlugin);
@@ -98,17 +101,20 @@ void ClientThreadTest::testGetPlugin()
     QCOMPARE(iClientThread->iRunning, true);
     QCOMPARE(iClientThread->getPlugin(), iPlugin);
 }
+
 void ClientThreadTest::testGetProfileName()
 {
     QCOMPARE(iClientThreadRet, true);
     QCOMPARE(iClientThread->getProfileName(), PROFILE);
 }
+
 void ClientThreadTest::testClientThread()
 {
     //The thread is already running
     QCOMPARE(iClientThread->startThread(iPlugin), false);
     QCOMPARE(iClientThread->iRunning, true);
 }
+
 void ClientThreadTest::testGetSyncResults()
 {
     SyncResults syncRes;
@@ -130,6 +136,7 @@ void ClientThreadTest::testGetSyncResults()
     //QCOMPARE(syncRes.syncTime().date(), QDateTime::currentDateTime().date());
 
 }
+
 void ClientThreadTest::testInitError()
 {
     iPluginDerived->iTestClSignal = true;
@@ -137,7 +144,7 @@ void ClientThreadTest::testInitError()
     //Test for the signal
     QSignalSpy spy(iClientThread, SIGNAL(initError(const QString &,
                                                    const QString &,
-                                                   int )));
+                                                   SyncResults::MinorCode)));
     QCOMPARE(iClientThread->startThread(iPlugin), true);
     QTest::qWait(20);
     QCOMPARE(spy.count(), 1);
