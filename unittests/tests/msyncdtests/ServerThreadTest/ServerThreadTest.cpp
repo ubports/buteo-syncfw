@@ -86,6 +86,7 @@ void ServerThreadTest::initTestCase()
     iPluginDerived = new ServerPluginDerived(PGNAME, *iProfile, nullptr);
     iThreadTestSp = iPluginDerived;
 }
+
 void ServerThreadTest::cleanupTestCase()
 {
     QVERIFY(iProfile != 0);
@@ -100,11 +101,13 @@ void ServerThreadTest::cleanupTestCase()
     iServerThread = 0;
     iThreadTestSp = 0;
 }
+
 void ServerThreadTest::testServerThreadConstructor()
 {
     QVERIFY(iServerThread->getPlugin() == nullptr);
     QCOMPARE(iServerThread->iRunning, false);
 }
+
 void ServerThreadTest::testGetPlugin()
 {
     iThreadreturn = iServerThread->startThread(iThreadTestSp);
@@ -112,11 +115,13 @@ void ServerThreadTest::testGetPlugin()
     QCOMPARE(iThreadreturn, true);
     QCOMPARE(iServerThread->getPlugin(), iThreadTestSp);
 }
+
 void ServerThreadTest::testGetProfileName()
 {
     QCOMPARE(iThreadreturn, true);
     QCOMPARE(iServerThread->getProfileName(), PFNAME);
 }
+
 void ServerThreadTest::testThread()
 {
     //The Thread is already started in testGetPlugin()
@@ -124,6 +129,7 @@ void ServerThreadTest::testThread()
     QCOMPARE(iServerThread->iRunning, true);
     QCOMPARE(iServerThread->getPlugin(), iThreadTestSp);
 }
+
 void ServerThreadTest::testStopThErrorSignal()
 {
     QVERIFY(iServerThread != 0);
@@ -133,7 +139,7 @@ void ServerThreadTest::testStopThErrorSignal()
 
     //Test for the signal
     QSignalSpy spy(iServerThread, SIGNAL(initError(const QString &,
-                                                   const QString &, int)));
+                                                   const QString &, SyncResults::MinorCode)));
     QCOMPARE(iServerThread->startThread(iThreadTestSp), true);
     QTest::qWait(20);
     QCOMPARE(spy.count(), 1);

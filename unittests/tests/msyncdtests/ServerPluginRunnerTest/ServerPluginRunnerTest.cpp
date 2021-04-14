@@ -103,7 +103,7 @@ void ServerPluginRunnerTest::testSyncResults()
 void ServerPluginRunnerTest::testSignals()
 {
     QSignalSpy sessionSpy(iServerPluginRunner, SIGNAL(newSession(QString)));
-    QSignalSpy errorSpy(iServerPluginRunner, SIGNAL(error(QString, QString, int)));
+    QSignalSpy errorSpy(iServerPluginRunner, SIGNAL(error(QString, QString, SyncResults::MinorCode)));
     QSignalSpy successSpy(iServerPluginRunner, SIGNAL(success(QString, QString)));
     QSignalSpy doneSpy(iServerPluginRunner, SIGNAL(done()));
 

@@ -38,6 +38,7 @@ void ClientPluginRunnerTest::initTestCase()
     iClientPrunner = new ClientPluginRunner(PLUGIN, iSprofile, iPluginMgr,
                                             iPluginCbIf, nullptr);
 }
+
 void ClientPluginRunnerTest::cleanupTestCase()
 {
     QVERIFY(iSprofile);
@@ -54,6 +55,7 @@ void ClientPluginRunnerTest::cleanupTestCase()
     iPluginCbIf = 0;
     iClientPrunner = 0;
 }
+
 void ClientPluginRunnerTest::testCpluginRunnerConstructor()
 {
     SyncResults syncRes;
@@ -77,6 +79,7 @@ void ClientPluginRunnerTest::testCpluginRunnerConstructor()
     dateTime = syncRes.syncTime() >= current;
     QVERIFY(dateTime);
 }
+
 void ClientPluginRunnerTest::testInit()
 {
     SyncResults syncRes;
@@ -94,6 +97,7 @@ void ClientPluginRunnerTest::testInit()
     iClientPrunner->iInitialized = true;
     QCOMPARE(iClientPrunner->iInitialized, true);
 }
+
 void ClientPluginRunnerTest::testStart()
 {
     //test start()
@@ -105,6 +109,7 @@ void ClientPluginRunnerTest::testStart()
     QVERIFY(iClientPrunner->iThread != 0);
     QCOMPARE(iClientPrunner->start(), false);
 }
+
 void ClientPluginRunnerTest::testSignals()
 {
     QSignalSpy doneSignal(iClientPrunner, SIGNAL(done()));
@@ -117,7 +122,7 @@ void ClientPluginRunnerTest::testSignals()
     QCOMPARE(successSignal.count(), 1);
 
     QSignalSpy errorSignal(iClientPrunner, SIGNAL(error(const QString &,
-                                                        const QString &, int)));
+                                                        const QString &, SyncResults::MinorCode)));
     iClientPrunner->onError(PROFILE, "Message", SyncResults::PLUGIN_ERROR);
     QCOMPARE(errorSignal.count(), 1);
 
