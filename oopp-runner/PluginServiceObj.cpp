@@ -61,8 +61,8 @@ SyncPluginBase *PluginServiceObj::initializePlugin()
 
     iSyncPluginLoader = qobject_cast<SyncPluginLoader *>(iPluginLoader->instance());
     if (!iSyncPluginLoader) {
-        LOG_WARNING("Unable to load SyncPluginLoader " << iPluginName
-                    << " from path " << iPluginFilePath);
+        LOG_WARNING("Unable to load SyncPluginLoader" << iPluginName << "from path" << iPluginFilePath)
+                << "Error:" << iPluginLoader->errorString();
         return nullptr;
     }
 
