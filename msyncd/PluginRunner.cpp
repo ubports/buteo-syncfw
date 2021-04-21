@@ -23,6 +23,7 @@
 
 #include "PluginRunner.h"
 #include "LogMacros.h"
+#include "SyncResults.h"
 
 using namespace Buteo;
 
@@ -38,6 +39,7 @@ PluginRunner::PluginRunner(PluginType aPluginType, const QString &aPluginName,
     FUNCTION_CALL_TRACE;
 
     // register various metatypes used in DBus arguments
+    qRegisterMetaType<SyncResults::MinorCode>("SyncResults::MinorCode");
     qRegisterMetaType<Sync::SyncStatus>("Sync::SyncStatus");
     qRegisterMetaType<Sync::TransferDatabase>("Sync::TransferDatabase");
     qRegisterMetaType<Sync::TransferType>("Sync::TransferType");
