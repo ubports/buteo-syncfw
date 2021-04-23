@@ -21,6 +21,7 @@
  *
  */
 #include "SyncPluginBase.h"
+#include "SyncResults.h"
 #include "PluginCbInterface.h"
 
 using namespace Buteo;
@@ -33,6 +34,7 @@ SyncPluginBase::SyncPluginBase(const QString &aPluginName,
       iProfileName(aProfileName)
 {
     // register various metatypes used in DBus arguments
+    qRegisterMetaType<SyncResults::MinorCode>("SyncResults::MinorCode");
     qRegisterMetaType<Sync::SyncStatus>("Sync::SyncStatus");
     qRegisterMetaType<Sync::TransferDatabase>("Sync::TransferDatabase");
     qRegisterMetaType<Sync::TransferType>("Sync::TransferType");
