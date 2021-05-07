@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ *               2019 Updated to use bluez5 by deloptes@gmail.com
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -60,26 +61,34 @@ void TransportTrackerTest :: testConnectivityAvailable()
 
     // first set value as false
     iTransportTracker->updateState(Sync::CONNECTIVITY_USB, false);
+#ifdef HAVE_BLUEZ_5
     iTransportTracker->updateState(Sync::CONNECTIVITY_BT, false);
+#endif
     iTransportTracker->updateState(Sync::CONNECTIVITY_INTERNET, false);
 
     bool usbTransportStatus = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_USB);
     QCOMPARE(usbTransportStatus, false);
+#ifdef HAVE_BLUEZ_5
     bool btTransportStatus = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT);
     QCOMPARE(btTransportStatus, false);
+#endif
     bool internetTransportStatus = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_INTERNET);
     QCOMPARE(internetTransportStatus, false);
 
 
     // next set the value true
     iTransportTracker->updateState(Sync::CONNECTIVITY_USB, true);
+#ifdef HAVE_BLUEZ_5
     iTransportTracker->updateState(Sync::CONNECTIVITY_BT, true);
+#endif
     iTransportTracker->updateState(Sync::CONNECTIVITY_INTERNET, true);
 
     usbTransportStatus = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_USB);
     QCOMPARE(usbTransportStatus, true);
+#ifdef HAVE_BLUEZ_5
     btTransportStatus = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT);
     QCOMPARE(btTransportStatus, true);
+#endif
     internetTransportStatus = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_INTERNET);
     QCOMPARE(internetTransportStatus, true);
 
@@ -100,15 +109,22 @@ void TransportTrackerTest :: testStateChanged()
     QCOMPARE(connectivityStateSpy.first().at(1).value<bool>(), !usbCurrentState);
     connectivityStateSpy.clear();
 
+#ifdef HAVE_BLUEZ_5
     // change BT state and verify
     bool btCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT);
-    iTransportTracker->onBtStateChanged("Powered", QDBusVariant(QVariant(!btCurrentState)));
+
+    QVariantMap map;
+    QStringList list;
+    map["Powered"] = QVariant(!btCurrentState);
+    list << "Powered";
+    iTransportTracker->onBtStateChanged(BT::BLUEZ_ADAPTER_INTERFACE, map, list);
 
     QCOMPARE(iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_BT), !btCurrentState);
     QCOMPARE(connectivityStateSpy.count(), 1);
     QCOMPARE(connectivityStateSpy.first().at(0).value<Sync::ConnectivityType>(), Sync::CONNECTIVITY_BT);
     QCOMPARE(connectivityStateSpy.first().at(1).value<bool>(), !btCurrentState);
     connectivityStateSpy.clear();
+#endif
 
     // change internet state and verify
     bool internetCurrentState = iTransportTracker->isConnectivityAvailable(Sync::CONNECTIVITY_INTERNET);

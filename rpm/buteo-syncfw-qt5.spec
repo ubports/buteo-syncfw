@@ -97,7 +97,7 @@ Summary: Tests for %{name}
 
 
 %build
-%qmake5 -recursive "VERSION=%{version}" CONFIG+=usb-moded DEFINES+=USE_KEEPALIVE
+%qmake5 -recursive "VERSION=%{version}" CONFIG+=usb-moded DEFINES+=USE_KEEPALIVE DEFINES+=HAVE_BLUEZ_5
 make %{_smp_mflags}
 make doc %{_smp_mflags}
 

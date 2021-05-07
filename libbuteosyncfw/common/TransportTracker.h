@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ *               2019 Updated to use bluez5 by deloptes@gmail.com
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -30,6 +31,10 @@
 #include <QMutex>
 #include <QDBusVariant>
 #include <QDBusConnection>
+
+#ifdef HAVE_BLUEZ_5
+#include <BtCommon.h>
+#endif
 
 namespace Buteo {
 
@@ -91,7 +96,13 @@ private slots:
 
     void onUsbStateChanged(bool aConnected);
 
-    void onBtStateChanged(QString aKey, QDBusVariant aValue);
+#ifdef HAVE_BLUEZ_5
+    void onBtStateChanged(QString interface, QVariantMap changed, QStringList invalidated);
+
+    void onBtInterfacesAdded(const QDBusObjectPath &path, const InterfacesMap interfaces);
+
+    void onBtInterfacesRemoved(const QDBusObjectPath &path, const QStringList interfaces);
+#endif
 
     void onInternetStateChanged(bool aConnected, Sync::InternetConnectionType aType);
 
@@ -103,6 +114,7 @@ private:
 
     NetworkManager *iInternet;
     QDBusConnection iSystemBus;
+    QString iDefaultBtAdapter;
 
     mutable QMutex iMutex;
 
@@ -118,10 +130,12 @@ private:
     friend class SynchronizerTest;
 #endif
 
+#ifdef HAVE_BLUEZ_5
     bool btConnectivityStatus();
+#endif
 
 };
 
-}
+} // namespace Buteo
 
 #endif /* TRANSPORTTRACKER_H_ */
