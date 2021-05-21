@@ -90,7 +90,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 
-    void addSetting(Accounts::AccountId id, QString key, QVariant value);
+    void registerAccountListeners();
 
 private:
     void syncEnableWithAccount(Accounts::Account *account);

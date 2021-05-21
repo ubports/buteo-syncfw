@@ -109,12 +109,6 @@ public:
     /// \see PluginCbInterface::getValue
     virtual QString getValue(const QString &aAddress, const QString &aKey);
 
-    /// \see PluginCbInterface::getSyncProfileByRemoteAddress
-    virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress);
-
-    /// \see PluginCbInterface::getValue
-    virtual QString getValue(const QString& aAddress, const QString& aKey);
-
 
 // From SyncDBusInterface
 // --------------------------------------------------------------------------
@@ -147,9 +141,6 @@ public slots:
 
     //! \see SyncDBusInterface::saveSyncResults
     virtual bool saveSyncResults(QString aProfileId, QString aSyncResults);
-
-    //! \see SyncDBusInterface::createSyncProfileForAccount
-    virtual QString createSyncProfileForAccount(uint aAccountId);
 
     //! \see SyncDBusInterface::createSyncProfileForAccount
     virtual QString createSyncProfileForAccount(uint aAccountId);
@@ -451,37 +442,6 @@ private:
 
     bool iSOCEnabled;
     QString iUUID;
-    QString iRemoteName;
-
-    /*
-     * Temporary, until we can clean up Buteo and properly implement the SyncOnChange
-     * queue to handle all of the required changes (account + profile + connectivity)
-     * in a sane manner (also taking into account BackupRestore status).
-     * However, that change will be far more invasive, so for now this is much simpler.
-     */
-    QList<QPair<QString, ProfileManager::ProfileChangeType> > iProfileChangeTriggerQueue;
-    QTimer iProfileChangeTriggerTimer;
-
-    SyncOnChange iSyncOnChange;
-
-    SyncOnChangeScheduler iSyncOnChangeScheduler;
-
-    /*! \brief Save the counter for given profile
-     *
-     * @param aProfile profile to save counter
-     */
-    void saveProfileCounter(const SyncProfile* aProfile);
-
-    /*! \brief Restore the counter for given profile
-     *
-     * @param aProfile profile to restore counter
-     */
-    void restoreProfileCounter(SyncProfile* aProfile);
-
-    bool iSOCEnabled;
-
-    QString iUUID;
-
     QString iRemoteName;
 
     /*

@@ -53,7 +53,6 @@
 #include <fcntl.h>
 #include <termios.h>
 
-
 using namespace Buteo;
 
 static const QString SYNC_DBUS_OBJECT = "/synchronizer";
@@ -435,14 +434,6 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         iWaitingOnlineSyncs.removeOne(aProfileName);
         LOG_DEBUG("Removing" << aProfileName << "from online waiting list.");
     }
-    else if (!aScheduled && iWaitingOnlineSyncs.contains(aProfileName))
-    {
-        // Manual sync is allowed to happen in any kind of connection
-        // if sync is not scheduled remove it from iWaitingOnlineSyncs to avoid
-        // sync it twice later
-        iWaitingOnlineSyncs.removeOne(aProfileName);
-        LOG_DEBUG("Removing" << aProfileName << "from online waiting list.");
-    }
 
     SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
     if (!profile) {
@@ -461,28 +452,12 @@ bool Synchronizer::startSync(const QString &aProfileName, bool aScheduled)
         delete profile;
         return false;
     }
-    else if(false == profile->isEnabled())
-    {
-        LOG_WARNING("Profile is disabled, not stating sync");
-        SyncResults syncResults(QDateTime::currentDateTime(), SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::INTERNAL_ERROR);
-        iProfileManager.saveSyncResults(aProfileName, syncResults);
-        emit syncStatus(aProfileName, Sync::SYNC_ERROR, "Internal Error" , Buteo::SyncResults::INTERNAL_ERROR);
-        delete profile;
-        return false;
-    }
 
     SyncSession *session = new SyncSession(profile, this);
     session->setScheduled(aScheduled);
 
     if (profile->clientProfile()
             && clientProfileActive(profile->clientProfile()->name())) {
-        LOG_DEBUG( "Sync request of the same type in progress, adding request to the sync queue" );
-        iSyncQueue.enqueue(session);
-        emit syncStatus(aProfileName, Sync::SYNC_QUEUED, "", 0);
-        return false;
-    }
-
-    if (clientProfileActive(profile->clientProfile()->name())) {
         LOG_DEBUG( "Sync request of the same type in progress, adding request to the sync queue" );
         iSyncQueue.enqueue(session);
         emit syncStatus(aProfileName, Sync::SYNC_QUEUED, "", 0);
@@ -647,9 +622,6 @@ void Synchronizer::onSessionFinished(const QString &aProfileName,
                 if (sessionProf->boolKey(KEY_CAPS_MODIFIED) == false) {
                     iProfileManager.setStoragesVisible(*sessionProf, storageMap, &visibleUpdated);
                 }
-                iProfileManager.retriesDone(sessionProf->name());
-                break;
-            }
 
                 if (enabledUpdated || visibleUpdated) {
                     iProfileManager.updateProfile(*sessionProf);
@@ -1449,78 +1421,6 @@ void Synchronizer::slotProfileChanged(QString aProfileName, int aChangeType, QSt
         iProfileChangeTriggerTimer.start(30000); // 30 seconds.
     }
     break;
-    }
-
-    emit signalProfileChanged(aProfileName, aChangeType, aProfileAsXml);
-}
-
-void Synchronizer::profileChangeTriggerTimeout()
-{
-    if (iProfileChangeTriggerQueue.isEmpty()) {
-        return;
-    }
-
-    QPair<QString, ProfileManager::ProfileChangeType> queuedChange = iProfileChangeTriggerQueue.takeFirst();
-    SyncProfile *profile = iProfileManager.syncProfile(queuedChange.first);
-    if (profile) {
-        if (queuedChange.second == ProfileManager::PROFILE_ADDED) {
-            enableSOCSlot(queuedChange.first);
-            if (profile->isEnabled()) {
-                LOG_DEBUG("Triggering queued profile addition sync for:" << queuedChange.first);
-                startSync(queuedChange.first);
-            }
-        } else if (profile->isEnabled()) {
-            LOG_DEBUG("Triggering queued profile modification sync for:" << queuedChange.first);
-            startScheduledSync(queuedChange.first);
-        }
-        delete profile;
-    }
-
-    // continue triggering profiles until we have emptied the queue.
-    QMetaObject::invokeMethod(this, "profileChangeTriggerTimeout", Qt::QueuedConnection);
-}
-
-void Synchronizer::slotProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml)
-{
-    // queue up a sync when a new profile is added or an existing profile is modified.
-    // we coalesce changes to profiles so that we do not trigger syncs immediately
-    // on change, to avoid thrash during backup/restore and races if the client wishes
-    // to trigger manually.  Temporary until we can improve Buteo's SyncOnChange handler.
-    switch (aChangeType)
-    {
-        case ProfileManager::PROFILE_ADDED:
-            {
-                iProfileChangeTriggerQueue.append(qMakePair(aProfileName, ProfileManager::PROFILE_ADDED));
-                iProfileChangeTriggerTimer.start(30000); // 30 seconds.
-            }
-            break;
-
-        case ProfileManager::PROFILE_REMOVED:
-            iSyncOnChangeScheduler.removeProfile(aProfileName);
-            iWaitingOnlineSyncs.removeAll(aProfileName);
-            for (int i = iProfileChangeTriggerQueue.size() - 1; i >= 0; --i) {
-                if (iProfileChangeTriggerQueue[i].first == aProfileName) {
-                    LOG_DEBUG("Removing queued profile change sync due to profile removal:" << aProfileName);
-                    iProfileChangeTriggerQueue.removeAt(i);
-                }
-            }
-            break;
-
-        case ProfileManager::PROFILE_MODIFIED:
-            {
-                bool alreadyQueued = false;
-                for (int i = 0; i < iProfileChangeTriggerQueue.size(); ++i) {
-                    if (iProfileChangeTriggerQueue.at(i).first == aProfileName) {
-                        alreadyQueued = true;
-                        break;
-                    }
-                }
-                if (!alreadyQueued) {
-                    iProfileChangeTriggerQueue.append(qMakePair(aProfileName, ProfileManager::PROFILE_MODIFIED));
-                }
-                iProfileChangeTriggerTimer.start(30000); // 30 seconds.
-            }
-            break;
     }
 
     emit signalProfileChanged(aProfileName, aChangeType, aProfileAsXml);

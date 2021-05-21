@@ -93,7 +93,6 @@ void SyncScheduler::addProfileForSyncRetry(const SyncProfile *aProfile, QDateTim
         }
 #endif
     }
-#endif
 }
 
 bool SyncScheduler::addProfile(const SyncProfile *aProfile)

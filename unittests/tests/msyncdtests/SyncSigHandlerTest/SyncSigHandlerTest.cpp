@@ -41,11 +41,7 @@ void SyncSigHandlerTest :: cleanup()
 {
     FUNCTION_CALL_TRACE;
     delete iSigHandler ;
-<<<<<<< HEAD:unittests/tests/msyncdtests/SyncSigHandlerTest.cpp
-    iSigHandler = NULL;
-=======
     iSigHandler = nullptr;
->>>>>>> master:unittests/tests/msyncdtests/SyncSigHandlerTest/SyncSigHandlerTest.cpp
 }
 
 

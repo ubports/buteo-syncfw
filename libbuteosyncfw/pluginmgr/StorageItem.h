@@ -95,18 +95,6 @@ public:
      */
     const QString &getVersion() const;
 
-    /*! \brief Sets the version of this item
-     *
-     * @param aVersion Version of this item
-     */
-    void setVersion( const QString& aVersion );
-
-    /*! \brief Gets the version of this item
-     *
-     * @return Version of this item
-     */
-    const QString& getVersion() const;
-
     /*! \brief Write (part of) the item data
      *
      * @param aOffset Offset to start writing from

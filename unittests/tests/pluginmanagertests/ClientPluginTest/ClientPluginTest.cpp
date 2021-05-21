@@ -51,7 +51,6 @@ void ClientPluginTest::testCreateDestroy()
 
     pluginManager.destroyClient( client2 );
 
-    QEXPECT_FAIL("", "According to a comment in PluginManager.cpp: KLUDGE: Due to NB #169065, crashes are seen in QMetaType if we unload DLLs. Hence commenting", Continue);
     QVERIFY( pluginManager.iLoadedDlls.count() == 0 );
 }
 

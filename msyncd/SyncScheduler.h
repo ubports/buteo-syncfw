@@ -86,13 +86,6 @@ public:
      */
     void addProfileForSyncRetry(const SyncProfile *aProfile, QDateTime aNextSyncTime);
 
-    /* Schedule a retry for a failed sync if the profile has retries enabled
-     *
-     * @param aProfile sync profile
-     * @param aNExtSyncTime retry after this duration
-     */
-    void addProfileForSyncRetry(const SyncProfile* aProfile, QDateTime aNextSyncTime);
-
     /*! \brief Removes the profile with the given name from the scheduler.
      *
      * No new syncNow signals will be sent for the profile. Note that an

@@ -32,6 +32,7 @@
 
 namespace Buteo {
 
+class ProfileManagerPrivate;
 
 /*! \brief
  * ProfileManager is responsible for storing and retrieving the profiles.

@@ -60,7 +60,6 @@ AccountsHelper::~AccountsHelper()
 void AccountsHelper::createProfileForAccount(Accounts::AccountId id)
 {
     FUNCTION_CALL_TRACE;
-    QString profileName;
     Accounts::Account *newAccount = iAccountManager->account(id);
 
     if (0 != newAccount) {
@@ -90,8 +89,6 @@ void AccountsHelper::createProfileForAccount(Accounts::AccountId id)
     } else {
         LOG_DEBUG("Account not found:" << id);
     }
-
-    return profileName;
 }
 
 void AccountsHelper::slotAccountRemoved(Accounts::AccountId id)

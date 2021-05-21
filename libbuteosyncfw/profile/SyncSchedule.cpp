@@ -492,6 +492,71 @@ QDateTime SyncSchedule::nextRushSwitchTime(const QDateTime &aFromTime) const
     }
 }
 
+bool SyncSchedule::isSyncScheduled(const QDateTime &aActualDateTime, const QDateTime &aPreviousSyncTime) const
+{
+    LOG_DEBUG("Check if sync is scheduled against" << aActualDateTime.toString());
+
+    // Simple case, aDateTime is the defined sync time.
+    if (d_ptr->iTime.isValid() && !d_ptr->iDays.isEmpty()) {
+        /* Todo: this is to simple implementation for the case where
+           sync time is close to midnight and the day has changed
+           already when fired. */
+        if (!d_ptr->iDays.contains(aActualDateTime.date().dayOfWeek())) {
+            return false;
+        }
+
+        /* Keep a 10 minutes margin to ensure that delayed
+           syncs by more prioritary sync in progress are still
+           considered as valid sync times. */
+        return (aActualDateTime.time() < d_ptr->iTime.addSecs(5 * 60)
+                && aActualDateTime.time() > d_ptr->iTime.addSecs(-5 * 60));
+    }
+
+    // If sync schedule is defined by rush, check that rush is enabled for aActualDateTime
+    if (rushEnabled() && d_ptr->iRushInterval > 0 && d_ptr->isRush(aActualDateTime)) {
+        return true;
+    }
+
+    if (!scheduleEnabled() || !d_ptr->iInterval) {
+        LOG_DEBUG("Scheduled by interval: schedule is disabled or not syncing by interval");
+        return false;
+    }
+
+    QDateTime reference = (aPreviousSyncTime.isValid()) ? aPreviousSyncTime : d_ptr->iScheduleConfiguredTime;
+    if (!reference.isValid()) {
+        LOG_DEBUG("Schedule has no reference past date, sync now");
+        return true;
+    }
+
+    qint64 longInterval = 0;
+    if (d_ptr->iInterval == Sync::SYNC_INTERVAL_MONTHLY) {
+        QDateTime nextSync = reference.addMonths(1);
+        nextSync.setTime(d_ptr->iTime);
+        longInterval = reference.secsTo(nextSync) / 60;
+    } else if (d_ptr->iInterval == Sync::SYNC_INTERVAL_FIRST_DAY_OF_MONTH) {
+        // Calculate interval to the first day of the month after the previous sync.
+        QDate date = reference.date().addMonths(1);
+        date.setDate(date.year(), date.month(), 1);
+        QDateTime nextSync(date, d_ptr->iTime);
+        longInterval = reference.secsTo(nextSync) / 60;
+    } else if (d_ptr->iInterval == Sync::SYNC_INTERVAL_LAST_DAY_OF_MONTH) {
+        // Calculate interval to the last day of the month after the previous sync.
+        QDate date = reference.date();
+        if (reference.date() == aActualDateTime.date()) {
+            // Already synced on the last day, so calculate to the next month instead.
+            date = date.addMonths(1);
+        }
+        QDateTime nextSync(date, d_ptr->iTime);
+        longInterval = reference.secsTo(nextSync) / 60;
+    }
+
+    const unsigned int interval = longInterval > 0
+                                  ? (longInterval > UINT_MAX ? UINT_MAX : static_cast<unsigned int>(longInterval))
+                                  : d_ptr->iInterval;
+
+    // avoid wrap-around: don't subtract from unsigned interval
+    return reference.secsTo(aActualDateTime) > (interval * 60);
+}
 
 DaySet SyncSchedulePrivate::parseDays(const QString &aDays) const
 {

@@ -93,10 +93,6 @@ public:
 
     // ============ RUSH HOUR SETTINGS ===========
 
-    bool iEnabled;
-
-    // ============ RUSH HOUR SETTINGS =========== 
-
     //! indicates the schedule for rush hour - days
     DaySet iRushDays;
 

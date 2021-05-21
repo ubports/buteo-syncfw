@@ -74,19 +74,6 @@ public:
         return "";
     }
 
-    virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress)
-    {
-        Q_UNUSED(aAddress);
-        return 0;
-    }
-
-    virtual QString getValue(const QString& aAddress, const QString& aKey)
-    {
-        Q_UNUSED(aAddress);
-        Q_UNUSED(aKey);
-        return "";
-    }
-
 private slots:
 
     void testCreateDestroy();
