@@ -42,82 +42,91 @@
 #include <QtCore/QVariant>
 #include <QtDBus/QtDBus>
 
-namespace Buteo
-{
+namespace Buteo {
 
 /*! \brief - Proxy class for interface com.meego.usb_moded
  */
 class USBModedProxy: public QDBusAbstractInterface
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
 
-	/*! \brief - returns the static interface name */
-	static inline const char *staticInterfaceName()
-	{
-		return "com.meego.usb_moded";
-	}
+    /*! \brief - returns the static interface name */
+    static inline const char *staticInterfaceName()
+    {
+        return "com.meego.usb_moded";
+    }
 
 public:
-	/*! \brief - Constructor
-	 *
-	 *@param parent - pointer to parent object
-	 */
-	USBModedProxy(QObject *parent = 0);
+    /*! \brief - Constructor
+     *
+     *@param parent - pointer to parent object
+     */
+    USBModedProxy(QObject *parent = 0);
 
-	/*! \brief - Destructor
-	 *
-	 */
-	~USBModedProxy();
+    /*! \brief - Destructor
+     *
+     */
+    ~USBModedProxy();
 
-	/*! \brief - function to check if usb is connected or not
-	 *
-	 *@return -  Returns true if the USB cable is connected in
-	 *            the Ovi Suite mode,false, if it's in any other mode,
-	 *            or if it isn't connected
-	 */
-	bool isUSBConnected();
+    /*! \brief - function to check if usb is connected or not
+     *
+     *@return -  Returns true if the USB cable is connected in
+     *            the Ovi Suite mode,false, if it's in any other mode,
+     *            or if it isn't connected
+     */
+    bool isUSBConnected();
 
 public Q_SLOTS: // METHODS
 
-	/*! \brief - connected to usbmoded proxy's sig_usb_state_ind signal
-	 *
-	 * @param mode - new mode to which usb has changed to
-	 *
-	 */
-	void slotModeChanged(const QString &mode);
+    /*! \brief - connected to usbmoded proxy's sig_usb_state_ind signal
+     *
+     * @param mode - new mode to which usb has changed to
+     *
+     */
+    void slotModeChanged(const QString &mode);
 
-	/*! \brief - method to make a DBUS call to USB moded daemon
-	 *
-	 *@return - result of the request as QString
-	 */
-	inline QDBusPendingReply<QString> mode_request()
-	{
-		QList<QVariant> argumentList;
-		return asyncCallWithArgumentList(QLatin1String("mode_request"), argumentList);
-	}
+    /*! \brief - method to make a DBUS call to USB moded daemon
+     *
+     *@return - result of the request as QString
+     */
+    inline QDBusPendingReply<QString> mode_request()
+    {
+        QList<QVariant> argumentList;
+        return asyncCallWithArgumentList(QLatin1String("mode_request"), argumentList);
+    }
 
 Q_SIGNALS: // SIGNALS
 
-	/*! \brief - overridden signal from usb moded proxy.
-	 *
-	 *@param mode  new mode
-	 */
-	void sig_usb_state_ind(const QString &mode);
+    /*! \brief - overridden signal from usb moded proxy.
+     *
+     *@param mode  new mode
+     */
+    void sig_usb_state_ind(const QString &mode);
 
-	/*! \brief - this is emitted on receiving sig_usb_state_ind
-	 * from usb moded daemon
-	 *
-	 * @param bConnected - boolean flag to indicate whether the connection is successful or not
-	 */
-	void usbConnection(bool bConnected);
+    /*! \brief - this is emitted on receiving sig_usb_state_ind
+     * from usb moded daemon
+     *
+     * @param bConnected - boolean flag to indicate whether the connection is successful or not
+     */
+    void usbConnection(bool bConnected);
+
+private:
+    /*! \brief - handle replies to async usb mode queries */
+    void handleUsbModeReply(QDBusPendingCallWatcher *call);
+
+    /*! \brief - helper for initializing usb mode tracking from the constructor */
+    void initUsbModeTracking();
+
+    /*! \brief - cached pc_suite/mtp_mode usb connection status */
+    bool m_isConnected;
 };
 }
 
 namespace com {
-  namespace meego {
-    typedef Buteo::USBModedProxy usb_moded;
-  }
+namespace meego {
+typedef Buteo::USBModedProxy usb_moded;
+}
 }
 #endif
 

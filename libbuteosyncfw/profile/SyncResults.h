@@ -42,8 +42,8 @@ struct DatabaseResults {
     int     iRemoteItemsModified;   /*!<The number of items updated in the remote database*/
     int     iRemoteItemsDeleted;    /*!<The number of items deleted from the remote database*/
 
-    DatabaseResults() : iLocalItemsAdded( 0 ), iLocalItemsModified( 0 ), iLocalItemsDeleted( 0 ),
-                        iRemoteItemsAdded( 0 ), iRemoteItemsModified( 0 ), iRemoteItemsDeleted( 0 ) { }
+    DatabaseResults() : iLocalItemsAdded(0), iLocalItemsModified(0), iLocalItemsDeleted(0),
+        iRemoteItemsAdded(0), iRemoteItemsModified(0), iRemoteItemsDeleted(0) { }
 
 };
 
@@ -87,6 +87,8 @@ public:
         INTERNAL_ERROR = 401,
         AUTHENTICATION_FAILURE,
         DATABASE_FAILURE,
+        PLUGIN_ERROR,
+        PLUGIN_TIMEOUT,
 
         // Server/Network errors 5xx
         SUSPENDED = 501,
@@ -124,7 +126,7 @@ public:
      * \param aMajorCode Sync result code.
      * \param aMinorCode Sync Failed Reason.
      */
-    SyncResults(QDateTime aTime, int aMajorCode, int aMinorCode);
+    SyncResults(QDateTime aTime, MajorCode aMajorCode, MinorCode aMinorCode);
 
     /*! \brief Constructs sync results from XML.
      *
@@ -140,7 +142,7 @@ public:
      *
      * \param aRhs Source.
      */
-    SyncResults& operator=(const SyncResults &aRhs);
+    SyncResults &operator=(const SyncResults &aRhs);
 
     /*! \brief Exports the sync results to XML.
      *
@@ -179,32 +181,32 @@ public:
      *
      * \return major code.
      */
-    int majorCode() const;
+    MajorCode majorCode() const;
 
     /*! \brief Sets the result code.
      *
      * \param aMajorCode The result code.
      */
-    void setMajorCode(int aMajorCode);
+    void setMajorCode(MajorCode aMajorCode);
 
     /*! \brief Gets the failed reason.
      *
      * \return failed Reason.
      */
-    int minorCode() const;
+    MinorCode minorCode() const;
 
     /*! \brief Sets the failed Reason.
      *
      * \param aMinorCode - minor code or the reason
      */
-    void setMinorCode(int aMinorCode);
+    void setMinorCode(MinorCode aMinorCode);
 
 
     /*! \brief Sets the remote target Id.
      *
      * \param aTargetId The remote device Id.
      */
-    void setTargetId(const QString& aTargetId) ;
+    void setTargetId(const QString &aTargetId);
 
     /*! \brief Gets the remote target Id.
      */

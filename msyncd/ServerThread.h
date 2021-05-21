@@ -25,17 +25,18 @@
 
 #include <QThread>
 #include <QMutex>
+#include <SyncResults.h>
 
 namespace Buteo {
 
 class ServerPlugin;
-    
+
 /*! \brief Thread for server plugin
  *
  */
 class ServerThread : public QThread
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
 
     /*! \brief Constructor
@@ -58,7 +59,7 @@ public:
      *
      * @return Plugin
      */
-    ServerPlugin* getPlugin() const;
+    ServerPlugin *getPlugin() const;
 
     /*! \brief Starts server thread
      *
@@ -66,7 +67,7 @@ public:
      *  and must not be deleted while the thread is running.
      * @return True on success, otherwise false
      */
-    bool startThread( ServerPlugin* aServerPlugin );
+    bool startThread( ServerPlugin *aServerPlugin);
 
     /*! \brief Stops server thread
      *
@@ -75,15 +76,15 @@ public:
 
 signals:
 
-        /*! \brief Emitted when synchronization cannot be started due to an
-         *         error in plugin initialization
-         *
-         * @param aProfileName Name of the profile being synchronized
-         * @param aMessage Message data related to error event
-         * @param aErrorCode Error code
-         */
-    void initError( const QString &aProfileName, const QString &aMessage,
-        int aErrorCode);
+    /*! \brief Emitted when synchronization cannot be started due to an
+     *         error in plugin initialization
+     *
+     * @param aProfileName Name of the profile being synchronized
+     * @param aMessage Message data related to error event
+     * @param aErrorCode Error code
+     */
+    void initError(const QString &aProfileName, const QString &aMessage,
+                   SyncResults::MinorCode aErrorCode);
 
 protected:
 
@@ -91,15 +92,12 @@ protected:
     virtual void run();
 
 private:
-
     ServerPlugin *iServerPlugin;
-
     bool iRunning;
-
     mutable QMutex iMutex;
 
 #ifdef SYNCFW_UNIT_TESTS
-	friend class ServerThreadTest;
+    friend class ServerThreadTest;
 #endif
 
 };

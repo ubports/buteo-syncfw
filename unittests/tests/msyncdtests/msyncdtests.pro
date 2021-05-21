@@ -1,24 +1,24 @@
 TEMPLATE = subdirs
 SUBDIRS = \
-        AccountsHelperTest.pro \
-        ClientPluginRunnerTest.pro \
-        ClientThreadTest.pro \
-        PluginRunnerTest.pro \
-        ServerActivatorTest.pro \
-        ServerPluginRunnerTest.pro \
-        ServerThreadTest.pro \
-        StorageBookerTest.pro \
-        SyncBackupTest.pro \
-        SyncQueueTest.pro \
-        SyncSessionTest.pro \
-        SyncSigHandlerTest.pro \
-        SynchronizerTest.pro \
-        TransportTrackerTest.pro \
+        AccountsHelperTest \
+        ClientPluginRunnerTest \
+        ClientThreadTest \
+        PluginRunnerTest \
+        ServerActivatorTest \
+        ServerPluginRunnerTest \
+        ServerThreadTest \
+        StorageBookerTest \
+        SyncBackupTest \
+        SyncQueueTest \
+        SyncSessionTest \
+        SyncSigHandlerTest \
+        SynchronizerTest \
+        TransportTrackerTest \
 
 !contains(DEFINES, USE_KEEPALIVE) {
 SUBDIRS += \
-        IPHeartBeatTest.pro \
-        SyncSchedulerTest.pro \
+        IPHeartBeatTest \
+        SyncSchedulerTest \
 }
 
 coverage.CONFIG += recursive

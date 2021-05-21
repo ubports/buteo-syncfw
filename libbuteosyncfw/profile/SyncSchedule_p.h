@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd
+ * Copyright (C) 2014-2015 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -28,14 +28,14 @@
 #include <QString>
 
 namespace Buteo {
-    
+
 //! Private implementation class for SyncSchedule.
 class SyncSchedulePrivate
 {
 public:
-	/*! \brief Constructor
-	 *
-	 */
+    /*! \brief Constructor
+     *
+     */
     SyncSchedulePrivate();
 
     /*! \brief Copy Constructor
@@ -87,7 +87,11 @@ public:
     QDateTime iScheduleConfiguredTime;
 
     //! Time interval
-    unsigned iInterval;
+    unsigned int iInterval;
+
+    bool iEnabled;
+
+    // ============ RUSH HOUR SETTINGS ===========
 
     bool iEnabled;
 
@@ -103,7 +107,7 @@ public:
     QTime iRushEnd;
 
     //! Rush Hour Time interval
-    unsigned iRushInterval;
+    unsigned int iRushInterval;
 
     //! Indicates if Rush Hour is Enabled
     bool iRushEnabled;

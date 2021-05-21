@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd.
+ * Copyright (C) 2014-2021 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -28,6 +28,10 @@
 #include <QMap>
 #include <QReadWriteLock>
 #include <QProcess>
+#include <QPointer>
+
+class QPluginLoader;
+class QProcess;
 
 namespace Buteo {
 
@@ -43,46 +47,6 @@ class ClientPluginTest;
 class ServerPluginTest;
 class StoragePluginTest;
 
-// Location filters of plugin maps
-const QString STORAGEMAP_LOCATION = "-storage.so";
-const QString CLIENTMAP_LOCATION = "-client.so";
-const QString SERVERMAP_LOCATION = "-server.so";
-const QString STORAGECHANGENOTIFIERMAP_LOCATION = "-changenotifier.so";
-
-// OOP plugins binary name suffix
-const QString OOP_CLIENT_SUFFIX = "-client";
-const QString OOP_SERVER_SUFFIX = "-server";
-
-// Default directory from which to look for plugins
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/";
-const QString DEFAULT_OOP_PLUGIN_PATH = "/usr/lib/buteo-plugins-qt5/oopp";
-#else
-const QString DEFAULT_PLUGIN_PATH = "/usr/lib/buteo-plugins/";
-#endif
-
-// The name of the function which is used to create a plugin
-const QString CREATE_FUNCTION = "createPlugin";
-
-// The name of the function which is used to destroy a plugin
-const QString DESTROY_FUNCTION = "destroyPlugin";
-
-typedef ClientPlugin* (*FUNC_CREATE_CLIENT)( const QString&,
-                                             const SyncProfile&,
-                                             PluginCbInterface* );
-typedef void (*FUNC_DESTROY_CLIENT)( ClientPlugin* );
-
-typedef ServerPlugin* (*FUNC_CREATE_SERVER)( const QString&,
-                                             const Profile&,
-                                             PluginCbInterface* );
-typedef void (*FUNC_DESTROY_SERVER)( ServerPlugin* );
-
-typedef StoragePlugin* (*FUNC_CREATE_STORAGE)(const QString&);
-typedef void (*FUNC_DESTROY_STORAGE)(StoragePlugin*);
-
-typedef StorageChangeNotifierPlugin* (*FUNC_CREATE_STORAGECHANGENOTIFIER)(const QString&);
-typedef void (*FUNC_DESTROY_STORAGECHANGENOTIFIER)(StorageChangeNotifierPlugin*);
-
 /*! \brief Manages plugins
  *
  * Is responsible for creating and destroying storage,
@@ -93,11 +57,12 @@ class PluginManager : public QObject
     Q_OBJECT
 
 public:
+    PluginManager();
     /*! \brief Constructor
      *
      * @param aPluginPath Path where plugins are stored
      */
-    PluginManager( const QString &aPluginPath = DEFAULT_PLUGIN_PATH );
+    PluginManager(const QString &aPluginPath);
 
     /*! \brief Destructor
      *
@@ -109,26 +74,26 @@ public:
      *
      * @param aStorageName well-known name of the storage
      */
-    StorageChangeNotifierPlugin* createStorageChangeNotifier( const QString& aStorageName );
+    StorageChangeNotifierPlugin *createStorageChangeNotifier(const QString &aStorageName);
 
     /*! \brief Destroys a storage change notifier plugin instance
      *
      * @param aStorageName well-known storage name of the plugin to be destroyed
      */
-    void destroyStorageChangeNotifier( StorageChangeNotifierPlugin *aPlugin );
+    void destroyStorageChangeNotifier(StorageChangeNotifierPlugin *aPlugin);
 
     /*! \brief Creates a new storage plugin instance
      *
      * @param aPluginName Name of the plugin
      * @return Storage plugin if success, otherwise NULL
      */
-    StoragePlugin* createStorage( const QString& aPluginName );
+    StoragePlugin *createStorage(const QString &aPluginName);
 
     /*! \brief Destroys a storage plugin instance
      *
      * @param aPlugin Plugin to destroy
      */
-    void destroyStorage( StoragePlugin* aPlugin );
+    void destroyStorage(StoragePlugin *aPlugin);
 
     /*! \brief Creates a new client plugin instance
      *
@@ -137,15 +102,15 @@ public:
      * @param aCbInterface Callback interface
      * @return Client plugin on success, otherwise NULL
      */
-    ClientPlugin* createClient( const QString& aPluginName,
-                                const SyncProfile& aProfile,
-                                PluginCbInterface *aCbInterface );
+    ClientPlugin *createClient(const QString &aPluginName,
+                               const SyncProfile &aProfile,
+                               PluginCbInterface *aCbInterface);
 
     /*! \brief Destroys a client plugin instance
      *
      * @param aPlugin Plugin to destroy
      */
-    void destroyClient( ClientPlugin* aPlugin );
+    void destroyClient(ClientPlugin *aPlugin);
 
     /*! \brief Creates a new server plugin instance
      *
@@ -154,65 +119,61 @@ public:
      * @param aCbInterface Callback interface
      * @return Server plugin on success, otherwise NULL
      */
-    ServerPlugin* createServer( const QString& aPluginName,
-                                const Profile& aProfile,
-                                PluginCbInterface *aCbInterface );
+    ServerPlugin *createServer(const QString &aPluginName,
+                               const Profile &aProfile,
+                               PluginCbInterface *aCbInterface);
 
     /*! \brief Destroys a server plugin
      *
      * @param aPlugin Plugin to destroy
      */
-    void destroyServer( ServerPlugin *aPlugin );
+    void destroyServer(ServerPlugin *aPlugin);
 
 protected slots:
 
-    void onProcessFinished( int exitCode, QProcess::ExitStatus exitStatus );
+    void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
 
-    struct DllInfo
+    class DllInfo
     {
-        QString iPath;
-        void*   iHandle;
-        int     iRefCount;
+    public:
+        void cleanUp();
 
-        DllInfo() : iHandle( NULL ), iRefCount( 0 ) { }
+        QString iPath;
+        QProcess *iHandle = nullptr;
+        QPluginLoader *iPluginLoader = nullptr;
+        QPointer<QObject> iLoadedPlugin;
+        int iRefCount = 0;
     };
 
+    void loadPluginMaps(const QString &pluginDirPath, const QString &aFilter, QMap<QString, QString> &aTargetMap);
 
-    void loadPluginMaps( const QString aFilter, QMap<QString, QString>& aTargetMap );
+    QProcess *startOOPPlugin(const QString &aPluginName, const QString &aProfileName, const QString &aPluginFilePath);
 
-    void loadOOPPluginMaps( const QString aFilter, QMap<QString, QString>& aTargetMap );
+    void stopOOPPlugin(const QString &aPath);
 
-    void* loadDll( const QString& aPath );
+    void addLoadedPlugin(const QString &libraryName,
+                         QPluginLoader *pluginLoader,
+                         QObject *plugin);
+    QObject *acquireLoadedPlugin(const QString &libraryName);
+    void unloadPlugin(const QString &libraryName);
 
-    void* getDllHandle( const QString& aPath );
+    QString iPluginPath;
 
-    void unloadDll( const QString& aPath );
+    QMap<QString, QString> iStorageChangeNotifierMaps;
+    QMap<QString, QString> iStorageMaps;
+    QMap<QString, QString> iClientMaps;
+    QMap<QString, QString> iServerMaps;
 
-    static bool killProcess( const QString& aPath );
+    QMap<QString, QString> iOopClientMaps;
+    QMap<QString, QString> iOoPServerMaps;
 
-    QProcess* startOOPPlugin( const QString& aPath,
-                              const QString& aPluginName,
-                              const QString& aProfileName );
+    QList<DllInfo> iLoadedDlls;
 
-    void stopOOPPlugin( const QString& aPath );
+    QReadWriteLock iDllLock;
 
-    QString                 iPluginPath;
-
-    QMap<QString, QString>  iStorageChangeNotifierMaps;
-    QMap<QString, QString>  iStorageMaps;
-    QMap<QString, QString>  iClientMaps;
-    QMap<QString, QString>  iServerMaps;
-
-    QMap<QString, QString>  iOopClientMaps;
-    QMap<QString, QString>  iOoPServerMaps;
-
-    QList<DllInfo>          iLoadedDlls;
-
-    QReadWriteLock          iDllLock;
-
-    QString                 iProcBinaryPath;
+    QString iProcBinaryPath;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class ClientPluginTest;

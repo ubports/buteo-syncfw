@@ -32,7 +32,7 @@ namespace Buteo {
 class ClientPlugin;
 class ClientThread;
 class SyncProfile;
-    
+
 /*! \brief Class for running client sync plug-ins
  */
 class ClientPluginRunner : public PluginRunner
@@ -52,8 +52,8 @@ public:
      * @param aParent Parent object
      */
     ClientPluginRunner(const QString &aPluginName, SyncProfile *aProfile,
-        PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf,
-        QObject *aParent = 0);
+                       PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf,
+                       QObject *aParent = 0);
 
     //! \brief Destructor
     virtual ~ClientPluginRunner();
@@ -84,16 +84,16 @@ private slots:
     // Slots for catching plug-in signals.
 
     void onTransferProgress(const QString &aProfileName,
-        Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-        const QString &aMimeType, int aCommittedItems);
+                            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                            const QString &aMimeType, int aCommittedItems);
 
-    void onError(const QString &aProfileName, const QString &aMessage, int aErrorCode);
+    void onError(const QString &aProfileName, const QString &aMessage, SyncResults::MinorCode aErrorCode);
 
     void onSuccess(const QString &aProfileName, const QString &aMessage);
 
     void onStorageAccquired(const QString &aMimeType);
 
-    void onSyncProgressDetail(const QString &aProfileName,int aProgressDetail);
+    void onSyncProgressDetail(const QString &aProfileName, int aProgressDetail);
 
     // Slot for observing thread exit
     void onThreadExit();
@@ -101,13 +101,10 @@ private slots:
     void pluginTimeout();
 
 private:
-
     SyncProfile *iProfile;
-
     ClientPlugin *iPlugin;
-
     ClientThread *iThread;
-    
+
 #ifdef SYNCFW_UNIT_TESTS
     friend class ClientPluginRunnerTest;
 #endif

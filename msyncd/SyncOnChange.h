@@ -5,8 +5,7 @@
 #include <QHash>
 #include <QStringList>
 
-namespace Buteo
-{
+namespace Buteo {
 
 class SyncProfile;
 class StorageChangeNotifier;
@@ -43,9 +42,9 @@ public:
      * @return false if SOC can't be enabled for one or more
      * storages
      */
-    bool enable(const QHash<QString,QList<SyncProfile*> >& aSOCStorageMap,
-                SyncOnChangeScheduler* aSOCScheduler,
-                PluginManager* aPluginManager, QStringList& aFailedStorages);
+    bool enable(const QHash<QString, QList<SyncProfile *> > &aSOCStorageMap,
+                SyncOnChangeScheduler *aSOCScheduler,
+                PluginManager *aPluginManager, QStringList &aFailedStorages);
 
     /*! If the storage change notifier plug-in's have already been loaded,
      * call this to re-enable sync on change. Handy to call after a disable.
@@ -67,9 +66,9 @@ public:
     /*! \brief adds a profile to the list of profiles interested in soc for a specific storage
      *
      * @param aStorageName storage name
-     * @param aProfile sync profile 
+     * @param aProfile sync profile
      */
-    void addProfile(const QString& aStorageName, SyncProfile* aProfile);
+    void addProfile(const QString &aStorageName, SyncProfile *aProfile);
 
 public Q_SLOTS:
     /*! initiate sync for this storage
@@ -80,7 +79,7 @@ private:
     /*! \brief destroys profile objects interested in SOC for this
      * storage
      */
-    void cleanup(const QString& aStorageName);
+    void cleanup(const QString &aStorageName);
 
     /*! \brief Get the names for storages for which SOC is desired
      *
@@ -88,9 +87,9 @@ private:
      */
     QStringList getSOCStorageNames();
 
-    StorageChangeNotifier* iStorageChangeNotifier;
-    QHash<QString,QList<SyncProfile*> > iSOCStorageMap;
-    SyncOnChangeScheduler* iSOCScheduler;
+    StorageChangeNotifier *iStorageChangeNotifier;
+    QHash<QString, QList<SyncProfile *> > iSOCStorageMap;
+    SyncOnChangeScheduler *iSOCScheduler;
 };
 
 }

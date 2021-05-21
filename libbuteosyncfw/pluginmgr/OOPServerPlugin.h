@@ -1,7 +1,7 @@
 /*
 * This file is part of buteo-sync-plugins package
 *
-* Copyright (C) 2013 Jolla Ltd. and/or its subsidiary(-ies).
+* Copyright (C) 2013 Jolla Ltd.
 *
 * Author: Sateesh Kavuri <sateesh.kavuri@gmail.com>
 *
@@ -31,31 +31,24 @@ class OOPServerPlugin : public ServerPlugin
     Q_OBJECT
 
 public:
-    OOPServerPlugin( const QString& aPluginName,
-                     const Profile& aProfile,
-                     PluginCbInterface* aCbInterface,
-                     QProcess& process );
+    OOPServerPlugin(const QString &aPluginName,
+                    const Profile &aProfile,
+                    PluginCbInterface *aCbInterface,
+                    QProcess &process);
 
     virtual ~OOPServerPlugin();
 
     virtual bool init();
-
     virtual bool uninit();
-
     virtual bool startListen();
-
     virtual void stopListen();
-
     virtual void suspend();
-
     virtual void resume();
-
     virtual bool cleanUp();
 
 public slots:
+    virtual void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
 
-    virtual void connectivityStateChanged( Sync::ConnectivityType aType,
-                                           bool aState );
     void onProcessError(QProcess::ProcessError error);
 
     void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);

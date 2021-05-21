@@ -19,23 +19,19 @@ INCLUDEPATH += . \
     ../libbuteosyncfw/profile
 
 
-PKGCONFIG += dbus-1 gio-2.0
-
-equals(QT_MAJOR_VERSION, 4): {
-    PKGCONFIG += libsignon-qt accounts-qt
-    CONFIG += mobility
-    MOBILITY += systeminfo
-    LIBS += -lbuteosyncfw
+PKGCONFIG += dbus-1 gio-2.0 libsignon-qt5 accounts-qt5
+CONFIG(systeminfo) {
+    DEFINES += USE_SYSTEMINFO
+    PKGCONFIG += Qt5SystemInfo
+} else {
+    PKGCONFIG += mce-qt5
 }
-equals(QT_MAJOR_VERSION, 5): {
-    PKGCONFIG += libsignon-qt5 accounts-qt5 Qt5SystemInfo
-    LIBS += -lbuteosyncfw5
-    packagesExist(qt5-boostable) {
-        DEFINES += HAS_BOOSTER
-        PKGCONFIG += qt5-boostable
-    } else {
-        warning("qt5-boostable not available; startup times will be slower")
-    }
+LIBS += -lbuteosyncfw5
+packagesExist(qt5-boostable) {
+    DEFINES += HAS_BOOSTER
+    PKGCONFIG += qt5-boostable
+} else {
+    warning("qt5-boostable not available; startup times will be slower")
 }
 
 QMAKE_LIBDIR_QT += ../libsyncprofile/

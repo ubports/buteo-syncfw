@@ -34,7 +34,7 @@ namespace Buteo {
 class ProfilePrivate
 {
 public:
-	 //! \brief Constructor
+    //! \brief Constructor
     ProfilePrivate();
 
     //! \brief Copy Constructor
@@ -62,13 +62,13 @@ public:
     QMap<QString, QString> iMergedKeys;
 
     //! Local fields, that are not merged from sub-profiles.
-    QList<const ProfileField*> iLocalFields;
+    QList<const ProfileField *> iLocalFields;
 
     //! Fields that are merged from sub-profiles.
-    QList<const ProfileField*> iMergedFields;
+    QList<const ProfileField *> iMergedFields;
 
     //! List of sub-profiles.
-    QList<Profile*> iSubProfiles;
+    QList<Profile *> iSubProfiles;
 };
 }
 
@@ -76,30 +76,27 @@ public:
 
 
 Buteo::ProfilePrivate::ProfilePrivate()
-:   iLoaded(false),
-    iMerged(false)
+    :   iLoaded(false),
+        iMerged(false)
 {
 }
 
 Buteo::ProfilePrivate::ProfilePrivate(const ProfilePrivate &aSource)
-:   iName(aSource.iName),
-    iType(aSource.iType),
-    iLoaded(aSource.iLoaded),
-    iMerged(aSource.iMerged),
-    iLocalKeys(aSource.iLocalKeys),
-    iMergedKeys(aSource.iMergedKeys)
+    :   iName(aSource.iName),
+        iType(aSource.iType),
+        iLoaded(aSource.iLoaded),
+        iMerged(aSource.iMerged),
+        iLocalKeys(aSource.iLocalKeys),
+        iMergedKeys(aSource.iMergedKeys)
 {
-    foreach (const ProfileField *localField, aSource.iLocalFields)
-    {
+    foreach (const ProfileField *localField, aSource.iLocalFields) {
         iLocalFields.append(new ProfileField(*localField));
     }
-    foreach (const ProfileField *mergedField, aSource.iMergedFields)
-    {
+    foreach (const ProfileField *mergedField, aSource.iMergedFields) {
         iMergedFields.append(new ProfileField(*mergedField));
     }
 
-    foreach (Profile *p, aSource.iSubProfiles)
-    {
+    foreach (Profile *p, aSource.iSubProfiles) {
         iSubProfiles.append(p->clone());
     }
 }

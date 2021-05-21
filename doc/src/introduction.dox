@@ -590,8 +590,9 @@ of the API
 </td></tr></table>
 
 \section support-oop-plugins Support for out of process plugins
+
 Buteo syncfw version 0.1.0 supported only dynamic link library plugins which the
-framework loads into the same process memory as msyncd. This archicture has a
+framework loads into the same process memory as msyncd. This architecture has a
 problem that if any one of the plugin misbehaves (crashes, for example), msyncd
 would also crash and there is a probability that it would never recover. To avoid
 such situations, an out of process plugin architecture was devised and implemented.
@@ -599,27 +600,14 @@ In this architecture, each of the plugins would be running as separate processes
 and msyncd process would interact with each of the processes to handle the sync
 life cycle and operations.
 
-This new architecture is devised with the following absolute requirements:
+From Buteo syncfw version 0.10.0, the plugin architecture uses Qt Plugins
+(https://doc.qt.io/qt-5/plugins-howto.html). Plugin files installed in
+/usr/lib/buteo-plugins-qt5 are launched in-process; plugin files installed in
+/usr/lib/buteo-plugins-qt5/oopp are launched out-of-process using the
+buteo-oopp-runner binary.
 
-- None of the plugin code should change. This is to ensure backward compatibility
-of all existing plugins
-- The flow of msyncd should not change w.r.t the new plugins, ie., the flow remains
-the same for both DLL plugins as well as process plugins
-- Support for DLL plugins still continues and they can co-exist along with process
-plugins 
-
-Keeping the above requirements in context, the following architecture is devised,
-the class diagram of which is depicted below. 
-
-</p><p>\image html Outofprocesspluginclasses.png
-
-The classes in blue belong to the framework, while the classes in pink to the plugin.
-Two concrete classes, OOPClientPlugin and OOPServerPlugin (that inherit from ClientPlugin
-and ServerPlugin respectively) are created which act as the interface between the
-plugin and the framework. These classes will be responsible for performing any
-back-forth conversion of the data transferred. These classes also ensure that the
-interface between msyncd and the plugins remain the same. In dll based plugin,
-the .so file is opened using dlsym and the binary is loaded into memory and then
+Plugins should publicly inherit from Buteo::ClientPlugin or Buteo::ServerPlugin.
+In dll based plugins, the .so file is opened using dlsym and the binary is loaded into memory and then
 the ClientPlugin object is created. In this mechanism, the plugin process is started
 and then the OOPClientPlugin object is created, which then talks to the process
 plugin over d-bus.
@@ -643,9 +631,6 @@ PluginServiceObj and registers it as a dbus service.
 
 All signals emitted by the plugin (and msyncd) are automatically relayed by Qt dbus.
 The life cycle of a process plugin is similar to that of a dll plugin.
-
-To convert an existing dll plugin to a process plugin, only a few settings need
-to be added. Described here \ref oop-plugins
 
 </div>
 */

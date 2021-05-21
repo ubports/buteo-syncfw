@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2015 Jolla Ltd
+ * Copyright (C) 2015 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -88,7 +88,7 @@ signals:
      */
 
     void transferProgress(QString aProfileName, int aTransferDatabase,
-                          int aTransferType , QString aMimeType, int aCommittedItems);
+                          int aTransferType, QString aMimeType, int aCommittedItems);
 
     /*! \brief Notifies about a change in profile.
      *
@@ -102,7 +102,7 @@ signals:
      * \param aProfileAsXml Updated Profile Object is sent as xml
      *
      */
-    void signalProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
+    void signalProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml);
 
 
     /*! \brief Notifies about Backup start.
@@ -140,7 +140,7 @@ signals:
      * \param aProfileName Name of the profile for which results are available
      * \param aResultsAsXml results as an xml object
      */
-    void resultsAvailable(QString aProfileName , QString aResultsAsXml);
+    void resultsAvailable(QString aProfileName, QString aResultsAsXml);
 
     /*! \brief Notifies sync status change for a set of account Ids
      *
@@ -159,7 +159,8 @@ signals:
      * Invalid time is returned if there was no last sync.
      * \param aNextSyncTime This is an out parameter. The next sync time.
      */
-    void statusChanged(unsigned int aAccountId, int aNewStatus, int aFailedReason, qlonglong aPrevSyncTime, qlonglong aNextSyncTime);
+    void statusChanged(unsigned int aAccountId, int aNewStatus, int aFailedReason, qlonglong aPrevSyncTime,
+                       qlonglong aNextSyncTime);
 
     /*! \brief Returns the connectivity state of a specific medium like
      * bluetooth, USB or network.
@@ -279,7 +280,7 @@ public slots:
      *
      * \return bool - status of the operation
      */
-    virtual bool setSyncSchedule(QString aProfileId , QString aScheduleAsXml) = 0;
+    virtual bool setSyncSchedule(QString aProfileId, QString aScheduleAsXml) = 0;
 
     /*!
      * \brief Save SyncResults to log.xml file.
@@ -287,7 +288,7 @@ public slots:
      * \param aSyncResults to save in the \code <profileId>.log.xml. \endcode
      * \return status of the saveSyncResults
      */
-    virtual bool saveSyncResults(QString aProfileId,QString aSyncResults) = 0;
+    virtual bool saveSyncResults(QString aProfileId, QString aSyncResults) = 0;
 
     /*! \brief To get lastSyncResult.
      *  \param aProfileId

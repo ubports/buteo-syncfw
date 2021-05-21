@@ -32,8 +32,7 @@
 
 namespace Buteo {
 
-class ProfileManagerPrivate;
-    
+
 /*! \brief
  * ProfileManager is responsible for storing and retrieving the profiles.
  *
@@ -46,19 +45,10 @@ class ProfileManager: public QObject
 {
     Q_OBJECT
 public:
-
-    //! Primary profile path where profiles will be searched.
-    static const QString DEFAULT_PRIMARY_PROFILE_PATH;
-
-    //! Secondary profile path where profiles will be searched.
-    static const QString DEFAULT_SECONDARY_PROFILE_PATH;
-
     //! Search criteria for finding profiles.
-    struct SearchCriteria
-    {
-    	//! Enum to identify if a member type exists or not
-        enum Type
-        {
+    struct SearchCriteria {
+        //! Enum to identify if a member type exists or not
+        enum Type {
             //! Sub-profile (and key) exists.
             EXISTS,
 
@@ -100,8 +90,7 @@ public:
     };
 
     //! \brief  Enum to indicate the change type of the Profile Operation
-    enum ProfileChangeType
-    {
+    enum ProfileChangeType {
         //! a New Profile has been added
         PROFILE_ADDED = 0,
         //! a Existing Profile has been modified
@@ -120,8 +109,8 @@ public:
      *  not found from the primary path. Useful for having default read-only
      *  profiles.
      */
-    ProfileManager(const QString &aPrimaryPath = DEFAULT_PRIMARY_PROFILE_PATH,
-                   const QString &aSecondaryPath = DEFAULT_SECONDARY_PROFILE_PATH);
+    ProfileManager(const QString &aPrimaryPath = QString(),
+                   const QString &aSecondaryPath = QString());
 
     /*! \brief Destructor.
      */
@@ -152,7 +141,7 @@ public:
      * \return The list of sync profiles. Caller is responsible for deleting
      *  the returned profile objects.
      */
-    QList<SyncProfile*> allSyncProfiles();
+    QList<SyncProfile *> allSyncProfiles();
 
     /*! \brief Gets all visible sync profiles.
      *
@@ -161,7 +150,7 @@ public:
      * \return The list of sync profiles. Caller is responsible for deleting
      *  the returned profile objects.
      */
-    QList<SyncProfile*> allVisibleSyncProfiles();
+    QList<SyncProfile *> allVisibleSyncProfiles();
 
     /*! \brief Gets profiles with matching data.
      *
@@ -178,9 +167,9 @@ public:
      * \return List of matching profiles. Caller is responsible for deleting
      *  the returned profile objects.
      */
-    QList<SyncProfile*> getSyncProfilesByData(const QString &aSubProfileName,
-        const QString &aSubProfileType,
-        const QString &aKey = "", const QString &aValue = "");
+    QList<SyncProfile *> getSyncProfilesByData(const QString &aSubProfileName,
+                                               const QString &aSubProfileType,
+                                               const QString &aKey = "", const QString &aValue = "");
 
     /*! \brief Gets profiles with matching data.
      *
@@ -189,7 +178,7 @@ public:
      * \return List of matching profiles. Caller is responsible for deleting
      *  the returned profile objects.
      */
-    QList<SyncProfile*> getSyncProfilesByData(
+    QList<SyncProfile *> getSyncProfilesByData(
         const QList<SearchCriteria> &aCriteria);
 
     /*! \brief Gets profiles based on supported storages.
@@ -203,7 +192,7 @@ public:
      * \return List of matching profiles. Caller is responsible for deleting
      *  the returned profile objects.
      */
-    QList<SyncProfile*> getSyncProfilesByStorage(
+    QList<SyncProfile *> getSyncProfilesByStorage(
         const QString &aStorageName, bool aStorageMustBeEnabled = false);
 
     /*! \brief Gets profiles interested in sync on change for a storage
@@ -214,7 +203,7 @@ public:
      * \return List of matching profiles. Caller is responsible for deleting
      *  the returned profile objects.
      */
-    QList<SyncProfile*> getSOCProfilesForStorage(
+    QList<SyncProfile *> getSOCProfilesForStorage(
         const QString &aStorageName);
 
     /*! \brief Expands the given profile.
@@ -263,12 +252,12 @@ public:
      *  updateProfile function of this class is called
      */
     Profile *profileFromXml(const QString &aProfileAsXml);
-     
+
     /*! \brief Gets a temporary profile (saved if sync is sucessfull).
      *
      * \param btAddress  Address of the remote device bt address/usb .
      * \param saveNewProfile If to save the profile or not (e.g pc suite profile)
-     * \return Pointer to the profile. 
+     * \return Pointer to the profile.
      *  Changes made to the profile are not saved to profile storage, unless
      *  save function of this class is called
      */
@@ -277,7 +266,7 @@ public:
     /*! \brief Updates the existing profile with the profile
      * given as parameter and emits profileChanged() Signal with appropriate value
      * depening if profile was newly added (0) or updated (1)
-     * 
+     *
      * NOTE: only Sync Profiles can be updated using ProfileManger
      *
      * \param aProfile  - Profile Object
@@ -302,7 +291,7 @@ public:
      * \return Returns true if the rename was successful
      */
     bool rename(const QString &aName, const QString &aNewName);
-  
+
     /*! \brief Enables sync'd storages in profile
      *
      * \param aProfile Profile of the remote device
@@ -310,54 +299,54 @@ public:
      * enabled value true/false
      * \param aModified Whether the profile was updated as a result of this function call,
      * and thus requires writing to disk
-     */ 
-    void enableStorages (Profile &aProfile, QMap<QString , bool> &aStorageMap, bool *aModified = NULL);
-   
-     /*! \brief Sets storage subprofiles hidden status for the given profile
-     *
-     * \param aProfile Profile of the remote device
-     * \param aStorageMap Map of storage names (hcalendar, hcontacts) and visibility status. With value \e true
-     * the storage will be set visible (equals profile attribute hidden=false)
-     * \param aModified Whether the profile was updated as a result of this function call,
-     * and thus requires writing to disk
-     */ 
+     */
+    void enableStorages (Profile &aProfile, QMap<QString, bool> &aStorageMap, bool *aModified = NULL);
+
+    /*! \brief Sets storage subprofiles hidden status for the given profile
+    *
+    * \param aProfile Profile of the remote device
+    * \param aStorageMap Map of storage names (hcalendar, hcontacts) and visibility status. With value \e true
+    * the storage will be set visible (equals profile attribute hidden=false)
+    * \param aModified Whether the profile was updated as a result of this function call,
+    * and thus requires writing to disk
+    */
     void setStoragesVisible(Profile &aProfile, QMap<QString, bool> &aStorageMap, bool *aModified = NULL);
-    
+
     /*! \brief Sets remote target in profile
      *
      * \param aProfile Profile of the remote device
      * \param aId remote device id
      *
-     */ 
-    void saveRemoteTargetId (Profile &aProfile,const QString& aId);
-    
+     */
+    void saveRemoteTargetId (Profile &aProfile, const QString &aId);
+
     /*! \brief Sets/Overwrites the schedule to a profile
      *
      * \param aProfileId Profile Id
      * \param aScheduleAsXml SyncSchedule Object as an xml string
      *
      */
-    bool setSyncSchedule(QString aProfileId , QString aScheduleAsXml);
+    bool setSyncSchedule(QString aProfileId, QString aScheduleAsXml);
 
     /*! \brief checks if a profile has retries info and stores the same
      *
      * @param aProfile sync profile
      */
-    void addRetriesInfo(const SyncProfile* aProfile);
+    void addRetriesInfo(const SyncProfile *aProfile);
 
     /*! \brief gets the next retry after time for a sync profile
      *
      * @param aProfile sync profile
      * @return next retry interval
      */
-    QDateTime getNextRetryInterval(const SyncProfile* aProfile);
+    QDateTime getNextRetryInterval(const SyncProfile *aProfile);
 
     /*! \brief call this to indicate that retries have to stop for a certain
      * sync for a profile - either the no. of retry attempts exhausted or one of the retries succeeded
      *
      * @param aProfileName name of the profile
      */
-    void retriesDone(const QString& aProfileName);
+    void retriesDone(const QString &aProfileName);
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class ProfileManagerTest;
@@ -374,12 +363,12 @@ signals:
     * \param aProfileAsXml Updated Profile Object is sent as xml
     *
     */
-    void signalProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
+    void signalProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml);
 
 private:
-    
-    ProfileManager& operator=(const ProfileManager &aRhs);
-    
+
+    ProfileManager &operator=(const ProfileManager &aRhs);
+
     ProfileManagerPrivate *d_ptr;
 
     QHash<QString, QList<quint32> > iSyncRetriesInfo;

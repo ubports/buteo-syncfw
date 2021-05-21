@@ -38,55 +38,65 @@ using namespace Buteo;
 static const QString USB_MODE_SERVICE("com.meego.usb_moded");
 static const QString USB_MODE_OBJECT("/com/meego/usb_moded");
 static const QString SYNC_MODE_NAME("pc_suite");
+static const QString MTP_MODE_NAME("mtp_mode");
 
 /*
  * Implementation of interface class USBModedProxy
  */
 
 USBModedProxy::USBModedProxy(QObject *parent)
-    : QDBusAbstractInterface(USB_MODE_SERVICE, USB_MODE_OBJECT, staticInterfaceName(), QDBusConnection::systemBus(), parent)
+    : QDBusAbstractInterface(USB_MODE_SERVICE, USB_MODE_OBJECT, staticInterfaceName(), QDBusConnection::systemBus(),
+                             parent),
+      m_isConnected(false)
 {
     FUNCTION_CALL_TRACE;
-    if(false == QObject::connect(this, SIGNAL(sig_usb_state_ind(const QString&)), this, SLOT(slotModeChanged(const QString&))))
-    {
-        LOG_CRITICAL("Failed to connect to USB moded signal! USB notifications will not be available.");
-    }
+    initUsbModeTracking();
 }
 
 USBModedProxy::~USBModedProxy()
 {
 }
 
+void USBModedProxy::initUsbModeTracking()
+{
+    if (!QObject::connect(this, &USBModedProxy::sig_usb_state_ind,
+                          this, &USBModedProxy::slotModeChanged)) {
+        LOG_CRITICAL("Failed to connect to USB moded signal! USB notifications will not be available.");
+    }
+
+    QDBusPendingReply<QString> reply = this->mode_request();
+    QDBusPendingCallWatcher *watch = new QDBusPendingCallWatcher(reply, this);
+    connect(watch, &QDBusPendingCallWatcher::finished,
+            this,  &USBModedProxy::handleUsbModeReply);
+}
+
+void USBModedProxy::handleUsbModeReply(QDBusPendingCallWatcher *call)
+{
+    QDBusPendingReply<QString> reply = *call;
+
+    if (reply.isError()) {
+        LOG_WARNING("Call to" << USB_MODE_SERVICE << "failed:" << reply.error());
+    } else {
+        slotModeChanged(reply.value());
+    }
+
+    call->deleteLater();
+}
+
 void USBModedProxy::slotModeChanged(const QString &mode)
 {
     FUNCTION_CALL_TRACE;
-    bool isConnected = false;
 
-    if(SYNC_MODE_NAME == mode)
-    {
-        isConnected = true;
+    bool isConnected = (mode == MTP_MODE_NAME || mode == SYNC_MODE_NAME);
+
+    if (m_isConnected != isConnected) {
+        m_isConnected = isConnected;
+        emit usbConnection(m_isConnected);
     }
-    emit usbConnection(isConnected);
 }
 
 bool USBModedProxy::isUSBConnected()
 {
     FUNCTION_CALL_TRACE;
-    bool isConnected = false;
-
-    QDBusPendingReply<QString> reply = this->mode_request();
-    reply.waitForFinished();
-    if(reply.isError())
-    {
-        LOG_CRITICAL("Get mode returns::" << reply.error());
-    }
-    else
-    {
-        LOG_INFO("USB connected in mode::" << reply.value());
-        if(SYNC_MODE_NAME == reply.value())
-        {
-            isConnected = true;
-        }
-    }
-    return isConnected;
+    return m_isConnected;
 }
