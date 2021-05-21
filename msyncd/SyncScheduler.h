@@ -183,11 +183,11 @@ private: // functions
 
 private: // data
 
+    QSet<QString> iActiveBackgroundSyncProfiles;
 #ifdef USE_KEEPALIVE
     /// BackgroundSync management object
     BackgroundSync *iBackgroundActivity;
     ProfileManager iProfileManager;
-    QSet<QString> iActiveBackgroundSyncProfiles;
 #else
     /// A list of sync schedule profiles
     QMap<QString, int> iSyncScheduleProfiles;

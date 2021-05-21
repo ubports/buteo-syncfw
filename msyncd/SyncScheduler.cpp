@@ -170,7 +170,6 @@ void SyncScheduler::syncStatusChanged(const QString &aProfileName, int aStatus,
         iActiveBackgroundSyncProfiles.remove(aProfileName);
 #ifdef USE_KEEPALIVE
         iBackgroundActivity->onBackgroundSyncCompleted(aProfileName);
-#endif
 
         // and schedule the next background sync if necessary.
         SyncProfile *profile = iProfileManager.syncProfile(aProfileName);
@@ -178,6 +177,7 @@ void SyncScheduler::syncStatusChanged(const QString &aProfileName, int aStatus,
             setNextAlarm(profile);
             delete profile;
         }
+#endif
     }
 }
 
