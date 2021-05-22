@@ -50,4 +50,4 @@ void StoragePluginTest::testCreateDestroy()
     QVERIFY( pluginManager.iLoadedDlls.count() == 0 );
 }
 
-QTEST_MAIN(Buteo::StoragePluginTest)
+QTEST_GUILESS_MAIN(Buteo::StoragePluginTest)

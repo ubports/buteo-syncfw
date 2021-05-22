@@ -64,4 +64,4 @@ void StorageProfileTest::testStorageProfile()
     QCOMPARE(p->isEnabled(), true);
 }
 
-QTEST_MAIN(Buteo::StorageProfileTest)
+QTEST_GUILESS_MAIN(Buteo::StorageProfileTest)

@@ -223,4 +223,4 @@ void SyncProfileTest::testSubProfiles()
 
 }
 
-QTEST_MAIN(Buteo::SyncProfileTest)
+QTEST_GUILESS_MAIN(Buteo::SyncProfileTest)

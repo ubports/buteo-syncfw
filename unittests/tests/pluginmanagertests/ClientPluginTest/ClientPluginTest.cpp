@@ -54,4 +54,4 @@ void ClientPluginTest::testCreateDestroy()
     QVERIFY( pluginManager.iLoadedDlls.count() == 0 );
 }
 
-QTEST_MAIN(Buteo::ClientPluginTest)
+QTEST_GUILESS_MAIN(Buteo::ClientPluginTest)

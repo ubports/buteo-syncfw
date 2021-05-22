@@ -298,4 +298,4 @@ void SyncLogTest::testAddDetails()
                                  TargetResults::ITEM_OPERATION_FAILED).isEmpty());
 }
 
-QTEST_MAIN(Buteo::SyncLogTest)
+QTEST_GUILESS_MAIN(Buteo::SyncLogTest)

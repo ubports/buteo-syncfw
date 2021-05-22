@@ -122,4 +122,4 @@ void DeletedItemsIdStorageTest::testSnapshot()
 }
 
 
-QTEST_MAIN(Buteo::DeletedItemsIdStorageTest)
+QTEST_GUILESS_MAIN(Buteo::DeletedItemsIdStorageTest)

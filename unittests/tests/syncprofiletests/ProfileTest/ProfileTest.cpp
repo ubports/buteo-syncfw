@@ -453,4 +453,4 @@ QString ProfileTest::profileFileToString(const QString &aName,
 }
 
 
-QTEST_MAIN(Buteo::ProfileTest)
+QTEST_GUILESS_MAIN(Buteo::ProfileTest)

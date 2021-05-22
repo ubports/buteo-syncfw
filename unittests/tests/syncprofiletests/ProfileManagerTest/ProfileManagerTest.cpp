@@ -675,4 +675,4 @@ void ProfileManagerTest::testBackup()
     QVERIFY(!QFile::exists(fileName + ".bak"));
 }
 
-QTEST_MAIN(Buteo::ProfileManagerTest)
+QTEST_GUILESS_MAIN(Buteo::ProfileManagerTest)

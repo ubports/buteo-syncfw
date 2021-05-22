@@ -70,4 +70,4 @@ void ProfileFieldTest::testField()
     QCOMPARE(doc.toString(), doc2.toString());
 }
 
-QTEST_MAIN(Buteo::ProfileFieldTest)
+QTEST_GUILESS_MAIN(Buteo::ProfileFieldTest)

@@ -103,4 +103,4 @@ void ProfileFactoryTest::testCreateFromXml()
 
 }
 
-QTEST_MAIN(Buteo::ProfileFactoryTest)
+QTEST_GUILESS_MAIN(Buteo::ProfileFactoryTest)
