@@ -31,13 +31,13 @@
 using namespace Buteo;
 
 ServerPluginRunner::ServerPluginRunner(const QString &aPluginName,
-    Profile *aProfile, PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf,
-    ServerActivator *aServerActivator, QObject *aParent)
-:   PluginRunner(PLUGIN_SERVER, aPluginName, aPluginMgr, aPluginCbIf, aParent),
-    iProfile(aProfile),
-    iPlugin(0),
-    iThread(0),
-    iServerActivator(aServerActivator)
+                                       Profile *aProfile, PluginManager *aPluginMgr, PluginCbInterface *aPluginCbIf,
+                                       ServerActivator *aServerActivator, QObject *aParent)
+    :   PluginRunner(PLUGIN_SERVER, aPluginName, aPluginMgr, aPluginCbIf, aParent),
+        iProfile(aProfile),
+        iPlugin(0),
+        iThread(0),
+        iServerActivator(aServerActivator)
 {
     FUNCTION_CALL_TRACE;
 }
@@ -49,8 +49,7 @@ ServerPluginRunner::~ServerPluginRunner()
     stop();
     disconnect();
 
-    if (iPlugin != 0 && iPluginMgr != 0)
-    {
+    if (iPlugin != 0 && iPluginMgr != 0) {
         iPluginMgr->destroyServer(iPlugin);
         iPlugin = 0;
     }
@@ -69,58 +68,46 @@ bool ServerPluginRunner::init()
     if (iInitialized)
         return true;
 
-    if (iPluginMgr == 0 || iPluginCbIf == 0 || iProfile == 0)
-    {
+    if (iPluginMgr == 0 || iPluginCbIf == 0 || iProfile == 0) {
         LOG_WARNING("Invalid members, failed to initialize");
         return false;
     }
 
     iPlugin = iPluginMgr->createServer(iPluginName, *iProfile, iPluginCbIf);
-    if (iPlugin == 0)
-    {
+    if (iPlugin == 0) {
         LOG_WARNING("Failed to create server plug-in:" << iPluginName);
         return false;
     }
 
     iThread = new ServerThread();
-    if (iThread == 0)
-    {
-        LOG_WARNING("Failed to create server thread");
-        return false;
-    }
 
     // Pass connectivity state change signal to the plug-in.
     connect(this, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)),
-        iPlugin, SLOT(connectivityStateChanged(Sync::ConnectivityType, bool)));
+            iPlugin, SLOT(connectivityStateChanged(Sync::ConnectivityType, bool)));
 
     connect(iPlugin, SIGNAL(newSession(const QString &)),
-        this, SLOT(onNewSession(const QString &)));
+            this, SLOT(onNewSession(const QString &)));
 
     // Connect signals from the plug-in.
 
-    connect(iPlugin, SIGNAL(transferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &,int)),
-        this, SLOT(onTransferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &,int)));
+    connect(iPlugin, SIGNAL(transferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &,
+                                             int)),
+            this, SLOT(onTransferProgress(const QString &, Sync::TransferDatabase, Sync::TransferType, const QString &, int)));
 
-    connect(iPlugin, SIGNAL(error(const QString &, const QString &, int)),
-        this, SLOT(onError(const QString &, const QString &, int)));
+    connect(iPlugin, &ServerPlugin::error, this, &ServerPluginRunner::onError);
 
     connect(iPlugin, SIGNAL(success(const QString &, const QString &)),
-        this, SLOT(onSuccess(const QString &, const QString &)));
+            this, SLOT(onSuccess(const QString &, const QString &)));
 
     connect(iPlugin, SIGNAL(accquiredStorage(const QString &)),
-        this, SLOT(onStorageAccquired(const QString &)));
+            this, SLOT(onStorageAccquired(const QString &)));
 
-    connect(iPlugin,SIGNAL(syncProgressDetail(const QString &,int)),
-            this ,SIGNAL(syncProgressDetail(const QString &,int)));
+    connect(iPlugin, SIGNAL(syncProgressDetail(const QString &, int)),
+            this, SIGNAL(syncProgressDetail(const QString &, int)));
 
     // Connect signals from the thread.
 
-    connect(iThread, SIGNAL(initError(const QString &, const QString &, int)),
-        this, SLOT(onError(const QString &, const QString &, int)));
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    connect(iThread, SIGNAL(terminated()), this, SLOT(onThreadExit()));
-#endif
+    connect(iThread, &ServerThread::initError, this, &ServerPluginRunner::onError);
 
     connect(iThread, SIGNAL(finished()), this, SLOT(onThreadExit()));
 
@@ -134,8 +121,7 @@ bool ServerPluginRunner::start()
     FUNCTION_CALL_TRACE;
 
     bool rv = false;
-    if (iInitialized && iThread != 0)
-    {
+    if (iInitialized && iThread != 0) {
         rv = iThread->startThread(iPlugin);
         LOG_DEBUG("ServerPluginRunner started thread for plugin:" << iPlugin->getProfileName() << ", returning:" << rv);
     }
@@ -150,8 +136,7 @@ void ServerPluginRunner::stop()
     // Disconnect all signals from this object to the plug-in.
     disconnect(this, 0, iPlugin, 0);
 
-    if (iThread != 0)
-    {
+    if (iThread != 0) {
         iThread->stopThread();
         iThread->wait();
     }
@@ -161,8 +146,7 @@ void ServerPluginRunner::abort(Sync::SyncStatus aStatus)
 {
     FUNCTION_CALL_TRACE;
 
-    if (iPlugin != 0)
-    {
+    if (iPlugin != 0) {
         iPlugin->abortSync(aStatus);
     }
 }
@@ -171,8 +155,7 @@ void ServerPluginRunner::suspend()
 {
     FUNCTION_CALL_TRACE;
 
-    if (iPlugin != 0)
-    {
+    if (iPlugin != 0) {
         iPlugin->suspend();
     }
 }
@@ -181,8 +164,7 @@ void ServerPluginRunner::resume()
 {
     FUNCTION_CALL_TRACE;
 
-    if (iPlugin != 0)
-    {
+    if (iPlugin != 0) {
         iPlugin->resume();
     }
 }
@@ -198,12 +180,9 @@ SyncResults ServerPluginRunner::syncResults()
 {
     FUNCTION_CALL_TRACE;
 
-    if (iPlugin != 0)
-    {
+    if (iPlugin != 0) {
         return iPlugin->getSyncResults();
-    }
-    else
-    {
+    } else {
         return SyncResults();
     }
 }
@@ -213,8 +192,7 @@ bool ServerPluginRunner::cleanUp()
     FUNCTION_CALL_TRACE;
 
     bool retval = false ;
-    if (iPlugin != 0)
-    {
+    if (iPlugin != 0) {
         retval = iPlugin->cleanUp();
     }
     return retval;
@@ -224,8 +202,7 @@ void ServerPluginRunner::onNewSession(const QString &aDestination)
 {
     // Add reference to the server plug-in, so that the plug-in
     // will not be stopped when there is a session running.
-    if (iServerActivator != 0)
-    {
+    if (iServerActivator != 0) {
         iServerActivator->addRef(plugin()->getProfileName());
     }
 
@@ -233,8 +210,8 @@ void ServerPluginRunner::onNewSession(const QString &aDestination)
 }
 
 void ServerPluginRunner::onTransferProgress(const QString &aProfileName,
-    Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-    const QString &aMimeType, int aCommittedItems)
+                                            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                                            const QString &aMimeType, int aCommittedItems)
 {
     FUNCTION_CALL_TRACE;
 
@@ -242,7 +219,7 @@ void ServerPluginRunner::onTransferProgress(const QString &aProfileName,
 }
 
 void ServerPluginRunner::onError(const QString &aProfileName,
-                                 const QString &aMessage, int aErrorCode)
+                                 const QString &aMessage, SyncResults::MinorCode aErrorCode)
 {
     FUNCTION_CALL_TRACE;
 
@@ -261,7 +238,7 @@ void ServerPluginRunner::onSuccess(const QString &aProfileName,
     onSessionDone();
 }
 
-void ServerPluginRunner::onStorageAccquired(const QString &aMimeType )
+void ServerPluginRunner::onStorageAccquired(const QString &aMimeType)
 {
     FUNCTION_CALL_TRACE;
 
@@ -285,8 +262,7 @@ void ServerPluginRunner::onSessionDone()
 #if 0
     // SyncML Server plugin should not die after one single session
     // Don't think removing the server reference is useful
-    if (iServerActivator != 0)
-    {
+    if (iServerActivator != 0) {
         iServerActivator->removeRef(plugin()->getProfileName());
     }
 #endif

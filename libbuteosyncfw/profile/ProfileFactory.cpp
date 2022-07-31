@@ -29,7 +29,7 @@
 #include "ProfileEngineDefs.h"
 
 using namespace Buteo;
-    
+
 ProfileFactory::ProfileFactory()
 {
 }
@@ -38,21 +38,17 @@ Profile *ProfileFactory::createProfile(const QString &aName,
                                        const QString &aType)
 {
     if (aType.isEmpty())
-        return NULL;
+        return nullptr;
 
-    Profile *p = NULL;
+    Profile *p = nullptr;
 
-    if (aType == Profile::TYPE_SYNC)
-    {
+    if (aType == Profile::TYPE_SYNC) {
         p = new SyncProfile(aName);
-    }
-    else if (aType == Profile::TYPE_STORAGE)
-    {
+    } else if (aType == Profile::TYPE_STORAGE) {
         p = new StorageProfile(aName);
     }
     // Entries for each class derived from Profile can be added here.
-    else
-    {
+    else {
         p = new Profile(aName, aType);
     }
 
@@ -61,20 +57,16 @@ Profile *ProfileFactory::createProfile(const QString &aName,
 
 Profile *ProfileFactory::createProfile(const QDomElement &aRoot)
 {
-    Profile *p = NULL;
+    Profile *p = nullptr;
 
     QString type = aRoot.attribute(ATTR_TYPE);
-    if (type == Profile::TYPE_SYNC)
-    {
+    if (type == Profile::TYPE_SYNC) {
         p = new SyncProfile(aRoot);
-    }
-    else if (type == Profile::TYPE_STORAGE)
-    {
+    } else if (type == Profile::TYPE_STORAGE) {
         p = new StorageProfile(aRoot);
     }
     // Entries for each class derived from Profile can be added here.
-    else
-    {
+    else {
         p = new Profile(aRoot);
     }
 

@@ -148,7 +148,7 @@ public:
      * \param aMajorCode Error code
      * \param aMinorCode failed reason
      */
-    void setFailureResult(int aMajorCode, int aMinorCode);
+    void setFailureResult(SyncResults::MajorCode aMajorCode, SyncResults::MinorCode aMinorCode);
 
     /*! \brief Tries to reserve storages needed by the session
      *
@@ -167,13 +167,13 @@ public:
     void releaseStorages();
 
     //! \brief returns the StorageMap used for this session
-    QMap<QString,bool> getStorageMap();
+    QMap<QString, bool> getStorageMap();
 
     /*! \brief sets the storage map for this session
      *
      * @param aStorageMap - storage map to set
      */
-    void setStorageMap(QMap<QString,bool> &aStorageMap);
+    void setStorageMap(QMap<QString, bool> &aStorageMap);
 
     //! \brief returns the returns the status of the profile creation for this session
     bool isProfileCreated();
@@ -188,15 +188,15 @@ signals:
 
     //! @see SyncPluginBase::transferProgress
     void transferProgress(const QString &aProfileName,
-            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-            const QString &aMimeType, int aCommittedItems);
+                          Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                          const QString &aMimeType, int aCommittedItems);
 
     /*! \brief Signal sent when a storage is accquired
      *
      * @param aProfileName Name of the profile used by the session
      * @param aMimeType Mimetype of the storage accquired.
      */
-    void storageAccquired (const QString &aProfileName , const QString &aMimeType) ;
+    void storageAccquired(const QString &aProfileName, const QString &aMimeType);
 
     /*! \brief Signal sent when the session has finished
      *
@@ -206,14 +206,14 @@ signals:
      * @param aErrorCode Error code, if the status is error
      */
     void finished(const QString &aProfileName, Sync::SyncStatus aStatus,
-            const QString &aMessage, int aErrorCode);
+                  const QString &aMessage, SyncResults::MinorCode aErrorCode);
 
     /*! \brief Signal sent when the sync is in progress to indicate the detail of the progress
      *
      * @param aProfileName Name of the profile used by the session
      * @param aProgressDetail Detail of the progress.
      */
-    void syncProgressDetail(const QString &aProfileName,int aProgressDetail);
+    void syncProgressDetail(const QString &aProfileName, int aProgressDetail);
 private:
 
     bool tryStart();
@@ -224,15 +224,15 @@ private slots:
 
     void onSuccess(const QString &aProfileName, const QString &aMessage);
 
-    void onError(const QString &aProfileName, const QString &aMessage, int aErrorCode);
+    void onError(const QString &aProfileName, const QString &aMessage, SyncResults::MinorCode aErrorCode);
 
     void onTransferProgress(const QString &aProfileName,
-            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-            const QString &aMimeType, int aCommittedItems);
+                            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+                            const QString &aMimeType, int aCommittedItems);
 
     void onStorageAccquired (const QString &aMimeType);
 
-    void onSyncProgressDetail(const QString &aProfileName,int aProgressDetail);
+    void onSyncProgressDetail(const QString &aProfileName, int aProgressDetail);
 
     void onDone();
 
@@ -242,44 +242,27 @@ private slots:
 
     void onNetworkSessionError();
 
-    private:
-
+private:
     SyncProfile *iProfile;
-
     PluginRunner *iPluginRunner;
-
     SyncResults iResults;
-
     Sync::SyncStatus iStatus;
-
-    int iErrorCode;
-
+    SyncResults::MinorCode iErrorCode;
     bool iPluginRunnerOwned;
-
     bool iScheduled;
-
     bool iAborted;
-
     bool iStarted;
-
     bool iFinished;
-
     bool iCreateProfile;
-
     QString iMessage;
-
-    QString iRemoteId ;
-
+    QString iRemoteId;
     StorageBooker *iStorageBooker;
-
-    QMap<QString , bool> iStorageMap;
-
+    QMap<QString, bool> iStorageMap;
     NetworkManager *iNetworkManager;
 
-    #ifdef SYNCFW_UNIT_TESTS
+#ifdef SYNCFW_UNIT_TESTS
     friend class SyncSessionTest;
-    #endif
-
+#endif
 };
 
 }

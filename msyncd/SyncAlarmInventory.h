@@ -38,73 +38,73 @@ class SyncAlarmInventory : public QObject
 {
     Q_OBJECT
 
-    public:
-        /*! The alarm inventory constructor
-         * Always Call init()  before using other methods of this class */
-        SyncAlarmInventory();
+public:
+    /*! The alarm inventory constructor
+     * Always Call init()  before using other methods of this class */
+    SyncAlarmInventory();
 
-        /*! The alarm inventory destructor */
-        ~SyncAlarmInventory();
+    /*! The alarm inventory destructor */
+    ~SyncAlarmInventory();
 
-        /*! \brief Creates and Initialize the alarms database. also Creates the timers
-         * Please call this function to make sure the database is initialised properly
-         * @return - status of the initialisation
-         */
-        bool init();
+    /*! \brief Creates and Initialize the alarms database. also Creates the timers
+     * Please call this function to make sure the database is initialised properly
+     * @return - status of the initialisation
+     */
+    bool init();
 
-        /*! \brief Method to add an alarm
-         *
-         * @param alarmTime - time of the alarm as QDateTime
-         * @return id of the alarm if alarm was added successfully. else 0
-         */
-        int  addAlarm(QDateTime alarmTime);
+    /*! \brief Method to add an alarm
+     *
+     * @param alarmTime - time of the alarm as QDateTime
+     * @return id of the alarm if alarm was added successfully. else 0
+     */
+    int  addAlarm(QDateTime alarmTime);
 
-        /*! Method to remove an alarm
-         *
-         * @param alarmId - id of the alarm to remove
-         * @return status of the remove
-         */
-        bool removeAlarm(int alarmId);
+    /*! Method to remove an alarm
+     *
+     * @param alarmId - id of the alarm to remove
+     * @return status of the remove
+     */
+    bool removeAlarm(int alarmId);
 
-        /*! Method to remove all alarms
-         *
-         */
-        void removeAllAlarms();
+    /*! Method to remove all alarms
+     *
+     */
+    void removeAllAlarms();
 
-    signals:
-        /*! \brief Signal triggered when an alarm expired
-         * @param alarmId  - id of the alarm that got triggered.
-         * */
-        void triggerAlarm(int alarmId);
+signals:
+    /*! \brief Signal triggered when an alarm expired
+     * @param alarmId  - id of the alarm that got triggered.
+     * */
+    void triggerAlarm(int alarmId);
 
-    private:
-        /* Deletes the alarm from DB */
-        bool deleteAlarmFromDb( int alarmName );
+private:
+    /* Deletes the alarm from DB */
+    bool deleteAlarmFromDb(int alarmName);
 
-        /* Method to add an alarm to the database */
-        int addAlarmToDb( QDateTime timeStamp );
+    /* Method to add an alarm to the database */
+    int addAlarmToDb(QDateTime timeStamp);
 
-        /* Method to fetch the database handle */
-        QSqlDatabase*  getDbHandle();
+    /* Method to fetch the database handle */
+    QSqlDatabase *getDbHandle();
 
-        /* Timer object to keep tracke of alarm timers */
-        QTimer*        iTimer;
+    /* Timer object to keep tracke of alarm timers */
+    QTimer *iTimer;
 
-        /* Current alarm that is under work */
-        int            currentAlarm;
+    /* Current alarm that is under work */
+    int currentAlarm;
 
-        /* Number of times that the alarm triggers */
-        int            triggerCount;
+    /* Number of times that the alarm triggers */
+    int triggerCount;
 
-        /* Database handle */
-        QSqlDatabase   iDbHandle;
+    /* Database handle */
+    QSqlDatabase iDbHandle;
 
-        /* Database connection name */
-        QString        iConnectionName;
+    /* Database connection name */
+    QString iConnectionName;
 
-    private slots:
-        /*! Slot used whenever the timer object expires */
-        void timerTriggered();
+private slots:
+    /*! Slot used whenever the timer object expires */
+    void timerTriggered();
 };
 
 #endif

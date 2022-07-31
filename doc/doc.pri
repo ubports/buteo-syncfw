@@ -9,7 +9,7 @@ doc.depends = FORCE
 
 QMAKE_CLEAN += $${PWD}/html/* $${PWD}/buteo-syncfw.tag
 
-htmldocs.files = $${PWD}/html/*
+htmldocs.files = $${PWD}/html/
 htmldocs.path = /usr/share/doc/buteo-syncfw-doc/
 htmldocs.CONFIG += no_check_exist
 

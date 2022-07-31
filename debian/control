@@ -6,15 +6,17 @@ XSBC-Original-Maintainer: Duggirala Karthik <karthik.2.duggirala@nokia.com>
 Build-Depends: debhelper (>= 9),
                doxygen,
                libaccounts-qt5-dev, 
+               libbluetooth-dev,
                libdbus-1-dev,
                libglib2.0-dev,
                libgsettings-qt-dev,
                libiphb-dev,
+               libmirclient-dev,
+               libmircore-dev,
                libsignon-qt5-dev,
                libevdev-dev,
                libudev-dev,               
                qtsystems5-dev,
-               qt5-default,
                quilt,
 Standards-Version: 3.9.5
 Homepage: https://github.com/nemomobile/buteo-syncfw
@@ -47,9 +49,9 @@ Depends: ${misc:Depends},
 Description: Files required for synchronizer plugin development
  Header file needed for making plugins.
  
-#Package: libbuteosyncfw5-doc
-#Section: doc
-#Architecture: all
-#Depends: ${misc:Depends},
-#Description: API documentation for sync-fw.
-# API documentation package for sync-fw.
+Package: libbuteosyncfw5-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends},
+Description: API documentation for sync-fw.
+ API documentation package for sync-fw.

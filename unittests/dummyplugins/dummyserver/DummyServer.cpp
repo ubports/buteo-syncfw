@@ -2,6 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2013 - 2021 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -24,22 +25,10 @@
 
 using namespace Buteo;
 
-extern "C" DummyServer* createPlugin( const QString& aPluginName,
-                                      const Profile& aProfile,
-                                      PluginCbInterface *aCbInterface )
-{
-    return new DummyServer( aPluginName, aProfile, aCbInterface );
-}
-
-extern "C" void destroyPlugin( DummyServer *aServer )
-{
-    delete aServer;
-}
-
-DummyServer::DummyServer( const QString& aPluginName,
-                          const Profile& aProfile,
+DummyServer::DummyServer( const QString &aPluginName,
+                          const Profile &aProfile,
                           PluginCbInterface *aCbInterface )
- : ServerPlugin( aPluginName, aProfile, aCbInterface )
+    : ServerPlugin( aPluginName, aProfile, aCbInterface )
 {
 
 }
@@ -86,3 +75,12 @@ void DummyServer::connectivityStateChanged( Sync::ConnectivityType /*aType*/,
 {
 
 }
+
+
+ServerPlugin *DummyServerLoader::createServerPlugin( const QString &aPluginName,
+                                                     const Buteo::Profile &aProfile,
+                                                     Buteo::PluginCbInterface *aCbInterface )
+{
+    return new DummyServer( aPluginName, aProfile, aCbInterface );
+}
+

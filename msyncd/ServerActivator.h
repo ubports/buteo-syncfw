@@ -31,7 +31,7 @@
 #include <QString>
 
 namespace Buteo {
-    
+
 /*! \brief Keeps track of which server plug-ins should be enabled
  *
  * Finds out from server profiles which transports each server plug-in uses and
@@ -46,7 +46,7 @@ namespace Buteo {
  */
 class ServerActivator : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
 
@@ -57,7 +57,7 @@ public:
      * @param aParent Parent object
      */
     ServerActivator(ProfileManager &aProfileManager,
-        TransportTracker &aTransportTracker, QObject *aParent = 0);
+                    TransportTracker &aTransportTracker, QObject *aParent = 0);
 
     //! \brief Destructor
     virtual ~ServerActivator();

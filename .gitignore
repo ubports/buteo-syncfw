@@ -1,7 +1,10 @@
 Makefile
 Makefile.*
+*.o
+*.gcno
 *.so*
 *.prl
+moc_*.cpp
 pkgconfig/
 *.list
 *.tag
