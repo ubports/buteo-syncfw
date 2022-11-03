@@ -2,8 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2019 Jolla Ltd.
- * Copyright (C) 2020 Open Mobile Platform LLC.
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -65,7 +64,7 @@ class BatteryInfo;
 /// This class manages other components and connects them to provide
 /// the fully functioning synchronization framework.
 class Synchronizer : public SyncDBusInterface, // Derived from QObject
-    public PluginCbInterface
+                     public PluginCbInterface
 {
     Q_OBJECT
 public:
@@ -95,19 +94,19 @@ public:
                                 const SyncPluginBase *aCaller);
 
     /// \see PluginCbInterface::createStorage
-    virtual StoragePlugin *createStorage(const QString &aPluginName);
+    virtual StoragePlugin* createStorage(const QString &aPluginName);
 
     /// \see PluginCbInterface::destroyStorage
     virtual void destroyStorage(StoragePlugin *aStorage);
 
     /// \see PluginCbInterface::isConnectivityAvailable
-    virtual bool isConnectivityAvailable(Sync::ConnectivityType aType);
+    virtual bool isConnectivityAvailable( Sync::ConnectivityType aType );
 
     /// \see PluginCbInterface::getSyncProfileByRemoteAddress
-    virtual Profile *getSyncProfileByRemoteAddress(const QString &aAddress);
+    virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress);
 
     /// \see PluginCbInterface::getValue
-    virtual QString getValue(const QString &aAddress, const QString &aKey);
+    virtual QString getValue(const QString& aAddress, const QString& aKey);
 
 
 // From SyncDBusInterface
@@ -137,10 +136,10 @@ public slots:
     virtual QStringList runningSyncs();
 
     //! \see SyncDBusInterface::setSyncSchedule
-    virtual bool setSyncSchedule(QString aProfileId, QString aScheduleAsXml);
+    virtual bool setSyncSchedule(QString aProfileId , QString aScheduleAsXml);
 
     //! \see SyncDBusInterface::saveSyncResults
-    virtual bool saveSyncResults(QString aProfileId, QString aSyncResults);
+    virtual bool saveSyncResults(QString aProfileId,QString aSyncResults);
 
     //! \see SyncDBusInterface::createSyncProfileForAccount
     virtual QString createSyncProfileForAccount(uint aAccountId);
@@ -231,7 +230,7 @@ public slots:
 
 signals:
 
-    //! emitted by releaseStorages call
+        //! emitted by releaseStorages call
     void storageReleased();
 
     /*! \brief emit this signal when the sync session is completed,
@@ -250,23 +249,22 @@ private slots:
      */
     void onStorageReleased();
 
-    void onTransferProgress(const QString &aProfileName,
-                            Sync::TransferDatabase aDatabase, Sync::TransferType aType,
-                            const QString &aMimeType, int aCommittedItems);
+    void onTransferProgress( const QString &aProfileName,
+        Sync::TransferDatabase aDatabase, Sync::TransferType aType,
+        const QString &aMimeType, int aCommittedItems );
 
-    void onSessionFinished(const QString &aProfileName,
-                           Sync::SyncStatus aStatus, const QString &aMessage,
-                           SyncResults::MinorCode aErrorCode);
+    void onSessionFinished( const QString &aProfileName,
+        Sync::SyncStatus aStatus, const QString &aMessage, int aErrorCode );
 
     void onStorageAccquired(const QString &aProfileName, const QString &aMimeType);
 
-    void onSyncProgressDetail(const QString &aProfileName, int aProgressDetail);
+    void onSyncProgressDetail(const QString &aProfileName,int aProgressDetail);
 
     void onServerDone();
 
     void onNewSession(const QString &aDestination);
 
-    void slotProfileChanged(QString aProfileName, int aChangeType, QString aProfileAsXml);
+    void slotProfileChanged(QString aProfileName, int aChangeType , QString aProfileAsXml);
 
     /*! \brief Starts a server plug-in
      *
@@ -288,7 +286,7 @@ private slots:
      *
      * @param aProfileName profile name
      */
-    void enableSOCSlot(const QString &aProfileName);
+    void enableSOCSlot(const QString& aProfileName);
 
     /*! \brief Adds a profile to sync scheduler
      *
@@ -312,12 +310,14 @@ private slots:
      */
     void removeScheduledSync(const QString &aProfileName);
 
-    /*! \brief Handles externalSyncChanged signal
+    /*! \brief Checks the status of external sync for a given profile, when the status
+     * changes(or aQuery param is set to true) or the profile is added for the first time 'syncedExternallyStatus' dbus signal
+     * will be emitted to notify possible clients.
      *
-     * @param aProfileName Name of the profile
+     * @param aProfile the profile that the state will be checked
      * @param aQuery When true 'syncedExternallyStatus' dbus signal will be emitted even if the state did not change.
      */
-    void externalSyncStatus(const QString &aProfileName, bool aQuery);
+    void externalSyncStatus(const SyncProfile *aProfile, bool aQuery=false);
 
     /*! \brief Triggers sync for profiles which were queued for sync due to profile changes. */
     void profileChangeTriggerTimeout();
@@ -352,30 +352,30 @@ private:
      *
      * @param resume, if true resume servers instead of starting them
      */
-    void startServers(bool resume = false);
+    void startServers( bool resume = false );
 
     /*! \brief Stop all server plug-ins
      *
      * @param suspend, if true suspend servers instead of stopping them
      */
-    void stopServers(bool suspend = false);
+    void stopServers( bool suspend = false );
 
     /*! \brief Helper function when backup/restore starts.
      *
      */
-    void backupRestoreStarts();
+     void backupRestoreStarts ();
 
     /*! \brief Helper function when backup/restore is done.
      *
      */
-    void backupRestoreFinished();
+     void backupRestoreFinished();
 
     /*! \brief Initializes sync scheduler
      *
      */
     void initializeScheduler();
 
-    bool isBackupRestoreInProgress();
+    bool isBackupRestoreInProgress ();
 
     /*! \brief Requests for a cleanup from the plugin for the given profileId
      *
@@ -397,51 +397,62 @@ private:
      *
      * @param aType the connection type;
      */
-    bool acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType, SyncProfile *profile) const;
+    bool acceptScheduledSync(bool aConnected, Sync::InternetConnectionType aType) const;
 
-    /*! \brief Checks the status of external sync for a given profile, when the status
-     * changes(or aQuery param is set to true) or the profile is added for the first time 'syncedExternallyStatus' dbus signal
-     * will be emitted to notify possible clients.
-     *
-     * @param aProfile the profile that the state will be checked
-     * @param aQuery When true 'syncedExternallyStatus' dbus signal will be emitted even if the state did not change.
-     */
-    void externalSyncStatus(const SyncProfile *aProfile, bool aQuery = false);
+    QMap<QString, SyncSession*> iActiveSessions;
 
-    QMap<QString, SyncSession *> iActiveSessions;
     QMap<QString, bool> iExternalSyncProfileStatus;
+
     QList<QString> iProfilesToRemove;
-    QMap<QString, ServerPluginRunner *> iServers;
+
+    QMap<QString, ServerPluginRunner*> iServers;
+
     QList<QString> iWaitingOnlineSyncs;
+
     NetworkManager *iNetworkManager;
+
     QMap<QString, int> iCountersStorage;
+
     PluginManager iPluginManager;
+
     ProfileManager iProfileManager;
+
     SyncQueue iSyncQueue;
+
     StorageBooker iStorageBooker;
+
     SyncScheduler *iSyncScheduler;
+
     SyncBackup *iSyncBackup;
+
     TransportTracker *iTransportTracker;
+
     ServerActivator *iServerActivator;
+
     AccountsHelper *iAccounts;
+
     bool iClosing;
+
     SyncOnChange iSyncOnChange;
+
     SyncOnChangeScheduler iSyncOnChangeScheduler;
 
     /*! \brief Save the counter for given profile
      *
      * @param aProfile profile to save counter
      */
-    void saveProfileCounter(const SyncProfile *aProfile);
+    void saveProfileCounter(const SyncProfile* aProfile);
 
     /*! \brief Restore the counter for given profile
      *
      * @param aProfile profile to restore counter
      */
-    void restoreProfileCounter(SyncProfile *aProfile);
+    void restoreProfileCounter(SyncProfile* aProfile);
 
     bool iSOCEnabled;
+
     QString iUUID;
+
     QString iRemoteName;
 
     /*

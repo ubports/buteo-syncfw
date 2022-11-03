@@ -2,7 +2,6 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2013 - 2021 Jolla Ltd.
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -25,9 +24,19 @@
 
 using namespace Buteo;
 
+extern "C" StoragePlugin* createPlugin( const QString& aPluginName )
+{
+    return new DummyStorage( aPluginName );
+}
 
-DummyStorage::DummyStorage( const QString &aPluginName )
-    : StoragePlugin( aPluginName )
+extern "C" void destroyPlugin( StoragePlugin* aStorage )
+{
+    delete aStorage;
+}
+
+
+DummyStorage::DummyStorage( const QString& aPluginName )
+ : StoragePlugin( aPluginName )
 {
 
 }
@@ -37,7 +46,7 @@ DummyStorage::~DummyStorage()
 
 }
 
-bool DummyStorage::init( const QMap<QString, QString> & /*aProperties*/ )
+bool DummyStorage::init( const QMap<QString, QString>& /*aProperties*/ )
 {
     return true;
 }
@@ -47,113 +56,106 @@ bool DummyStorage::uninit()
     return true;
 }
 
-bool DummyStorage::getAllItems( QList<StorageItem *> & /*aItems*/ )
+bool DummyStorage::getAllItems( QList<StorageItem*>& /*aItems*/ )
 {
     return true;
 }
 
-bool DummyStorage::getNewItems( QList<StorageItem *> & /*aNewItems*/, const QDateTime & /*aTime*/ )
+bool DummyStorage::getNewItems( QList<StorageItem*>& /*aNewItems*/, const QDateTime& /*aTime*/ )
 {
     return true;
 }
 
-bool DummyStorage::getModifiedItems( QList<StorageItem *> & /*aModifiedItems*/, const QDateTime & /*aTime*/ )
+bool DummyStorage::getModifiedItems( QList<StorageItem*>& /*aModifiedItems*/, const QDateTime& /*aTime*/ )
 {
     return true;
 }
 
-bool DummyStorage::getDeletedItems( QList<StorageItem *> & /*aDeletedItems*/, const QDateTime & /*aTime*/ )
+bool DummyStorage::getDeletedItems( QList<StorageItem*>& /*aDeletedItems*/, const QDateTime& /*aTime*/ )
 {
     return true;
 }
 
-bool DummyStorage::getAllItemIds( QList<QString> & /*aItems*/ )
+bool DummyStorage::getAllItemIds( QList<QString>& /*aItems*/ )
 {
     return true;
 }
 
-bool DummyStorage::getNewItemIds( QList<QString> & /*aNewItems*/, const QDateTime & /*aTime*/ )
+bool DummyStorage::getNewItemIds( QList<QString>& /*aNewItems*/, const QDateTime& /*aTime*/ )
 {
     return true;
 }
 
-bool DummyStorage::getModifiedItemIds( QList<QString> & /*aModifiedItems*/, const QDateTime & /*aTime*/ )
+bool DummyStorage::getModifiedItemIds( QList<QString>& /*aModifiedItems*/, const QDateTime& /*aTime*/ )
 {
     return true;
 }
 
-bool DummyStorage::getDeletedItemIds( QList<QString> & /*aDeletedItems*/, const QDateTime & /*aTime*/ )
+bool DummyStorage::getDeletedItemIds( QList<QString>& /*aDeletedItems*/, const QDateTime& /*aTime*/ )
 {
     return true;
 }
 
-StorageItem *DummyStorage::newItem()
+StorageItem* DummyStorage::newItem()
 {
-    return nullptr;
+    return NULL;
 }
 
-StorageItem *DummyStorage::getItem( const QString & /*aItemId*/ )
+StorageItem* DummyStorage::getItem( const QString& /*aItemId*/ )
 {
-    return nullptr;
+    return NULL;
 }
 
-QList<StorageItem *> DummyStorage::getItems(const QStringList & /*aItemIdList*/ )
+QList<StorageItem*> DummyStorage::getItems(const QStringList& aItemIdList )
 {
-    QList<StorageItem *> items;
+    QList<StorageItem*> items;
     return items;
 }
 
-StoragePlugin::OperationStatus DummyStorage::addItem( StorageItem & /*aItem*/ )
+StoragePlugin::OperationStatus DummyStorage::addItem( StorageItem& /*aItem*/ )
 {
     return STATUS_OK;
 }
 
-QList<StoragePlugin::OperationStatus> DummyStorage::addItems( const QList<StorageItem *> &aItems )
+QList<StoragePlugin::OperationStatus> DummyStorage::addItems( const QList<StorageItem*>& aItems )
 {
     QList<OperationStatus> statuses;
 
-    for ( int i = 0; i < aItems.count(); ++i ) {
+    for( int i = 0; i < aItems.count(); ++i ) {
         statuses.append( STATUS_OK );
     }
 
     return statuses;
 }
 
-StoragePlugin::OperationStatus DummyStorage::modifyItem( StorageItem & /*aItem*/ )
+StoragePlugin::OperationStatus DummyStorage::modifyItem( StorageItem& /*aItem*/ )
 {
     return STATUS_OK;
 }
 
-QList<StoragePlugin::OperationStatus> DummyStorage::modifyItems( const QList<StorageItem *> &aItems )
+QList<StoragePlugin::OperationStatus> DummyStorage::modifyItems( const QList<StorageItem*>& aItems )
 {
     QList<OperationStatus> statuses;
 
-    for ( int i = 0; i < aItems.count(); ++i ) {
+    for( int i = 0; i < aItems.count(); ++i ) {
         statuses.append( STATUS_OK );
     }
 
     return statuses;
 }
 
-StoragePlugin::OperationStatus DummyStorage::deleteItem( const QString & /*aItemId*/ )
+StoragePlugin::OperationStatus DummyStorage::deleteItem( const QString& /*aItemId*/ )
 {
     return STATUS_OK;
 }
 
-QList<StoragePlugin::OperationStatus> DummyStorage::deleteItems( const QList<QString> &aItemIds )
+QList<StoragePlugin::OperationStatus> DummyStorage::deleteItems( const QList<QString>& aItemIds )
 {
     QList<OperationStatus> statuses;
 
-    for ( int i = 0; i < aItemIds.count(); ++i ) {
+    for( int i = 0; i < aItemIds.count(); ++i ) {
         statuses.append( STATUS_OK );
     }
 
     return statuses;
 }
-
-
-StoragePlugin *DummyStorageLoader::createPlugin( const QString &aPluginName )
-{
-    return new DummyStorage( aPluginName );
-}
-

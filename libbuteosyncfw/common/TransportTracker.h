@@ -2,7 +2,6 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- *               2019 Updated to use bluez5 by deloptes@gmail.com
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -31,9 +30,8 @@
 #include <QMutex>
 #include <QDBusVariant>
 #include <QDBusConnection>
-
-#ifdef HAVE_BLUEZ_5
-#include <BtCommon.h>
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#include <QtSystemInfo/QSystemDeviceInfo>
 #endif
 
 namespace Buteo {
@@ -48,25 +46,25 @@ class NetworkManager;
  */
 class TransportTracker : public QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
 public:
 
-    /*! \brief Constructor
-     *
-     * @param aParent Parent object
-     */
-    TransportTracker(QObject *aParent = 0);
+        /*! \brief Constructor
+         *
+         * @param aParent Parent object
+         */
+        TransportTracker(QObject *aParent = 0);
 
-    //! \brief Destructor
-    virtual ~TransportTracker();
+        //! \brief Destructor
+        virtual ~TransportTracker();
 
-    /*! \brief Checks the state of the given connectivity type
-     *
-     * @param aType Connectivity type
-     * @return True if available, false if not
-     */
-    bool isConnectivityAvailable(Sync::ConnectivityType aType) const;
+        /*! \brief Checks the state of the given connectivity type
+         *
+         * @param aType Connectivity type
+         * @return True if available, false if not
+         */
+        bool isConnectivityAvailable(Sync::ConnectivityType aType) const;
 
 signals:
 
@@ -75,7 +73,7 @@ signals:
      * @param aType Connectivity type whose state has changed
      * @param aState New state. True if available, false if not.
      */
-    void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
+        void connectivityStateChanged(Sync::ConnectivityType aType, bool aState);
 
     /*! \brief Signal emitted when a n/w state changes
      *
@@ -94,14 +92,12 @@ signals:
 
 private slots:
 
-    void onUsbStateChanged(bool aConnected);
+        void onUsbStateChanged(bool aConnected);
 
-#ifdef HAVE_BLUEZ_5
-    void onBtStateChanged(QString interface, QVariantMap changed, QStringList invalidated);
-
-    void onBtInterfacesAdded(const QDBusObjectPath &path, const InterfacesMap interfaces);
-
-    void onBtInterfacesRemoved(const QDBusObjectPath &path, const QStringList interfaces);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    void onBtStateChanged(bool aState);
+#else
+    void onBtStateChanged(QString aKey, QDBusVariant aValue);
 #endif
 
     void onInternetStateChanged(bool aConnected, Sync::InternetConnectionType aType);
@@ -112,30 +108,31 @@ private:
 
     USBModedProxy *iUSBProxy;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    QtMobility::QSystemDeviceInfo iDeviceInfo;
+#endif
+
     NetworkManager *iInternet;
-    QDBusConnection iSystemBus;
-    QString iDefaultBtAdapter;
+    QDBusConnection *iSystemBus;
 
     mutable QMutex iMutex;
 
-    /*! \brief updates the state of the given connectivity type to input value
-     *
-     * @param aType Connectivity type
-     * @param aState Connectivity State
-     */
-    void updateState(Sync::ConnectivityType aType, bool aState);
+        /*! \brief updates the state of the given connectivity type to input value
+         *
+         * @param aType Connectivity type
+         * @param aState Connectivity State
+         */
+        void updateState(Sync::ConnectivityType aType, bool aState);
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class TransportTrackerTest;
     friend class SynchronizerTest;
 #endif
 
-#ifdef HAVE_BLUEZ_5
     bool btConnectivityStatus();
-#endif
 
 };
 
-} // namespace Buteo
+}
 
 #endif /* TRANSPORTTRACKER_H_ */

@@ -2,7 +2,6 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- *               2019 Updated to use bluez5 by deloptes@gmail.com
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -39,7 +38,7 @@ TransportTracker::TransportTracker(QObject *aParent) :
     QObject(aParent),
     iUSBProxy(0),
     iInternet(0),
-    iSystemBus(QDBusConnection::systemBus())
+    iSystemBus(0)
 {
     FUNCTION_CALL_TRACE;
 
@@ -50,72 +49,68 @@ TransportTracker::TransportTracker(QObject *aParent) :
 #if __USBMODED__
     // USB
     iUSBProxy = new USBModedProxy(this);
-    if (!iUSBProxy->isValid()) {
+    if (!iUSBProxy->isValid())
+    {
         LOG_CRITICAL("Failed to connect to USB moded D-Bus interface");
         delete iUSBProxy;
-        iUSBProxy = nullptr;
-    } else {
+        iUSBProxy = NULL;
+    }
+    else
+    {
         QObject::connect(iUSBProxy, SIGNAL(usbConnection(bool)), this,
-                         SLOT(onUsbStateChanged(bool)));
+            SLOT(onUsbStateChanged(bool)));
         iTransportStates[Sync::CONNECTIVITY_USB] =
             iUSBProxy->isUSBConnected();
     }
 #endif
 
-#ifdef HAVE_BLUEZ_5
     // BT
-    qDBusRegisterMetaType <InterfacesMap> ();
-    qDBusRegisterMetaType <ObjectsMap> ();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 
-    // listen for added interfaces
-    if (!iSystemBus.connect(BT::BLUEZ_DEST,
-                     QString("/"),
-                     BT::BLUEZ_MANAGER_INTERFACE,
-                     BT::INTERFACESADDED,
+    // Set the bluetooth state
+    iTransportStates[Sync::CONNECTIVITY_BT] = btConnectivityStatus();
+
+    // Add signal to track the bluetooth state changes
+    iSystemBus = new QDBusConnection(QDBusConnection::connectToBus(QDBusConnection::SystemBus,
+                                                                    QStringLiteral("buteo_system_bus")));
+    if (!iSystemBus->connect("org.bluez",
+                     "",
+                     "org.bluez.Adapter",
+                     "PropertyChanged",
                      this,
-                     SLOT(onBtInterfacesAdded(QDBusObjectPath, InterfacesMap)))) {
-        LOG_WARNING("Failed to connect InterfacesAdded signal");
+                     SLOT(onBtStateChanged(QString, QDBusVariant)
+                     )))
+    {
+        LOG_WARNING("Unable to connect to system bus for org.bluez.Adapter");
     }
 
-    if (!iSystemBus.connect(BT::BLUEZ_DEST,
-                     QString("/"),
-                     BT::BLUEZ_MANAGER_INTERFACE,
-                     BT::INTERFACESREMOVED,
-                     this,
-                     SLOT(onBtInterfacesRemoved(QDBusObjectPath, QStringList)))) {
-        LOG_WARNING("Failed to connect InterfacesRemoved signal");
-    }
-
-    // get the initial state
-    if (btConnectivityStatus()) {
-        if (!iSystemBus.connect(BT::BLUEZ_DEST,
-                iDefaultBtAdapter,
-                BT::BLUEZ_PROPERTIES_INTERFACE,
-                BT::PROPERTIESCHANGED,
-                this,
-                SLOT(onBtStateChanged(QString, QVariantMap, QStringList)))) {
-            LOG_WARNING("Failed to connect PropertiesChanged signal");
-        }
-        // Set the bluetooth state to on
-        iTransportStates[Sync::CONNECTIVITY_BT] = true;
-    } else {
-        LOG_WARNING("The BT adapter is powered off or missing");
-    }
+#else
+    iTransportStates[Sync::CONNECTIVITY_BT] = iDeviceInfo.currentBluetoothPowerState();
+    QObject::connect(&iDeviceInfo, SIGNAL(bluetoothStateChanged(bool)), this, SLOT(onBtStateChanged(bool)));
+    LOG_DEBUG("Current bluetooth power state"<<iDeviceInfo.currentBluetoothPowerState());
 #endif
 
     // Internet
     // @todo: enable when internet state is reported correctly.
     iInternet = new NetworkManager(this);
-    iTransportStates[Sync::CONNECTIVITY_INTERNET] =
+    if (iInternet != 0)
+    {
+        iTransportStates[Sync::CONNECTIVITY_INTERNET] =
             iInternet->isOnline();
-    connect(iInternet,
-            SIGNAL(statusChanged(bool, Sync::InternetConnectionType)),
-            SLOT(onInternetStateChanged(bool, Sync::InternetConnectionType)) /*, Qt::QueuedConnection*/);
+        connect(iInternet,
+                SIGNAL(statusChanged(bool, Sync::InternetConnectionType)),
+                SLOT(onInternetStateChanged(bool, Sync::InternetConnectionType)) /*, Qt::QueuedConnection*/);
+    }
+    else
+    {
+        LOG_WARNING("Failed to listen for Internet state changes");
+    }
 }
 
 TransportTracker::~TransportTracker()
 {
     FUNCTION_CALL_TRACE;
+    delete iSystemBus;
 }
 
 bool TransportTracker::isConnectivityAvailable(Sync::ConnectivityType aType) const
@@ -135,88 +130,26 @@ void TransportTracker::onUsbStateChanged(bool aConnected)
     updateState(Sync::CONNECTIVITY_USB, aConnected);
 }
 
-#ifdef HAVE_BLUEZ_5
-void TransportTracker::onBtStateChanged(QString interface, QVariantMap changed, QStringList invalidated)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+void TransportTracker::onBtStateChanged(bool aState)
 {
     FUNCTION_CALL_TRACE;
 
-    Q_UNUSED(invalidated);
-
-    if (interface == BT::BLUEZ_ADAPTER_INTERFACE) {
-        for (QVariantMap::iterator i = changed.begin(); i != changed.end(); ++i) {
-            if (i.key() == "Powered") {
-                bool btOn = i.value().toBool();
-                LOG_INFO("BT power state " << btOn);
-                updateState(Sync::CONNECTIVITY_BT, btOn);
-            }
-        }
-    }
+    Q_UNUSED(aState);
+    bool btPowered = iDeviceInfo.currentBluetoothPowerState();
+    LOG_DEBUG("BT power state" << btPowered);
+    updateState(Sync::CONNECTIVITY_BT, btPowered);
 }
-
-void TransportTracker::onBtInterfacesAdded(const QDBusObjectPath &path, const InterfacesMap interfaces)
+#else
+void TransportTracker::onBtStateChanged(QString aKey, QDBusVariant aValue)
 {
     FUNCTION_CALL_TRACE;
 
-    for (InterfacesMap::const_iterator i = interfaces.cbegin(); i != interfaces.cend(); ++i) {
-        if (i.key() == BT::BLUEZ_ADAPTER_INTERFACE) {
-
-            // do not process other interfaces after default one was selected
-            if (!iDefaultBtAdapter.isEmpty())
-                break;
-
-            iDefaultBtAdapter = path.path();
-            LOG_DEBUG(BT::BLUEZ_ADAPTER_INTERFACE << "interface" << iDefaultBtAdapter);
-
-            QDBusInterface adapter(BT::BLUEZ_DEST,
-                    iDefaultBtAdapter,
-                    BT::BLUEZ_ADAPTER_INTERFACE,
-                    iSystemBus);
-
-            if (!iSystemBus.connect(BT::BLUEZ_DEST,
-                    iDefaultBtAdapter,
-                    BT::BLUEZ_PROPERTIES_INTERFACE,
-                    BT::PROPERTIESCHANGED,
-                    this,
-                    SLOT(onBtStateChanged(QString, QVariantMap, QStringList)))) {
-                LOG_WARNING("Failed to connect PropertiesChanged signal");
-
-            }
-
-            if (adapter.isValid()) {
-                updateState(Sync::CONNECTIVITY_BT, adapter.property("Powered").toBool());
-                LOG_INFO("BT state changed" << adapter.property("Powered").toBool());
-            }
-        }
-    }
-}
-
-void TransportTracker::onBtInterfacesRemoved(const QDBusObjectPath &path, const QStringList interfaces)
-{
-    FUNCTION_CALL_TRACE;
-
-    for (QStringList::const_iterator i = interfaces.cbegin(); i != interfaces.cend(); ++i) {
-        if (*i == BT::BLUEZ_ADAPTER_INTERFACE) {
-
-            if (path.path() != iDefaultBtAdapter)
-                continue;
-
-            LOG_DEBUG("DBus adapter path: " << iDefaultBtAdapter );
-
-            if (!iSystemBus.disconnect(BT::BLUEZ_DEST,
-                    iDefaultBtAdapter,
-                    BT::BLUEZ_PROPERTIES_INTERFACE,
-                    BT::PROPERTIESCHANGED,
-                    this,
-                    SLOT(onBtStateChanged(QString,QVariantMap,QStringList)))) {
-                LOG_WARNING("Failed to disconnect PropertiesChanged signal");
-            } else {
-                LOG_DEBUG("'org.bluez.Adapter1' interface removed from " << path.path());
-            }
-
-            iDefaultBtAdapter = QString();
-
-            break;
-        }
+    if (aKey == "Powered")
+    {
+        bool btPowered = aValue.variant().toBool();
+        LOG_DEBUG("BT power state " << btPowered);
+        updateState(Sync::CONNECTIVITY_BT, btPowered);
     }
 }
 #endif
@@ -230,7 +163,8 @@ void TransportTracker::onInternetStateChanged(bool aConnected, Sync::InternetCon
     emit networkStateChanged(aConnected, aType);
 }
 
-void TransportTracker::updateState(Sync::ConnectivityType aType, bool aState)
+void TransportTracker::updateState(Sync::ConnectivityType aType,
+                                   bool aState)
 {
     FUNCTION_CALL_TRACE;
 
@@ -241,50 +175,71 @@ void TransportTracker::updateState(Sync::ConnectivityType aType, bool aState)
         oldState = iTransportStates[aType];
         iTransportStates[aType] = aState;
     }
-    if (oldState != aState) {
-        if (aType != Sync::CONNECTIVITY_INTERNET) {
+    if(oldState != aState)
+    {
+        if (aType != Sync::CONNECTIVITY_INTERNET)
+        {
             emit connectivityStateChanged(aType, aState);
         }
     }
 }
 
-#ifdef HAVE_BLUEZ_5
 bool TransportTracker::btConnectivityStatus()
 {
     FUNCTION_CALL_TRACE;
 
-    QDBusInterface  manager(BT::BLUEZ_DEST,
-            QString("/"),
-            BT::BLUEZ_MANAGER_INTERFACE,
-            iSystemBus);
+    bool btOn = false;
+    QDBusConnection *systemBus = new QDBusConnection(QDBusConnection::connectToBus(QDBusConnection::SystemBus,
+                                                                                    QStringLiteral("buteo_system_bus2")));
+    QDBusMessage methodCallMsg = QDBusMessage::createMethodCall("org.bluez",
+                                                                "/",
+                                                                "org.bluez.Manager",
+                                                                "DefaultAdapter");
 
-    QDBusReply<ObjectsMap> reply = manager.call(BT::GETMANAGEDOBJECTS);
-    if (!reply.isValid()) {
-        LOG_WARNING( "Failed to connect BT ObjectManager: " << reply.error().message() );
-        return false;
+    QDBusMessage reply = systemBus->call(methodCallMsg);
+    if (reply.type() == QDBusMessage::ErrorMessage)
+    {
+        LOG_WARNING("This device does not have a BT adapter");
+        delete systemBus;
+        return btOn;
     }
 
-    ObjectsMap objects = reply.value();
-    for (ObjectsMap::iterator i = objects.begin(); i != objects.end(); ++i) {
+    QList<QVariant> adapterList = reply.arguments();
+    // We will take the first adapter in the list
+    QString adapterPath = qdbus_cast<QDBusObjectPath>(adapterList.at(0)).path();
 
-        InterfacesMap ifaces = i.value();
-        for (InterfacesMap::const_iterator j = ifaces.cbegin(); j != ifaces.cend(); ++j) {
+    if (!adapterPath.isEmpty() || !adapterPath.isNull())
+    {
+        // Retrive the properties of the adapter and check for "Powered" key
+        methodCallMsg = QDBusMessage::createMethodCall("org.bluez",
+                                                       adapterPath,
+                                                       "org.bluez.Adapter",
+                                                       "GetProperties");
+        reply = systemBus->call(methodCallMsg);
+        if (reply.type() == QDBusMessage::ErrorMessage)
+        {
+            LOG_WARNING("Error in retrieving bluetooth properties");
+            delete systemBus;
+            return btOn;
+        }
 
-            if (j.key() == BT::BLUEZ_ADAPTER_INTERFACE) {
-                if (iDefaultBtAdapter.isEmpty() || iDefaultBtAdapter != i.key().path()) {
-                    iDefaultBtAdapter = i.key().path();
-                    LOG_DEBUG ("Using adapter path: " << iDefaultBtAdapter);
+        QDBusArgument arg = reply.arguments().at(0).value<QDBusArgument>();
+        if (arg.currentType() == QDBusArgument::MapType)
+        {
+            // Scan through the dict returned and check for "Powered" entry
+            QMap<QString,QVariant> dict = qdbus_cast<QMap<QString,QVariant> >(arg);
+            QMap<QString,QVariant>::iterator iter;
+            for(iter = dict.begin(); iter != dict.end(); ++iter)
+            {
+                if (iter.key() == "Powered")
+                {
+                    btOn = iter.value().toBool();
+                    LOG_DEBUG ("Bluetooth powered on? " << btOn);
+                    break;
                 }
-                QDBusInterface adapter(BT::BLUEZ_DEST,
-                        iDefaultBtAdapter,
-                        BT::BLUEZ_ADAPTER_INTERFACE,
-                        iSystemBus);
-
-                return adapter.property("Powered").toBool(); // use first adapter
             }
         }
     }
-
-    return false;
+    delete systemBus;
+    return btOn;
 }
-#endif

@@ -2,8 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2019 Jolla Ltd.
- * Copyright (C) 2020 Open Mobile Platform LLC.
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -40,8 +39,6 @@ const QString ATTR_READONLY("readonly");
 const QString ATTR_ADDED("added");
 const QString ATTR_DELETED("deleted");
 const QString ATTR_MODIFIED("modified");
-const QString ATTR_UID("uid");
-const QString ATTR_STATUS("status");
 const QString ATTR_TIME("time");
 const QString ATTR_INTERVAL("interval");
 const QString ATTR_BEGIN("begin");
@@ -62,9 +59,6 @@ const QString TAG_SYNC_RESULTS("syncresults");
 const QString TAG_SYNC_LOG("synclog");
 const QString TAG_LOCAL("local");
 const QString TAG_REMOTE("remote");
-const QString TAG_ADDED_ITEM("addedItem");
-const QString TAG_DELETED_ITEM("deletedItem");
-const QString TAG_MODIFIED_ITEM("modifiedItem");
 const QString TAG_SCHEDULE("schedule");
 const QString TAG_RUSH("rush");
 const QString TAG_ERROR_ATTEMPTS("attempts");
@@ -109,7 +103,6 @@ const QString KEY_STORAGE_UPDATED("storage_updated");
 const QString KEY_HTTP_PROXY_HOST("http_proxy_host");
 const QString KEY_HTTP_PROXY_PORT("http_proxy_port");
 const QString KEY_PROFILE_ID("profile_id");
-const QString KEY_INTERNET_CONNECTION_TYPES("internet_connection_types");
 
 const QString BOOLEAN_TRUE("true");
 const QString BOOLEAN_FALSE("false");

@@ -43,7 +43,7 @@ const QString ProfileField::TYPE_BOOLEAN = "boolean";
 class ProfileFieldPrivate
 {
 public:
-    //! \brief Constructor
+	//! \brief Constructor
     ProfileFieldPrivate();
 
     //! \brief Copy Constructor
@@ -76,23 +76,23 @@ public:
 using namespace Buteo;
 
 ProfileFieldPrivate::ProfileFieldPrivate()
-    :   iReadOnly(false)
+:   iReadOnly(false)
 {
 }
 
 ProfileFieldPrivate::ProfileFieldPrivate(const ProfileFieldPrivate &aSource)
-    :   iName(aSource.iName),
-        iType(aSource.iType),
-        iDefaultValue(aSource.iDefaultValue),
-        iOptions(aSource.iOptions),
-        iLabel(aSource.iLabel),
-        iVisible(aSource.iVisible),
-        iReadOnly(aSource.iReadOnly)
+:   iName(aSource.iName),
+    iType(aSource.iType),
+    iDefaultValue(aSource.iDefaultValue),
+    iOptions(aSource.iOptions),
+    iLabel(aSource.iLabel),
+    iVisible(aSource.iVisible),
+    iReadOnly(aSource.iReadOnly)
 {
 }
 
 ProfileField::ProfileField(const QDomElement &aRoot)
-    :   d_ptr(new ProfileFieldPrivate())
+:   d_ptr(new ProfileFieldPrivate())
 {
     d_ptr->iName = aRoot.attribute(ATTR_NAME);
     d_ptr->iType = aRoot.attribute(ATTR_TYPE);
@@ -100,30 +100,36 @@ ProfileField::ProfileField(const QDomElement &aRoot)
     d_ptr->iLabel = aRoot.attribute(ATTR_LABEL);
     d_ptr->iVisible = aRoot.attribute(ATTR_VISIBLE);
     d_ptr->iReadOnly = (aRoot.attribute(ATTR_READONLY).compare(
-                            BOOLEAN_TRUE, Qt::CaseInsensitive) == 0);
+        BOOLEAN_TRUE, Qt::CaseInsensitive) == 0);
 
     // Parse options.
     QDomElement option = aRoot.firstChildElement(TAG_OPTION);
-    for (; !option.isNull(); option = option.nextSiblingElement(TAG_OPTION)) {
+    for (; !option.isNull(); option = option.nextSiblingElement(TAG_OPTION))
+    {
         QString optionStr = option.text();
-        if (!optionStr.isEmpty()) {
+        if (!optionStr.isEmpty())
+        {
             d_ptr->iOptions.append(optionStr);
-        } else {
+        }
+        else
+        {
             // Empty value.
         }
     }
 
     // Options for boolean type are inserted automatically.
-    if (d_ptr->iOptions.empty()) {
-        if (d_ptr->iType == TYPE_BOOLEAN) {
+    if (d_ptr->iOptions.empty())
+    {
+        if (d_ptr->iType == TYPE_BOOLEAN)
+        {
             d_ptr->iOptions.append(BOOLEAN_TRUE);
             d_ptr->iOptions.append(BOOLEAN_FALSE);
-        }
-    }
+        } // no else
+    } // no else
 }
 
 ProfileField::ProfileField(const ProfileField &aSource)
-    :   d_ptr(new ProfileFieldPrivate(*aSource.d_ptr))
+:   d_ptr(new ProfileFieldPrivate(*aSource.d_ptr))
 {
 }
 
@@ -163,9 +169,12 @@ bool ProfileField::validate(const QString &aValue) const
     // Value is valid if it exists in the list of options,
     // or if options have not been defined.
     if (!aValue.isEmpty() &&
-            (d_ptr->iOptions.contains(aValue) || d_ptr->iOptions.empty())) {
+        (d_ptr->iOptions.contains(aValue) || d_ptr->iOptions.empty()))
+    {
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
@@ -182,26 +191,33 @@ QDomElement ProfileField::toXml(QDomDocument &aDoc) const
     if (d_ptr->iReadOnly)
         root.setAttribute(ATTR_READONLY, BOOLEAN_TRUE);
 
-    if (d_ptr->iType == TYPE_BOOLEAN) {
+    if (d_ptr->iType == TYPE_BOOLEAN)
+    {
         // No need to specify true/false options, field parser will add
         // them automatically.
-    } else if (!d_ptr->iOptions.isEmpty()) {
-        foreach (QString optionStr, d_ptr->iOptions) {
+    }
+    else if (!d_ptr->iOptions.isEmpty())
+    {
+        foreach (QString optionStr, d_ptr->iOptions)
+        {
             QDomElement e = aDoc.createElement(TAG_OPTION);
             QDomText t = aDoc.createTextNode(optionStr);
             e.appendChild(t);
             root.appendChild(e);
         }
-    }
+    } // no else
 
     return root;
 }
 
 QString ProfileField::visible() const
 {
-    if (d_ptr->iVisible.isEmpty()) {
+    if (d_ptr->iVisible.isEmpty())
+    {
         return VISIBLE_USER;
-    } else {
+    }
+    else
+    {
         return d_ptr->iVisible;
     }
 }

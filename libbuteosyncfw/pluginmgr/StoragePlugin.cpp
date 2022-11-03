@@ -24,8 +24,8 @@
 
 using namespace Buteo;
 
-StoragePlugin::StoragePlugin(const QString &aPluginName)
-    : iPluginName(aPluginName)
+StoragePlugin::StoragePlugin( const QString& aPluginName ) :
+  iPluginName( aPluginName )
 {
 }
 
@@ -33,12 +33,12 @@ StoragePlugin::~StoragePlugin()
 {
 }
 
-const QString &StoragePlugin::getPluginName() const
+const QString& StoragePlugin::getPluginName() const
 {
     return iPluginName;
 }
 
-QString StoragePlugin::getProperty(const QString &aProperty) const
+QString StoragePlugin::getProperty( const QString& aProperty ) const
 {
     QString returnValue = "";
 
@@ -48,7 +48,7 @@ QString StoragePlugin::getProperty(const QString &aProperty) const
     return returnValue;
 }
 
-void StoragePlugin::getProperties(QMap<QString, QString> &aProperties) const
+void StoragePlugin::getProperties( QMap<QString, QString>& aProperties ) const
 {
     aProperties = iProperties;
 }

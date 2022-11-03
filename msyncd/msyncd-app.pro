@@ -16,16 +16,25 @@ INCLUDEPATH += . \
     ../libbuteosyncfw/pluginmgr \
     ../libbuteosyncfw/common \
     ../libbuteosyncfw/profile
-PRE_TARGETDEPS += libmsyncd.a
 
 
-PKGCONFIG += dbus-1 libsignon-qt5 accounts-qt5
-LIBS += -lbuteosyncfw5
-packagesExist(qt5-boostable) {
-    DEFINES += HAS_BOOSTER
-    PKGCONFIG += qt5-boostable
-} else {
-    warning("qt5-boostable not available; startup times will be slower")
+PKGCONFIG += dbus-1
+
+equals(QT_MAJOR_VERSION, 4): {
+    PKGCONFIG += libsignon-qt accounts-qt
+    CONFIG += mobility
+    MOBILITY += systeminfo
+    LIBS += -lbuteosyncfw
+}
+equals(QT_MAJOR_VERSION, 5): {
+    PKGCONFIG += libsignon-qt5 accounts-qt5 Qt5SystemInfo
+    LIBS += -lbuteosyncfw5
+    packagesExist(qt5-boostable) {
+        DEFINES += HAS_BOOSTER
+        PKGCONFIG += qt5-boostable
+    } else {
+        warning("qt5-boostable not available; startup times will be slower")
+    }
 }
 
 QMAKE_LIBDIR_QT += ../libsyncprofile/
@@ -50,8 +59,8 @@ target.path = /usr/bin/
 loglevel.files = bin/set_sync_log_level
 loglevel.path = /etc/buteo/
 service.files = bin/msyncd.service
-service.path = /usr/lib/systemd/user/
 upstart.files = bin/msyncd.conf
+service.path = /usr/lib/systemd/user/
 upstart.path = /usr/share/upstart/sessions/
 syncwidget.path = /etc/syncwidget/
 syncwidget.files = com.meego.msyncd
@@ -61,8 +70,8 @@ INSTALLS += target \
     loglevel \
     syncwidget \
     service \
-    upstart \
-    gschemas
+    gschemas \
+    upstart
 
 # #####################################################################
 # make coverage (debug)

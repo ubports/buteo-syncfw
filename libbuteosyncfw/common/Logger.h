@@ -35,7 +35,7 @@
 
 
 namespace Buteo {
-
+    
 /*!
  * \brief A logger singleton class.
  *
@@ -48,9 +48,9 @@ namespace Buteo {
 class Q_DECL_EXPORT Logger
 {
 public:
-
+    
     static const int NUM_LEVELS = 4;
-
+    
     //! Default indent size.
     static const int DEFAULT_INDENT_SIZE;
 
@@ -135,10 +135,7 @@ public:
      */
     int getLogLevel() const;
 
-    bool enabled()
-    {
-        return iEnabled;
-    }
+    bool enabled(){return iEnabled;}
 
 private:
     Logger(const QString &aLogFileName, bool aUseStdOut, int aIndentSize);
@@ -147,16 +144,25 @@ private:
 
     static Logger *sInstance;
 
-    QBitArray iEnabledLevels;
-    int iIndentLevel;
-    int iIndentSize;
-    QFile iFile;
+    QBitArray   iEnabledLevels;
+
+    int         iIndentLevel;
+
+    int         iIndentSize;
+
+    QFile       iFile;
+
     QTextStream *iFileStream;
+
     QTextStream *iStdOutStream;
+
     QTextStream *iStdErrStream;
-    QMutex iMutex;
-    bool iEnabled;
-    int iLogLevel;
+
+    QMutex      iMutex;
+
+    bool        iEnabled;
+
+    int         iLogLevel;
 };
 
 }

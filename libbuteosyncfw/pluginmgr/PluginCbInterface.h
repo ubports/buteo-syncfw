@@ -31,7 +31,7 @@ namespace Buteo {
 
 class StoragePlugin;
 class Profile;
-
+             
 /*! \brief Interface which client and server plugins can use to communicate with
  *         synchronization daemon
  */
@@ -73,7 +73,7 @@ public:
      * \param aPluginName Name of the storage plug-in to create.
      * \return Created plug-in instance. NULL if failed.
      */
-    virtual StoragePlugin *createStorage(const QString &aPluginName) = 0;
+    virtual StoragePlugin* createStorage(const QString &aPluginName) = 0;
 
     /*! \brief Destroys the given storage plug-in instance.
      *
@@ -86,7 +86,7 @@ public:
      * @param aType Type of connectivity domain
      * @return True if connectivity domain is available, otherwise false
      */
-    virtual bool isConnectivityAvailable(Sync::ConnectivityType aType) = 0;
+    virtual bool isConnectivityAvailable( Sync::ConnectivityType aType ) = 0;
 
     /*! \brief tries to fetch a profile object based on the remote party's
      * address (BT address for eg)
@@ -94,7 +94,7 @@ public:
      * @param aAddress remote party's address
      * @return profile object - to be deleted by caller
      */
-    virtual Profile *getSyncProfileByRemoteAddress(const QString &aAddress) = 0;
+    virtual Profile* getSyncProfileByRemoteAddress(const QString& aAddress) = 0;
 
     /*! \brief Get a value for a property describing the remote device
      *
@@ -102,7 +102,7 @@ public:
      * @param aKey profile key identifying the property
      * @return value for the property
      */
-    virtual QString getValue(const QString &aAddress, const QString &aKey) = 0;
+    virtual QString getValue(const QString& aAddress, const QString& aKey) = 0;
 };
 
 }

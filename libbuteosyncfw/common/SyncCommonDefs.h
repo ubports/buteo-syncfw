@@ -26,12 +26,18 @@
 
 #include <QMetaType>
 #include <QDir>
-#include <QStandardPaths>
 #include <QtNetwork/QNetworkConfiguration>
 
 namespace Sync {
 
-const QString syncCacheDir();
+#ifdef __GNUC__
+static const QString syncCacheDir() __attribute__ ((unused));
+#endif
+static const QString syncCacheDir()
+{
+    const QString HOME_PATH = (::getenv("XDG_CACHE_HOME") == NULL) ? QDir::homePath() + QDir::separator() + ".cache" : ::getenv("XDG_CACHE_HOME");
+    return HOME_PATH + QDir::separator() + "msyncd";
+}
 
 enum SyncStatus {
     SYNC_QUEUED = 0,
@@ -55,7 +61,7 @@ enum SyncStatus {
 // UI needs to display a detailed Progress for the Current ongoing sync
 enum SyncProgressDetail {
     SYNC_PROGRESS_INITIALISING = 201,
-    SYNC_PROGRESS_SENDING_ITEMS,
+    SYNC_PROGRESS_SENDING_ITEMS ,
     SYNC_PROGRESS_RECEIVING_ITEMS,
     SYNC_PROGRESS_FINALISING
 };
@@ -92,20 +98,6 @@ enum InternetConnectionType {
     INTERNET_CONNECTION_WIMAX = QNetworkConfiguration::BearerWiMAX,
     INTERNET_CONNECTION_EVDO = QNetworkConfiguration::BearerEVDO,
     INTERNET_CONNECTION_LTE = QNetworkConfiguration::BearerLTE
-};
-
-// These are values that can be used for the SyncSchedule::interval, to specify sync intervals
-// that should be specially handled (instead of treating them as minute intervals). This allows
-// special intervals to be handled without additional SyncSchedule attributes.
-enum ExtendedSyncInterval : unsigned int {
-    // Sync is scheduled one month after the last successful sync.
-    SYNC_INTERVAL_MONTHLY = 365 * 24 * 60 * 2,   // Start the named interval values at an unlikely minute-based interval ((365 * 24 * 60 * 2) = 1051200 minutes = 2 years)
-
-    // Sync is scheduled on the first day of each month.
-    SYNC_INTERVAL_FIRST_DAY_OF_MONTH,
-
-    // Sync is scheduled on the last day of each month.
-    SYNC_INTERVAL_LAST_DAY_OF_MONTH
 };
 
 } // namespace Sync

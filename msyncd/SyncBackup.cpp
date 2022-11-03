@@ -31,32 +31,40 @@
 
 using namespace Buteo;
 
-const char *SyncBackup::DBUS_BACKUP_OBJECT = "/backup";
+const char* SyncBackup::DBUS_BACKUP_OBJECT = "/backup";
 const QString BACKUP_SERVICE_NAME = "com.nokia.backup";
 
 SyncBackup::SyncBackup() :
-    iBackupRestore(false),
-    iReply(0),
-    iWatchService(0),
-    iAdaptor(0)
+	iBackupRestore(false),
+	iReply(0),
+        iWatchService(0),
+        iAdaptor(0) 
 {
     FUNCTION_CALL_TRACE;
-
+   
     iAdaptor = new SyncBackupAdaptor(this);
+    if (!iAdaptor) {
+    	LOG_CRITICAL("Failed to initialize adaptor");
+	Q_ASSERT(false);
+    }
 
     QDBusConnection dbus = QDBusConnection::sessionBus();
 
     if (dbus.registerObject(DBUS_BACKUP_OBJECT, this)) {
-        LOG_DEBUG("Registered sync backup to D-Bus");
+	    LOG_DEBUG("Registered sync backup to D-Bus");
     } else {
-        LOG_CRITICAL("Failed to register sync backup to D-Bus");
-        Q_ASSERT(false);
+	    LOG_CRITICAL("Failed to register sync backup to D-Bus");
+            Q_ASSERT(false); 
+    }
+    
+    iWatchService = new QDBusServiceWatcher (BACKUP_SERVICE_NAME , dbus, QDBusServiceWatcher::WatchForUnregistration);
+    if (!iWatchService) {
+    	LOG_CRITICAL("Failed to initialize watch service : backup");
+	Q_ASSERT(false);
     }
 
-    iWatchService = new QDBusServiceWatcher (BACKUP_SERVICE_NAME, dbus, QDBusServiceWatcher::WatchForUnregistration);
-
-    connect(iWatchService, SIGNAL(serviceUnregistered(const QString &)),
-            this, SLOT(backupServiceUnregistered(const QString &)));
+    connect(iWatchService, SIGNAL(serviceUnregistered(const QString&)),
+		    this, SLOT(backupServiceUnregistered(const QString&)));
 }
 
 SyncBackup::~SyncBackup()
@@ -73,15 +81,15 @@ SyncBackup::~SyncBackup()
     LOG_DEBUG("Unregistered backup from D-Bus");
 }
 
-void SyncBackup::backupServiceUnregistered(const QString  &serviceName)
+void SyncBackup::backupServiceUnregistered(const QString  &serviceName) 
 {
-    FUNCTION_CALL_TRACE;
-    Q_UNUSED (serviceName);
-    if (iBackupRestore) {
-        // Should not happen ; backup framework exited abruptly
-        iBackupRestore = false;
-        emit restoreDone();
-    }
+	FUNCTION_CALL_TRACE;
+	Q_UNUSED (serviceName);
+	if (iBackupRestore) {
+	// Should not happen ; backup framework exitted abruptly
+		emit restoreDone();
+	}
+	iBackupRestore = false;
 }
 
 uchar SyncBackup::sendDelayReply (const QDBusMessage &message)
@@ -89,12 +97,12 @@ uchar SyncBackup::sendDelayReply (const QDBusMessage &message)
     FUNCTION_CALL_TRACE;
 
     if (SYNCFW_UNIT_TESTS_RUNTIME)
-        return 0;
+         return 0;
 
     // coverity[unreachable]  //Suppressing false positives with code annotations
     message.setDelayedReply(true);
     if (!iReply)
-        iReply = new QDBusMessage;
+	    iReply = new QDBusMessage;
     *iReply = message.createReply();
     return 0;
 }
@@ -104,18 +112,18 @@ void SyncBackup::sendReply (uchar aResult)
     FUNCTION_CALL_TRACE;
 
     if (SYNCFW_UNIT_TESTS_RUNTIME)
-        return ;
+         return ;
 
     // coverity[unreachable]  //Suppressing false positives with code annotations
     if (iReply) {
-        LOG_DEBUG ("Send Reply");
-        QList<QVariant>  arguments;
-        QVariant vt = QVariant::fromValue((uchar)aResult);
-        arguments.append(vt);
-        iReply->setArguments(arguments);
-        QDBusConnection::sessionBus().send(*iReply);
-        delete iReply;
-        iReply = 0;
+	    LOG_DEBUG ("Send Reply");
+	    QList<QVariant>  arguments;
+	    QVariant vt = QVariant::fromValue((uchar)aResult);
+            arguments.append(vt);
+            iReply->setArguments(arguments);
+	    QDBusConnection::sessionBus().send(*iReply);
+	    delete iReply;
+	    iReply = 0;
     }
 }
 
@@ -156,9 +164,9 @@ uchar SyncBackup::restoreFinished(const QDBusMessage &message)
     emit restoreDone();
     return 0;
 }
-
+    
 bool SyncBackup::getBackUpRestoreState()
 {
     FUNCTION_CALL_TRACE;
-    return iBackupRestore;
+    return iBackupRestore;    
 }

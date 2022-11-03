@@ -21,8 +21,7 @@ cd "${TMP_DIR}"
 export LD_LIBRARY_PATH="${TESTS_DIR}:${LD_LIBRARY_PATH}"
 
 # Accept both absolute and relative path to test executable
-TESTDIR=$(cd "${TESTS_DIR}"; readlink -f "${1}")
-TEST=$(basename ${1})
+TEST="$(cd "${TESTS_DIR}"; readlink -f "${1}")"
 shift
 
-exec "${TESTDIR}/${TEST}" "${@}" -maxwarnings 0
+exec "${TEST}" "${@}" -maxwarnings 0

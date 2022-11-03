@@ -28,21 +28,24 @@
 using namespace Buteo;
 
 ServerActivator::ServerActivator(ProfileManager &aProfileManager,
-                                 TransportTracker &aTransportTracker, QObject *aParent)
-    :   QObject(aParent),
-        iProfileManager(aProfileManager),
-        iTransportTracker(aTransportTracker)
+    TransportTracker &aTransportTracker, QObject *aParent)
+:   QObject(aParent),
+    iProfileManager(aProfileManager),
+    iTransportTracker(aTransportTracker)
 {
     FUNCTION_CALL_TRACE;
 
     // Get server profiles and transports used by them.
     QStringList serverProfileNames = iProfileManager.profileNames(
-                                         Profile::TYPE_SERVER);
-    foreach (QString serverProfileName, serverProfileNames) {
+        Profile::TYPE_SERVER);
+    foreach (QString serverProfileName, serverProfileNames)
+    {
         Profile *serverProfile = iProfileManager.profile(serverProfileName,
-                                                         Profile::TYPE_SERVER);
-        if (serverProfile != 0) {
-            if (serverProfile->isEnabled()) {
+            Profile::TYPE_SERVER);
+        if (serverProfile != 0)
+        {
+            if (serverProfile->isEnabled())
+            {
                 ServerData data;
                 data.iTransports = transportsFromProfile(serverProfile);
 
@@ -50,7 +53,8 @@ ServerActivator::ServerActivator(ProfileManager &aProfileManager,
                 // used by it is available. A server profile can force the
                 // the plug-in to be always loaded be defining the following
                 // key.
-                if (serverProfile->boolKey(KEY_LOAD_WITHOUT_TRANSPORT)) {
+                if (serverProfile->boolKey(KEY_LOAD_WITHOUT_TRANSPORT))
+                {
                     data.iRefCount++;
                 }
 
@@ -59,7 +63,9 @@ ServerActivator::ServerActivator(ProfileManager &aProfileManager,
 
             delete serverProfile;
             serverProfile = 0;
-        } else {
+        }
+        else
+        {
             LOG_WARNING("Failed to load server profile:" << serverProfileName);
         }
     }
@@ -69,17 +75,20 @@ ServerActivator::ServerActivator(ProfileManager &aProfileManager,
     transports.append(Sync::CONNECTIVITY_BT);
     transports.append(Sync::CONNECTIVITY_USB);
     transports.append(Sync::CONNECTIVITY_INTERNET);
-    foreach (Sync::ConnectivityType transport, transports) {
+    foreach (Sync::ConnectivityType transport, transports)
+    {
         bool transportEnabled = iTransportTracker.isConnectivityAvailable(transport);
-        foreach (QString serverName, iServers.keys()) {
-            if (transportEnabled && iServers[serverName].iTransports.contains(transport)) {
+        foreach (QString serverName, iServers.keys())
+        {
+            if (transportEnabled && iServers[serverName].iTransports.contains(transport))
+            {
                 iServers[serverName].iRefCount++;
             }
         }
     }
 
     connect(&aTransportTracker, SIGNAL(connectivityStateChanged(Sync::ConnectivityType, bool)),
-            this, SLOT(onConnectivityStateChanged(Sync::ConnectivityType, bool)));
+        this, SLOT(onConnectivityStateChanged(Sync::ConnectivityType, bool)));
 }
 
 ServerActivator::~ServerActivator()
@@ -92,12 +101,16 @@ int ServerActivator::addRef(const QString &aServerName, bool emitSignal /*= true
     FUNCTION_CALL_TRACE;
 
     int refCount = 0;
-    if (iServers.contains(aServerName)) {
+    if (iServers.contains(aServerName))
+    {
         refCount = ++iServers[aServerName].iRefCount;
-        if (emitSignal && (refCount == 1)) {
+        if (emitSignal && (refCount == 1))
+        {
             emit serverEnabled(aServerName);
-        }
-    } else {
+        } // no else
+    }
+    else
+    {
         LOG_WARNING("Unknown server:" << aServerName);
     }
 
@@ -109,16 +122,21 @@ int ServerActivator::removeRef(const QString &aServerName, bool emitSignal /*= t
     FUNCTION_CALL_TRACE;
 
     int refCount = 0;
-    if (iServers.contains(aServerName)) {
+    if (iServers.contains(aServerName))
+    {
         ServerData &data = iServers[aServerName];
-        if (data.iRefCount > 0) {
+        if (data.iRefCount > 0)
+        {
             data.iRefCount--;
-            if (emitSignal && data.iRefCount == 0) {
+            if (emitSignal && data.iRefCount == 0)
+            {
                 emit serverDisabled(aServerName);
             }
-        }
+        } // no else
         refCount = data.iRefCount;
-    } else {
+    }
+    else
+    {
         LOG_WARNING("Unknown server:" << aServerName);
     }
 
@@ -130,8 +148,10 @@ QStringList ServerActivator::enabledServers() const
     FUNCTION_CALL_TRACE;
 
     QStringList enabledServers;
-    foreach (QString serverName, iServers.keys()) {
-        if (iServers[serverName].iRefCount > 0) {
+    foreach (QString serverName, iServers.keys())
+    {
+        if (iServers[serverName].iRefCount > 0)
+        {
             enabledServers.append(serverName);
         }
     }
@@ -140,15 +160,20 @@ QStringList ServerActivator::enabledServers() const
 }
 
 void ServerActivator::onConnectivityStateChanged(Sync::ConnectivityType aType,
-                                                 bool aState)
+    bool aState)
 {
     FUNCTION_CALL_TRACE;
 
-    foreach (QString serverName, iServers.keys()) {
-        if (iServers[serverName].iTransports.contains(aType)) {
-            if (aState) {
+    foreach (QString serverName, iServers.keys())
+    {
+        if (iServers[serverName].iTransports.contains(aType))
+        {
+            if (aState)
+            {
                 addRef(serverName);
-            } else {
+            }
+            else
+            {
                 removeRef(serverName);
             }
         }
@@ -161,14 +186,18 @@ QList<Sync::ConnectivityType> ServerActivator::transportsFromProfile(
     FUNCTION_CALL_TRACE;
 
     QList<Sync::ConnectivityType> transports;
-    if (aProfile != 0) {
-        if (aProfile->boolKey(KEY_BT_TRANSPORT)) {
+    if (aProfile != 0)
+    {
+        if (aProfile->boolKey(KEY_BT_TRANSPORT))
+        {
             transports.append(Sync::CONNECTIVITY_BT);
         }
-        if (aProfile->boolKey(KEY_USB_TRANSPORT)) {
+        if (aProfile->boolKey(KEY_USB_TRANSPORT))
+        {
             transports.append(Sync::CONNECTIVITY_USB);
         }
-        if (aProfile->boolKey(KEY_INTERNET_TRANSPORT)) {
+        if (aProfile->boolKey(KEY_INTERNET_TRANSPORT))
+        {
             transports.append(Sync::CONNECTIVITY_INTERNET);
         }
     }

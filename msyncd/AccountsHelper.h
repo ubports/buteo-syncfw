@@ -64,15 +64,16 @@ public:
      * \return A list of sync profiles. The caller should delete the profiles
      * after use.
      */
-    QList<SyncProfile *> getProfilesByAccountId(Accounts::AccountId id);
+    QList<SyncProfile*> getProfilesByAccountId(Accounts::AccountId id);
 
 public Q_SLOTS:
 
-    /*! \brief This method is used to create profiles for a specified
+    /*! \brief This method is used to create a profile for a specified
      * account
      * \param id Accounts Id
+     * \return A string with the new profile name
      */
-    void createProfileForAccount(Accounts::AccountId id);
+    QString createProfileForAccount(Accounts::AccountId id);
 
     /*! \brief slot for Accounts::Manager accountRemoved signal
      *
@@ -80,26 +81,44 @@ public Q_SLOTS:
      */
     void slotAccountRemoved(Accounts::AccountId id);
 
+    /*! \brief slot for Accounts::Account enabledChanged signal
+     *
+     * \param serviceName The service that was enabled/disabled. Empty if the
+     * entire account is enabled/disabled
+     * \param enabled Boolean indicating enabled (true) or disabled (false)
+     */
+    void slotAccountEnabledChanged(const QString &serviceName, bool enabled);
+
+    /*! \brief slot for Accounts::Manager displayNameChanged signal
+     * *
+     * \param id of the accounts
+     */
+    void slotAccountUpdated(Accounts::AccountId id);
+
     void slotSchedulerSettingsChanged(const char *aKey);
 Q_SIGNALS:
 
-    void enableSOC(const QString &aProfileName);
-    void scheduleUpdated(const QString &aProfileName);
+    void enableSOC(const QString& aProfileName);
+    void scheduleUpdated(const QString& aProfileName);
     void removeProfile(QString profileId);
-    void removeScheduledSync(const QString &profileId);
+    void removeScheduledSync(const QString& profileId);
 
 private Q_SLOTS:
 
     void registerAccountListeners();
 
 private:
-    void syncEnableWithAccount(Accounts::Account *account);
-    bool addProfileForAccount(Accounts::Account *account,
-                              const QString &serviceName,
-                              bool serviceEnabled,
-                              const QString &label = QString());
+    void createProfileForAccount(Accounts::Account* account,
+                                 const QString profileName,
+                                 const SyncProfile* baseProfile);
+
+    QString addAccountIfNotExists(Accounts::Account *account,
+                                  Accounts::Service service,
+                                  const SyncProfile *baseProfile);
 
     void setSyncSchedule(SyncProfile *syncProfile, Accounts::AccountId id, bool aCreateNew = false);
+
+    void addSetting(Accounts::AccountId id, QString key, QVariant value);
 
     void registerAccountListener(Accounts::AccountId id);
 
@@ -107,8 +126,8 @@ private:
 
     ProfileManager &iProfileManager;
 
-    QList<Accounts::Account *> iAccountList;
-    QMap <Accounts::Watch *, Accounts::AccountId> iAcctWatchMap;
+    QList<Accounts::Account*> iAccountList;
+    QMap <Accounts::Watch*, Accounts::AccountId> iAcctWatchMap;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class AccountsHelperTest;

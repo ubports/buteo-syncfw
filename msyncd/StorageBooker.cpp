@@ -27,7 +27,7 @@
 using namespace Buteo;
 
 StorageBooker::StorageBooker()
-    :   iMutex(QMutex::Recursive)
+:   iMutex(QMutex::Recursive)
 {
     FUNCTION_CALL_TRACE;
 }
@@ -46,18 +46,24 @@ bool StorageBooker::reserveStorage(const QString &aStorageName,
 
     bool success = false;
 
-    if (iStorageMap.contains(aStorageName)) {
+    if (iStorageMap.contains(aStorageName))
+    {
         StorageMapItem item = iStorageMap[aStorageName];
-        if (aClientId.isEmpty() || aClientId != item.iClientId) {
+        if (aClientId.isEmpty() || aClientId != item.iClientId)
+        {
             // Already reserved for different client.
             success = false;
-        } else {
+        }
+        else
+        {
             // Already reserved for the same client. Increase ref count.
             item.iRefCount++;
             iStorageMap[aStorageName] = item;
             success = true;
         }
-    } else {
+    }
+    else
+    {
         // No reservations for the storage. Add a new entry to the storage
         // reservation map.
         iStorageMap.insert(aStorageName, aClientId);
@@ -75,12 +81,16 @@ bool StorageBooker::reserveStorages(const QStringList &aStorageNames,
     QMutexLocker locker(&iMutex);
 
     bool success = false;
-    if (storagesAvailable(aStorageNames, aClientId)) {
-        foreach (QString storage, aStorageNames) {
+    if (storagesAvailable(aStorageNames, aClientId))
+    {
+        foreach (QString storage, aStorageNames)
+        {
             reserveStorage(storage, aClientId);
         }
         success = true;
-    } else {
+    }
+    else
+    {
         success = false;
     }
 
@@ -95,17 +105,21 @@ unsigned StorageBooker::releaseStorage(const QString &aStorageName)
 
     unsigned remainingRefCount = 0;
 
-    if (iStorageMap.contains(aStorageName)) {
+    if (iStorageMap.contains(aStorageName))
+    {
         StorageMapItem item = iStorageMap[aStorageName];
         item.iRefCount--;
         remainingRefCount = item.iRefCount;
 
-        if (remainingRefCount == 0) {
+        if (remainingRefCount == 0)
+        {
             iStorageMap.remove(aStorageName);
-        } else {
+        }
+        else
+        {
             iStorageMap[aStorageName] = item;
         }
-    }
+    } // no else
 
     return remainingRefCount;
 }
@@ -116,7 +130,8 @@ void StorageBooker::releaseStorages(const QStringList &aStorageNames)
 
     QMutexLocker locker(&iMutex);
 
-    foreach (QString storage, aStorageNames) {
+    foreach (QString storage, aStorageNames)
+    {
         releaseStorage(storage);
     }
 }
@@ -141,7 +156,8 @@ bool StorageBooker::storagesAvailable(const QStringList &aStorageNames,
 
     QMutexLocker locker(&iMutex);
 
-    foreach (QString storage, aStorageNames) {
+    foreach (QString storage, aStorageNames)
+    {
         if (!isStorageAvailable(storage, aClientId))
             return false;
     }

@@ -46,28 +46,28 @@ public:
 
 signals:
 
-
+    
     /*! \brief Notifies about completion of backup.
      *
-     * This signal is sent when the backup is completed
+     * This signal is sent when the backup is completed 
      */
     void backupDone();
-
+    
     /*! \brief Notifies about starting of backup.
      *
      * This signal is sent when the backup is started
      */
     void startBackup();
-
+    
     /*! \brief Notifies about completion of restore opertaion.
      *
-     * This signal is sent when the backup is completed
+     * This signal is sent when the backup is completed 
      */
     void restoreDone();
-
+    
     /*! \brief Notifies about starting of restore operation.
      *
-     * This signal is sent when the restore is started/in progress
+     * This signal is sent when the restore is started/in progress 
      */
     void startRestore();
 
@@ -81,7 +81,7 @@ public slots:
      * @param message  Received dbus message
      */
     virtual uchar  backupStarts (const QDBusMessage &message) = 0;
-
+    
     /*!
      * \brief Sets the required params and starts the servers.
      *
@@ -89,7 +89,7 @@ public slots:
      * @param message  Received dbus message
      */
     virtual uchar backupFinished (const QDBusMessage &message) = 0;
-
+    
     /*!
      * \brief Sets the required params and stops the servers and any running sync
      * sessions.
@@ -98,7 +98,7 @@ public slots:
      * @param message  Received dbus message
      */
     virtual uchar restoreStarts (const QDBusMessage &message) = 0;
-
+    
     /*!
      * \brief Sets the required params and starts the servers.
      *
@@ -106,7 +106,7 @@ public slots:
      * @param message  Received dbus message
      */
     virtual uchar restoreFinished (const QDBusMessage &message) = 0;
-
+    
     /*!
      * \brief Requests the current state og backup/restore operation.
      */

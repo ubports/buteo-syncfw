@@ -1,9 +1,9 @@
 TEMPLATE = subdirs
 SUBDIRS = \
-        ClientPluginTest \
-        DeletedItemsIdStorageTest \
-        ServerPluginTest \
-        StoragePluginTest \
+        ClientPluginTest.pro \
+        DeletedItemsIdStorageTest.pro \
+        ServerPluginTest.pro \
+        StoragePluginTest.pro \
 
 coverage.CONFIG += recursive
 QMAKE_EXTRA_TARGETS += coverage

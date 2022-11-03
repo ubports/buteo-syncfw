@@ -1,14 +1,14 @@
 include(../tests_common.pri)
 TEMPLATE = subdirs
 SUBDIRS = \
-        ProfileFactoryTest \
-        ProfileFieldTest \
-        ProfileManagerTest \
-        ProfileTest \
-        StorageProfileTest \
-        SyncLogTest \
-        SyncProfileTest \
-        SyncScheduleTest \
+        ProfileFactoryTest.pro \
+        ProfileFieldTest.pro \
+        ProfileManagerTest.pro \
+        ProfileTest.pro \
+        StorageProfileTest.pro \
+        SyncLogTest.pro \
+        SyncProfileTest.pro \
+        SyncScheduleTest.pro \
 
 testprofiles_client.files = testprofiles/user/client/*
 testprofiles_client.path = $${INSTALL_TESTDIR}/syncprofiletests/testprofiles/user/client/

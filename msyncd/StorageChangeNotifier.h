@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QHash>
 
-namespace Buteo {
+namespace Buteo
+{
 
 class StorageChangeNotifierPlugin;
 class PluginManager;
@@ -30,8 +31,8 @@ public:
      * @param aPluginManager used to load SOC storage plugins
      * @param aStorageNames list of storages we wan't to monitor
      */
-    void loadNotifiers(PluginManager *aPluginManager,
-                       const QStringList &aStorageNames);
+    void loadNotifiers(PluginManager* aPluginManager,
+                       const QStringList& aStorageNames);
 
     /*! Call this to start monitoring changes in storages
      *
@@ -39,7 +40,7 @@ public:
      * @return true if we can monitor all storages requested for
      * false otherwise
      */
-    bool startListen(QStringList &aFailedStorages);
+    bool startListen(QStringList& aFailedStorages);
 
     /*! \brief call this to ignore taking action on
      * storage changes. Whether there was a change can
@@ -72,8 +73,8 @@ Q_SIGNALS:
     void storageChange(QString aStorageName);
 
 private:
-    QHash<QString, StorageChangeNotifierPlugin *> iNotifierMap;
-    PluginManager *iPluginManager;
+    QHash<QString,StorageChangeNotifierPlugin*> iNotifierMap;
+    PluginManager* iPluginManager;
 };
 
 }

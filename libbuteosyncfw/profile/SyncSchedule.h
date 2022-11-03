@@ -2,8 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2019 Jolla Ltd.
- * Copyright (C) 2020 Open Mobile Platform LLC.
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -78,14 +77,14 @@ public:
      *
      * \param aRhs Source
      */
-    SyncSchedule &operator=(const SyncSchedule &aRhs);
+    SyncSchedule& operator=(const SyncSchedule &aRhs);
 
     /*! \brief Equal to operator.
      *
      * \param aRhs Source
      */
     bool operator==(const SyncSchedule &aRhs);
-
+    
     /*! \brief Exports the sync schedule to XML.
      *
      * \param aDoc Parent document for the created XML elements.
@@ -93,7 +92,7 @@ public:
      */
     QDomElement toXml(QDomDocument &aDoc) const;
 
-    /*! \brief Exports the sync schedule to QString.
+	/*! \brief Exports the sync schedule to QString.
      *
      * \return return the Schedule as xml formatted string
      */
@@ -125,6 +124,7 @@ public:
      * \param aTime Sync time.
      */
     void setTime(const QTime &aTime);
+
 
     /*! \brief Sets scheduled config time.
     *
@@ -244,6 +244,7 @@ public:
     /*! \brief Gets next sync time based on the sync schedule settings.
      *
      * \param aPrevSync Previous sync time.
+     * \param aPrevious sync time.
      * \return Next sync time. Null object if schedule is not defined.
      */
     QDateTime nextSyncTime(const QDateTime &aPrevSync) const;
@@ -254,19 +255,11 @@ public:
      * \return Next time to switch rush/off-rush schedule intervals. Null object if schedule is not defined for rush/off-rush
      *  or if the rush and off-rush intervals are the same.
      */
-    QDateTime nextRushSwitchTime(const QDateTime &aFromTime) const;
-
-    /*! \brief Returns true if aDateTime is within a scheduled period.
-     *
-     * \param aActualDateTime the actual sync date time to be tested.
-     * \param aPreviousSyncTime the previous sync time, for calculation where a sync interval is used.
-     * \return true if at aActualDateTime, the synchronization is possible.
-     */
-    bool isSyncScheduled(const QDateTime &aActualDateTime, const QDateTime &aPreviousSyncTime = QDateTime()) const;
+    QDateTime nextRushSwitchTime(const QDateTime& aFromTime) const;
 
 private:
 
-    SyncSchedulePrivate *d_ptr;
+    SyncSchedulePrivate* d_ptr;
 
 #ifdef SYNCFW_UNIT_TESTS
     friend class SyncScheduleTest;
