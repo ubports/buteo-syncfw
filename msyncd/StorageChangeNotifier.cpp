@@ -8,7 +8,7 @@
 using namespace Buteo;
 
 StorageChangeNotifier::StorageChangeNotifier() :
-    iPluginManager(0)
+iPluginManager(0)
 {
     FUNCTION_CALL_TRACE;
 }
@@ -16,50 +16,60 @@ StorageChangeNotifier::StorageChangeNotifier() :
 StorageChangeNotifier::~StorageChangeNotifier()
 {
     FUNCTION_CALL_TRACE;
-    StorageChangeNotifierPlugin *plugin = 0;
-    for (QHash<QString, StorageChangeNotifierPlugin *>::iterator storageNameItr = iNotifierMap.begin();
-            storageNameItr != iNotifierMap.end(); ++storageNameItr) {
+    StorageChangeNotifierPlugin* plugin = 0;
+    for(QHash<QString,StorageChangeNotifierPlugin*>::iterator storageNameItr = iNotifierMap.begin();
+        storageNameItr != iNotifierMap.end(); ++storageNameItr)
+    {
         plugin = storageNameItr.value();
-        if (iPluginManager && plugin) {
+        if(iPluginManager && plugin)
+        {
             iPluginManager->destroyStorageChangeNotifier(plugin);
         }
     }
 }
 
-void StorageChangeNotifier::loadNotifiers(PluginManager *aPluginManager,
-                                          const QStringList &aStorageNames)
+void StorageChangeNotifier::loadNotifiers(PluginManager* aPluginManager,
+                                          const QStringList& aStorageNames)
 {
     FUNCTION_CALL_TRACE;
-    StorageChangeNotifierPlugin *plugin = 0;
+    StorageChangeNotifierPlugin* plugin = 0;
     iPluginManager = aPluginManager;
-    for (QStringList::const_iterator storageNameItr = aStorageNames.constBegin();
-            storageNameItr != aStorageNames.constEnd(); ++storageNameItr) {
-        if (iPluginManager) {
+    for(QStringList::const_iterator storageNameItr = aStorageNames.constBegin();
+        storageNameItr != aStorageNames.constEnd(); ++storageNameItr)
+    {
+        if(iPluginManager)
+        {
             plugin = iPluginManager->createStorageChangeNotifier(*storageNameItr);
-            if (plugin) {
+            if(plugin)
+            {
                 iNotifierMap[*storageNameItr] = plugin;
             }
         }
     }
 }
 
-bool StorageChangeNotifier::startListen(QStringList &aFailedStorages)
+bool StorageChangeNotifier::startListen(QStringList& aFailedStorages)
 {
     FUNCTION_CALL_TRACE;
     bool success = true;
-    StorageChangeNotifierPlugin *plugin = 0;
+    StorageChangeNotifierPlugin* plugin = 0;
 
-    if (!iNotifierMap.count()) {
+    if(!iNotifierMap.count())
+    {
         success = false;
     }
-    for (QHash<QString, StorageChangeNotifierPlugin *>::iterator storageNameItr = iNotifierMap.begin();
-            storageNameItr != iNotifierMap.end(); ++storageNameItr) {
+    for(QHash<QString,StorageChangeNotifierPlugin*>::iterator storageNameItr = iNotifierMap.begin();
+        storageNameItr != iNotifierMap.end(); ++storageNameItr)
+    {
         plugin = storageNameItr.value();
-        if (plugin) {
+        if(plugin)
+        {
             QObject::connect(plugin, SIGNAL(storageChange()),
                              this, SLOT(storageChanged()));
             plugin->enable();
-        } else {
+        }
+        else
+        {
             aFailedStorages << storageNameItr.key();
             success = false;
         }
@@ -70,11 +80,13 @@ bool StorageChangeNotifier::startListen(QStringList &aFailedStorages)
 void StorageChangeNotifier::stopListen(bool disableAfterNextChange)
 {
     FUNCTION_CALL_TRACE;
-    StorageChangeNotifierPlugin *plugin = 0;
-    for (QHash<QString, StorageChangeNotifierPlugin *>::iterator storageNameItr = iNotifierMap.begin();
-            storageNameItr != iNotifierMap.end(); ++storageNameItr) {
+    StorageChangeNotifierPlugin* plugin = 0;
+    for(QHash<QString,StorageChangeNotifierPlugin*>::iterator storageNameItr = iNotifierMap.begin();
+        storageNameItr != iNotifierMap.end(); ++storageNameItr)
+    {
         plugin = storageNameItr.value();
-        if (plugin) {
+        if(plugin)
+        {
             QObject::disconnect(plugin, SIGNAL(storageChange()),
                                 this, SLOT(storageChanged()));
             plugin->disable(disableAfterNextChange);
@@ -85,8 +97,9 @@ void StorageChangeNotifier::stopListen(bool disableAfterNextChange)
 void StorageChangeNotifier::storageChanged()
 {
     FUNCTION_CALL_TRACE;
-    StorageChangeNotifierPlugin *plugin = qobject_cast<StorageChangeNotifierPlugin *>(sender());
-    if (plugin) {
+    StorageChangeNotifierPlugin* plugin = qobject_cast<StorageChangeNotifierPlugin*>(sender());
+    if(plugin)
+    {
         LOG_DEBUG("Change in storage" << plugin->name());
         plugin->changesReceived();
         emit storageChange(plugin->name());
@@ -96,11 +109,13 @@ void StorageChangeNotifier::storageChanged()
 void StorageChangeNotifier::checkForChanges()
 {
     FUNCTION_CALL_TRACE;
-    StorageChangeNotifierPlugin *plugin = 0;
-    for (QHash<QString, StorageChangeNotifierPlugin *>::iterator storageNameItr = iNotifierMap.begin();
-            storageNameItr != iNotifierMap.end(); ++storageNameItr) {
+    StorageChangeNotifierPlugin* plugin = 0;
+    for(QHash<QString,StorageChangeNotifierPlugin*>::iterator storageNameItr = iNotifierMap.begin();
+        storageNameItr != iNotifierMap.end(); ++storageNameItr)
+    {
         plugin = storageNameItr.value();
-        if (plugin && plugin->hasChanges()) {
+        if(plugin && plugin->hasChanges())
+        {
             plugin->changesReceived();
             emit storageChange(plugin->name());
         }

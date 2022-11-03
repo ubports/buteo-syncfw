@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2014-2015 Jolla Ltd.
+ * Copyright (C) 2014-2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -44,7 +44,8 @@ public:
 
     SyncSchedule iSchedule;
 
-    struct SyncRetriesInfo {
+    struct SyncRetriesInfo
+    {
         QList<quint32> iRetryIntervals;
         quint32 iIntervalIndex;
 
@@ -66,7 +67,8 @@ public:
         qint32 nextInterval()
         {
             qint32 next = -1;
-            if (iIntervalIndex < retries()) {
+            if(iIntervalIndex < retries())
+            {
                 next = iRetryIntervals.at(iIntervalIndex);
                 ++iIntervalIndex;
             }
@@ -78,36 +80,38 @@ public:
             return iRetryIntervals;
         }
 
-        SyncRetriesInfo &operator=(const SyncRetriesInfo &rhs)
+        SyncRetriesInfo& operator=(const SyncRetriesInfo& rhs)
         {
-            if (this != &rhs) {
+            if(this != &rhs)
+            {
                 iIntervalIndex = rhs.iIntervalIndex;
                 iRetryIntervals = rhs.iRetryIntervals;
             }
             return *this;
         }
-    } iSyncRetriesInfo;
+    }iSyncRetriesInfo;
 };
 
 }
 
 using namespace Buteo;
 
-const quint32 DEFAULT_SOC_AFTER_TIME(5 * 60);
+const quint32 DEFAULT_SOC_AFTER_TIME(5*60);
 
 SyncProfilePrivate::SyncProfilePrivate()
-    :   iLog(0)
+:   iLog(0)
 {
     iSyncRetriesInfo.init();
 }
 
 SyncProfilePrivate::SyncProfilePrivate(const SyncProfilePrivate &aSource)
-    :   iLog(0),
-        iSchedule(aSource.iSchedule)
+:   iLog(0),
+    iSchedule(aSource.iSchedule)
 {
-    if (aSource.iLog != 0) {
+    if (aSource.iLog != 0)
+    {
         iLog = new SyncLog(*aSource.iLog);
-    }
+    } // no else
     iSyncRetriesInfo = aSource.iSyncRetriesInfo;
 }
 
@@ -118,26 +122,29 @@ SyncProfilePrivate::~SyncProfilePrivate()
 }
 
 SyncProfile::SyncProfile(const QString &aName)
-    :   Profile(aName, Profile::TYPE_SYNC),
-        d_ptr(new SyncProfilePrivate())
+:   Profile(aName, Profile::TYPE_SYNC),
+    d_ptr(new SyncProfilePrivate())
 {
 }
 
 SyncProfile::SyncProfile(const QDomElement &aRoot)
-    :   Profile(aRoot),
-        d_ptr(new SyncProfilePrivate())
+:   Profile(aRoot),
+    d_ptr(new SyncProfilePrivate())
 {
     QDomElement schedule = aRoot.firstChildElement(TAG_SCHEDULE);
-    if (!schedule.isNull()) {
+    if (!schedule.isNull())
+    {
         d_ptr->iSchedule = SyncSchedule(schedule);
-    }
+    } // no else
     QDomElement retriesElement = aRoot.firstChildElement(TAG_ERROR_ATTEMPTS);
-    if (!retriesElement.isNull()) {
+    if (!retriesElement.isNull())
+    {
         QDomElement timeElement  = retriesElement.firstChildElement(TAG_ATTEMPT_DELAY);
         while (!timeElement.isNull()) {
             bool ok = false;
             int parsedTime = timeElement.attribute(ATTR_VALUE, "-1").toUInt(&ok);
-            if (ok && parsedTime > 0) {
+            if ( ok && parsedTime > 0 )
+            {
                 d_ptr->iSyncRetriesInfo.addInterval(parsedTime);
             }
             timeElement = timeElement.nextSiblingElement(TAG_ATTEMPT_DELAY);
@@ -146,8 +153,8 @@ SyncProfile::SyncProfile(const QDomElement &aRoot)
 }
 
 SyncProfile::SyncProfile(const SyncProfile &aSource)
-    :   Profile(aSource),
-        d_ptr(new SyncProfilePrivate(*aSource.d_ptr))
+:   Profile(aSource),
+    d_ptr(new SyncProfilePrivate(*aSource.d_ptr))
 {
 }
 
@@ -166,15 +173,19 @@ QDomElement SyncProfile::toXml(QDomDocument &aDoc, bool aLocalOnly) const
 {
     QDomElement root = Profile::toXml(aDoc, aLocalOnly);
     QDomElement schedule = d_ptr->iSchedule.toXml(aDoc);
-    if (!schedule.isNull()) {
+    if (!schedule.isNull())
+    {
         root.appendChild(schedule);
-    }
-    if (d_ptr->iSyncRetriesInfo.retries()) {
+    } // no else
+    if (d_ptr->iSyncRetriesInfo.retries())
+    {
         QDomElement retries = aDoc.createElement(TAG_ERROR_ATTEMPTS);
-        for (quint32 i = 0;  i < d_ptr->iSyncRetriesInfo.retries(); ++i) {
+        for (quint32 i = 0;  i < d_ptr->iSyncRetriesInfo.retries(); ++i)
+        {
             QDomElement retryInterval = aDoc.createElement(TAG_ATTEMPT_DELAY);
             qint32 nextInt = d_ptr->iSyncRetriesInfo.nextInterval();
-            if (-1 != nextInt) {
+            if(-1 != nextInt)
+            {
                 retryInterval.setAttribute(ATTR_VALUE, nextInt);
                 retries.appendChild(retryInterval);
             }
@@ -187,25 +198,25 @@ QDomElement SyncProfile::toXml(QDomDocument &aDoc, bool aLocalOnly) const
 
 void SyncProfile::setName(const QString &aName)
 {
-    // sets the name in the super class Profile.
-    Profile::setName(aName);
-    // Here we also must set name for the log associated to this profile,
-    // as that is only set during log construction. Changing SyncProfile name does not
-    // reflect there
-    if (d_ptr->iLog)
-        d_ptr->iLog->setProfileName(aName);
+  // sets the name in the super class Profile.
+  Profile::setName(aName);
+  // Here we also must set name for the log associated to this profile,
+  // as that is only set during log construction. Changing SyncProfile name does not
+  // reflect there
+  if (d_ptr->iLog)
+    d_ptr->iLog->setProfileName(aName);
 }
 
 void SyncProfile::setName(const QStringList &aKeys)
 {
-    // sets the name in the super class Profile.
+  // sets the name in the super class Profile.
 
-    Profile::setName(aKeys);
-    // Here we also must set name for the log associated to this profile,
-    // as that is only set during log construction. Changing SyncProfile name does not
-    // reflect there
-    if (d_ptr->iLog)
-        d_ptr->iLog->setProfileName(Profile::name());
+  Profile::setName(aKeys);
+  // Here we also must set name for the log associated to this profile,
+  // as that is only set during log construction. Changing SyncProfile name does not
+  // reflect there
+  if (d_ptr->iLog)
+    d_ptr->iLog->setProfileName(Profile::name());
 }
 
 bool SyncProfile::syncExternallyEnabled() const
@@ -221,7 +232,7 @@ bool SyncProfile::rushEnabled() const
 bool SyncProfile::syncExternallyDuringRush() const
 {
     return d_ptr->iSchedule.scheduleEnabled() && d_ptr->iSchedule.rushEnabled()
-           && d_ptr->iSchedule.syncExternallyDuringRush();
+            && d_ptr->iSchedule.syncExternallyDuringRush();
 }
 
 bool SyncProfile::inExternalSyncRushPeriod(QDateTime aDateTime) const
@@ -233,21 +244,28 @@ QDateTime SyncProfile::lastSyncTime() const
 {
     QDateTime lastSync;
 
-    if (d_ptr->iLog != 0 && d_ptr->iLog->lastResults() != 0) {
+    if (d_ptr->iLog != 0 && d_ptr->iLog->lastResults() != 0)
+    {
         lastSync = d_ptr->iLog->lastResults()->syncTime();
-    }
+    } // no else
 
-    LOG_DEBUG("lastSync:" << lastSync);
+    LOG_DEBUG("lastSync:"<<lastSync);
     return lastSync;
 }
 
 QDateTime SyncProfile::lastSuccessfulSyncTime () const
 {
     QDateTime lastSuccessSyncTime;
-    if (d_ptr->iLog) {
-        const SyncResults *success = d_ptr->iLog->lastSuccessfulResults();
-        if (success)
-            lastSuccessSyncTime = success->syncTime();
+    if (d_ptr->iLog)
+    {
+        QList<const SyncResults*> allResults = d_ptr->iLog->allResults();
+        foreach (const SyncResults* result, allResults) {
+            if ((result->majorCode () == SyncResults::SYNC_RESULT_SUCCESS) &&
+                (result->minorCode () == SyncResults::NO_ERROR) &&
+                (lastSyncTime().isNull() || (result->syncTime () > lastSuccessSyncTime))) {
+                    lastSuccessSyncTime = result->syncTime ();
+            }
+        }
     }
     return lastSuccessSyncTime;
 }
@@ -255,10 +273,12 @@ QDateTime SyncProfile::lastSuccessfulSyncTime () const
 QDateTime SyncProfile::nextSyncTime(QDateTime aDateTime) const
 {
     QDateTime nextSync;
-    if (syncType() == SYNC_SCHEDULED) {
+    if(syncType() == SYNC_SCHEDULED)
+    {
         if (aDateTime.isValid()) {
             nextSync = d_ptr->iSchedule.nextSyncTime(aDateTime);
-        } else {
+        }
+        else {
             nextSync = d_ptr->iSchedule.nextSyncTime(lastSyncTime());
         }
 
@@ -269,7 +289,8 @@ QDateTime SyncProfile::nextSyncTime(QDateTime aDateTime) const
 QDateTime SyncProfile::nextRushSwitchTime(const QDateTime &aFromTime) const
 {
     QDateTime nextSwitch;
-    if (syncType() == SYNC_SCHEDULED) {
+    if(syncType() == SYNC_SCHEDULED)
+    {
         nextSwitch = d_ptr->iSchedule.nextRushSwitchTime(aFromTime);
     }
     return nextSwitch;
@@ -277,9 +298,12 @@ QDateTime SyncProfile::nextRushSwitchTime(const QDateTime &aFromTime) const
 
 const SyncResults *SyncProfile::lastResults() const
 {
-    if (d_ptr->iLog != 0) {
+    if (d_ptr->iLog != 0)
+    {
         return d_ptr->iLog->lastResults();
-    } else {
+    }
+    else
+    {
         return 0;
     }
 }
@@ -297,9 +321,10 @@ void SyncProfile::setLog(SyncLog *aLog)
 
 void SyncProfile::addResults(const SyncResults &aResults)
 {
-    if (0 == d_ptr->iLog) {
+    if (0 == d_ptr->iLog)
+    {
         d_ptr->iLog = new SyncLog(name());
-    }
+    } // no else
 
     d_ptr->iLog->addResults(aResults);
 }
@@ -307,8 +332,7 @@ void SyncProfile::addResults(const SyncResults &aResults)
 SyncProfile::SyncType SyncProfile::syncType() const
 {
     // Sync schedule is enabled for peak or manual -> it is scheduled type.
-    return !syncExternallyEnabled() && (d_ptr->iSchedule.scheduleEnabled()
-                                        || d_ptr->iSchedule.rushEnabled()) ? SYNC_SCHEDULED : SYNC_MANUAL;
+    return !syncExternallyEnabled() && (d_ptr->iSchedule.scheduleEnabled() || d_ptr->iSchedule.rushEnabled()) ? SYNC_SCHEDULED : SYNC_MANUAL;
 }
 
 // TODO: seems effectless since d6d974e (Added functions to enable/disable normal scheduling.)
@@ -327,42 +351,20 @@ void SyncProfile::setSyncSchedule(const SyncSchedule &aSchedule)
     d_ptr->iSchedule = aSchedule;
 }
 
-QList<Sync::InternetConnectionType> SyncProfile::internetConnectionTypes() const
-{
-    QSet<Sync::InternetConnectionType> types;
-    const QStringList typeStrings = key(KEY_INTERNET_CONNECTION_TYPES).split(',');
-    foreach (QString typeString, typeStrings) {
-        bool ok = false;
-        int typeInt = typeString.toInt(&ok);
-        if (!ok || typeInt < Sync::INTERNET_CONNECTION_UNKNOWN || typeInt > Sync::INTERNET_CONNECTION_LTE) {
-            continue;
-        }
-        types.insert(Sync::InternetConnectionType(typeInt));
-    }
-    return types.toList();
-}
-
-void SyncProfile::setInternetConnectionTypes(const QList<Sync::InternetConnectionType> &aTypes)
-{
-    QStringList typeStrings;
-    foreach (Sync::InternetConnectionType type, aTypes) {
-        typeStrings.append(QString::number(int(type)));
-    }
-    setKey(KEY_INTERNET_CONNECTION_TYPES, typeStrings.join(','));
-}
-
 QStringList SyncProfile::storageBackendNames() const
 {
     QStringList enabledStorageBackends;
     QStringList storageNames = subProfileNames(Profile::TYPE_STORAGE);
 
-    foreach (QString storage, storageNames) {
+    foreach (QString storage, storageNames)
+    {
         const Profile *p = subProfile(storage, Profile::TYPE_STORAGE);
-        if (p->isEnabled()) {
+        if (p->isEnabled())
+        {
             // Get backend name from the storage profile. If the backend name
             // is not defined, use profile name as the backend name.
             enabledStorageBackends.append(p->key(KEY_BACKEND, p->name()));
-        }
+        } // no else
     }
 
     return enabledStorageBackends;
@@ -387,7 +389,7 @@ const Profile *SyncProfile::serviceProfile() const
         if (p->type() == TYPE_SERVICE)
         {
             return p;
-        }
+        } // no else
     }
 
     return 0;
@@ -401,7 +403,7 @@ Profile *SyncProfile::serviceProfile()
         if (p->type() == TYPE_SERVICE)
         {
             return p;
-        }
+        } // no else
     }
 
     return 0;
@@ -410,11 +412,13 @@ Profile *SyncProfile::serviceProfile()
 
 const Profile *SyncProfile::clientProfile() const
 {
-    QList<const Profile *> subProfiles = allSubProfiles();
-    foreach (const Profile *p, subProfiles) {
-        if (p->type() == TYPE_CLIENT) {
+    QList<const Profile*> subProfiles = allSubProfiles();
+    foreach (const Profile *p, subProfiles)
+    {
+        if (p->type() == TYPE_CLIENT)
+        {
             return p;
-        }
+        } // no else
     }
 
     return 0;
@@ -422,11 +426,13 @@ const Profile *SyncProfile::clientProfile() const
 
 Profile *SyncProfile::clientProfile()
 {
-    QList<Profile *> subProfiles = allSubProfiles();
-    foreach (Profile *p, subProfiles) {
-        if (p->type() == TYPE_CLIENT) {
+    QList<Profile*> subProfiles = allSubProfiles();
+    foreach (Profile *p, subProfiles)
+    {
+        if (p->type() == TYPE_CLIENT)
+        {
             return p;
-        }
+        } // no else
     }
 
     return 0;
@@ -434,11 +440,13 @@ Profile *SyncProfile::clientProfile()
 
 const Profile *SyncProfile::serverProfile() const
 {
-    QList<const Profile *> subProfiles = allSubProfiles();
-    foreach (const Profile *p, subProfiles) {
-        if (p->type() == TYPE_SERVER) {
+    QList<const Profile*> subProfiles = allSubProfiles();
+    foreach (const Profile *p, subProfiles)
+    {
+        if (p->type() == TYPE_SERVER)
+        {
             return p;
-        }
+        } // no else
     }
 
     return 0;
@@ -446,37 +454,43 @@ const Profile *SyncProfile::serverProfile() const
 
 Profile *SyncProfile::serverProfile()
 {
-    QList<Profile *> subProfiles = allSubProfiles();
-    foreach (Profile *p, subProfiles) {
-        if (p->type() == TYPE_SERVER) {
+    QList<Profile*> subProfiles = allSubProfiles();
+    foreach (Profile *p, subProfiles)
+    {
+        if (p->type() == TYPE_SERVER)
+        {
             return p;
-        }
+        } // no else
     }
 
     return 0;
 }
 
-QList<const Profile *> SyncProfile::storageProfiles() const
+QList<const Profile*> SyncProfile::storageProfiles() const
 {
-    QList<const Profile *> storages;
-    QList<const Profile *> subProfiles = allSubProfiles();
-    foreach (const Profile *p, subProfiles) {
-        if (p->type() == TYPE_STORAGE) {
+    QList<const Profile*> storages;
+    QList<const Profile*> subProfiles = allSubProfiles();
+    foreach (const Profile *p, subProfiles)
+    {
+        if (p->type() == TYPE_STORAGE)
+        {
             storages.append(p);
-        }
+        } // no else
     }
 
     return storages;
 }
 
-QList<Profile *> SyncProfile::storageProfilesNonConst()
+QList<Profile*> SyncProfile::storageProfilesNonConst()
 {
-    QList<Profile *> storages;
-    QList<Profile *> subProfiles = allSubProfiles();
-    foreach (Profile *p, subProfiles) {
-        if (p->type() == TYPE_STORAGE) {
+    QList<Profile*> storages;
+    QList<Profile*> subProfiles = allSubProfiles();
+    foreach (Profile *p, subProfiles)
+    {
+        if (p->type() == TYPE_STORAGE)
+        {
             storages.append(p);
-        }
+        } // no else
     }
 
     return storages;
@@ -490,14 +504,19 @@ SyncProfile::DestinationType SyncProfile::destinationType() const
     //const Profile *service = serviceProfile();
     //if (service)
     //{
-    typeStr = this->key(KEY_DESTINATION_TYPE);
-    //}
+        typeStr = this->key(KEY_DESTINATION_TYPE);
+    //} // no else
 
-    if (typeStr == VALUE_ONLINE) {
+    if (typeStr == VALUE_ONLINE)
+    {
         type = DESTINATION_TYPE_ONLINE;
-    } else if (typeStr == VALUE_DEVICE) {
+    }
+    else if (typeStr == VALUE_DEVICE)
+    {
         type = DESTINATION_TYPE_DEVICE;
-    } else {
+    }
+    else
+    {
         type = DESTINATION_TYPE_UNDEFINED;
     }
 
@@ -510,17 +529,25 @@ SyncProfile::SyncDirection SyncProfile::syncDirection() const
     QString dirStr;
 
     const Profile *client = clientProfile();
-    if (client) {
+    if (client)
+    {
         dirStr = client->key(KEY_SYNC_DIRECTION);
-    }
+    } // no else
 
-    if (dirStr == VALUE_TWO_WAY) {
+    if (dirStr == VALUE_TWO_WAY)
+    {
         dir = SYNC_DIRECTION_TWO_WAY;
-    } else if (dirStr == VALUE_FROM_REMOTE) {
+    }
+    else if (dirStr == VALUE_FROM_REMOTE)
+    {
         dir = SYNC_DIRECTION_FROM_REMOTE;
-    } else if (dirStr == VALUE_TO_REMOTE) {
+    }
+    else if (dirStr == VALUE_TO_REMOTE)
+    {
         dir = SYNC_DIRECTION_TO_REMOTE;
-    } else {
+    }
+    else
+    {
         dir = SYNC_DIRECTION_UNDEFINED;
     }
 
@@ -533,11 +560,12 @@ bool SyncProfile::isSOCProfile() const
     //const Profile *service = serviceProfile();
     //if (service)
     //{
-    QString enabled = this->key(KEY_SOC);
-    enabled = enabled.trimmed();
-    if ("true" == enabled) {
-        aSOCProfile = true;
-    }
+        QString enabled = this->key(KEY_SOC);
+        enabled = enabled.trimmed();
+        if("true" == enabled)
+        {
+            aSOCProfile = true;
+        }
     //}
     return aSOCProfile;
 }
@@ -549,14 +577,16 @@ quint32 SyncProfile::syncOnChangeAfter() const
     //const Profile *service = serviceProfile();
     //if (service)
     //{
-    QString time = this->key(KEY_SOC_AFTER);
-    if (!time.isEmpty()) {
-        bool ok = false;
-        syncOnChangeAfterTime = time.toUInt(&ok);
-        if (false == ok) {
-            syncOnChangeAfterTime = DEFAULT_SOC_AFTER_TIME;
+        QString time = this->key(KEY_SOC_AFTER);
+        if(!time.isEmpty())
+        {
+            bool ok = false;
+            syncOnChangeAfterTime = time.toUInt(&ok);
+            if(false == ok)
+            {
+                syncOnChangeAfterTime = DEFAULT_SOC_AFTER_TIME;
+            }
         }
-    }
     //}
     LOG_DEBUG("Sync on change after time from profile :" << syncOnChangeAfterTime);
     return syncOnChangeAfterTime;
@@ -566,7 +596,8 @@ void SyncProfile::setSyncDirection(SyncDirection aDirection)
 {
     QString dirStr;
 
-    switch (aDirection) {
+    switch (aDirection)
+    {
     case SYNC_DIRECTION_TWO_WAY:
         dirStr = VALUE_TWO_WAY;
         break;
@@ -586,9 +617,12 @@ void SyncProfile::setSyncDirection(SyncDirection aDirection)
     }
 
     Profile *client = clientProfile();
-    if (client) {
+    if (client)
+    {
         client->setKey(KEY_SYNC_DIRECTION, dirStr);
-    } else {
+    }
+    else
+    {
         LOG_WARNING("Profile" << name() << "has no client profile");
         LOG_WARNING("Failed to set sync direction");
     }
@@ -600,15 +634,21 @@ SyncProfile::ConflictResolutionPolicy SyncProfile::conflictResolutionPolicy() co
     QString policyStr;
 
     const Profile *client = clientProfile();
-    if (client) {
+    if (client)
+    {
         policyStr = client->key(KEY_CONFLICT_RESOLUTION_POLICY);
-    }
+    } // no else
 
-    if (policyStr == VALUE_PREFER_REMOTE) {
+    if (policyStr == VALUE_PREFER_REMOTE)
+    {
         policy = CR_POLICY_PREFER_REMOTE_CHANGES;
-    } else if (policyStr == VALUE_PREFER_LOCAL) {
+    }
+    else if (policyStr == VALUE_PREFER_LOCAL)
+    {
         policy = CR_POLICY_PREFER_LOCAL_CHANGES;
-    } else {
+    }
+    else
+    {
         policy = CR_POLICY_UNDEFINED;
     }
 
@@ -619,7 +659,8 @@ void SyncProfile::setConflictResolutionPolicy(ConflictResolutionPolicy aPolicy)
 {
     QString policyStr;
 
-    switch (aPolicy) {
+    switch (aPolicy)
+    {
     case CR_POLICY_PREFER_REMOTE_CHANGES:
         policyStr = VALUE_PREFER_REMOTE;
         break;
@@ -635,9 +676,12 @@ void SyncProfile::setConflictResolutionPolicy(ConflictResolutionPolicy aPolicy)
     }
 
     Profile *client = clientProfile();
-    if (client) {
+    if (client)
+    {
         client->setKey(KEY_CONFLICT_RESOLUTION_POLICY, policyStr);
-    } else {
+    }
+    else
+    {
         LOG_WARNING("Profile" << name() << "has no client profile");
         LOG_WARNING("Failed to set conflict resolution policy");
     }
@@ -659,9 +703,10 @@ SyncProfile::CurrentSyncStatus SyncProfile::currentSyncStatus() const
     const SyncResults *syncResult = lastResults();
     SyncProfile::CurrentSyncStatus syncStatus = SyncProfile::SYNC_NEVER_HAPPENED;
 
-    if (syncResult) {
+    if (syncResult)
+    {
         if ((syncResult->majorCode() == SyncResults::SYNC_RESULT_SUCCESS) &&
-                (syncResult->minorCode() == SyncResults::NO_ERROR))
+            (syncResult->minorCode() == SyncResults::NO_ERROR))
             syncStatus = SyncProfile::SYNC_SUCCESS;
         else if (syncResult->majorCode() == SyncResults::SYNC_RESULT_FAILED)
             syncStatus = SyncProfile::SYNC_FAILED;

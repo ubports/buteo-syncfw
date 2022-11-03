@@ -1,5 +1,6 @@
 TEMPLATE = lib
-TARGET = buteosyncfw5
+equals(QT_MAJOR_VERSION, 4): TARGET = buteosyncfw
+equals(QT_MAJOR_VERSION, 5): TARGET = buteosyncfw5
 DEPENDPATH += . clientfw  common  pluginmgr  profile
 INCLUDEPATH += . clientfw  common  pluginmgr  profile
 
@@ -16,8 +17,6 @@ CONFIG += dll \
 
 #DEFINES += BUTEO_ENABLE_DEBUG
 
-DEFINES += DEFAULT_PLUGIN_PATH=\"\\\"$$[QT_INSTALL_LIBS]/buteo-plugins-qt5\\\"\"
-
 # Input
 HEADERS += common/Logger.h \
            common/LogMacros.h \
@@ -33,12 +32,9 @@ HEADERS += common/Logger.h \
            pluginmgr/PluginManager.h \
            pluginmgr/ServerPlugin.h \
            pluginmgr/StorageChangeNotifierPlugin.h \
-           pluginmgr/StorageChangeNotifierPluginLoader.h \
            pluginmgr/StorageItem.h \
            pluginmgr/StoragePlugin.h \
-           pluginmgr/StoragePluginLoader.h \
            pluginmgr/SyncPluginBase.h \
-           pluginmgr/SyncPluginLoader.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
@@ -69,7 +65,6 @@ SOURCES += common/Logger.cpp \
            pluginmgr/StorageItem.cpp \
            pluginmgr/StoragePlugin.cpp \
            pluginmgr/SyncPluginBase.cpp \
-           pluginmgr/SyncPluginLoader.cpp \
            profile/BtHelper.cpp \
            profile/Profile.cpp \
            profile/ProfileFactory.cpp \
@@ -104,8 +99,17 @@ QMAKE_CLEAN += $(OBJECTS_DIR)/moc_*
 QMAKE_CLEAN += lib$${TARGET}.prl pkgconfig/*
 
 # install
-target.path = $$[QT_INSTALL_LIBS]
-headers.path = /usr/include/buteosyncfw5/
+target.path  = $${LIBDIR}
+
+equals(QT_MAJOR_VERSION, 4): headers.path = /usr/include/buteosyncfw
+equals(QT_MAJOR_VERSION, 5): headers.path = /usr/include/buteosyncfw5
+
+sources.path = /usr/include/buteosyncfw5/
+
+sources.files = pluginmgr/plugin_main.cpp \
+                pluginmgr/PluginServiceObj.cpp \
+                pluginmgr/ButeoPluginIfaceAdaptor.cpp \
+                pluginmgr/PluginCbImpl.cpp
 
 headers.files = common/Logger.h \
            common/LogMacros.h \
@@ -121,13 +125,13 @@ headers.files = common/Logger.h \
            pluginmgr/PluginManager.h \
            pluginmgr/ServerPlugin.h \
            pluginmgr/StorageChangeNotifierPlugin.h \
-           pluginmgr/StorageChangeNotifierPluginLoader.h \
            pluginmgr/StorageItem.h \
            pluginmgr/StoragePlugin.h \
-           pluginmgr/StoragePluginLoader.h \
            pluginmgr/SyncPluginBase.h \
-           pluginmgr/SyncPluginLoader.h \
+           pluginmgr/PluginServiceObj.h \
+           pluginmgr/ButeoPluginIfaceAdaptor.h \
            pluginmgr/ButeoPluginIface.h \
+           pluginmgr/PluginCbImpl.h \
            profile/BtHelper.h \
            profile/Profile.h \
            profile/Profile_p.h \
@@ -143,12 +147,15 @@ headers.files = common/Logger.h \
            profile/SyncSchedule_p.h \
            profile/TargetResults.h
 
-INSTALLS += target headers
+utility.path = /opt/tests/buteo-syncfw
+utility.files = ../bin/*.pl \
+    ../bin/*.sh
+
+INSTALLS += target headers utility sources
 
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 QMAKE_PKGCONFIG_LIBDIR  = $$target.path
 QMAKE_PKGCONFIG_INCDIR  = $$headers.path
-QMAKE_PKGCONFIG_VERSION = $$VERSION
 pkgconfig.files = $${TARGET}.pc
 
 # #####################################################################

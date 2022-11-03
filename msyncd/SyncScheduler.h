@@ -32,8 +32,6 @@
 #endif
 #include <QObject>
 #include <QMap>
-#include <QSet>
-#include <QString>
 #include <QDateTime>
 #include <ctime>
 
@@ -45,7 +43,7 @@ class IPHeartBeat;
 #endif
 
 namespace Buteo {
-
+    
 class SyncSession;
 class SyncSchedulerTest;
 class SyncProfile;
@@ -59,7 +57,7 @@ public:
 
     //! \brief Constructor.
     SyncScheduler(QObject *aParent = 0);
-
+    
     /**
      * \brief Destructor
      */
@@ -77,14 +75,14 @@ public:
      * \param aProfile Profile to add to scheduler.
      * \return Success indicator.
      */
-    bool addProfile(const SyncProfile *aProfile);
+    bool addProfile(const SyncProfile* aProfile);
 
     /* Schedule a retry for a failed sync if the profile has retries enabled
      *
      * @param aProfile sync profile
      * @param aNExtSyncTime retry after this duration
      */
-    void addProfileForSyncRetry(const SyncProfile *aProfile, QDateTime aNextSyncTime);
+    void addProfileForSyncRetry(const SyncProfile* aProfile, QDateTime aNextSyncTime);
 
     /*! \brief Removes the profile with the given name from the scheduler.
      *
@@ -95,35 +93,21 @@ public:
      */
     void removeProfile(const QString &aProfileName);
 
-public slots:
-    /*! \brief Handles the sync status change signal from the synchronizer
-     *
-     * This allows the SyncScheduler to appropriately wait() or stop() any background
-     * activity which is preventing device suspend.
-     *
-     * @param aProfileName Name of the profile
-     * @param aStatus Status of the sync
-     * @param aMessage Status message as a string
-     * @param aMoreDetails In case of failure, contains detailed reason
-     */
-    void syncStatusChanged(const QString &aProfileName, int aStatus,
-                           const QString &aMessage, int aMoreDetails);
-
 private slots:
 
 #ifndef USE_KEEPALIVE
     /**
      * \brief Performs needed actions when scheduled alarm is triggered
-     *
+     * 
      * @param aAlarmEventID an ID that identifies the triggered alarm event
      */
 
     void doAlarmActions(int aAlarmEventID);
 #endif
-
+    
     /**
      * \brief Performs needed actions when a IP heart beat is triggered
-     *
+     * 
      * @param aProfileName Name of the profile on which heart beat received
      */
     void doIPHeartbeatActions(QString aProfileName);
@@ -134,7 +118,7 @@ private slots:
      *
      * @param aProfileName Name of the profile to reschedule
      */
-    void rescheduleBackgroundActivity(const QString &aProfileName);
+    void rescheduleBackgroundActivity(const QString& aProfileName);
 #endif
 
 signals:
@@ -150,19 +134,19 @@ signals:
      *
      * \param aProfileName Name of the profile.
      */
-    void externalSyncChanged(QString aProfileName, bool aQuery = false);
+    void externalSyncChanged(const SyncProfile* aProfile, bool aQuery=false);
 
 private: // functions
-
+    
     /**
      * \brief Programs next alarm event to alarmd.
-     *
+     * 
      * @param aProfile The profile for which the alarm is programmed
      * @param aNextSyncTime use if provided, otherwise fetch the info from the profile
      * @return Unique alarm event ID or 0 in failure case.
      */
-    int setNextAlarm(const SyncProfile *aProfile, QDateTime aNextSyncTime = QDateTime());
-
+    int setNextAlarm(const SyncProfile* aProfile, QDateTime aNextSyncTime = QDateTime());
+    
     /**
      * \brief Creates a DBUS adaptor for the scheduler
      */
@@ -174,16 +158,15 @@ private: // functions
      * @param aAlarmEventID ID of the alarm to be removed
      */
     void removeAlarmEvent(int aAlarmEvent);
-
+    
     /**
      * \brief A convenience method that removes all alarms from alarmd queue
      */
     void removeAllAlarms();
 #endif
-
+    
 private: // data
 
-    QSet<QString> iActiveBackgroundSyncProfiles;
 #ifdef USE_KEEPALIVE
     /// BackgroundSync management object
     BackgroundSync *iBackgroundActivity;
@@ -193,10 +176,10 @@ private: // data
     QMap<QString, int> iSyncScheduleProfiles;
 
     /// Alarm factory object
-    SyncAlarmInventory *iAlarmInventory;
+    SyncAlarmInventory      *iAlarmInventory;
 
     /// IP Heartbeat management object
-    IPHeartBeat *iIPHeartBeatMan;
+    IPHeartBeat* iIPHeartBeatMan;
 #endif
 
 #ifdef SYNCFW_UNIT_TESTS

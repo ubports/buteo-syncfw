@@ -24,7 +24,6 @@
 #define TARGETRESULTS_H
 
 #include <QString>
-#include <QList>
 
 class QDomDocument;
 class QDomElement;
@@ -32,10 +31,10 @@ class QDomElement;
 namespace Buteo {
 
 class TargetResultsPrivate;
-
+    
 //! \brief Container for number of items added, deleted and modified.
 struct ItemCounts {
-    //! No. of Items added
+	//! No. of Items added
     unsigned added;
 
     //! No. of Items deleted
@@ -60,17 +59,6 @@ struct ItemCounts {
 class TargetResults
 {
 public:
-    enum ItemOperation {
-        ITEM_ADDED,
-        ITEM_DELETED,
-        ITEM_MODIFIED
-    };
-
-    enum ItemOperationStatus {
-        ITEM_OPERATION_SUCCEEDED,
-        ITEM_OPERATION_FAILED
-    };
-
     /*! \brief Copy constructor.
      *
      * \param aSource Copy source.
@@ -83,8 +71,8 @@ public:
      * \param aLocalItems Counts of local items.
      * \param aRemoteItems Counts of remote items.
      */
-    TargetResults(const QString &aTargetName, ItemCounts aLocalItems = ItemCounts(),
-                  ItemCounts aRemoteItems = ItemCounts());
+    TargetResults(const QString &aTargetName, ItemCounts aLocalItems,
+                  ItemCounts aRemoteItems);
 
     /*! \brief Constructs TargetResults from XML.
      *
@@ -100,7 +88,7 @@ public:
      *
      * \param aRhs Source.
      */
-    TargetResults &operator=(const TargetResults &aRhs);
+    TargetResults& operator=(const TargetResults &aRhs);
 
     /*! \brief Exports the target results to XML.
      *
@@ -128,78 +116,6 @@ public:
      * \return Item counts.
      */
     ItemCounts remoteItems() const;
-
-    /*! \brief Add some details on the local changes done during the sync process.
-     *
-     * Provide additional information per item basis on the local changes
-     * done during the sync process. If the operation succeeded, the associated
-     * item count is increase by one.
-     *
-     * \param aUid A way for a sync plugin to identify the changed item.
-     * \param aOperation The operation done on the item (addition, deletion
-     *  or modification).
-     * \param aStatus Particular status for this item sync operation.
-     * \param aMessage Additional information related to this item operation.
-     */
-    void addLocalDetails(const QString &aUid,
-                         ItemOperation aOperation,
-                         ItemOperationStatus aStatus = ITEM_OPERATION_SUCCEEDED,
-                         const QString &aMessage = QString());
-
-    /*! \brief Add some details on the remote changes done during the sync process.
-     *
-     * Provide additional information per item basis on the remote changes
-     * done during the sync process. If the operation succeeded, the associated
-     * item count is increase by one.
-     *
-     * \param aUid A way for a sync plugin to identify the changed item.
-     * \param aOperation The operation done on the item (addition, deletion
-     *  or modification).
-     * \param aStatus Particular status for this item sync operation.
-     * \param aMessage Additional information related to this item operation.
-     */
-    void addRemoteDetails(const QString &aUid,
-                          ItemOperation aOperation,
-                          ItemOperationStatus aStatus = ITEM_OPERATION_SUCCEEDED,
-                          const QString &aMessage = QString());
-
-    /*! \brief Gets the details, if any for changes done local during a sync process.
-     *
-     * \param aOperation The operation the details are related to (addition,
-     *  deletion or modification).
-     * \param aStatus The kind of status for the operation (success or failure).
-     * \return A list of UIDs that correspond to this operation and status.
-     *         The meaning of these UIDs is defined by the SyncPlugin
-     *         which generated the log.
-     */
-    QList<QString> localDetails(ItemOperation aOperation,
-                                ItemOperationStatus aStatus) const;
-
-    /*! \brief Gets a possible message related to the a given item.
-     *
-     * \param aUid A UID as returned by localDetails().
-     * \return A message stored in the log related to this particular item.
-     */
-    QString localMessage(const QString &aUid) const;
-
-    /*! \brief Gets the details, if any for changes done remote during a sync process.
-     *
-     * \param aOperation The operation the details are related to (addition,
-     *  deletion or modification).
-     * \param aStatus The kind of status for the operation (success or failure).
-     * \return A list of UIDs that correspond to this operation and status.
-     *         The meaning of these UIDs is defined by the SyncPlugin
-     *         which generated the log.
-     */
-    QList<QString> remoteDetails(ItemOperation aOperation,
-                                 ItemOperationStatus aStatus) const;
-
-    /*! \brief Gets a possible message related to the a given item.
-     *
-     * \param aUid A UID as returned by remoteDetails().
-     * \return A message stored in the log related to this particular item.
-     */
-    QString remoteMessage(const QString &aUid) const;
 
 private:
 

@@ -3,12 +3,11 @@ TEMPLATE = subdirs
 SUBDIRS += \
     libbuteosyncfw \
     msyncd \
-    oopp-runner \
     unittests \
+    tools \
     doc
 
 msyncd.depends = libbuteosyncfw
-oopp-runner.depends = libbuteosyncfw
 unittests.depends = libbuteosyncfw msyncd
 
 coverage.CONFIG += recursive

@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QString>
 
-namespace Buteo {
+namespace Buteo
+{
 
 /*! \brief Implement this class to notify about changes in
  * a specific storage - contacts/calendar/sms, or even custom
@@ -15,16 +16,16 @@ class StorageChangeNotifierPlugin : public QObject
 {
     Q_OBJECT
 
-public:
+public: 
     /*! \brief constructor
      * @param aStorageName pass the well known sync storage name
      */
-    StorageChangeNotifierPlugin(const QString &aStorageName):
-        iStorageName(aStorageName) {}
+    StorageChangeNotifierPlugin(const QString& aStorageName):
+    iStorageName(aStorageName){}
 
     /*! \brief destructor
      */
-    virtual ~StorageChangeNotifierPlugin() {}
+    virtual ~StorageChangeNotifierPlugin(){};
 
     /*! \brief the name should be a well-known name
      * which buteo sync-fw knows about as a storage that
@@ -45,7 +46,7 @@ public:
      * received, either via a signal or by calling hasChanges()
      * manually
      */
-    virtual void changesReceived() = 0;
+    virtual void changesReceived() = 0; 
 
     /*! \brief Enable listening to storage changes
      */

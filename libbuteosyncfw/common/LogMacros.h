@@ -49,10 +49,10 @@
 # define LOG_TRACE(msg) if (Buteo::Logger::instance()->getLogLevel() >= 8) qDebug() << msg
 # define LOG_TRACE_PLAIN(msg) if (Buteo::Logger::instance()->getLogLevel() >= 8) qDebug() << msg
 
-/*!
- * Creates a trace message to log when the function is entered and exited.
- * Logs also to time spent in the function.
- */
+ /*!
+  * Creates a trace message to log when the function is entered and exited.
+  * Logs also to time spent in the function.
+  */
 # define FUNCTION_CALL_TRACE QScopedPointer<Buteo::LogTimer> timerDebugVariable; \
     if (Buteo::Logger::instance()->getLogLevel() >= 9) \
         timerDebugVariable.reset(new Buteo::LogTimer(QString(__PRETTY_FUNCTION__)));
@@ -83,7 +83,7 @@ public:
     ~LogTimer()
     {
         LOG_TRACE_PLAIN(iFunc << ":Exit, execution time:" << iTimer.elapsed()
-                        << "ms");
+            << "ms");
     }
 
 private:

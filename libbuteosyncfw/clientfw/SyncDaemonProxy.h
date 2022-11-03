@@ -51,9 +51,7 @@ class SyncDaemonProxy: public QDBusAbstractInterface
 public:
     //! \brief  returns Interface Name
     static inline const char *staticInterfaceName()
-    {
-        return "com.meego.msyncd";
-    }
+    { return "com.meego.msyncd"; }
 
 public:
     //! \see SyncDBusInterface::SyncDBusInterface()
@@ -195,7 +193,7 @@ public Q_SLOTS: // METHODS
         argumentList << qVariantFromValue(aProfileId);
         return callWithArgumentList(QDBus::Block, QLatin1String("syncProfile"), argumentList);
     }
-
+    
     //! \see SyncDBusInterface::syncProfilesByKey
     inline QDBusPendingReply<QStringList> syncProfilesByKey(const QString &aKey, const QString &aValue)
     {
@@ -203,7 +201,7 @@ public Q_SLOTS: // METHODS
         argumentList << qVariantFromValue(aKey) << qVariantFromValue(aValue);
         return asyncCallWithArgumentList(QLatin1String("syncProfilesByKey"), argumentList);
     }
-
+    
     //! \see SyncDBusInterface::syncProfilesByType
     inline QDBusPendingReply<QStringList> syncProfilesByType(const QString &aType)
     {
@@ -244,8 +242,7 @@ Q_SIGNALS: // SIGNALS
     void syncStatus(const QString &aProfileName, int aStatus, const QString &aMessage, int aErrorCode);
 
     //! \see SyncDBusInterface::transferProgress()
-    void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType,
-                          int aCommittedItems);
+    void transferProgress(const QString &aProfileName, int aTransferDatabase, int aTransferType, const QString &aMimeType, int aCommittedItems);
 };
 
 #endif

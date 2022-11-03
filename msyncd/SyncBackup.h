@@ -37,7 +37,7 @@ namespace Buteo {
 class SyncBackup : public SyncBackupProxy // Derived from QObject
 {
     Q_OBJECT
-
+	  
 public:
     /*!
      * \brief Default Constructor
@@ -50,7 +50,7 @@ public:
     ~SyncBackup ();
 
     //! \brief  path to the backup dbus object
-    static const char *DBUS_BACKUP_OBJECT;
+    static const char* DBUS_BACKUP_OBJECT;
 
     /*!
      * \brief Requests the current state og backup/restore operation.
@@ -62,45 +62,45 @@ public:
     */
     void sendReply (uchar aResult);
 
-signals:
+signals :
 
 public slots:
-    //  From backup framework ...
+	//  From backup framework ...
 
     /*! \brief Called by backup framework when backup starts
-    * @param message - result
-    * @return uchar
-    */
+	* @param message - result
+	* @return uchar
+	*/
     uchar backupStarts(const QDBusMessage &message);
 
     /*! Called by backup framework when backup is completed
     * @param message - result
-    * @return uchar
-    */
+	* @return uchar
+	*/
     uchar backupFinished(const QDBusMessage &message);
 
     /*! Called by backup framework when it starts to restore a backup.
     * @param message - result
-    * @return uchar
-    */
+	* @return uchar
+	*/
     uchar restoreStarts(const QDBusMessage &message);
 
     /*! Called by backup framework when backup ie restored
     * @param message - result
-    * @return uchar
-    */
+	* @return uchar
+	*/
     uchar restoreFinished(const QDBusMessage &message);
 
     /*! Called if backup service exits/aborts...
     * @param serviceName - name of the service
     */
-    void backupServiceUnregistered(const QString  &serviceName);
+    void backupServiceUnregistered(const QString  &serviceName); 
 
 private :
-    bool iBackupRestore;
-    QDBusMessage *iReply;
-    QDBusServiceWatcher *iWatchService;
-    SyncBackupAdaptor *iAdaptor;
+    bool iBackupRestore;	    
+    QDBusMessage *iReply; 
+    QDBusServiceWatcher *iWatchService;  
+    SyncBackupAdaptor *iAdaptor;  
     // Reply to backup dbus framework that response will
     // be delayed
     uchar sendDelayReply (const QDBusMessage &message);

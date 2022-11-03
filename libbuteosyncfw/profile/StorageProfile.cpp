@@ -51,20 +51,20 @@ StorageProfilePrivate::StorageProfilePrivate(
 }
 
 StorageProfile::StorageProfile(const QString &aName)
-    :   Profile(aName, Profile::TYPE_STORAGE),
-        d_ptr(new StorageProfilePrivate())
+:   Profile(aName, Profile::TYPE_STORAGE),
+    d_ptr(new StorageProfilePrivate())
 {
 }
 
 StorageProfile::StorageProfile(const QDomElement &aRoot)
-    :   Profile(aRoot),
-        d_ptr(new StorageProfilePrivate())
+:   Profile(aRoot),
+    d_ptr(new StorageProfilePrivate())
 {
 }
 
 StorageProfile::StorageProfile(const StorageProfile &aSource)
-    :   Profile(aSource),
-        d_ptr(new StorageProfilePrivate(*aSource.d_ptr))
+:   Profile(aSource),
+    d_ptr(new StorageProfilePrivate(*aSource.d_ptr))
 {
 }
 

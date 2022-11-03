@@ -36,7 +36,7 @@ class PluginCbInterface;
  */
 class ClientPlugin : public SyncPluginBase
 {
-    Q_OBJECT
+    Q_OBJECT;
 
 public:
 
@@ -46,9 +46,9 @@ public:
      * @param aProfile Sync profile for the client
      * @param aCbInterface Pointer to the callback interface
      */
-    ClientPlugin(const QString &aPluginName,
-                 const SyncProfile &aProfile,
-                 PluginCbInterface *aCbInterface);
+    ClientPlugin( const QString& aPluginName,
+                  const SyncProfile& aProfile,
+                  PluginCbInterface* aCbInterface );
 
     /*! \brief Destructor
      *
@@ -65,14 +65,15 @@ public:
 
     /*! \brief access to profile owned and used by this instance
      */
-    SyncProfile &profile()
-    {
-        return iProfile;
-    }
+    SyncProfile &profile() { return iProfile; }
 
 protected:
+
     //! Sync Profile Object that the plugin is currently operating on
     SyncProfile iProfile;
+
+private:
+
 };
 
 }

@@ -2,7 +2,7 @@
  * This file is part of buteo-syncfw package
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
- * Copyright (C) 2015 Jolla Ltd.
+ * Copyright (C) 2015 Jolla Ltd
  *
  * Contact: Sateesh Kavuri <sateesh.kavuri@nokia.com>
  *
@@ -122,8 +122,7 @@ bool SyncDBusAdaptor::saveSyncResults(const QString &aProfileId, const QString &
 {
     // handle method call com.meego.msyncd.saveSyncResults
     bool out0;
-    QMetaObject::invokeMethod(parent(), "saveSyncResults", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId),
-                              Q_ARG(QString, aSyncResults));
+    QMetaObject::invokeMethod(parent(), "saveSyncResults", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId), Q_ARG(QString, aSyncResults));
     return out0;
 }
 
@@ -131,8 +130,7 @@ bool SyncDBusAdaptor::setSyncSchedule(const QString &aProfileId, const QString &
 {
     // handle method call com.meego.msyncd.setSyncSchedule
     bool out0;
-    QMetaObject::invokeMethod(parent(), "setSyncSchedule", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId),
-                              Q_ARG(QString, aScheduleAsXml));
+    QMetaObject::invokeMethod(parent(), "setSyncSchedule", Q_RETURN_ARG(bool, out0), Q_ARG(QString, aProfileId), Q_ARG(QString, aScheduleAsXml));
     return out0;
 }
 
@@ -174,8 +172,7 @@ QStringList SyncDBusAdaptor::syncProfilesByKey(const QString &aKey, const QStrin
 {
     // handle method call com.meego.msyncd.syncProfilesByKey
     QStringList out0;
-    QMetaObject::invokeMethod(parent(), "syncProfilesByKey", Q_RETURN_ARG(QStringList, out0), Q_ARG(QString, aKey),
-                              Q_ARG(QString, aValue));
+    QMetaObject::invokeMethod(parent(), "syncProfilesByKey", Q_RETURN_ARG(QStringList, out0), Q_ARG(QString, aKey), Q_ARG(QString, aValue));
     return out0;
 }
 
@@ -213,8 +210,7 @@ QString SyncDBusAdaptor::createSyncProfileForAccount(uint aAccountId)
 {
     // handle method call com.meego.msyncd.createSyncProfileForAccount
     QString out0;
-    QMetaObject::invokeMethod(parent(), "createSyncProfileForAccount", Q_RETURN_ARG(QString, out0), Q_ARG(uint,
-                                                                                                          aAccountId));
+    QMetaObject::invokeMethod(parent(), "createSyncProfileForAccount", Q_RETURN_ARG(QString, out0), Q_ARG(uint, aAccountId));
     return out0;
 }
 

@@ -26,7 +26,7 @@
 #include <QQueue>
 
 namespace Buteo {
-
+    
 class SyncSession;
 
 /*! \brief Class for queuing sync sessions.
@@ -84,13 +84,13 @@ public:
      *
      * \return Is the profile in the queue.
      */
-    const QList<SyncSession *> &getQueuedSyncSessions() const;
+    const QList<SyncSession*>& getQueuedSyncSessions() const;
 
 private:
 
     void sort();
 
-    QQueue<SyncSession *> iItems;
+    QQueue<SyncSession*> iItems;
 };
 
 }

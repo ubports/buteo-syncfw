@@ -27,60 +27,60 @@
 using namespace Buteo;
 
 SyncClientInterface::SyncClientInterface():
-    d_ptr(new SyncClientInterfacePrivate(this))
+		d_ptr(new SyncClientInterfacePrivate(this))
 {
 
 }
 
 SyncClientInterface::~SyncClientInterface()
 {
-    delete d_ptr;
-    d_ptr = nullptr;
+	delete d_ptr;
+	d_ptr = NULL;
 }
 
 bool SyncClientInterface::startSync(const QString &aProfileId) const
 {
-    return d_ptr->startSync(aProfileId);
+	return d_ptr->startSync(aProfileId);
 }
 
 void SyncClientInterface::abortSync(const QString &aProfileId) const
 {
-    d_ptr->abortSync(aProfileId);
+	d_ptr->abortSync(aProfileId);
 }
 
 QStringList SyncClientInterface::getRunningSyncList()
 {
-    return d_ptr->getRunningSyncList();
+	return d_ptr->getRunningSyncList();
 }
 
 bool SyncClientInterface::removeProfile(QString &aProfileId)
 {
-    return d_ptr->removeProfile(aProfileId);
+	return d_ptr->removeProfile(aProfileId);
 }
 
 bool SyncClientInterface::updateProfile(Buteo::SyncProfile &aProfile)
 {
-    return d_ptr->updateProfile(aProfile);
+	return d_ptr->updateProfile(aProfile);
 }
 
-bool SyncClientInterface::setSyncSchedule(QString &aProfileId, SyncSchedule &aSchedule)
+bool SyncClientInterface::setSyncSchedule(QString &aProfileId,SyncSchedule &aSchedule)
 {
-    return d_ptr->setSyncSchedule(aProfileId, aSchedule);
+	return d_ptr->setSyncSchedule(aProfileId,aSchedule);
 }
 
-bool SyncClientInterface::saveSyncResults(const QString &aProfileId, const Buteo::SyncResults &aSyncResults)
+bool SyncClientInterface::saveSyncResults(const QString &aProfileId,const Buteo::SyncResults &aSyncResults)
 {
-    return d_ptr->saveSyncResults(aProfileId, aSyncResults);
+    return d_ptr->saveSyncResults(aProfileId,aSyncResults);
 }
 
 bool SyncClientInterface::getBackUpRestoreState()
 {
-    return d_ptr->getBackUpRestoreState();
+	return d_ptr->getBackUpRestoreState();
 }
 
 bool SyncClientInterface::isValid()
 {
-    return d_ptr->isValid();
+	return d_ptr->isValid();
 }
 
 Buteo::SyncResults SyncClientInterface::getLastSyncResult(const QString &aProfileId)

@@ -34,11 +34,11 @@ class QDomDocument;
 class QDomElement;
 
 namespace Buteo {
-
+    
 class ProfileTest;
 class ProfilePrivate;
 
-
+    
 /*! \brief This class represents a single profile, a collection of settings or
  *  data releated to some entity.
  *
@@ -63,11 +63,11 @@ public:
     //static const QString TYPE_SERVICE;
     //! Sync type
     static const QString TYPE_SYNC;
-
-    /*! \brief Default Constructor
-     *
-     */
-    Profile();
+	
+   /*! \brief Default Constructor
+    *
+    */
+   Profile();
 
 
     /*! \brief Constructs a Profile object with given name and type.
@@ -116,7 +116,7 @@ public:
      * \param aName Name of the profile.
      */
     virtual void setName(const QString &aName);
-
+    
     /*! \brief Sets the name of the profile.
      *
      * \param aKeys Keys required to generate the profile name.
@@ -240,7 +240,7 @@ public:
      *
      * \return List of pointers to the fields.
      */
-    QList<const ProfileField *> allFields() const;
+    QList<const ProfileField*> allFields() const;
 
     /*! \brief Gets all visible fields of the profile.
      *
@@ -248,7 +248,7 @@ public:
      * fields that are visible.
      * \return List of pointers to the visible fields.
      */
-    QList<const ProfileField *> visibleFields() const;
+    QList<const ProfileField*> visibleFields() const;
 
     /*! \brief Checks if the profile is valid.
      *
@@ -305,14 +305,14 @@ public:
      * \return List of sub-profiles. The returned sub-profiles are owned by the main
      *  profile and the user must not delete them.
      */
-    QList<Profile *> allSubProfiles();
+    QList<Profile*> allSubProfiles();
 
     /*! \brief Gets all sub-profiles as const
      *
      * \return List of sub-profiles. The returned sub-profiles are const and are owned by the main
      *  profile and the user must not delete them.
      */
-    QList<const Profile *> allSubProfiles() const;
+    QList<const Profile*> allSubProfiles() const;
 
     /*! \brief Merges a profile to this profile.
      *
@@ -373,7 +373,7 @@ public:
 
 private:
 
-    Profile &operator=(const Profile &aRhs);
+    Profile& operator=(const Profile &aRhs);
 
     ProfilePrivate *d_ptr;
 
@@ -382,7 +382,7 @@ private:
      * \param aKeys List of keys to generate profile id
      * \returns Profile name
      *
-     */
+     */ 
     QString generateProfileId(const QStringList &aKeys);
 
 #ifdef SYNCFW_UNIT_TESTS
