@@ -5,7 +5,8 @@ Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 XSBC-Original-Maintainer: Duggirala Karthik <karthik.2.duggirala@nokia.com>
 Build-Depends: debhelper (>= 9),
                doxygen,
-               libaccounts-qt5-dev, 
+               libaccounts-qt5-dev,
+               libbluetooth-dev,
                libdbus-1-dev,
                libglib2.0-dev,
                libgsettings-qt-dev,
